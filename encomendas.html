@@ -1,0 +1,165 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cardápio de Encomendas | Martins Confeitaria</title><link rel="icon" href="assets/logo.png"><link rel="stylesheet" href="style.css"><style>
+.kit-included-grid{display:grid;gap:.65rem;margin:.8rem 0}.kit-included-option{display:flex;align-items:center;gap:.65rem;position:relative}.kit-included-option input{accent-color:currentColor}.kit-included-option small{margin-left:auto;opacity:.7}.kit-choice-help{margin:.7rem 0 0}.kit-fixed-cake{display:grid;gap:.3rem;margin:.8rem 0;padding:1rem;border-radius:14px}.kit-fixed-cake strong{font-size:1.05rem}.other-order-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:1rem}.other-order-list .brigadeiro-box{display:grid;align-content:start;gap:.6rem}.other-order-list label{display:grid;gap:.35rem}.other-order-list input,.other-order-list select{width:100%;padding:.7rem;border:1px solid var(--line,#ddd);border-radius:10px}.other-price{font-weight:700;margin:0}
+
+.custom-photo-panel{position:relative;width:100vw;height:58svh;min-height:380px;max-height:760px;margin:0 calc(50% - 50vw) 55px;background-size:cover;background-position:center; background-repeat:no-repeat;overflow:hidden;border-radius:0;box-shadow:0 18px 55px rgba(43,120,150,.12)}
+.custom-photo-panel:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,20,20,.05),rgba(20,20,20,.18))}
+@media(max-width:560px){.custom-photo-panel{height:48svh;min-height:300px;margin-bottom:40px;background-position:center}}
+</style>
+</head><body>
+<header class="top"><a class="brand" href="index.html#inicio"><img src="assets/logo.png" alt="Martins Confeitaria"><span>Martins Confeitaria</span></a><nav><a href="index.html#bolo">Voltar ao site</a><a href="index.html#cardapio">Cardápio</a></nav></header>
+<main><section class="custom-page">
+<div class="section-head reveal"><span class="eyebrow">CARDÁPIO DE ENCOMENDAS</span><h1>Monte sua encomenda 🎂</h1><p>Escolha Naked Cake ou Chantininho, o tamanho, 1 massa, exatamente 2 recheios e complete com adicionais e personalização.</p></div><form id="cakeForm" class="form cake-builder custom-builder"><fieldset class="extras cake-sizes" id="cakeSizeSection"><legend>Escolha seu bolo — quantidade de pessoas e valor</legend><div id="cakeType"></div></fieldset><div id="kitCakeFixed" class="kit-fixed-cake" hidden></div><input type="hidden" name="Kit bolo definido" id="kitCakeValue"><label>Massa<select name="Massa" id="cakeMass" required></select></label><fieldset class="extras"><legend>Recheios — escolha exatamente 2</legend><div id="cakeFillings"></div></fieldset><fieldset class="extras"><legend>Adicionais</legend><div id="cakeExtras"></div></fieldset><fieldset class="extras"><legend>Personalização</legend><div id="cakePersonalizations"></div></fieldset><label>Nome<input name="Nome" required></label><label>WhatsApp<input name="WhatsApp" type="tel" required></label><label>Data desejada<input name="Data desejada" type="date" required></label><label class="full-label">Observações<textarea name="Observações"></textarea></label><div class="cake-total">Total estimado: <strong id="cakeTotal">R$ 0,00</strong></div><section class="extras kit-section"><div class="section-head"><span class="eyebrow">KITS FESTA</span><h2>Escolha seu Kit</h2><p>Ao escolher um Kit, os itens que fazem parte dele serão marcados automaticamente na personalização.</p></div><div id="kitOptions" class="kit-options"></div><div id="kitIncluded" class="kit-included" hidden></div></section><section class="extras brigadeiro-section" id="brigadeiroSection"><div class="section-head"><span class="eyebrow">DOCINHOS</span><h2>Docinhos</h2><p>Escolha uma linha, a quantidade e depois os sabores.</p></div><div class="brigadeiro-list"><div class="brigadeiro-box"><h3>Linha Clássica</h3><div class="brigadeiro-quantities"><label class="extra-option"><input type="radio" name="brig-line" value="Clássica"> <span>50 unidades</span><strong>R$ 62,50</strong></label><label class="extra-option"><input type="radio" name="brig-line" value="Clássica100"> <span>100 unidades</span><strong>R$ 125,00</strong></label></div><p class="brig-help">50 unidades: até 2 sabores • 100 unidades: até 4 sabores</p><div id="brig-classica"></div></div><div class="brigadeiro-box"><h3>Linha Premium</h3><div class="brigadeiro-quantities"><label class="extra-option"><input type="radio" name="brig-line" value="Premium"> <span>50 unidades</span><strong>R$ 72,50</strong></label><label class="extra-option"><input type="radio" name="brig-line" value="Premium100"> <span>100 unidades</span><strong>R$ 145,00</strong></label></div><p class="brig-help">50 unidades: até 2 sabores • 100 unidades: até 4 sabores</p><div id="brig-premium"></div></div></div></section>
+<section class="extras other-orders-section" id="otherOrders"><div class="section-head"><span class="eyebrow">OUTRAS ENCOMENDAS</span><h2>Outros itens</h2><p>Escolha as quantidades. O valor por unidade é atualizado automaticamente conforme a quantidade.</p></div>
+<div class="other-order-list">
+ <div class="brigadeiro-box"><h3>Petit Brownie</h3><p>Quadradinho de brownie com uma pitanga de brigadeiro na caixeta de docinho.</p><label>Quantidade<select name="Petit Brownie" id="petitQty"><option value="0">Não quero</option><option value="50">50 unidades — R$ 90,00</option><option value="100">100 unidades — R$ 180,00</option></select></label></div>
+ <div class="brigadeiro-box"><h3>Mini Brownie Recheado</h3><p>R$ 3,50 por unidade; a partir de 20 unidades, R$ 2,80 cada.</p><label>Quantidade<input type="number" name="Mini Brownie quantidade" id="miniBrownieQty" min="0" step="1" value="0"></label><p class="other-price" id="miniBrowniePrice">Subtotal: R$ 0,00</p></div>
+ <div class="brigadeiro-box"><h3>Bem Casado — Papel Crepom</h3><p>R$ 6,00 por unidade; a partir de 20 unidades, R$ 4,80 cada.</p><label>Quantidade<input type="number" name="Bem Casado Papel Crepom quantidade" id="bemCrepomQty" min="0" step="1" value="0"></label><p class="other-price" id="bemCrepomPrice">Subtotal: R$ 0,00</p></div>
+ <div class="brigadeiro-box"><h3>Bem Casado — Folha de Celofane</h3><p>R$ 5,00 por unidade; a partir de 20 unidades, R$ 4,00 cada.</p><label>Quantidade<input type="number" name="Bem Casado Celofane quantidade" id="bemCelofaneQty" min="0" step="1" value="0"></label><p class="other-price" id="bemCelofanePrice">Subtotal: R$ 0,00</p></div>
+ <div class="brigadeiro-box"><h3>Cupcake com Plaquinha</h3><p>R$ 6,50 por unidade.</p><label>Quantidade<input type="number" name="Cupcake com plaquinha quantidade" id="cupcakePlaqueQty" min="0" step="1" value="0"></label><p class="other-price" id="cupcakePlaquePrice">Subtotal: R$ 0,00</p></div>
+ <div class="brigadeiro-box"><h3>Cupcake sem Plaquinha</h3><p>R$ 5,50 por unidade.</p><label>Quantidade<input type="number" name="Cupcake sem plaquinha quantidade" id="cupcakeNoPlaqueQty" min="0" step="1" value="0"></label><p class="other-price" id="cupcakeNoPlaquePrice">Subtotal: R$ 0,00</p></div>
+</div></section>
+<button class="btn primary full submit-order" type="submit">Enviar pedido da encomenda</button>
+</form></section></main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="defaults.js"></script>
+<script>
+(()=>{
+const D=window.MARTINS_DEFAULTS,c=D.cake,$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],money=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+$('#cakeType').innerHTML=['Naked Cake','Chantininho'].map(tipo=>`<div class="cake-kind"><h3>${tipo}</h3>${c.types.filter(([n])=>n.startsWith(tipo)).map(([n,v])=>{const qtd=n.split('—')[1]?.trim()||n;return `<label class="extra-option cake-size-option"><input type="radio" name="Tipo e tamanho" value="${esc(n)}" data-price="${v}" required> <span>${esc(qtd)}</span><strong>${money(v)}</strong></label>`}).join('')}</div>`).join('');
+$('#cakeMass').innerHTML='<option value="">Escolha 1 massa</option>'+c.masses.map(x=>`<option>${esc(x)}</option>`).join('');
+$('#cakeFillings').innerHTML=c.fillings.map(x=>`<label class="extra-option"><input type="checkbox" name="Recheio" value="${esc(x)}"> ${esc(x)}</label>`).join('');
+$('#cakeExtras').innerHTML=c.extras.map(([n,v])=>`<label class="extra-option"><input type="checkbox" name="Adicional" value="${esc(n)}" data-price="${v}"> ${esc(n)} (+${money(v)})</label>`).join('');
+$('#cakePersonalizations').innerHTML=(c.personalizations||[]).map(([n,v])=>`<label class="extra-option"><input type="checkbox" name="Personalização" value="${esc(n)}" data-price="${v}"> ${esc(n)} (+${money(v)})</label>`).join('');
+const kitProducts=(D.products||[]).filter(x=>x.category==='Kits');
+$('#kitOptions').innerHTML=kitProducts.map(k=>`<label class="extra-option kit-option"><input type="radio" name="Kit Festa" value="${esc(k.id)}" data-name="${esc(k.name)}" data-price="${k.price}"><span><b>${esc(k.name)}</b><small>${esc(k.description||'')}</small></span><strong>${money(k.price)}</strong></label>`).join('');
+const kitRules={
+ k1:{bolo:'Chantininho 10/15 pessoas',itens:[['4 cupcakes',true],['20 petit brownies',true],['20 docinhos',true]]},
+ k2:{bolo:'Chantininho 15/20 pessoas',itens:[['5 cupcakes',true],['30 petit brownies',true],['30 docinhos',true]]},
+ k3:{bolo:'Chantininho 20/25 pessoas',itens:[['8 cupcakes',true],['50 petit brownies',true],['50 docinhos',true]]},
+ k4:{bolo:'Chantininho 30/40 pessoas',itens:[['10 cupcakes',true],['60 petit brownies',true],['60 docinhos',true]]},
+ k5:{bolo:'Chantininho 40/50 pessoas',itens:[['12 cupcakes',true],['70 petit brownies',true],['70 docinhos',true]]},
+ k6:{bolo:'Chantininho 10/12 pessoas',itens:[['4 cupcakes',true],['4 pirulitos',true],['20 docinhos',true]]},
+ k7:{bolo:'Chantininho 15/20 pessoas',itens:[['5 cupcakes',true],['5 pirulitos',true],['5 docinhos',true]]},
+ k8:{bolo:'Chantininho 20/25 pessoas',itens:[['8 cupcakes',true],['8 pirulitos',true],['50 docinhos',true]]},
+ k9:{bolo:'Chantininho 30/40 pessoas',itens:[['10 cupcakes',true],['10 pirulitos',true],['60 docinhos',true]]},
+ k10:{bolo:'Chantininho 40/50 pessoas',itens:[['12 cupcakes',true],['12 pirulitos',true],['70 docinhos',true]]}
+};
+$$('input[name="Recheio"]').forEach(x=>x.onchange=()=>{const ck=$$('input[name="Recheio"]:checked');if(ck.length>2){x.checked=false;alert('Escolha somente 2 recheios.')}});
+const kitActive=()=>!!document.querySelector('input[name="Kit Festa"]:checked');
+const calc=()=>{let t=kitActive()?0:Number($('input[name="Tipo e tamanho"]:checked')?.dataset.price||0);t+=Number($('input[name="Kit Festa"]:checked')?.dataset.price||0);$$('#cakeExtras input:checked,#cakePersonalizations input:checked').forEach(x=>t+=Number(x.dataset.price||0));t+=otherItemPrices().reduce((sum,x)=>sum+x.total,0);$('#cakeTotal').textContent=money(t);return t};
+const setKitChoiceVisibility=(active)=>{
+  const sizeSection=$('#cakeSizeSection'), fixed=$('#kitCakeFixed'), fixedInput=$('#kitCakeValue');
+  sizeSection.hidden=active;
+  fixed.hidden=!active;
+  if(!active){fixed.innerHTML='';fixedInput.value='';}
+};
+const applyKit=(kit)=>{
+ const included=$('#kitIncluded'),fixed=$('#kitCakeFixed'),fixedInput=$('#kitCakeValue'),brig=$('#brigadeiroSection');
+ if(!kit){
+  included.hidden=true;included.innerHTML='';setKitChoiceVisibility(false);brig.hidden=false;
+  $$('input[name="Tipo e tamanho"]').forEach(x=>{x.checked=false;x.disabled=false;});
+  $('#cakeMass').disabled=false;$$('input[name="Recheio"]').forEach(x=>{x.disabled=false;x.checked=false;});
+  $$('#cakeExtras input,#cakePersonalizations input').forEach(x=>{x.disabled=false;x.checked=false;});
+  updateTopoOnly();
+  return;
+ }
+ const rule=kitRules[kit.id]||{bolo:'Chantininho',itens:[]};
+ setKitChoiceVisibility(true);
+ $$('input[name="Tipo e tamanho"]').forEach(x=>{x.checked=false;x.disabled=true;});
+ fixed.hidden=false;fixed.innerHTML=`<div class="kit-fixed-title">Bolo definido pelo kit</div><strong>✓ ${esc(rule.bolo)}</strong>`;fixedInput.value=rule.bolo;
+ const rows=[`<label class="extra-option kit-included-option"><input type="checkbox" checked disabled><span>✓ ${esc(rule.bolo)}</span><small>Incluído no kit</small></label>`,...rule.itens.map(([item])=>`<label class="extra-option kit-included-option"><input type="checkbox" checked disabled><span>✓ ${esc(item)}</span><small>Incluído no kit</small></label>`)];
+ included.hidden=false;included.innerHTML=`<div class="kit-included-grid">${rows.join('')}</div><p class="kit-choice-help">Este kit já vem definido assim. Você só escolhe <b>1 massa</b>, <b>2 recheios</b> e <b>1 topo</b>.</p>`;
+ brig.hidden=true;
+ $('#cakeMass').disabled=false;$$('input[name="Recheio"]').forEach(x=>{x.disabled=false;x.checked=false;});
+ $('#cakeExtras input').forEach(x=>{x.checked=false;x.disabled=true;});
+ $('#cakePersonalizations input').forEach(x=>{x.checked=false;x.disabled=false;});
+ updateTopoOnly();
+};
+const cakeExtrasFieldset=$('#cakeExtras')?.closest('fieldset');
+const cakePersonalizationFieldset=$('#cakePersonalizations')?.closest('fieldset');
+const updateTopoOnly=()=>{const active=kitActive();if(cakeExtrasFieldset)cakeExtrasFieldset.hidden=active;$$('#cakePersonalizations label.extra-option').forEach(label=>{const input=label.querySelector('input');const isTopo=/^Topo/i.test(input?.value||'');label.hidden=active&&!isTopo;if(active){input.disabled=!isTopo;if(!isTopo)input.checked=false;}});};
+$$('input[name="Tipo e tamanho"]').forEach(x=>x.onchange=calc);
+$$('input[name="Kit Festa"]').forEach(x=>x.onchange=()=>{applyKit(x.checked?x:null);calc()});
+$$('#cakePersonalizations input').forEach(x=>x.onchange=()=>{if(kitActive()&&x.checked){$$('#cakePersonalizations input').filter(y=>y!==x).forEach(y=>y.checked=false);}calc();});
+$$('#cakeExtras input').forEach(x=>x.onchange=calc);
+updateTopoOnly();
+const kitId=new URLSearchParams(location.search).get('kit');
+if(kitId){const k=document.querySelector(`input[name="Kit Festa"][value="${CSS.escape(kitId)}"]`);if(k){k.checked=true;applyKit(k);setTimeout(()=>k.scrollIntoView({behavior:'smooth',block:'center'}),250)}}
+const renderBrig=(id,items)=>{$('#'+id).innerHTML=items.map(x=>`<label class="extra-option"><input type="checkbox" name="Brigadeiro" value="${esc(x)}"> ${esc(x)}</label>`).join('')};
+renderBrig('brig-classica',D.brigadeiros.classica);renderBrig('brig-premium',D.brigadeiros.premium);
+$$('input[name="brig-line"]').forEach(r=>r.onchange=()=>{const line=r.value.startsWith('Clássica')?'Clássica':'Premium',target=line==='Clássica'?'brig-classica':'brig-premium',max=r.value.endsWith('100')?4:2;$$('#'+target+' input').forEach(x=>{x.disabled=false;x.checked=false;x.onchange=()=>{const checked=$$('#'+target+' input:checked');if(checked.length>max){x.checked=false;alert(`Escolha no máximo ${max} sabores.`)}}});['brig-classica','brig-premium'].filter(x=>x!==target).forEach(x=>$$('#'+x+' input').forEach(y=>{y.checked=false;y.disabled=true}))});
+const otherItemPrices=()=>{
+ const val=id=>Math.max(0,Math.floor(Number($('#'+id).value)||0));
+ const petitQty=val('petitQty'),mini=val('miniBrownieQty'),crepom=val('bemCrepomQty'),celof=val('bemCelofaneQty'),cp=val('cupcakePlaqueQty'),cn=val('cupcakeNoPlaqueQty');
+ const items=[
+  {name:'Petit Brownie',qty:petitQty,price:petitQty===50?90:petitQty===100?180:0,total:petitQty===50?90:petitQty===100?180:0},
+  {name:'Mini Brownie Recheado',qty:mini,price:mini>=20?2.8:3.5,total:mini*(mini>=20?2.8:3.5)},
+  {name:'Bem Casado — Papel Crepom',qty:crepom,price:crepom>=20?4.8:6,total:crepom*(crepom>=20?4.8:6)},
+  {name:'Bem Casado — Folha de Celofane',qty:celof,price:celof>=20?4:5,total:celof*(celof>=20?4:5)},
+  {name:'Cupcake com Plaquinha',qty:cp,price:6.5,total:cp*6.5},
+  {name:'Cupcake sem Plaquinha',qty:cn,price:5.5,total:cn*5.5}
+ ];
+ $('#miniBrowniePrice').textContent=`Subtotal: ${money(mini*(mini>=20?2.8:3.5))} (${money(mini>=20?2.8:3.5)}/un.)`;
+ $('#bemCrepomPrice').textContent=`Subtotal: ${money(crepom*(crepom>=20?4.8:6))} (${money(crepom>=20?4.8:6)}/un.)`;
+ $('#bemCelofanePrice').textContent=`Subtotal: ${money(celof*(celof>=20?4:5))} (${money(celof>=20?4:5)}/un.)`;
+ $('#cupcakePlaquePrice').textContent=`Subtotal: ${money(cp*6.5)}`;
+ $('#cupcakeNoPlaquePrice').textContent=`Subtotal: ${money(cn*5.5)}`;
+ return items.filter(x=>x.qty>0);
+};
+['petitQty','miniBrownieQty','bemCrepomQty','bemCelofaneQty','cupcakePlaqueQty','cupcakeNoPlaqueQty'].forEach(id=>$('#'+id).addEventListener('input',calc));
+const buildOrderData=()=>{
+  const f=new FormData($('#cakeForm'));
+  const fills=f.getAll('Recheio');
+  const kitEl=$('input[name="Kit Festa"]:checked');
+  const otherItems=otherItemPrices();
+  const brigadeLine=f.get('brig-line');
+  const brigadeFlavors=f.getAll('Brigadeiro');
+  return {
+    kit:kitEl?(kitEl.dataset.name||kitEl.value):'Não selecionado',
+    bolo:f.get('Kit bolo definido')||f.get('Tipo e tamanho')||'Não informado',
+    massa:f.get('Massa')||'Não informado',
+    recheios:fills.length?fills.join(' + '):'Não informado',
+    topo:f.getAll('Personalização').filter(x=>/^Topo/i.test(x)).join(', ')||'Nenhum',
+    personalizacao:f.getAll('Personalização').filter(x=>!/^Topo/i.test(x)).join(', ')||'Nenhuma',
+    adicionais:f.getAll('Adicional').join(', ')||'Nenhum',
+    brigadeiros:brigadeLine?`${brigadeLine} — ${brigadeFlavors.join(' + ')||'Nenhum sabor'}`:'Não selecionado',
+    outros:otherItems.length?otherItems.map(x=>`${x.qty}x ${x.name} — ${money(x.total)}`).join('\n'):'Nenhum',
+    nome:f.get('Nome')||'Não informado',
+    whatsapp:f.get('WhatsApp')||'Não informado',
+    data:f.get('Data desejada')||'Não informado',
+    observacoes:f.get('Observações')||'Nenhuma',
+    total:$('#cakeTotal').textContent
+  };
+};
+$('#cakeForm').onsubmit=async e=>{
+  e.preventDefault();
+  const f=new FormData(e.target),fills=f.getAll('Recheio'),kit=f.get('Kit Festa');
+  if(fills.length!==2){alert('Escolha exatamente 2 recheios.');return;}
+  if(!f.get('Massa')){alert('Escolha 1 massa.');return;}
+  const total=calc(),bl=f.get('brig-line'),bs=f.getAll('Brigadeiro'),otherItems=otherItemPrices();
+  if(bl&&((bl.endsWith('100')&&bs.length>4)||(!bl.endsWith('100')&&bs.length>2))){alert('Verifique a quantidade máxima de sabores.');return;}
+  const kitEl=$('input[name="Kit Festa"]:checked');
+  const data={
+    'Kit Festa':kit?(kitEl?.dataset.name||kit):'Não selecionado',
+    'Brigadeiros':bl?`${bl} — ${bs.join(' + ')||'Nenhum sabor'}`:'Não selecionado',
+    'Outros itens':otherItems.length?otherItems.map(x=>`${x.qty}x ${x.name} — ${money(x.total)} (${money(x.price)}/un.)`).join('\n'):'Nenhum',
+    'Tipo e tamanho':f.get('Kit bolo definido')||f.get('Tipo e tamanho'),
+    'Massa':f.get('Massa'),'Recheios':fills.join(' + '),
+    'Adicionais':f.getAll('Adicional').join(', ')||'Nenhum',
+    'Personalização':f.getAll('Personalização').join(', ')||'Nenhuma',
+    'Nome':f.get('Nome'),'WhatsApp':f.get('WhatsApp'),'Data desejada':f.get('Data desejada'),
+    'Observações':f.get('Observações'),'Total estimado':money(total)
+  };
+  const text='Olá! Quero fazer uma encomenda na Martins Confeitaria.\n\n'+Object.entries(data).map(([k,v])=>`*${k}:* ${v||'Não informado'}`).join('\n');
+  try{
+    if(window.supabase&&window.MARTINS_CONFIG?.SUPABASE_URL){
+      const sb=window.supabase.createClient(window.MARTINS_CONFIG.SUPABASE_URL,window.MARTINS_CONFIG.SUPABASE_ANON_KEY);
+      await sb.from('custom_cakes').insert({data,status:'novo'});
+    }
+  }catch(err){console.warn(err)}
+  window.open('https://wa.me/'+D.whatsapp+'?text='+encodeURIComponent(text),'_blank','noopener');
+};
+
+
+})();
+</script></body></html>
