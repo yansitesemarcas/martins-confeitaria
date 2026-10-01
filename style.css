@@ -44,9 +44,9 @@ body{overflow-x:hidden}.top nav a{position:relative;transition:.25s}.top nav a:a
   background-color:#f8eeee;
   background-image:
     linear-gradient(rgba(255,250,247,.78),rgba(255,250,247,.78)),
-    url('assets/orcamento-fundo-1.jpg'),
-    url('assets/orcamento-fundo-2.jpg'),
-    url('assets/orcamento-fundo-3.jpg');
+    url('orcamento-fundo-1.jpg'),
+    url('orcamento-fundo-2.jpg'),
+    url('orcamento-fundo-3.jpg');
   background-repeat:no-repeat,no-repeat,no-repeat,no-repeat;
   background-position:center top, center 0%, center 42%, center 84%;
   background-size:100% 100%,100% auto,100% auto,100% auto;
