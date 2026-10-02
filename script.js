@@ -123,9 +123,13 @@
     $('#aboutText').innerHTML =
       aboutText +
       `
-        <p class="about-signature">
-          <strong>Chef Denilson Martins</strong>
-        </p>
+        <div class="about-signature">
+          <span>🩵 Feito com carinho, sabor e muitos sonhos</span>
+          <strong>Chef Denilson Martins ✨</strong>
+          <small>
+            O coração por trás de cada doce da Martins Confeitaria.
+          </small>
+        </div>
       `;
 
     if (S.maps) {
