@@ -305,6 +305,8 @@
               <th>Área</th>
               <th>Classificação</th>
               <th>Preço</th>
+              <th>Desconto</th>
+              <th>Agendamento</th>
               <th>Disponível</th>
               <th>Ações</th>
             </tr>
@@ -312,64 +314,131 @@
 
           <tbody>
             ${
-              (S.products || []).map(p => `
-                <tr>
-                  <td>
-                    ${
-                      p.image
-                        ? `<img src="${esc(p.image)}">`
-                        : ''
-                    }
-                  </td>
+              (S.products || []).map(p => {
+                const price = Number(p.price || 0);
+                const discount = Number(p.discount_percent || 0);
 
-                  <td>
-                    <b>${esc(p.name)}</b>
-                    <br>
-                    <small>${esc(p.description || '')}</small>
-                  </td>
+                const finalPrice =
+                  discount > 0
+                    ? price - (price * discount / 100)
+                    : price;
 
-                  <td>
-                    ${esc(AREAS[p.area] || 'Cardápio')}
-                  </td>
+                return `
+                  <tr>
+                    <td>
+                      ${
+                        p.image
+                          ? `<img src="${esc(p.image)}">`
+                          : ''
+                      }
+                    </td>
 
-                  <td>
-                    ${esc(p.category || '')}
-                  </td>
+                    <td>
+                      <b>${esc(p.name)}</b>
+                      <br>
+                      <small>${esc(p.description || '')}</small>
 
-                  <td>
-                    R$ ${Number(p.price || 0)
-                      .toFixed(2)
-                      .replace('.', ',')}
-                  </td>
+                      ${
+                        p.portion_size
+                          ? `<br><small>Porção: ${esc(p.portion_size)}</small>`
+                          : ''
+                      }
 
-                  <td>
-                    ${
-                      p.available !== false
-                        ? '<b style="color:green">Disponível</b>'
-                        : '<b style="color:#b00020">Pausado</b>'
-                    }
-                  </td>
+                      ${
+                        p.serves_up_to
+                          ? `<br><small>Serve até: ${esc(p.serves_up_to)} pessoas</small>`
+                          : ''
+                      }
 
-                  <td>
-                    <button
-                      class="btn alt edit"
-                      data-id="${p.id}"
-                    >
-                      Editar
-                    </button>
+                      ${
+                        p.weight_grams
+                          ? `<br><small>${esc(p.weight_grams)} g</small>`
+                          : ''
+                      }
+                    </td>
 
-                    <button
-                      class="btn alt del"
-                      data-id="${p.id}"
-                    >
-                      Excluir
-                    </button>
-                  </td>
-                </tr>
-              `).join('') ||
+                    <td>
+                      ${esc(AREAS[p.area] || 'Cardápio')}
+                    </td>
+
+                    <td>
+                      ${esc(p.category || '')}
+                    </td>
+
+                    <td>
+                      ${
+                        discount > 0
+                          ? `
+                            <span
+                              style="
+                                text-decoration:line-through;
+                                opacity:.6;
+                              "
+                            >
+                              R$ ${price
+                                .toFixed(2)
+                                .replace('.', ',')}
+                            </span>
+                            <br>
+                            <b>
+                              R$ ${finalPrice
+                                .toFixed(2)
+                                .replace('.', ',')}
+                            </b>
+                          `
+                          : `
+                            R$ ${price
+                              .toFixed(2)
+                              .replace('.', ',')}
+                          `
+                      }
+                    </td>
+
+                    <td>
+                      ${
+                        discount > 0
+                          ? `<b style="color:#b00020">${discount}%</b>`
+                          : '—'
+                      }
+                    </td>
+
+                    <td>
+                      ${
+                        p.requires_scheduling
+                          ? '<b style="color:#b00020">Obrigatório</b>'
+                          : 'Não'
+                      }
+                    </td>
+
+                    <td>
+                      ${
+                        p.available !== false
+                          ? '<b style="color:green">Disponível</b>'
+                          : '<b style="color:#b00020">Pausado</b>'
+                      }
+                    </td>
+
+                    <td>
+                      <button
+                        class="btn alt edit"
+                        data-id="${p.id}"
+                      >
+                        Editar
+                      </button>
+
+                      <button
+                        class="btn alt del"
+                        data-id="${p.id}"
+                      >
+                        Excluir
+                      </button>
+                    </td>
+                  </tr>
+                `;
+              }).join('') ||
               `
                 <tr>
-                  <td colspan="7">
+                  <td colspan="9">
                     Nenhum produto cadastrado.
                   </td>
                 </tr>
@@ -500,7 +569,14 @@
       image: '',
       available: true,
       featured: false,
-      sort: 0
+      sort: 0,
+
+      /* NOVOS CAMPOS */
+      portion_size: '',
+      serves_up_to: '',
+      weight_grams: '',
+      discount_percent: 0,
+      requires_scheduling: false
     }
   ) {
     ensureCategories();
@@ -515,6 +591,18 @@
       getCategories(initialArea).includes(p.category)
         ? p.category
         : getCategories(initialArea)[0] || '';
+
+    const currentDiscount =
+      Number(p.discount_percent || 0);
+
+    const currentPrice =
+      Number(p.price || 0);
+
+    const currentFinalPrice =
+      currentDiscount > 0
+        ? currentPrice -
+          (currentPrice * currentDiscount / 100)
+        : currentPrice;
 
     $('#view').innerHTML = `
       <div class="card">
@@ -540,6 +628,7 @@
 
             <input
               name="price"
+              id="productPrice"
               type="number"
               step="0.01"
               min="0"
@@ -593,6 +682,102 @@
             >
           </label>
 
+          <!-- TAMANHO DA PORÇÃO -->
+          <label class="field">
+            Tamanho da porção
+
+            <input
+              name="portion_size"
+              maxlength="100"
+              value="${esc(p.portion_size || '')}"
+              placeholder="Ex.: 1 fatia grande"
+            >
+          </label>
+
+          <!-- SERVE ATÉ -->
+          <label class="field">
+            Serve até
+
+            <input
+              name="serves_up_to"
+              type="number"
+              min="1"
+              step="1"
+              value="${p.serves_up_to || ''}"
+              placeholder="Ex.: 10"
+            >
+
+            <small>
+              pessoas
+            </small>
+          </label>
+
+          <!-- GRAMATURA -->
+          <label class="field">
+            Gramatura
+
+            <input
+              name="weight_grams"
+              type="number"
+              min="0"
+              step="1"
+              value="${p.weight_grams || ''}"
+              placeholder="Ex.: 1200"
+            >
+
+            <small>
+              gramas
+            </small>
+          </label>
+
+          <!-- DESCONTO -->
+          <label class="field">
+            Desconto
+
+            <input
+              name="discount_percent"
+              id="discountPercent"
+              type="number"
+              min="0"
+              max="100"
+              step="0.01"
+              value="${currentDiscount}"
+              placeholder="Ex.: 10"
+            >
+
+            <small>
+              %
+            </small>
+          </label>
+
+          <!-- PREÇO FINAL -->
+          <div
+            class="field"
+            id="finalPriceBox"
+            style="
+              padding:12px;
+              border-radius:10px;
+              background:#f8f8f8;
+            "
+          >
+            <b>
+              Preço final
+            </b>
+
+            <div
+              id="finalPrice"
+              style="
+                font-size:1.2rem;
+                font-weight:800;
+                margin-top:6px;
+              "
+            >
+              R$ ${currentFinalPrice
+                .toFixed(2)
+                .replace('.', ',')}
+            </div>
+          </div>
+
           <label class="field full">
             Descrição
 
@@ -612,7 +797,36 @@
             >
           </label>
 
-          <label>
+          <!-- AGENDAMENTO -->
+          <label
+            class="field"
+            style="
+              display:flex;
+              align-items:center;
+              gap:10px;
+              cursor:pointer;
+            "
+          >
+            <input
+              name="requires_scheduling"
+              type="checkbox"
+              ${p.requires_scheduling ? 'checked' : ''}
+            >
+
+            <span>
+              Agendamento obrigatório
+            </span>
+          </label>
+
+          <!-- DISPONIBILIDADE -->
+          <label
+            style="
+              display:flex;
+              align-items:center;
+              gap:10px;
+              cursor:pointer;
+            "
+          >
             <input
               name="available"
               type="checkbox"
@@ -622,7 +836,15 @@
             Disponível para venda
           </label>
 
-          <label>
+          <!-- DESTAQUE -->
+          <label
+            style="
+              display:flex;
+              align-items:center;
+              gap:10px;
+              cursor:pointer;
+            "
+          >
             <input
               name="featured"
               type="checkbox"
@@ -654,6 +876,46 @@
     const categorySelect = $('#productCategory');
     const newCategoryButton =
       $('#newCategoryFromProduct');
+
+    const priceInput =
+      $('#productPrice');
+
+    const discountInput =
+      $('#discountPercent');
+
+    const finalPrice =
+      $('#finalPrice');
+
+    function updateFinalPrice() {
+      const price =
+        Number(priceInput.value || 0);
+
+      let discount =
+        Number(discountInput.value || 0);
+
+      if (discount < 0) {
+        discount = 0;
+      }
+
+      if (discount > 100) {
+        discount = 100;
+      }
+
+      const final =
+        price -
+        (price * discount / 100);
+
+      finalPrice.textContent =
+        `R$ ${final
+          .toFixed(2)
+          .replace('.', ',')}`;
+    }
+
+    priceInput.oninput =
+      updateFinalPrice;
+
+    discountInput.oninput =
+      updateFinalPrice;
 
     function refreshCategories(area, selected = '') {
       const cats = getCategories(area);
@@ -718,26 +980,69 @@
 
       const f = new FormData(e.target);
 
-      const area = f.get('area');
+      let discount =
+        Number(
+          f.get('discount_percent') || 0
+        );
+
+      if (discount < 0) {
+        discount = 0;
+      }
+
+      if (discount > 100) {
+        discount = 100;
+      }
+
+      const serves =
+        f.get('serves_up_to');
+
+      const grams =
+        f.get('weight_grams');
 
       const obj = {
         name: f.get('name'),
         description: f.get('description'),
         price: Number(f.get('price')),
-        area,
+        area: f.get('area'),
         category: f.get('category'),
         image: f.get('image'),
-        available: f.has('available'),
-        featured: f.has('featured'),
-        sort: Number(f.get('sort') || 0)
+
+        available:
+          f.has('available'),
+
+        featured:
+          f.has('featured'),
+
+        sort:
+          Number(f.get('sort') || 0),
+
+        /* NOVOS CAMPOS */
+        portion_size:
+          f.get('portion_size') || null,
+
+        serves_up_to:
+          serves
+            ? Number(serves)
+            : null,
+
+        weight_grams:
+          grams
+            ? Number(grams)
+            : null,
+
+        discount_percent:
+          discount,
+
+        requires_scheduling:
+          f.has('requires_scheduling')
       };
 
       /*
        * Produtos da área "pronta entrega"
-       * também ficam marcados como destaque para
-       * manter compatibilidade com a versão atual.
+       * também ficam marcados como destaque
+       * para manter compatibilidade.
        */
-      if (area === 'pronta_entrega') {
+      if (obj.area === 'pronta_entrega') {
         obj.featured = true;
       }
 
@@ -754,6 +1059,8 @@
 
       await load();
     };
+
+    updateFinalPrice();
   }
 
   function printComanda(
