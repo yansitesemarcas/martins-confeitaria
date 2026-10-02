@@ -2740,3 +2740,267 @@ a.menu-big-btn{
 
   cursor:pointer !important;
 }
+/* =========================================================
+   CORREÇÃO DEFINITIVA — BOTÕES 100% SÓLIDOS
+========================================================= */
+
+/* Remove qualquer camada pseudo-elemento problemática */
+.btn::before,
+.btn::after,
+.cart-btn::before,
+.cart-btn::after,
+.add::before,
+.add::after,
+.cake-open::before,
+.cake-open::after,
+.menu-big-btn::before,
+.menu-big-btn::after,
+.submit-order::before,
+.submit-order::after {
+  content:none !important;
+  display:none !important;
+}
+
+/* Todos os botões */
+.btn,
+a.btn,
+button.btn,
+.cart-btn,
+.add,
+.cake-open,
+.menu-big-btn,
+.submit-order,
+.add-ready {
+  position:relative !important;
+
+  display:inline-flex !important;
+
+  align-items:center !important;
+  justify-content:center !important;
+
+  opacity:1 !important;
+  visibility:visible !important;
+
+  filter:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  mix-blend-mode:normal !important;
+
+  -webkit-appearance:none !important;
+  appearance:none !important;
+
+  background-image:none !important;
+
+  cursor:pointer !important;
+}
+
+/* =========================================================
+   AZUL
+========================================================= */
+
+.btn.primary,
+a.btn.primary,
+button.btn.primary,
+.menu-big-btn,
+.submit-order,
+.cart-btn {
+  background:#2b7896 !important;
+  background-color:#2b7896 !important;
+
+  border:2px solid #2b7896 !important;
+
+  color:#ffffff !important;
+
+  box-shadow:
+    0 8px 24px rgba(43,120,150,.35) !important;
+}
+
+/* =========================================================
+   ROSA
+========================================================= */
+
+.btn.pink-btn,
+.add,
+.add-ready,
+.cake-open,
+.hero-actions .btn.primary {
+  background:#f3b7bb !important;
+  background-color:#f3b7bb !important;
+
+  border:2px solid #f3b7bb !important;
+
+  color:#3d2b25 !important;
+
+  box-shadow:
+    0 8px 24px rgba(125,79,85,.25) !important;
+}
+
+/* =========================================================
+   BRANCO
+========================================================= */
+
+.btn.ghost,
+a.btn.ghost,
+button.btn.ghost {
+  background:#ffffff !important;
+  background-color:#ffffff !important;
+
+  border:2px solid #2b7896 !important;
+
+  color:#3d2b25 !important;
+
+  box-shadow:
+    0 8px 24px rgba(43,120,150,.18) !important;
+}
+
+/* =========================================================
+   CATEGORIAS
+========================================================= */
+
+.tab {
+  opacity:1 !important;
+  visibility:visible !important;
+
+  background:#ffffff !important;
+  background-color:#ffffff !important;
+  background-image:none !important;
+
+  border:2px solid #2b7896 !important;
+
+  color:#3d2b25 !important;
+
+  filter:none !important;
+  mix-blend-mode:normal !important;
+}
+
+.tab.active {
+  background:#2b7896 !important;
+  background-color:#2b7896 !important;
+
+  border-color:#2b7896 !important;
+
+  color:#ffffff !important;
+}
+
+/* =========================================================
+   HOVER
+========================================================= */
+
+.btn.primary:hover,
+.menu-big-btn:hover,
+.submit-order:hover,
+.cart-btn:hover {
+  background:#1d5d75 !important;
+  background-color:#1d5d75 !important;
+
+  border-color:#1d5d75 !important;
+
+  color:#ffffff !important;
+}
+
+.btn.pink-btn:hover,
+.add:hover,
+.add-ready:hover,
+.cake-open:hover,
+.hero-actions .btn.primary:hover {
+  background:#d9858e !important;
+  background-color:#d9858e !important;
+
+  border-color:#d9858e !important;
+
+  color:#3d2b25 !important;
+}
+
+.btn.ghost:hover {
+  background:#eaf8fc !important;
+  background-color:#eaf8fc !important;
+
+  border-color:#23677f !important;
+
+  color:#23677f !important;
+}
+
+/* =========================================================
+   TEXTO DOS BOTÕES
+========================================================= */
+
+.btn,
+.btn *,
+.cart-btn,
+.cart-btn *,
+.add,
+.add *,
+.add-ready,
+.add-ready *,
+.cake-open,
+.cake-open *,
+.menu-big-btn,
+.menu-big-btn *,
+.submit-order,
+.submit-order * {
+  opacity:1 !important;
+  visibility:visible !important;
+
+  filter:none !important;
+  mix-blend-mode:normal !important;
+}
+
+/* =========================================================
+   PRONTA ENTREGA
+========================================================= */
+
+.centered-actions .btn.primary {
+  background:#2b7896 !important;
+  background-color:#2b7896 !important;
+
+  border-color:#2b7896 !important;
+
+  color:#ffffff !important;
+
+  opacity:1 !important;
+}
+
+/* =========================================================
+   CARDÁPIO DE ENCOMENDAS
+========================================================= */
+
+.cake-open,
+a.cake-open {
+  background:#f3b7bb !important;
+  background-color:#f3b7bb !important;
+
+  border:2px solid #f3b7bb !important;
+
+  color:#3d2b25 !important;
+
+  opacity:1 !important;
+}
+
+/* =========================================================
+   PRONTA ENTREGA — BOTÃO ADICIONAR
+========================================================= */
+
+.add-ready {
+  min-height:42px !important;
+
+  padding:9px 15px !important;
+
+  border-radius:999px !important;
+
+  font-weight:900 !important;
+}
+
+/* =========================================================
+   NENHUMA TRANSPARÊNCIA HERDADA
+========================================================= */
+
+.btn,
+.cart-btn,
+.add,
+.add-ready,
+.tab,
+.cake-open,
+.menu-big-btn,
+.submit-order {
+  opacity:1 !important;
+}
