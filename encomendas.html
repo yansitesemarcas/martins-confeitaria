@@ -1,4 +1,3 @@
-```html
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -125,6 +124,46 @@
   );
 }
 
+.topo-section{
+  margin-top:1rem;
+}
+
+.topo-options{
+  display:grid;
+  gap:.65rem;
+}
+
+.topo-option{
+  cursor:pointer;
+}
+
+.topo-option input{
+  accent-color:var(--blue,#67b0cb);
+}
+
+.kit-mode-note{
+  margin:.8rem 0 0;
+  padding:.9rem 1rem;
+  border-radius:14px;
+  background:var(--pink-soft,#f8dfe1);
+  line-height:1.5;
+}
+
+.kit-option{
+  cursor:pointer;
+}
+
+.kit-option small{
+  display:block;
+  margin-top:.25rem;
+  opacity:.75;
+}
+
+.kit-disabled{
+  opacity:.55;
+  pointer-events:none;
+}
+
 @media(max-width:560px){
   .custom-photo-panel{
     height:48svh;
@@ -168,7 +207,7 @@
 
     <p>
       Escolha seu bolo, massa, recheios, adicionais,
-      docinhos e outros itens para sua festa.
+      topo e outros itens para sua festa.
     </p>
 
   </div>
@@ -179,9 +218,9 @@
     class="form cake-builder custom-builder"
   >
 
-    <!-- =========================
+    <!-- ==================================================
          BOLO
-    ========================== -->
+    =================================================== -->
 
     <fieldset
       class="extras cake-sizes"
@@ -197,6 +236,10 @@
     </fieldset>
 
 
+    <!-- ==================================================
+         BOLO DEFINIDO PELO KIT
+    =================================================== -->
+
     <div
       id="kitCakeFixed"
       class="kit-fixed-cake"
@@ -211,11 +254,42 @@
     >
 
 
-    <!-- =========================
-         MASSA
-    ========================== -->
+    <!-- ==================================================
+         TOPO DO BOLO
+         DISPONÍVEL PARA ENCOMENDA NORMAL E KIT
+    =================================================== -->
 
-    <fieldset class="extras">
+    <fieldset
+      class="extras topo-section"
+      id="topoSection"
+    >
+
+      <legend>
+        Topo do bolo
+      </legend>
+
+      <div
+        id="topoOptions"
+        class="topo-options"
+      ></div>
+
+      <p class="kit-mode-note" id="kitTopoNote" hidden>
+        🎀 Como você escolheu um Kit Festa, o bolo e todos os
+        itens do kit já estão definidos. Escolha somente o
+        topo do bolo.
+      </p>
+
+    </fieldset>
+
+
+    <!-- ==================================================
+         MASSA
+    =================================================== -->
+
+    <fieldset
+      class="extras"
+      id="massaSection"
+    >
 
       <legend>
         Massas — escolha 1
@@ -229,11 +303,14 @@
     </fieldset>
 
 
-    <!-- =========================
+    <!-- ==================================================
          RECHEIOS
-    ========================== -->
+    =================================================== -->
 
-    <fieldset class="extras">
+    <fieldset
+      class="extras"
+      id="recheioSection"
+    >
 
       <legend>
         Recheios — escolha exatamente 2
@@ -244,11 +321,14 @@
     </fieldset>
 
 
-    <!-- =========================
+    <!-- ==================================================
          ADICIONAIS
-    ========================== -->
+    =================================================== -->
 
-    <fieldset class="extras">
+    <fieldset
+      class="extras"
+      id="adicionalSection"
+    >
 
       <legend>
         Adicionais
@@ -259,11 +339,14 @@
     </fieldset>
 
 
-    <!-- =========================
+    <!-- ==================================================
          PERSONALIZAÇÃO
-    ========================== -->
+    =================================================== -->
 
-    <fieldset class="extras">
+    <fieldset
+      class="extras"
+      id="personalizacaoSection"
+    >
 
       <legend>
         Personalização
@@ -274,9 +357,9 @@
     </fieldset>
 
 
-    <!-- =========================
+    <!-- ==================================================
          DADOS
-    ========================== -->
+    =================================================== -->
 
     <label>
       Nome
@@ -313,9 +396,9 @@
     </label>
 
 
-    <!-- =========================
+    <!-- ==================================================
          TOTAL
-    ========================== -->
+    =================================================== -->
 
     <div class="cake-total">
 
@@ -328,11 +411,14 @@
     </div>
 
 
-    <!-- =========================
+    <!-- ==================================================
          KITS FESTA
-    ========================== -->
+    =================================================== -->
 
-    <section class="extras kit-section">
+    <section
+      class="extras kit-section"
+      id="kitSection"
+    >
 
       <div class="section-head">
 
@@ -345,8 +431,8 @@
         </h2>
 
         <p>
-          Kits completos para deixar sua festa
-          ainda mais especial.
+          Ao escolher um kit, o bolo e todos os itens
+          incluídos nele serão definidos automaticamente.
         </p>
 
       </div>
@@ -367,11 +453,14 @@
     </section>
 
 
-    <!-- =========================
+    <!-- ==================================================
          DOCINHOS
-    ========================== -->
+    =================================================== -->
 
-    <div class="section-head party-title">
+    <div
+      class="section-head party-title"
+      id="partyExtrasTitle"
+    >
 
       <span class="eyebrow">
         PARA SUA FESTA
@@ -388,6 +477,10 @@
 
     </div>
 
+
+    <!-- ==================================================
+         BRIGADEIROS
+    =================================================== -->
 
     <section
       class="extras brigadeiro-section"
@@ -414,17 +507,11 @@
 
       <div class="brigadeiro-list">
 
-
-        <!-- =========================
-             CLÁSSICA
-        ========================== -->
-
         <div class="brigadeiro-box">
 
           <h3>
             Linha Clássica
           </h3>
-
 
           <div class="brigadeiro-quantities">
 
@@ -481,16 +568,11 @@
         </div>
 
 
-        <!-- =========================
-             PREMIUM
-        ========================== -->
-
         <div class="brigadeiro-box">
 
           <h3>
             Linha Premium
           </h3>
-
 
           <div class="brigadeiro-quantities">
 
@@ -551,9 +633,9 @@
     </section>
 
 
-    <!-- =========================
+    <!-- ==================================================
          OUTROS ITENS
-    ========================== -->
+    =================================================== -->
 
     <section
       class="extras other-orders-section"
@@ -819,24 +901,20 @@
 <script src="config.js"></script>
 <script src="defaults.js"></script>
 
-
 <script>
 (() => {
 
-  const D = window.MARTINS_DEFAULTS;
+  const D = window.MARTINS_DEFAULTS || {};
   const c = D.cake || {};
 
   const $ = s => document.querySelector(s);
   const $$ = s => [...document.querySelectorAll(s)];
 
   const money = value =>
-    Number(value || 0).toLocaleString(
-      'pt-BR',
-      {
-        style: 'currency',
-        currency: 'BRL'
-      }
-    );
+    Number(value || 0).toLocaleString('pt-BR', {
+      style:'currency',
+      currency:'BRL'
+    });
 
   const esc = value =>
     String(value ?? '').replace(
@@ -852,8 +930,45 @@
 
 
   /* =====================================================
+     TOPOS DO BOLO
+     ===================================================== */
+
+  const topes = [
+    ['Topo 5', 20],
+    ['Topo 3D', 30],
+    ['Flores naturais', 70],
+    ['Scrap Cake', 30]
+  ];
+
+  $('#topoOptions').innerHTML = topes.map(
+    ([name, price]) => `
+
+      <label class="extra-option topo-option">
+
+        <input
+          type="radio"
+          name="Topo do bolo"
+          value="${esc(name)}"
+          data-price="${price}"
+        >
+
+        <span>
+          ${esc(name)}
+        </span>
+
+        <strong>
+          +${money(price)}
+        </strong>
+
+      </label>
+
+    `
+  ).join('');
+
+
+  /* =====================================================
      TIPOS DE BOLO
-  ===================================================== */
+     ===================================================== */
 
   $('#cakeType').innerHTML = [
     'Naked Cake',
@@ -880,7 +995,6 @@
                 name="Tipo e tamanho"
                 value="${esc(name)}"
                 data-price="${price}"
-                required
               >
 
               <span>
@@ -904,7 +1018,7 @@
 
   /* =====================================================
      MASSAS
-  ===================================================== */
+     ===================================================== */
 
   $('#cakeMassOptions').innerHTML =
     (c.masses || []).map(name => `
@@ -915,7 +1029,6 @@
           type="radio"
           name="Massa"
           value="${esc(name)}"
-          required
         >
 
         <span>
@@ -929,7 +1042,7 @@
 
   /* =====================================================
      RECHEIOS
-  ===================================================== */
+     ===================================================== */
 
   $('#cakeFillings').innerHTML =
     (c.fillings || []).map(name => `
@@ -953,7 +1066,7 @@
 
   /* =====================================================
      ADICIONAIS
-  ===================================================== */
+     ===================================================== */
 
   $('#cakeExtras').innerHTML =
     (c.extras || []).map(([name, price]) => `
@@ -982,7 +1095,7 @@
 
   /* =====================================================
      PERSONALIZAÇÕES
-  ===================================================== */
+     ===================================================== */
 
   $('#cakePersonalizations').innerHTML =
     (c.personalizations || []).map(([name, price]) => `
@@ -1011,7 +1124,7 @@
 
   /* =====================================================
      BRIGADEIROS
-  ===================================================== */
+     ===================================================== */
 
   const brigadeiros = {
 
@@ -1064,54 +1177,35 @@
   };
 
 
-  renderBrigadeiros(
-    'brig-classica',
-    brigadeiros.classica
-  );
+  renderBrigadeiros('brig-classica', brigadeiros.classica);
+  renderBrigadeiros('brig-premium', brigadeiros.premium);
 
-  renderBrigadeiros(
-    'brig-premium',
-    brigadeiros.premium
-  );
-
-
-  /* =====================================================
-     SELEÇÃO DOS BRIGADEIROS
-  ===================================================== */
 
   $$('input[name="brig-line"]').forEach(radio => {
 
     radio.addEventListener('change', () => {
 
+      if(kitActive()) return;
+
       const isPremium =
         radio.value.startsWith('Premium');
 
       const target =
-        isPremium
-          ? 'brig-premium'
-          : 'brig-classica';
+        isPremium ? 'brig-premium' : 'brig-classica';
 
       const other =
-        isPremium
-          ? 'brig-classica'
-          : 'brig-premium';
+        isPremium ? 'brig-classica' : 'brig-premium';
 
       const max =
-        radio.value.endsWith('100')
-          ? 4
-          : 2;
+        radio.value.endsWith('100') ? 4 : 2;
 
 
-      // Desativa a outra linha
       $$('#' + other + ' input').forEach(input => {
-
         input.checked = false;
         input.disabled = true;
-
       });
 
 
-      // Ativa a linha escolhida
       $$('#' + target + ' input').forEach(input => {
 
         input.disabled = false;
@@ -1146,7 +1240,7 @@
 
   /* =====================================================
      KITS FESTA
-  ===================================================== */
+     ===================================================== */
 
   const kits = [
 
@@ -1315,19 +1409,109 @@
     );
 
 
+  /* =====================================================
+     BLOQUEAR / LIBERAR CAMPOS
+     ===================================================== */
+
+  const setNormalFields = activeKit => {
+
+    const sections = [
+      '#massaSection',
+      '#recheioSection',
+      '#adicionalSection',
+      '#personalizacaoSection',
+      '#brigadeiroSection',
+      '#otherOrders',
+      '#partyExtrasTitle'
+    ];
+
+
+    sections.forEach(selector => {
+
+      const element = $(selector);
+
+      if(!element) return;
+
+      element.hidden = activeKit;
+
+    });
+
+
+    $$('#massaSection input').forEach(input => {
+      input.disabled = activeKit;
+
+      if(activeKit)
+        input.checked = false;
+    });
+
+
+    $$('#recheioSection input').forEach(input => {
+      input.disabled = activeKit;
+
+      if(activeKit)
+        input.checked = false;
+    });
+
+
+    $$('#adicionalSection input').forEach(input => {
+      input.disabled = activeKit;
+
+      if(activeKit)
+        input.checked = false;
+    });
+
+
+    $$('#personalizacaoSection input').forEach(input => {
+      input.disabled = activeKit;
+
+      if(activeKit)
+        input.checked = false;
+    });
+
+
+    $$('#brigadeiroSection input').forEach(input => {
+      input.disabled = activeKit;
+
+      if(activeKit)
+        input.checked = false;
+    });
+
+
+    $$('#otherOrders input, #otherOrders select').forEach(input => {
+
+      input.disabled = activeKit;
+
+      if(activeKit){
+
+        if(input.tagName === 'SELECT')
+          input.value = '0';
+
+        else if(input.type === 'number')
+          input.value = '0';
+
+      }
+
+    });
+
+  };
+
+
+  /* =====================================================
+     KIT VISUAL
+     ===================================================== */
+
   const setKitChoiceVisibility = active => {
 
-    const sizeSection =
-      $('#cakeSizeSection');
+    const sizeSection = $('#cakeSizeSection');
+    const fixed = $('#kitCakeFixed');
+    const fixedInput = $('#kitCakeValue');
+    const note = $('#kitTopoNote');
 
-    const fixed =
-      $('#kitCakeFixed');
-
-    const fixedInput =
-      $('#kitCakeValue');
 
     sizeSection.hidden = active;
     fixed.hidden = !active;
+    note.hidden = !active;
+
 
     if(!active){
 
@@ -1341,17 +1525,9 @@
 
   const applyKit = kitInput => {
 
-    const included =
-      $('#kitIncluded');
-
-    const fixed =
-      $('#kitCakeFixed');
-
-    const fixedInput =
-      $('#kitCakeValue');
-
-    const brigadeiroSection =
-      $('#brigadeiroSection');
+    const included = $('#kitIncluded');
+    const fixed = $('#kitCakeFixed');
+    const fixedInput = $('#kitCakeValue');
 
 
     if(!kitInput){
@@ -1360,18 +1536,13 @@
       included.innerHTML = '';
 
       setKitChoiceVisibility(false);
+      setNormalFields(false);
 
-      brigadeiroSection.hidden = false;
+      $$('#cakeSizeSection input').forEach(input => {
 
-      $$('input[name="Tipo e tamanho"]')
-        .forEach(input => {
+        input.disabled = false;
 
-          input.checked = false;
-          input.disabled = false;
-
-        });
-
-      updateTopoOnly();
+      });
 
       return;
 
@@ -1385,15 +1556,15 @@
 
 
     setKitChoiceVisibility(true);
+    setNormalFields(true);
 
 
-    $$('input[name="Tipo e tamanho"]')
-      .forEach(input => {
+    $$('#cakeSizeSection input').forEach(input => {
 
-        input.checked = false;
-        input.disabled = true;
+      input.checked = false;
+      input.disabled = true;
 
-      });
+    });
 
 
     fixed.hidden = false;
@@ -1401,7 +1572,7 @@
     fixed.innerHTML = `
 
       <div class="kit-fixed-title">
-        Bolo definido pelo kit
+        🎂 Bolo definido pelo kit
       </div>
 
       <strong>
@@ -1411,8 +1582,7 @@
     `;
 
 
-    fixedInput.value =
-      kit.cake;
+    fixedInput.value = kit.cake;
 
 
     const rows = [
@@ -1471,94 +1641,65 @@
       </div>
 
       <p class="kit-choice-help">
-        Este kit já possui os itens mostrados acima.
-        Você pode escolher <b>1 massa</b>,
-        <b>2 recheios</b> e uma personalização.
+        🎀 Este kit já possui o bolo e todos os itens
+        mostrados acima. Para finalizar, escolha apenas
+        o <b>topo do bolo</b>.
       </p>
 
     `;
 
-
-    /*
-      O kit já inclui os docinhos.
-      Por isso a escolha adicional de brigadeiros
-      continua disponível, mas fica opcional.
-    */
-
-    brigadeiroSection.hidden = false;
-
-    updateTopoOnly();
 
     calc();
 
   };
 
 
-  $$('input[name="Kit Festa"]')
-    .forEach(input => {
+  $$('input[name="Kit Festa"]').forEach(input => {
 
-      input.addEventListener('change', () => {
+    input.addEventListener('change', () => {
 
-        applyKit(
-          input.checked ? input : null
-        );
+      applyKit(input.checked ? input : null);
 
-        calc();
-
-      });
+      calc();
 
     });
+
+  });
 
 
   /* =====================================================
      RECHEIOS — LIMITE 2
-  ===================================================== */
+     ===================================================== */
 
-  $$('input[name="Recheio"]')
-    .forEach(input => {
+  $$('input[name="Recheio"]').forEach(input => {
 
-      input.addEventListener('change', () => {
+    input.addEventListener('change', () => {
 
-        const selected =
-          $$('input[name="Recheio"]:checked');
+      if(kitActive()) return;
 
-        if(selected.length > 2){
+      const selected =
+        $$('input[name="Recheio"]:checked');
 
-          input.checked = false;
+      if(selected.length > 2){
 
-          alert(
-            'Escolha exatamente 2 recheios.'
-          );
+        input.checked = false;
 
-        }
+        alert(
+          'Escolha exatamente 2 recheios.'
+        );
 
-        calc();
+      }
 
-      });
+      calc();
 
     });
 
-
-  /* =====================================================
-     TOPO / PERSONALIZAÇÃO
-  ===================================================== */
-
-  const cakeExtrasFieldset =
-    $('#cakeExtras')?.closest('fieldset');
-
-  const updateTopoOnly = () => {
-
-    const active = kitActive();
-
-    if(cakeExtrasFieldset)
-      cakeExtrasFieldset.hidden = active;
-
-  };
+  });
 
 
   /* =====================================================
      OUTROS ITENS
-  ===================================================== */
+     ===================================================== */
 
   const otherItemPrices = () => {
 
@@ -1566,28 +1707,17 @@
       Math.max(
         0,
         Math.floor(
-          Number($('#' + id).value) || 0
+          Number($('#' + id)?.value) || 0
         )
       );
 
 
-    const petitQty =
-      val('petitQty');
-
-    const mini =
-      val('miniBrownieQty');
-
-    const crepom =
-      val('bemCrepomQty');
-
-    const celof =
-      val('bemCelofaneQty');
-
-    const cp =
-      val('cupcakePlaqueQty');
-
-    const cn =
-      val('cupcakeNoPlaqueQty');
+    const petitQty = val('petitQty');
+    const mini = val('miniBrownieQty');
+    const crepom = val('bemCrepomQty');
+    const celof = val('bemCelofaneQty');
+    const cp = val('cupcakePlaqueQty');
+    const cn = val('cupcakeNoPlaqueQty');
 
 
     const miniUnit =
@@ -1605,12 +1735,6 @@
       {
         name:'Petit Brownie',
         qty:petitQty,
-        price:
-          petitQty === 50
-            ? 90 / 50
-            : petitQty === 100
-              ? 180 / 100
-              : 0,
         total:
           petitQty === 50
             ? 90
@@ -1622,35 +1746,30 @@
       {
         name:'Mini Brownie Recheado',
         qty:mini,
-        price:miniUnit,
         total:mini * miniUnit
       },
 
       {
         name:'Bem Casado — Papel Crepom',
         qty:crepom,
-        price:crepomUnit,
         total:crepom * crepomUnit
       },
 
       {
         name:'Bem Casado — Folha de Celofane',
         qty:celof,
-        price:celofUnit,
         total:celof * celofUnit
       },
 
       {
         name:'Cupcake com Plaquinha',
         qty:cp,
-        price:6.5,
         total:cp * 6.5
       },
 
       {
         name:'Cupcake sem Plaquinha',
         qty:cn,
-        price:5.5,
         total:cn * 5.5
       }
 
@@ -1661,23 +1780,19 @@
       `Subtotal: ${money(mini * miniUnit)}
       (${money(miniUnit)}/un.)`;
 
-
     $('#bemCrepomPrice').textContent =
       `Subtotal: ${money(crepom * crepomUnit)}
       (${money(crepomUnit)}/un.)`;
-
 
     $('#bemCelofanePrice').textContent =
       `Subtotal: ${money(celof * celofUnit)}
       (${money(celofUnit)}/un.)`;
 
-
     $('#cupcakePlaquePrice').textContent =
       `Subtotal: ${money(cp * 6.5)}`;
 
-
     $('#cupcakeNoPlaquePrice').textContent =
-      `Subtotal: ${money(cn * 5.5)}`;
+      `Subtotal: ${money(cn * 5.5)`;
 
 
     return items.filter(item => item.qty > 0);
@@ -1686,17 +1801,15 @@
 
 
   /* =====================================================
-     CÁLCULO TOTAL
-  ===================================================== */
+     TOTAL
+     ===================================================== */
 
   const calc = () => {
 
     let total = 0;
 
 
-    /*
-      Bolo normal
-    */
+    /* BOLO NORMAL */
 
     if(!kitActive()){
 
@@ -1708,9 +1821,7 @@
     }
 
 
-    /*
-      Kit Festa
-    */
+    /* KIT */
 
     const kit =
       $('input[name="Kit Festa"]:checked');
@@ -1724,60 +1835,70 @@
     }
 
 
-    /*
-      Adicionais
-    */
+    /* TOPO */
 
-    $$('#cakeExtras input:checked')
-      .forEach(input => {
+    const topo =
+      $('input[name="Topo do bolo"]:checked');
 
-        total += Number(
-          input.dataset.price || 0
-        );
-
-      });
-
-
-    /*
-      Personalizações
-    */
-
-    $$('#cakePersonalizations input:checked')
-      .forEach(input => {
-
-        total += Number(
-          input.dataset.price || 0
-        );
-
-      });
-
-
-    /*
-      Brigadeiros
-    */
-
-    const brigadeiro =
-      $('input[name="brig-line"]:checked');
-
-    if(brigadeiro){
+    if(topo){
 
       total += Number(
-        brigadeiro.dataset.brigPrice || 0
+        topo.dataset.price || 0
       );
 
     }
 
 
-    /*
-      Outros itens
-    */
+    /* ADICIONAIS */
 
-    total += otherItemPrices()
-      .reduce(
-        (sum, item) =>
-          sum + item.total,
-        0
-      );
+    if(!kitActive()){
+
+      $$('#cakeExtras input:checked')
+        .forEach(input => {
+
+          total += Number(
+            input.dataset.price || 0
+          );
+
+        });
+
+
+      /* PERSONALIZAÇÕES */
+
+      $$('#cakePersonalizations input:checked')
+        .forEach(input => {
+
+          total += Number(
+            input.dataset.price || 0
+          );
+
+        });
+
+
+      /* BRIGADEIROS */
+
+      const brigadeiro =
+        $('input[name="brig-line"]:checked');
+
+      if(brigadeiro){
+
+        total += Number(
+          brigadeiro.dataset.brigPrice || 0
+        );
+
+      }
+
+
+      /* OUTROS */
+
+      total += otherItemPrices()
+        .reduce(
+          (sum,item) =>
+            sum + item.total,
+          0
+        );
+
+    }
 
 
     $('#cakeTotal').textContent =
@@ -1789,11 +1910,12 @@
 
 
   /* =====================================================
-     EVENTOS DE CÁLCULO
-  ===================================================== */
+     EVENTOS
+     ===================================================== */
 
   $$(
     'input[name="Tipo e tamanho"],' +
+    'input[name="Topo do bolo"],' +
     '#cakeExtras input,' +
     '#cakePersonalizations input,' +
     '#cakeMassOptions input'
@@ -1816,7 +1938,7 @@
     'cupcakeNoPlaqueQty'
   ].forEach(id => {
 
-    $('#' + id).addEventListener(
+    $('#' + id)?.addEventListener(
       'input',
       calc
     );
@@ -1824,13 +1946,18 @@
   });
 
 
-  updateTopoOnly();
+  /* =====================================================
+     INICIALIZAÇÃO
+     ===================================================== */
+
+  setKitChoiceVisibility(false);
+  setNormalFields(false);
   calc();
 
 
   /* =====================================================
      KIT VIA URL
-  ===================================================== */
+     ===================================================== */
 
   const kitId =
     new URLSearchParams(location.search)
@@ -1865,7 +1992,7 @@
 
   /* =====================================================
      ENVIO
-  ===================================================== */
+     ===================================================== */
 
   $('#cakeForm').addEventListener(
     'submit',
@@ -1878,39 +2005,88 @@
         new FormData(event.target);
 
 
-      const fillings =
-        form.getAll('Recheio');
+      const kit =
+        $('input[name="Kit Festa"]:checked');
 
 
-      if(fillings.length !== 2){
+      const topo =
+        $('input[name="Topo do bolo"]:checked');
+
+
+      /* ================================================
+         TOPO OBRIGATÓRIO
+      ================================================ */
+
+      if(!topo){
 
         alert(
-          'Escolha exatamente 2 recheios.'
+          'Escolha o topo do bolo.'
         );
+
+        $('#topoSection').scrollIntoView({
+          behavior:'smooth',
+          block:'center'
+        });
 
         return;
 
       }
 
 
-      if(!form.get('Massa')){
+      /* ================================================
+         VALIDAÇÃO DE ENCOMENDA NORMAL
+      ================================================ */
 
-        alert(
-          'Escolha 1 massa.'
-        );
+      if(!kit){
 
-        return;
+        const fillings =
+          form.getAll('Recheio');
+
+
+        if(!form.get('Tipo e tamanho')){
+
+          alert(
+            'Escolha o tipo e tamanho do bolo.'
+          );
+
+          return;
+
+        }
+
+
+        if(!form.get('Massa')){
+
+          alert(
+            'Escolha 1 massa.'
+          );
+
+          return;
+
+        }
+
+
+        if(fillings.length !== 2){
+
+          alert(
+            'Escolha exatamente 2 recheios.'
+          );
+
+          return;
+
+        }
 
       }
 
+
+      /* ================================================
+         BRIGADEIROS
+      ================================================ */
 
       const brigadeLine =
-        form.get('brig-line');
-
+        kit ? null : form.get('brig-line');
 
       const brigadeFlavors =
-        form.getAll('Brigadeiro');
-
+        kit ? [] : form.getAll('Brigadeiro');
 
       const brigadeRadio =
         $('input[name="brig-line"]:checked');
@@ -1937,16 +2113,16 @@
 
 
       const otherItems =
-        otherItemPrices();
-
-
-      const kit =
-        $('input[name="Kit Festa"]:checked');
+        kit ? [] : otherItemPrices();
 
 
       const total =
         calc();
 
+
+      /* ================================================
+         DADOS DO PEDIDO
+      ================================================ */
 
       const data = {
 
@@ -1956,44 +2132,69 @@
             : 'Não selecionado',
 
         'Bolo':
-          form.get('Kit bolo definido') ||
-          form.get('Tipo e tamanho') ||
-          'Não informado',
+          kit
+            ? form.get('Kit bolo definido')
+            : form.get('Tipo e tamanho'),
+
+        'Itens do Kit':
+          kit
+            ? (
+                kits.find(x => x.id === kit.value)
+                  ?.items
+                  .join(' + ') || 'Não informado'
+              )
+            : 'Não se aplica',
+
+        'Topo do bolo':
+          `${topo.value} — ${money(topo.dataset.price)}`,
 
         'Massa':
-          form.get('Massa') ||
-          'Não informado',
+          kit
+            ? 'Definida pelo kit'
+            : form.get('Massa'),
 
         'Recheios':
-          fillings.join(' + '),
+          kit
+            ? 'Definidos pelo kit'
+            : form.getAll('Recheio').join(' + '),
 
         'Adicionais':
-          form.getAll('Adicional').join(', ') ||
-          'Nenhum',
+          kit
+            ? 'Inclusos no kit'
+            : form.getAll('Adicional').join(', ') ||
+              'Nenhum',
 
         'Personalização':
-          form.getAll('Personalização').join(', ') ||
-          'Nenhuma',
+          kit
+            ? 'Somente topo escolhido'
+            : form.getAll('Personalização').join(', ') ||
+              'Nenhuma',
 
         'Brigadeiros':
-          brigadeLine
-            ? `${brigadeLine} — ${
-                brigadeFlavors.length
-                  ? brigadeFlavors.join(' + ')
-                  : 'Nenhum sabor selecionado'
-              } — ${
-                money(
-                  brigadeRadio?.dataset.brigPrice || 0
-                )
-              }`
-            : 'Não selecionado',
+          kit
+            ? 'Docinhos já incluídos no kit'
+            : brigadeLine
+              ? `${brigadeLine} — ${
+                  brigadeFlavors.length
+                    ? brigadeFlavors.join(' + ')
+                    : 'Nenhum sabor selecionado'
+                } — ${
+                  money(
+                    brigadeRadio?.dataset.brigPrice || 0
+                  )
+                }`
+              : 'Não selecionado',
 
         'Outros itens':
-          otherItems.length
-            ? otherItems.map(item =>
-                `${item.qty}x ${item.name} — ${money(item.total)}`
-              ).join('\n')
-            : 'Nenhum',
+          kit
+            ? 'Itens já incluídos no kit'
+            : otherItems.length
+              ? otherItems
+                  .map(item =>
+                    `${item.qty}x ${item.name} — ${money(item.total)}`
+                  )
+                  .join('\n')
+              : 'Nenhum',
 
         'Nome':
           form.get('Nome'),
@@ -2014,6 +2215,10 @@
       };
 
 
+      /* ================================================
+         WHATSAPP
+      ================================================ */
+
       const whatsappText =
         'Olá! Quero fazer uma encomenda na Martins Confeitaria.\n\n' +
 
@@ -2024,9 +2229,9 @@
           .join('\n');
 
 
-      /* =================================================
+      /* ================================================
          SUPABASE
-      ================================================= */
+      ================================================ */
 
       try{
 
@@ -2061,9 +2266,9 @@
       }
 
 
-      /* =================================================
-         WHATSAPP
-      ================================================= */
+      /* ================================================
+         ABRIR WHATSAPP
+      ================================================ */
 
       window.open(
         'https://wa.me/' +
@@ -2082,4 +2287,3 @@
 
 </body>
 </html>
-```
