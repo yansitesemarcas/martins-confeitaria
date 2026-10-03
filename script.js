@@ -1,4 +1,3 @@
-```javascript
 (() => {
   const D = window.MARTINS_DEFAULTS || {};
   const C = window.MARTINS_CONFIG || {};
@@ -28,8 +27,13 @@
       "'": "&#39;"
     }[char]));
 
-  const wa = (text) =>
-    `https://wa.me/${S.whatsapp}?text=${encodeURIComponent(text)}`;
+  // WhatsApp
+  const wa = (text) => {
+    return "https://wa.me/" +
+      S.whatsapp +
+      "?text=" +
+      encodeURIComponent(text);
+  };
 
   function supabaseClient() {
     if (
@@ -78,7 +82,6 @@
         if (productsResult?.data?.length) {
           S.products = productsResult.data;
         }
-
       } catch (error) {
         console.warn("Supabase:", error);
       }
@@ -144,7 +147,9 @@
       const addressQuery = S.address.join(", ");
 
       mapFrame.src =
-        `https://www.google.com/maps?q=${encodeURIComponent(addressQuery)}&output=embed`;
+        "https://www.google.com/maps?q=" +
+        encodeURIComponent(addressQuery) +
+        "&output=embed";
     }
 
     // História
@@ -159,7 +164,7 @@
 
     if (aboutQuote) {
       aboutQuote.textContent =
-        `“${S.about?.quote || ""}”`;
+        "“" + (S.about?.quote || "") + "”";
     }
 
     const aboutText = $("#aboutText");
@@ -171,7 +176,9 @@
         .split(/\n\n+/)
         .map(
           (paragraph) =>
-            `<p>${esc(paragraph).replace(/\n/g, "<br>")}</p>`
+            "<p>" +
+            esc(paragraph).replace(/\n/g, "<br>") +
+            "</p>"
         )
         .join("");
     }
@@ -205,11 +212,10 @@
 
     hoursElement.innerHTML = (S.hours || [])
       .map((hour, index) => {
-
         let text = "Fechado";
 
         if (hour?.s === "open") {
-          text = `${hour.o} – ${hour.c}`;
+          text = hour.o + " – " + hour.c;
         }
 
         if (hour?.s === "tbd") {
@@ -233,8 +239,6 @@
   function status() {
     const element = $("#openState");
 
-    // Esse elemento não existe no HTML atual.
-    // Portanto, simplesmente ignoramos.
     if (!element) {
       return;
     }
@@ -285,7 +289,7 @@
       isOpen ? "● Aberta agora" : "● Fechada agora";
 
     element.className =
-      `status ${isOpen ? "is-open" : ""}`;
+      "status " + (isOpen ? "is-open" : "");
   }
 
   // =========================
@@ -481,7 +485,6 @@
 
     const items = cart
       .map((cartItem) => {
-
         const product = S.products?.find(
           (item) =>
             String(item.id) ===
@@ -522,15 +525,12 @@
     }
 
     if (!items.length) {
-
       cartItems.innerHTML = `
         <div class="empty">
           Seu carrinho está vazio.
         </div>
       `;
-
     } else {
-
       cartItems.innerHTML = items
         .map(
           (item) => `
@@ -681,16 +681,13 @@
       $("#addressWrap");
 
     if (receiving && addressWrap) {
-
       receiving.addEventListener(
         "change",
         (event) => {
-
           addressWrap.classList.toggle(
             "hidden",
             event.target.value !== "Entrega"
           );
-
         }
       );
     }
@@ -702,7 +699,6 @@
     checkoutForm.addEventListener(
       "submit",
       (event) => {
-
         event.preventDefault();
 
         const form =
@@ -710,7 +706,6 @@
 
         const items = cart
           .map((cartItem) => {
-
             const product =
               S.products?.find(
                 (item) =>
@@ -746,33 +741,43 @@
           items
             .map(
               (item) =>
-                `• ${item.qty}x ${item.name} — ${money(
-                  item.price * item.qty
-                )}`
+                "• " +
+                item.qty +
+                "x " +
+                item.name +
+                " — " +
+                money(item.price * item.qty)
             )
             .join("\n");
 
         const address =
           form.get("address");
 
-        const message = `
-Olá! Quero fazer um pedido na Martins Confeitaria.
-
-*Cliente:* ${form.get("customer")}
-*WhatsApp:* ${form.get("phone")}
-*Recebimento:* ${form.get("receiving")}
-${address ? `*Endereço:* ${address}` : ""}
-*Pagamento:* ${form.get("payment")}
-
-*Itens:*
-${lines}
-
-*Total:* ${money(total)}
-
-*Observações:* ${
-          form.get("notes") || "Nenhuma"
-        }
-        `.trim();
+        const message =
+          "Olá! Quero fazer um pedido na Martins Confeitaria.\n\n" +
+          "*Cliente:* " +
+          form.get("customer") +
+          "\n" +
+          "*WhatsApp:* " +
+          form.get("phone") +
+          "\n" +
+          "*Recebimento:* " +
+          form.get("receiving") +
+          "\n" +
+          (address
+            ? "*Endereço:* " + address + "\n"
+            : "") +
+          "*Pagamento:* " +
+          form.get("payment") +
+          "\n\n" +
+          "*Itens:*\n" +
+          lines +
+          "\n\n" +
+          "*Total:* " +
+          money(total) +
+          "\n\n" +
+          "*Observações:* " +
+          (form.get("notes") || "Nenhuma");
 
         window.open(
           wa(message),
@@ -812,7 +817,6 @@ ${lines}
   // =========================
 
   function updateCartEvents() {
-
     const openCart = $("#openCart");
 
     if (openCart) {
@@ -838,11 +842,8 @@ ${lines}
       $("#clearCart");
 
     if (clearCart) {
-
       clearCart.onclick = () => {
-
         cart = [];
-
         saveCart();
       };
     }
@@ -851,9 +852,7 @@ ${lines}
       $("#checkoutBtn");
 
     if (checkoutButton) {
-
       checkoutButton.onclick = () => {
-
         if (!cart.length) {
           return;
         }
@@ -880,4 +879,3 @@ ${lines}
   load();
 
 })();
-```
