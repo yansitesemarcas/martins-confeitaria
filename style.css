@@ -1263,3 +1263,563 @@ dialog small {
 
 }
 ```
+/* =========================================================
+   MARTINS CONFEITARIA — CORREÇÃO VISUAL FINAL
+   ========================================================= */
+
+/* Fontes */
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600;700&family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --blue: #67b0cb;
+  --blue-dark: #2b7896;
+  --pink: #f3b7bb;
+  --pink-soft: #f8dfe1;
+  --ink: #292322;
+  --cream: #fffaf7;
+  --white: #ffffff;
+}
+
+/* Evita fundo estranho no logo */
+.brand img,
+.brand-logo,
+.hero img,
+.hero-logo,
+.hero-logo-image {
+  background: transparent !important;
+  box-shadow: none;
+}
+
+/* =========================================================
+   BOTÕES
+   ========================================================= */
+
+a.btn,
+button.btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px;
+  min-height: 48px;
+  padding: 13px 22px;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  z-index: 30 !important;
+
+  text-decoration: none !important;
+  cursor: pointer;
+  font-family: "Nunito", Arial, sans-serif;
+  font-weight: 800;
+  border-radius: 14px;
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    background .25s ease,
+    color .25s ease;
+}
+
+a.btn:hover,
+button.btn:hover {
+  transform: translateY(-3px);
+}
+
+/* Botão principal */
+.btn.primary,
+a.btn.primary,
+button.btn.primary {
+  background: var(--ink) !important;
+  color: #fff !important;
+  border: 2px solid var(--ink) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Botão WhatsApp */
+#contactWa,
+a#contactWa,
+button#contactWa {
+  background: var(--blue-dark) !important;
+  color: #fff !important;
+  border: 2px solid var(--blue-dark) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+#contactWa:hover {
+  background: #23677f !important;
+  border-color: #23677f !important;
+}
+
+/* Botão principal do hero */
+.hero .btn.primary,
+.hero-actions .btn.primary {
+  background: var(--pink) !important;
+  color: var(--ink) !important;
+  border-color: var(--pink) !important;
+}
+
+.hero .btn.primary:hover,
+.hero-actions .btn.primary:hover {
+  background: #f0aeb4 !important;
+}
+
+/* Botões fantasma continuam claros */
+.btn.ghost,
+a.btn.ghost,
+button.btn.ghost {
+  background: #fff !important;
+  color: var(--ink) !important;
+  border: 2px solid var(--line) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* =========================================================
+   HISTÓRIA
+   ========================================================= */
+
+#sobre {
+  background: var(--cream) !important;
+  scroll-margin-top: 100px;
+}
+
+#aboutTitle {
+  font-family: "Dancing Script", cursive !important;
+  font-weight: 700;
+  animation: storyTitleIn .9s ease both;
+}
+
+#aboutQuote {
+  animation: storyQuoteIn .9s .15s ease both;
+}
+
+#aboutText {
+  animation: storyTextIn .8s .25s ease both;
+}
+
+#aboutText p {
+  margin-bottom: 18px;
+  line-height: 1.8;
+}
+
+/* Nome do chef */
+.chef-signature {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+
+  margin: 0 0 24px !important;
+  padding: 10px 16px;
+
+  background: var(--pink-soft);
+  border: 1px solid rgba(243, 183, 187, .65);
+  border-radius: 999px;
+
+  color: var(--ink);
+  font-family: "Nunito", Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 900;
+
+  box-shadow: 0 10px 25px rgba(43,34,31,.07);
+
+  animation: chefIn .8s .3s ease both;
+}
+
+/* =========================================================
+   ANIMAÇÕES
+   ========================================================= */
+
+@keyframes storyTitleIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes storyQuoteIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes storyTextIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes chefIn {
+  from {
+    opacity: 0;
+    transform: translateX(-15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* =========================================================
+   PÁGINA DE ENCOMENDAS
+   ========================================================= */
+
+.custom-page {
+  width: min(1180px, 92%);
+  margin: 0 auto;
+  padding: 70px 0 100px;
+}
+
+.custom-page .section-head {
+  margin-bottom: 35px;
+}
+
+.custom-page .section-head h1 {
+  font-family: "Dancing Script", cursive;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1;
+  color: var(--ink);
+  animation: storyTitleIn .8s ease both;
+}
+
+.custom-page .section-head .eyebrow {
+  color: var(--blue-dark);
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* Formulário */
+.custom-page .form {
+  display: grid;
+  gap: 24px;
+}
+
+.custom-page fieldset.extras {
+  min-width: 0;
+  margin: 0;
+  padding: 26px;
+
+  background: rgba(255,255,255,.96);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+
+  box-shadow: 0 16px 45px rgba(43,34,31,.08);
+
+  animation: formCardIn .65s ease both;
+}
+
+.custom-page fieldset.extras:hover {
+  box-shadow: 0 20px 55px rgba(43,34,31,.11);
+}
+
+.custom-page legend {
+  padding: 0 10px;
+
+  color: var(--ink);
+  font-size: 1.2rem;
+  font-weight: 900;
+}
+
+/* Campos */
+.custom-page label {
+  font-family: "Nunito", Arial, sans-serif;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.custom-page input,
+.custom-page select,
+.custom-page textarea {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 13px 15px;
+  margin-top: 7px;
+
+  background: #fff;
+  color: var(--ink);
+
+  border: 1.5px solid var(--line);
+  border-radius: 13px;
+
+  outline: none;
+  font-family: "Nunito", Arial, sans-serif;
+  font-size: .98rem;
+
+  transition:
+    border-color .2s ease,
+    box-shadow .2s ease,
+    transform .2s ease;
+}
+
+.custom-page input:focus,
+.custom-page select:focus,
+.custom-page textarea:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 4px rgba(103,176,203,.14);
+}
+
+/* Opções */
+.custom-page .extra-option,
+.custom-page .cake-size-option,
+.custom-page .kit-option {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 15px 16px;
+  margin: 9px 0;
+
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+
+  cursor: pointer;
+
+  transition:
+    transform .2s ease,
+    border-color .2s ease,
+    background .2s ease,
+    box-shadow .2s ease;
+}
+
+.custom-page .extra-option:hover,
+.custom-page .cake-size-option:hover,
+.custom-page .kit-option:hover {
+  transform: translateY(-2px);
+  border-color: var(--blue);
+  box-shadow: 0 10px 25px rgba(43,34,31,.07);
+}
+
+/* Opção selecionada */
+.custom-page .extra-option:has(input:checked),
+.custom-page .cake-size-option:has(input:checked),
+.custom-page .kit-option:has(input:checked) {
+  background: #f7fcfe;
+  border-color: var(--blue-dark);
+  box-shadow: 0 10px 25px rgba(43,34,31,.08);
+}
+
+.custom-page input[type="radio"],
+.custom-page input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--blue-dark);
+  box-shadow: none;
+}
+
+/* Tipo de bolo */
+.custom-page .cake-kind {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.custom-page .cake-kind > label {
+  margin: 0;
+}
+
+/* Tamanhos */
+.custom-page .cake-sizes {
+  display: grid;
+  gap: 10px;
+}
+
+/* Kits */
+.custom-page .kit-options {
+  display: grid;
+  gap: 12px;
+}
+
+.custom-page .kit-included {
+  margin-top: 15px;
+}
+
+.custom-page .kit-included-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+/* Brigadeiros */
+.custom-page .brigadeiro-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.custom-page .brigadeiro-box {
+  padding: 16px;
+
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+
+  box-shadow: 0 8px 25px rgba(43,34,31,.06);
+}
+
+.custom-page .brigadeiro-quantities {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/* Outros produtos */
+.custom-page .other-order-list {
+  display: grid;
+  gap: 12px;
+}
+
+.custom-page .other-order-list .brigadeiro-box {
+  background: #fff;
+}
+
+/* Textos auxiliares */
+.custom-page .kit-choice-help,
+.custom-page .brig-help,
+.custom-page .other-price {
+  color: #766c68;
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.custom-page .kit-fixed-title,
+.custom-page .party-title {
+  color: var(--ink);
+  font-weight: 900;
+}
+
+/* Foto */
+.custom-page .custom-photo-panel {
+  overflow: hidden;
+  border-radius: 22px;
+  background: var(--pink-soft);
+  border: 1px solid var(--line);
+}
+
+/* Botão enviar */
+.custom-page .submit-order {
+  width: 100%;
+  min-height: 58px;
+
+  margin-top: 10px;
+
+  background: var(--blue-dark) !important;
+  color: #fff !important;
+
+  border: 2px solid var(--blue-dark) !important;
+  border-radius: 16px;
+
+  font-size: 1.05rem;
+  font-weight: 900;
+
+  box-shadow: 0 14px 30px rgba(43,120,150,.20);
+
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.custom-page .submit-order:hover {
+  background: #23677f !important;
+  border-color: #23677f !important;
+  transform: translateY(-3px);
+}
+
+/* Animação dos cards */
+@keyframes formCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   RESPONSIVO — ENCOMENDAS
+   ========================================================= */
+
+@media (max-width: 760px) {
+  .custom-page {
+    width: min(94%, 600px);
+    padding: 45px 0 70px;
+  }
+
+  .custom-page fieldset.extras {
+    padding: 20px 16px;
+    border-radius: 20px;
+  }
+
+  .custom-page .cake-kind {
+    grid-template-columns: 1fr;
+  }
+
+  .custom-page .kit-included-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .custom-page .brigadeiro-list {
+    grid-template-columns: 1fr;
+  }
+
+  .custom-page .brigadeiro-quantities {
+    grid-template-columns: 1fr;
+  }
+
+  .custom-page .section-head h1 {
+    font-size: 3rem;
+  }
+}
+
+/* =========================================================
+   MELHORIAS DE MOVIMENTO
+   ========================================================= */
+
+.btn,
+.product-card,
+.menu-card,
+.review-card,
+.custom-page .extras {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .product-card,
+  .menu-card {
+    transition:
+      transform .3s ease,
+      box-shadow .3s ease;
+  }
+
+  .product-card:hover,
+  .menu-card:hover {
+    transform: translateY(-5px);
+  }
+}
