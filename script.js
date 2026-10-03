@@ -1,4 +1,3 @@
-```js
 (() => {
   const D = window.MARTINS_DEFAULTS || {};
   const C = window.MARTINS_CONFIG || {};
@@ -65,9 +64,6 @@
   // =========================
 
   async function load() {
-
-    // PRIMEIRO:
-    // mostra imediatamente os dados padrão
     render();
 
     const client = supabaseClient();
@@ -77,22 +73,17 @@
     }
 
     try {
+      const settingsResult = await client
+        .from("settings")
+        .select("value")
+        .eq("key", "site")
+        .maybeSingle();
 
-      const settingsResult =
-        await client
-          .from("settings")
-          .select("value")
-          .eq("key", "site")
-          .maybeSingle();
+      const productsResult = await client
+        .from("products")
+        .select("*")
+        .order("sort");
 
-      const productsResult =
-        await client
-          .from("products")
-          .select("*")
-          .order("sort");
-
-      // Mantém os dados padrão
-      // e só substitui o que realmente existir
       if (
         settingsResult &&
         !settingsResult.error &&
@@ -114,19 +105,13 @@
         S.products = productsResult.data;
       }
 
-      // Renderiza novamente caso o Supabase
-      // tenha fornecido dados válidos
       render();
-
     } catch (error) {
-
       console.warn(
         "Supabase não carregado. Usando dados padrão.",
         error
       );
 
-      // Mantém o site funcionando
-      // mesmo sem Supabase
       render();
     }
   }
@@ -136,15 +121,12 @@
   // =========================
 
   function render() {
-
     const year = $("#year");
 
     if (year) {
-      year.textContent =
-        new Date().getFullYear();
+      year.textContent = new Date().getFullYear();
     }
 
-    // WhatsApp
     const contactWa = $("#contactWa");
 
     if (contactWa) {
@@ -153,52 +135,39 @@
       );
     }
 
-    // Instagram
     const instagram = $("#instagram");
 
     if (instagram) {
-      instagram.href =
-        S.instagram || "#";
+      instagram.href = S.instagram || "#";
     }
 
-    // Google Maps
     const maps = $("#maps");
 
     if (maps) {
-      maps.href =
-        S.maps || "#";
+      maps.href = S.maps || "#";
     }
 
-    // Avaliação
     const review = $("#review");
 
     if (review) {
-      review.href =
-        S.review ||
-        S.maps ||
-        "#";
+      review.href = S.review || S.maps || "#";
     }
 
-    // Endereço
     const address = $("#address");
 
     if (address) {
-      address.innerHTML =
-        (S.address || [])
-          .map(esc)
-          .join("<br>");
+      address.innerHTML = (S.address || [])
+        .map(esc)
+        .join("<br>");
     }
 
-    // Mapa
-    const mapFrame =
-      $("#mapFrame");
+    const mapFrame = $("#mapFrame");
 
     if (
       mapFrame &&
       Array.isArray(S.address)
     ) {
-      const addressQuery =
-        S.address.join(", ");
+      const addressQuery = S.address.join(", ");
 
       mapFrame.src =
         "https://www.google.com/maps?q=" +
@@ -210,16 +179,14 @@
     // HISTÓRIA
     // =========================
 
-    const aboutTitle =
-      $("#aboutTitle");
+    const aboutTitle = $("#aboutTitle");
 
     if (aboutTitle) {
       aboutTitle.textContent =
         S.about?.title || "";
     }
 
-    const aboutQuote =
-      $("#aboutQuote");
+    const aboutQuote = $("#aboutQuote");
 
     if (aboutQuote) {
       aboutQuote.textContent =
@@ -228,24 +195,24 @@
         "”";
     }
 
-    const aboutText =
-      $("#aboutText");
+    const aboutText = $("#aboutText");
 
     if (aboutText) {
-
-      aboutText.innerHTML =
-        String(
-          S.about?.text || ""
-        )
-          .split(/\n\n+/)
-          .map(
-            (paragraph) =>
-              "<p>" +
-              esc(paragraph)
-                .replace(/\n/g, "<br>") +
-              "</p>"
-          )
-          .join("");
+      aboutText.innerHTML = String(
+        S.about?.text || ""
+      )
+        .split(/\n\n+/)
+        .map((paragraph) => {
+          return (
+            "<p>" +
+            esc(paragraph).replace(
+              /\n/g,
+              "<br>"
+            ) +
+            "</p>"
+          );
+        })
+        .join("");
     }
 
     renderHours();
@@ -269,9 +236,7 @@
   ];
 
   function renderHours() {
-
-    const hoursElement =
-      $("#hours");
+    const hoursElement = $("#hours");
 
     if (!hoursElement) {
       return;
@@ -280,7 +245,6 @@
     hoursElement.innerHTML =
       (S.hours || [])
         .map((hour, index) => {
-
           let text = "Fechado";
 
           if (hour?.s === "open") {
@@ -314,7 +278,6 @@
   // =========================
 
   function renderMenu() {
-
     const categoriesElement =
       $("#categories");
 
@@ -380,11 +343,9 @@
 
     $$("#categories button")
       .forEach((button) => {
-
         button.addEventListener(
           "click",
           () => {
-
             currentCategory =
               button.dataset.category ||
               "";
@@ -409,7 +370,6 @@
             <article class="product">
 
               <div class="product-img">
-
                 ${
                   product.image
                     ? `
@@ -425,7 +385,6 @@
                       </span>
                     `
                 }
-
               </div>
 
               <div class="product-body">
@@ -486,7 +445,6 @@
 
     $$(".add").forEach(
       (button) => {
-
         button.addEventListener(
           "click",
           () => {
@@ -495,7 +453,6 @@
             );
           }
         );
-
       }
     );
   }
@@ -505,7 +462,6 @@
   // =========================
 
   function addToCart(id) {
-
     const product =
       S.products?.find(
         (item) =>
@@ -538,7 +494,6 @@
   }
 
   function saveCart() {
-
     localStorage.setItem(
       "martins_cart",
       JSON.stringify(cart)
@@ -548,7 +503,6 @@
   }
 
   function renderCart() {
-
     const cartCount =
       $("#cartCount");
 
@@ -568,7 +522,6 @@
     const items =
       cart
         .map((cartItem) => {
-
           const product =
             S.products?.find(
               (item) =>
@@ -612,15 +565,12 @@
     }
 
     if (!items.length) {
-
       cartItems.innerHTML = `
         <div class="empty">
           Seu carrinho está vazio.
         </div>
       `;
-
     } else {
-
       cartItems.innerHTML =
         items
           .map(
@@ -680,7 +630,6 @@
 
     $$("[data-cart-plus]")
       .forEach((button) => {
-
         button.addEventListener(
           "click",
           () =>
@@ -689,12 +638,10 @@
               1
             )
         );
-
       });
 
     $$("[data-cart-minus]")
       .forEach((button) => {
-
         button.addEventListener(
           "click",
           () =>
@@ -703,7 +650,6 @@
               -1
             )
         );
-
       });
   }
 
@@ -711,7 +657,6 @@
     id,
     amount
   ) {
-
     const item =
       cart.find(
         (cartItem) =>
@@ -726,7 +671,6 @@
     item.qty += amount;
 
     if (item.qty < 1) {
-
       cart =
         cart.filter(
           (cartItem) =>
@@ -739,11 +683,10 @@
   }
 
   // =========================
-  // CARRINHO — ABRIR
+  // ABRIR CARRINHO
   // =========================
 
   function openDrawer() {
-
     const drawer =
       $("#drawer");
 
@@ -751,10 +694,7 @@
       $("#shade");
 
     if (drawer) {
-
-      drawer.classList.add(
-        "open"
-      );
+      drawer.classList.add("open");
 
       drawer.setAttribute(
         "aria-hidden",
@@ -768,11 +708,10 @@
   }
 
   // =========================
-  // CARRINHO — FECHAR
+  // FECHAR CARRINHO
   // =========================
 
   function closeDrawer() {
-
     const drawer =
       $("#drawer");
 
@@ -780,7 +719,6 @@
       $("#shade");
 
     if (drawer) {
-
       drawer.classList.remove(
         "open"
       );
@@ -803,7 +741,6 @@
   // =========================
 
   function setupCheckout() {
-
     const checkoutForm =
       $("#checkoutForm");
 
@@ -819,17 +756,14 @@
       receiving &&
       addressWrap
     ) {
-
       receiving.addEventListener(
         "change",
         (event) => {
-
           addressWrap.classList.toggle(
             "hidden",
             event.target.value !==
               "Entrega"
           );
-
         }
       );
     }
@@ -841,7 +775,6 @@
     checkoutForm.addEventListener(
       "submit",
       (event) => {
-
         event.preventDefault();
 
         const form =
@@ -852,7 +785,6 @@
         const items =
           cart
             .map((cartItem) => {
-
               const product =
                 S.products?.find(
                   (item) =>
@@ -870,7 +802,6 @@
                 ...product,
                 qty: cartItem.qty
               };
-
             })
             .filter(Boolean);
 
@@ -981,7 +912,6 @@
   // =========================
 
   function updateCartEvents() {
-
     const openCart =
       $("#openCart");
 
@@ -1010,11 +940,8 @@
       $("#clearCart");
 
     if (clearCart) {
-
       clearCart.onclick = () => {
-
         cart = [];
-
         saveCart();
       };
     }
@@ -1023,10 +950,8 @@
       $("#checkoutBtn");
 
     if (checkoutButton) {
-
       checkoutButton.onclick =
         () => {
-
           if (!cart.length) {
             return;
           }
@@ -1051,9 +976,5 @@
 
   setupCheckout();
 
-  // Renderiza imediatamente
-  // e depois sincroniza com Supabase
   load();
-
 })();
-```
