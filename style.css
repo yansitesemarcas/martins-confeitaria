@@ -5,8 +5,6 @@
   --pink:#f3b7bb;
   --pink-dark:#d9858e;
   --pink-light:#fdeced;
-  --cream:#fffaf8;
-  --white:#ffffff;
   --ink:#3d2b25;
   --muted:#705e56;
   --line:#dcebef;
@@ -51,9 +49,7 @@ button{
 }
 
 
-/* =========================
-   CABEÇALHO
-========================= */
+/* CABEÇALHO */
 
 .top{
   position:sticky;
@@ -64,7 +60,7 @@ button{
   display:flex;
   align-items:center;
   gap:25px;
-  background:#ffffff;
+  background:#fff;
   border-bottom:1px solid var(--line);
   box-shadow:0 5px 25px rgba(0,0,0,.06);
 }
@@ -101,9 +97,7 @@ button{
 }
 
 
-/* =========================
-   BOTÃO CARRINHO
-========================= */
+/* BOTÃO CARRINHO */
 
 .cart-btn{
   display:inline-flex !important;
@@ -113,16 +107,14 @@ button{
   padding:10px 16px;
   border:2px solid var(--blue-dark) !important;
   border-radius:999px;
-  background-color:var(--blue-dark) !important;
-  color:#ffffff !important;
+  background:var(--blue-dark) !important;
+  color:#fff !important;
   opacity:1 !important;
   visibility:visible !important;
 }
 
 
-/* =========================
-   BOTÕES
-========================= */
+/* BOTÕES DO SITE */
 
 .btn{
   display:inline-flex !important;
@@ -138,10 +130,7 @@ button{
   visibility:visible !important;
   position:relative;
   z-index:5;
-  transition:
-    transform .2s ease,
-    background .2s ease,
-    box-shadow .2s ease;
+  transition:.2s ease;
   box-shadow:0 8px 22px rgba(43,120,150,.18);
 }
 
@@ -149,25 +138,28 @@ button{
   transform:translateY(-2px);
 }
 
-.btn-primary{
-  background-color:var(--blue-dark) !important;
-  color:#ffffff !important;
+
+/* CLASSES USADAS PELO INDEX.HTML ATUAL */
+
+.btn.primary{
+  background:var(--blue-dark) !important;
+  color:#fff !important;
   border-color:var(--blue-dark) !important;
 }
 
-.btn-primary:hover{
-  background-color:var(--blue-deep) !important;
+.btn.primary:hover{
+  background:var(--blue-deep) !important;
   border-color:var(--blue-deep) !important;
 }
 
-.btn-secondary{
-  background-color:#ffffff !important;
+.btn.ghost{
+  background:#fff !important;
   color:var(--blue-deep) !important;
   border-color:var(--blue-dark) !important;
 }
 
-.btn-secondary:hover{
-  background-color:var(--pink-light) !important;
+.btn.ghost:hover{
+  background:var(--pink-light) !important;
 }
 
 .full{
@@ -175,9 +167,7 @@ button{
 }
 
 
-/* =========================
-   HERO
-========================= */
+/* HERO */
 
 .hero{
   position:relative;
@@ -187,25 +177,19 @@ button{
   align-items:center;
   justify-content:center;
   overflow:hidden;
-  background:linear-gradient(
-    135deg,
-    var(--blue-dark),
-    var(--blue)
-  );
+  background:linear-gradient(135deg,var(--blue-dark),var(--blue));
 }
 
-.hero-overlay{
+.hero-overlay,
+.hero-video-overlay{
   position:absolute;
   inset:0;
-  background:radial-gradient(
-    circle at center,
-    rgba(255,255,255,.12),
-    transparent 55%
-  );
+  background:rgba(29,93,117,.25);
   pointer-events:none;
 }
 
-.hero-content{
+.hero-content,
+.hero-center{
   position:relative;
   z-index:10;
   width:min(900px,100%);
@@ -215,7 +199,8 @@ button{
   text-align:center;
 }
 
-.hero-logo{
+.hero-logo,
+.hero-logo-image{
   width:min(300px,70vw);
   height:auto;
   margin-bottom:25px;
@@ -223,15 +208,19 @@ button{
   box-shadow:0 20px 60px rgba(0,0,0,.25);
 }
 
-.hero-subtitle{
+.hero-subtitle,
+.hero-main-phrase{
   margin:0 0 28px;
-  color:#ffffff;
+  color:#fff;
   font-size:clamp(22px,4vw,38px);
   font-weight:900;
   text-shadow:0 3px 15px rgba(0,0,0,.35);
 }
 
-.hero-buttons{
+.hero-buttons,
+.hero-actions,
+.actions,
+.centered-actions{
   display:flex;
   justify-content:center;
   align-items:center;
@@ -240,14 +229,64 @@ button{
 }
 
 
-/* =========================
-   SEÇÕES
-========================= */
+/* VÍDEO */
+
+.hero-video,
+.cake-bg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:0;
+}
+
+
+/* SEÇÕES */
 
 .about,
-.menu-section,
-.contact-section{
+.menu,
+.contact,
+.review-cta{
   padding:90px 6%;
+}
+
+.about{
+  max-width:1250px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:350px 1fr;
+  gap:70px;
+  align-items:center;
+  background:#fff;
+}
+
+.about-art{
+  display:flex;
+  justify-content:center;
+}
+
+.about-art img{
+  width:min(320px,100%);
+  border-radius:50%;
+  box-shadow:var(--shadow);
+}
+
+.about h2{
+  margin:0 0 18px;
+  font-size:clamp(30px,5vw,48px);
+  line-height:1.1;
+}
+
+.about p{
+  color:var(--muted);
+  line-height:1.8;
+}
+
+.quote{
+  color:var(--pink-dark) !important;
+  font-size:21px;
+  font-weight:900;
 }
 
 .section-head{
@@ -265,8 +304,7 @@ button{
   letter-spacing:2px;
 }
 
-.section-head h2,
-.about-content h2{
+.section-head h2{
   margin:0 0 18px;
   font-size:clamp(30px,5vw,48px);
   line-height:1.1;
@@ -278,60 +316,13 @@ button{
 }
 
 
-/* =========================
-   HISTÓRIA
-========================= */
+/* CARDÁPIO */
 
-.about{
-  max-width:1250px;
-  margin:auto;
-  display:grid;
-  grid-template-columns:350px 1fr;
-  gap:70px;
-  align-items:center;
-  background:#ffffff;
+.menu{
+  background:linear-gradient(135deg,#f5fcfe,#fff7f8);
 }
 
-.about-image{
-  display:flex;
-  justify-content:center;
-}
-
-.about-image img{
-  width:min(320px,100%);
-  border-radius:50%;
-  box-shadow:var(--shadow);
-}
-
-.about-content{
-  max-width:750px;
-}
-
-.about-content p{
-  color:var(--muted);
-  line-height:1.8;
-}
-
-.about-content .quote{
-  color:var(--pink-dark);
-  font-size:21px;
-  font-weight:900;
-}
-
-
-/* =========================
-   MENU
-========================= */
-
-.menu-section{
-  background:linear-gradient(
-    135deg,
-    #f5fcfe,
-    #fff7f8
-  );
-}
-
-.menu-buttons{
+.grid{
   max-width:1100px;
   margin:auto;
   display:grid;
@@ -339,86 +330,115 @@ button{
   gap:24px;
 }
 
+.tabs{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:30px;
+}
+
 .menu-card{
   display:block;
   padding:32px;
-  background:#ffffff;
+  background:#fff;
   border:1px solid var(--line);
   border-radius:var(--radius);
   box-shadow:var(--shadow);
-  transition:
-    transform .2s ease,
-    box-shadow .2s ease;
-}
-
-.menu-card:hover{
-  transform:translateY(-5px);
-  box-shadow:0 22px 55px rgba(43,120,150,.18);
-}
-
-.menu-icon{
-  display:block;
-  margin-bottom:15px;
-  font-size:42px;
-}
-
-.menu-card h3{
-  margin:0 0 10px;
-  color:var(--blue-deep);
-  font-size:23px;
-}
-
-.menu-card p{
-  margin:0 0 20px;
-  color:var(--muted);
-  line-height:1.6;
-}
-
-.menu-link{
-  color:var(--pink-dark);
-  font-weight:900;
 }
 
 
-/* =========================
-   CONTATO
-========================= */
+/* CONTATO */
 
-.contact-section{
-  background:#ffffff;
+.contact{
+  background:#fff;
 }
 
-.contact-grid{
+.info{
   max-width:1100px;
   margin:auto;
   display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:22px;
+  grid-template-columns:1fr 1fr;
+  gap:35px;
 }
 
-.contact-card{
+.info > div{
   padding:28px;
-  background:#ffffff;
   border:1px solid var(--line);
   border-radius:var(--radius);
   box-shadow:var(--shadow);
 }
 
-.contact-card h3{
-  margin-top:0;
-  color:var(--blue-deep);
+.contact-actions{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:20px;
 }
 
-.contact-card p{
-  min-height:75px;
+.map-side{
+  max-width:1100px;
+  margin:30px auto 0;
+}
+
+#mapFrame{
+  width:100%;
+  min-height:350px;
+  border:0;
+  border-radius:var(--radius);
+}
+
+
+/* BOLO */
+
+.cake{
+  position:relative;
+  min-height:600px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:80px 20px;
+}
+
+.cake-overlay{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.35);
+  z-index:1;
+}
+
+.cake-copy{
+  position:relative;
+  z-index:2;
+  text-align:center;
+  color:#fff;
+  max-width:750px;
+}
+
+.cake-copy h2{
+  font-size:clamp(32px,5vw,54px);
+}
+
+.cake-copy p{
+  font-size:20px;
+  line-height:1.6;
+}
+
+
+/* AVALIAÇÃO */
+
+.review-cta{
+  text-align:center;
+  background:linear-gradient(135deg,#fff7f8,#f5fcfe);
+}
+
+.review-cta p{
   color:var(--muted);
-  line-height:1.7;
 }
 
 
-/* =========================
-   RODAPÉ
-========================= */
+/* RODAPÉ */
 
 footer{
   padding:30px 6%;
@@ -427,15 +447,13 @@ footer{
   align-items:center;
   gap:20px;
   background:var(--blue-deep);
-  color:#ffffff;
+  color:#fff;
 }
 
 
-/* =========================
-   CARRINHO
-========================= */
+/* CARRINHO */
 
-.cart-shade{
+.shade{
   position:fixed;
   inset:0;
   z-index:1900;
@@ -446,13 +464,7 @@ footer{
   transition:.25s ease;
 }
 
-.cart-shade.show{
-  opacity:1;
-  visibility:visible;
-  pointer-events:auto;
-}
-
-.cart{
+.drawer{
   position:fixed;
   top:0;
   right:0;
@@ -461,17 +473,13 @@ footer{
   height:100vh;
   display:flex;
   flex-direction:column;
-  background:#ffffff;
+  background:#fff;
   box-shadow:-15px 0 50px rgba(0,0,0,.2);
   transform:translateX(105%);
   transition:.3s ease;
 }
 
-.cart.show{
-  transform:translateX(0);
-}
-
-.cart-header{
+.drawer-head{
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -479,56 +487,32 @@ footer{
   border-bottom:1px solid var(--line);
 }
 
-.cart-header h2{
-  margin:0;
-}
-
-.cart-header button{
+.drawer-head button{
   width:40px;
   height:40px;
   border:0;
   border-radius:50%;
   background:var(--pink-light);
-  color:var(--ink);
   font-size:28px;
 }
 
-.cart-items{
+#cartItems{
   flex:1;
   overflow:auto;
   padding:20px;
 }
 
-.cart-empty{
-  text-align:center;
-  color:var(--muted);
-}
-
-.cart-footer{
+.cart-foot{
   padding:22px;
   border-top:1px solid var(--line);
 }
-
-.cart-total{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:15px;
-  font-size:18px;
-}
-
-
-/* =========================
-   ESCONDER
-========================= */
 
 .hidden{
   display:none !important;
 }
 
 
-/* =========================
-   RESPONSIVO
-========================= */
+/* RESPONSIVO */
 
 @media(max-width:900px){
 
@@ -550,12 +534,11 @@ footer{
     text-align:center;
   }
 
-  .about-content{
-    margin:auto;
+  .grid{
+    grid-template-columns:1fr;
   }
 
-  .menu-buttons,
-  .contact-grid{
+  .info{
     grid-template-columns:1fr;
   }
 
@@ -579,27 +562,23 @@ footer{
     min-height:620px;
   }
 
-  .hero-logo{
-    width:250px;
-  }
-
-  .hero-buttons{
+  .hero-actions{
     width:100%;
     flex-direction:column;
   }
 
-  .hero-buttons .btn{
+  .hero-actions .btn{
     width:min(330px,100%);
   }
 
   .about,
-  .menu-section,
-  .contact-section{
+  .menu,
+  .contact,
+  .review-cta{
     padding:65px 20px;
   }
 
-  .menu-card,
-  .contact-card{
-    padding:24px;
+  .grid{
+    grid-template-columns:1fr;
   }
 }
