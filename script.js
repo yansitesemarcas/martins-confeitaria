@@ -1,3 +1,4 @@
+```js
 (() => {
   const D = window.MARTINS_DEFAULTS || {};
   const C = window.MARTINS_CONFIG || {};
@@ -27,13 +28,22 @@
       "'": "&#39;"
     }[char]));
 
-  // WhatsApp
+  // =========================
+  // WHATSAPP
+  // =========================
+
   const wa = (text) => {
-    return "https://wa.me/" +
+    return (
+      "https://wa.me/" +
       S.whatsapp +
       "?text=" +
-      encodeURIComponent(text);
+      encodeURIComponent(text)
+    );
   };
+
+  // =========================
+  // SUPABASE
+  // =========================
 
   function supabaseClient() {
     if (
@@ -55,39 +65,70 @@
   // =========================
 
   async function load() {
+
+    // PRIMEIRO:
+    // mostra imediatamente os dados padrão
+    render();
+
     const client = supabaseClient();
 
-    if (client) {
-      try {
-        const [settingsResult, productsResult] = await Promise.all([
-          client
-            .from("settings")
-            .select("value")
-            .eq("key", "site")
-            .maybeSingle(),
-
-          client
-            .from("products")
-            .select("*")
-            .order("sort")
-        ]);
-
-        if (settingsResult?.data?.value) {
-          S = {
-            ...S,
-            ...settingsResult.data.value
-          };
-        }
-
-        if (productsResult?.data?.length) {
-          S.products = productsResult.data;
-        }
-      } catch (error) {
-        console.warn("Supabase:", error);
-      }
+    if (!client) {
+      return;
     }
 
-    render();
+    try {
+
+      const settingsResult =
+        await client
+          .from("settings")
+          .select("value")
+          .eq("key", "site")
+          .maybeSingle();
+
+      const productsResult =
+        await client
+          .from("products")
+          .select("*")
+          .order("sort");
+
+      // Mantém os dados padrão
+      // e só substitui o que realmente existir
+      if (
+        settingsResult &&
+        !settingsResult.error &&
+        settingsResult.data &&
+        settingsResult.data.value
+      ) {
+        S = {
+          ...S,
+          ...settingsResult.data.value
+        };
+      }
+
+      if (
+        productsResult &&
+        !productsResult.error &&
+        Array.isArray(productsResult.data) &&
+        productsResult.data.length
+      ) {
+        S.products = productsResult.data;
+      }
+
+      // Renderiza novamente caso o Supabase
+      // tenha fornecido dados válidos
+      render();
+
+    } catch (error) {
+
+      console.warn(
+        "Supabase não carregado. Usando dados padrão.",
+        error
+      );
+
+      // Mantém o site funcionando
+      // mesmo sem Supabase
+      render();
+    }
   }
 
   // =========================
@@ -95,10 +136,12 @@
   // =========================
 
   function render() {
+
     const year = $("#year");
 
     if (year) {
-      year.textContent = new Date().getFullYear();
+      year.textContent =
+        new Date().getFullYear();
     }
 
     // WhatsApp
@@ -114,37 +157,48 @@
     const instagram = $("#instagram");
 
     if (instagram) {
-      instagram.href = S.instagram || "#";
+      instagram.href =
+        S.instagram || "#";
     }
 
     // Google Maps
     const maps = $("#maps");
 
     if (maps) {
-      maps.href = S.maps || "#";
+      maps.href =
+        S.maps || "#";
     }
 
     // Avaliação
     const review = $("#review");
 
     if (review) {
-      review.href = S.review || S.maps || "#";
+      review.href =
+        S.review ||
+        S.maps ||
+        "#";
     }
 
     // Endereço
     const address = $("#address");
 
     if (address) {
-      address.innerHTML = (S.address || [])
-        .map(esc)
-        .join("<br>");
+      address.innerHTML =
+        (S.address || [])
+          .map(esc)
+          .join("<br>");
     }
 
     // Mapa
-    const mapFrame = $("#mapFrame");
+    const mapFrame =
+      $("#mapFrame");
 
-    if (mapFrame && S.address) {
-      const addressQuery = S.address.join(", ");
+    if (
+      mapFrame &&
+      Array.isArray(S.address)
+    ) {
+      const addressQuery =
+        S.address.join(", ");
 
       mapFrame.src =
         "https://www.google.com/maps?q=" +
@@ -152,35 +206,46 @@
         "&output=embed";
     }
 
-    // História
-    const aboutTitle = $("#aboutTitle");
+    // =========================
+    // HISTÓRIA
+    // =========================
+
+    const aboutTitle =
+      $("#aboutTitle");
 
     if (aboutTitle) {
       aboutTitle.textContent =
         S.about?.title || "";
     }
 
-    const aboutQuote = $("#aboutQuote");
+    const aboutQuote =
+      $("#aboutQuote");
 
     if (aboutQuote) {
       aboutQuote.textContent =
-        "“" + (S.about?.quote || "") + "”";
+        "“" +
+        (S.about?.quote || "") +
+        "”";
     }
 
-    const aboutText = $("#aboutText");
+    const aboutText =
+      $("#aboutText");
 
     if (aboutText) {
-      aboutText.innerHTML = String(
-        S.about?.text || ""
-      )
-        .split(/\n\n+/)
-        .map(
-          (paragraph) =>
-            "<p>" +
-            esc(paragraph).replace(/\n/g, "<br>") +
-            "</p>"
+
+      aboutText.innerHTML =
+        String(
+          S.about?.text || ""
         )
-        .join("");
+          .split(/\n\n+/)
+          .map(
+            (paragraph) =>
+              "<p>" +
+              esc(paragraph)
+                .replace(/\n/g, "<br>") +
+              "</p>"
+          )
+          .join("");
     }
 
     renderHours();
@@ -204,92 +269,44 @@
   ];
 
   function renderHours() {
-    const hoursElement = $("#hours");
+
+    const hoursElement =
+      $("#hours");
 
     if (!hoursElement) {
       return;
     }
 
-    hoursElement.innerHTML = (S.hours || [])
-      .map((hour, index) => {
-        let text = "Fechado";
+    hoursElement.innerHTML =
+      (S.hours || [])
+        .map((hour, index) => {
 
-        if (hour?.s === "open") {
-          text = hour.o + " – " + hour.c;
-        }
+          let text = "Fechado";
 
-        if (hour?.s === "tbd") {
-          text = "A confirmar";
-        }
+          if (hour?.s === "open") {
+            text =
+              hour.o +
+              " – " +
+              hour.c;
+          }
 
-        return `
-          <div class="hour">
-            <span>${days[index] || ""}</span>
-            <b>${esc(text)}</b>
-          </div>
-        `;
-      })
-      .join("");
-  }
+          if (hour?.s === "tbd") {
+            text = "A confirmar";
+          }
 
-  // =========================
-  // STATUS
-  // =========================
+          return `
+            <div class="hour">
+              <span>
+                ${days[index] || ""}
+              </span>
 
-  function status() {
-    const element = $("#openState");
-
-    if (!element) {
-      return;
-    }
-
-    const now = new Date(
-      new Date().toLocaleString("en-US", {
-        timeZone: "America/Fortaleza"
-      })
-    );
-
-    const hour = S.hours?.[now.getDay()];
-
-    if (!hour) {
-      return;
-    }
-
-    if (hour.s === "tbd") {
-      element.textContent =
-        "Horário de terça-feira: a confirmar";
-
-      return;
-    }
-
-    let isOpen = false;
-
-    if (hour.s === "open") {
-      const currentMinutes =
-        now.getHours() * 60 + now.getMinutes();
-
-      const [openHour, openMinute] =
-        hour.o.split(":").map(Number);
-
-      const [closeHour, closeMinute] =
-        hour.c.split(":").map(Number);
-
-      const opening =
-        openHour * 60 + openMinute;
-
-      const closing =
-        closeHour * 60 + closeMinute;
-
-      isOpen =
-        currentMinutes >= opening &&
-        currentMinutes < closing;
-    }
-
-    element.textContent =
-      isOpen ? "● Aberta agora" : "● Fechada agora";
-
-    element.className =
-      "status " + (isOpen ? "is-open" : "");
+              <b>
+                ${esc(text)}
+              </b>
+            </div>
+          `;
+        })
+        .join("");
   }
 
   // =========================
@@ -297,126 +314,168 @@
   // =========================
 
   function renderMenu() {
-    const categoriesElement = $("#categories");
-    const productsElement = $("#products");
-    const emptyMenu = $("#emptyMenu");
 
-    if (!categoriesElement || !productsElement) {
+    const categoriesElement =
+      $("#categories");
+
+    const productsElement =
+      $("#products");
+
+    const emptyMenu =
+      $("#emptyMenu");
+
+    if (
+      !categoriesElement ||
+      !productsElement
+    ) {
       return;
     }
 
-    const products = S.products || [];
+    const products =
+      Array.isArray(S.products)
+        ? S.products
+        : [];
 
     const categories =
-      S.categories?.length
+      Array.isArray(S.categories) &&
+      S.categories.length
         ? S.categories
         : [
             ...new Set(
-              products.map((product) => product.category)
+              products.map(
+                (product) =>
+                  product.category
+              )
             )
           ];
 
     if (
       !currentCategory ||
-      !categories.includes(currentCategory)
+      !categories.includes(
+        currentCategory
+      )
     ) {
-      currentCategory = categories[0] || "";
+      currentCategory =
+        categories[0] || "";
     }
 
-    // Categorias
-    categoriesElement.innerHTML = categories
-      .map(
-        (category) => `
-          <button
-            type="button"
-            class="${category === currentCategory ? "active" : ""}"
-            data-category="${esc(category)}"
-          >
-            ${esc(category)}
-          </button>
-        `
-      )
-      .join("");
-
-    $$("#categories button").forEach((button) => {
-      button.addEventListener("click", () => {
-        currentCategory =
-          button.dataset.category || "";
-
-        renderMenu();
-      });
-    });
-
-    // Produtos
-    const list = products.filter(
-      (product) =>
-        product.available !== false &&
-        product.category === currentCategory
-    );
-
-    productsElement.innerHTML = list
-      .map(
-        (product) => `
-          <article class="product">
-
-            <div class="product-img">
-              ${
-                product.image
-                  ? `
-                    <img
-                      src="${esc(product.image)}"
-                      alt="${esc(product.name)}"
-                      loading="lazy"
-                    >
-                  `
-                  : `
-                    <span>Martins</span>
-                  `
-              }
-            </div>
-
-            <div class="product-body">
-
-              <span class="tag">
-                ${esc(product.category)}
-              </span>
-
-              <h3>
-                ${esc(product.name)}
-              </h3>
-
-              ${
-                product.description
-                  ? `
-                    <p>
-                      ${esc(product.description)}
-                    </p>
-                  `
+    categoriesElement.innerHTML =
+      categories
+        .map(
+          (category) => `
+            <button
+              type="button"
+              class="${
+                category === currentCategory
+                  ? "active"
                   : ""
-              }
+              }"
+              data-category="${esc(category)}"
+            >
+              ${esc(category)}
+            </button>
+          `
+        )
+        .join("");
 
-              <div class="product-row">
+    $$("#categories button")
+      .forEach((button) => {
 
-                <strong>
-                  ${money(product.price)}
-                </strong>
+        button.addEventListener(
+          "click",
+          () => {
 
-                <button
-                  type="button"
-                  class="add"
-                  data-product-id="${esc(product.id)}"
-                >
-                  Adicionar
-                </button>
+            currentCategory =
+              button.dataset.category ||
+              "";
+
+            renderMenu();
+          }
+        );
+      });
+
+    const list =
+      products.filter(
+        (product) =>
+          product.available !== false &&
+          product.category ===
+            currentCategory
+      );
+
+    productsElement.innerHTML =
+      list
+        .map(
+          (product) => `
+            <article class="product">
+
+              <div class="product-img">
+
+                ${
+                  product.image
+                    ? `
+                      <img
+                        src="${esc(product.image)}"
+                        alt="${esc(product.name)}"
+                        loading="lazy"
+                      >
+                    `
+                    : `
+                      <span>
+                        Martins
+                      </span>
+                    `
+                }
 
               </div>
 
-            </div>
+              <div class="product-body">
 
-          </article>
-        `
-      )
-      .join("");
+                <span class="tag">
+                  ${esc(product.category)}
+                </span>
+
+                <h3>
+                  ${esc(product.name)}
+                </h3>
+
+                ${
+                  product.description
+                    ? `
+                      <p>
+                        ${esc(
+                          product.description
+                        )}
+                      </p>
+                    `
+                    : ""
+                }
+
+                <div class="product-row">
+
+                  <strong>
+                    ${money(
+                      product.price
+                    )}
+                  </strong>
+
+                  <button
+                    type="button"
+                    class="add"
+                    data-product-id="${esc(
+                      product.id
+                    )}"
+                  >
+                    Adicionar
+                  </button>
+
+                </div>
+
+              </div>
+
+            </article>
+          `
+        )
+        .join("");
 
     if (emptyMenu) {
       emptyMenu.classList.toggle(
@@ -425,11 +484,20 @@
       );
     }
 
-    $$(".add").forEach((button) => {
-      button.addEventListener("click", () => {
-        addToCart(button.dataset.productId);
-      });
-    });
+    $$(".add").forEach(
+      (button) => {
+
+        button.addEventListener(
+          "click",
+          () => {
+            addToCart(
+              button.dataset.productId
+            );
+          }
+        );
+
+      }
+    );
   }
 
   // =========================
@@ -437,19 +505,24 @@
   // =========================
 
   function addToCart(id) {
-    const product = S.products?.find(
-      (item) =>
-        String(item.id) === String(id)
-    );
+
+    const product =
+      S.products?.find(
+        (item) =>
+          String(item.id) ===
+          String(id)
+      );
 
     if (!product) {
       return;
     }
 
-    const existing = cart.find(
-      (item) =>
-        String(item.id) === String(id)
-    );
+    const existing =
+      cart.find(
+        (item) =>
+          String(item.id) ===
+          String(id)
+      );
 
     if (existing) {
       existing.qty++;
@@ -465,6 +538,7 @@
   }
 
   function saveCart() {
+
     localStorage.setItem(
       "martins_cart",
       JSON.stringify(cart)
@@ -474,47 +548,60 @@
   }
 
   function renderCart() {
-    const cartCount = $("#cartCount");
-    const cartTotal = $("#cartTotal");
-    const cartItems = $("#cartItems");
-    const checkoutButton = $("#checkoutBtn");
+
+    const cartCount =
+      $("#cartCount");
+
+    const cartTotal =
+      $("#cartTotal");
+
+    const cartItems =
+      $("#cartItems");
+
+    const checkoutButton =
+      $("#checkoutBtn");
 
     if (!cartItems) {
       return;
     }
 
-    const items = cart
-      .map((cartItem) => {
-        const product = S.products?.find(
-          (item) =>
-            String(item.id) ===
-            String(cartItem.id)
-        );
+    const items =
+      cart
+        .map((cartItem) => {
 
-        if (!product) {
-          return null;
-        }
+          const product =
+            S.products?.find(
+              (item) =>
+                String(item.id) ===
+                String(cartItem.id)
+            );
 
-        return {
-          ...product,
-          qty: cartItem.qty
-        };
-      })
-      .filter(Boolean);
+          if (!product) {
+            return null;
+          }
 
-    const total = items.reduce(
-      (sum, item) =>
-        sum +
-        Number(item.price || 0) *
-        Number(item.qty || 0),
-      0
-    );
+          return {
+            ...product,
+            qty: cartItem.qty
+          };
+        })
+        .filter(Boolean);
+
+    const total =
+      items.reduce(
+        (sum, item) =>
+          sum +
+          Number(item.price || 0) *
+          Number(item.qty || 0),
+        0
+      );
 
     if (cartCount) {
       cartCount.textContent =
         items.reduce(
           (sum, item) =>
-            sum + Number(item.qty || 0),
+            sum +
+            Number(item.qty || 0),
           0
         );
     }
@@ -525,49 +612,65 @@
     }
 
     if (!items.length) {
+
       cartItems.innerHTML = `
         <div class="empty">
           Seu carrinho está vazio.
         </div>
       `;
+
     } else {
-      cartItems.innerHTML = items
-        .map(
-          (item) => `
-            <div class="cart-item">
 
-              <div>
-                <b>${esc(item.name)}</b>
+      cartItems.innerHTML =
+        items
+          .map(
+            (item) => `
+              <div class="cart-item">
 
-                <small>
-                  ${money(item.price)} cada
-                </small>
+                <div>
+
+                  <b>
+                    ${esc(item.name)}
+                  </b>
+
+                  <small>
+                    ${money(
+                      item.price
+                    )} cada
+                  </small>
+
+                </div>
+
+                <div class="qty">
+
+                  <button
+                    type="button"
+                    data-cart-minus="${esc(
+                      item.id
+                    )}"
+                  >
+                    −
+                  </button>
+
+                  <b>
+                    ${item.qty}
+                  </b>
+
+                  <button
+                    type="button"
+                    data-cart-plus="${esc(
+                      item.id
+                    )}"
+                  >
+                    +
+                  </button>
+
+                </div>
+
               </div>
-
-              <div class="qty">
-
-                <button
-                  type="button"
-                  data-cart-minus="${esc(item.id)}"
-                >
-                  −
-                </button>
-
-                <b>${item.qty}</b>
-
-                <button
-                  type="button"
-                  data-cart-plus="${esc(item.id)}"
-                >
-                  +
-                </button>
-
-              </div>
-
-            </div>
-          `
-        )
-        .join("");
+            `
+          )
+          .join("");
     }
 
     if (checkoutButton) {
@@ -575,8 +678,9 @@
         !items.length;
     }
 
-    $$("[data-cart-plus]").forEach(
-      (button) => {
+    $$("[data-cart-plus]")
+      .forEach((button) => {
+
         button.addEventListener(
           "click",
           () =>
@@ -585,11 +689,12 @@
               1
             )
         );
-      }
-    );
 
-    $$("[data-cart-minus]").forEach(
-      (button) => {
+      });
+
+    $$("[data-cart-minus]")
+      .forEach((button) => {
+
         button.addEventListener(
           "click",
           () =>
@@ -598,16 +703,21 @@
               -1
             )
         );
-      }
-    );
+
+      });
   }
 
-  function changeCart(id, amount) {
-    const item = cart.find(
-      (cartItem) =>
-        String(cartItem.id) ===
-        String(id)
-    );
+  function changeCart(
+    id,
+    amount
+  ) {
+
+    const item =
+      cart.find(
+        (cartItem) =>
+          String(cartItem.id) ===
+          String(id)
+      );
 
     if (!item) {
       return;
@@ -616,26 +726,36 @@
     item.qty += amount;
 
     if (item.qty < 1) {
-      cart = cart.filter(
-        (cartItem) =>
-          String(cartItem.id) !==
-          String(id)
-      );
+
+      cart =
+        cart.filter(
+          (cartItem) =>
+            String(cartItem.id) !==
+            String(id)
+        );
     }
 
     saveCart();
   }
 
   // =========================
-  // ABRIR / FECHAR CARRINHO
+  // CARRINHO — ABRIR
   // =========================
 
   function openDrawer() {
-    const drawer = $("#drawer");
-    const shade = $("#shade");
+
+    const drawer =
+      $("#drawer");
+
+    const shade =
+      $("#shade");
 
     if (drawer) {
-      drawer.classList.add("open");
+
+      drawer.classList.add(
+        "open"
+      );
+
       drawer.setAttribute(
         "aria-hidden",
         "false"
@@ -647,12 +767,24 @@
     }
   }
 
+  // =========================
+  // CARRINHO — FECHAR
+  // =========================
+
   function closeDrawer() {
-    const drawer = $("#drawer");
-    const shade = $("#shade");
+
+    const drawer =
+      $("#drawer");
+
+    const shade =
+      $("#shade");
 
     if (drawer) {
-      drawer.classList.remove("open");
+
+      drawer.classList.remove(
+        "open"
+      );
+
       drawer.setAttribute(
         "aria-hidden",
         "true"
@@ -660,7 +792,9 @@
     }
 
     if (shade) {
-      shade.classList.remove("open");
+      shade.classList.remove(
+        "open"
+      );
     }
   }
 
@@ -669,6 +803,7 @@
   // =========================
 
   function setupCheckout() {
+
     const checkoutForm =
       $("#checkoutForm");
 
@@ -680,14 +815,21 @@
     const addressWrap =
       $("#addressWrap");
 
-    if (receiving && addressWrap) {
+    if (
+      receiving &&
+      addressWrap
+    ) {
+
       receiving.addEventListener(
         "change",
         (event) => {
+
           addressWrap.classList.toggle(
             "hidden",
-            event.target.value !== "Entrega"
+            event.target.value !==
+              "Entrega"
           );
+
         }
       );
     }
@@ -699,30 +841,38 @@
     checkoutForm.addEventListener(
       "submit",
       (event) => {
+
         event.preventDefault();
 
         const form =
-          new FormData(checkoutForm);
+          new FormData(
+            checkoutForm
+          );
 
-        const items = cart
-          .map((cartItem) => {
-            const product =
-              S.products?.find(
-                (item) =>
-                  String(item.id) ===
-                  String(cartItem.id)
-              );
+        const items =
+          cart
+            .map((cartItem) => {
 
-            if (!product) {
-              return null;
-            }
+              const product =
+                S.products?.find(
+                  (item) =>
+                    String(item.id) ===
+                    String(
+                      cartItem.id
+                    )
+                );
 
-            return {
-              ...product,
-              qty: cartItem.qty
-            };
-          })
-          .filter(Boolean);
+              if (!product) {
+                return null;
+              }
+
+              return {
+                ...product,
+                qty: cartItem.qty
+              };
+
+            })
+            .filter(Boolean);
 
         if (!items.length) {
           return;
@@ -732,8 +882,12 @@
           items.reduce(
             (sum, item) =>
               sum +
-              Number(item.price || 0) *
-              Number(item.qty || 0),
+              Number(
+                item.price || 0
+              ) *
+              Number(
+                item.qty || 0
+              ),
             0
           );
 
@@ -746,7 +900,10 @@
                 "x " +
                 item.name +
                 " — " +
-                money(item.price * item.qty)
+                money(
+                  item.price *
+                  item.qty
+                )
             )
             .join("\n");
 
@@ -764,9 +921,13 @@
           "*Recebimento:* " +
           form.get("receiving") +
           "\n" +
-          (address
-            ? "*Endereço:* " + address + "\n"
-            : "") +
+          (
+            address
+              ? "*Endereço:* " +
+                address +
+                "\n"
+              : ""
+          ) +
           "*Pagamento:* " +
           form.get("payment") +
           "\n\n" +
@@ -777,7 +938,10 @@
           money(total) +
           "\n\n" +
           "*Observações:* " +
-          (form.get("notes") || "Nenhuma");
+          (
+            form.get("notes") ||
+            "Nenhuma"
+          );
 
         window.open(
           wa(message),
@@ -817,10 +981,13 @@
   // =========================
 
   function updateCartEvents() {
-    const openCart = $("#openCart");
+
+    const openCart =
+      $("#openCart");
 
     if (openCart) {
-      openCart.onclick = openDrawer;
+      openCart.onclick =
+        openDrawer;
     }
 
     const closeCart =
@@ -831,7 +998,8 @@
         closeDrawer;
     }
 
-    const shade = $("#shade");
+    const shade =
+      $("#shade");
 
     if (shade) {
       shade.onclick =
@@ -842,8 +1010,11 @@
       $("#clearCart");
 
     if (clearCart) {
+
       clearCart.onclick = () => {
+
         cart = [];
+
         saveCart();
       };
     }
@@ -852,22 +1023,25 @@
       $("#checkoutBtn");
 
     if (checkoutButton) {
-      checkoutButton.onclick = () => {
-        if (!cart.length) {
-          return;
-        }
 
-        const checkout =
-          $("#checkout");
+      checkoutButton.onclick =
+        () => {
 
-        if (
-          checkout &&
-          typeof checkout.showModal ===
-            "function"
-        ) {
-          checkout.showModal();
-        }
-      };
+          if (!cart.length) {
+            return;
+          }
+
+          const checkout =
+            $("#checkout");
+
+          if (
+            checkout &&
+            typeof checkout.showModal ===
+              "function"
+          ) {
+            checkout.showModal();
+          }
+        };
     }
   }
 
@@ -876,6 +1050,10 @@
   // =========================
 
   setupCheckout();
+
+  // Renderiza imediatamente
+  // e depois sincroniza com Supabase
   load();
 
 })();
+```
