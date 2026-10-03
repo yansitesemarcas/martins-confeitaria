@@ -678,8 +678,7 @@ footer{
   .menu-section,
   .contact-section{
     padding:65px 20px;
-  }
-/* TESTE DOS BOTÕES */
+  }/* TESTE DOS BOTÕES */
 .cart-btn,
 .btn,
 .btn-primary,
@@ -689,9 +688,4 @@ footer{
   border: 3px solid #000000 !important;
   opacity: 1 !important;
   visibility: visible !important;
-}
-  .menu-card,
-  .contact-card{
-    padding:24px;
-  }
 }
