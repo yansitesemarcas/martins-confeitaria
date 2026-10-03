@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="pt-BR">
-
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -11,36 +10,6 @@
 <link rel="icon" href="logo.png">
 
 <link rel="stylesheet" href="style.css?v=20261002-123">
-
-<!-- =====================================================
-     TESTE — FORÇAR BOTÕES VERMELHOS
-===================================================== -->
-
-<style>
-.btn,
-.cart-btn,
-.add,
-.add-ready,
-.cake-open,
-.menu-big-btn,
-.submit-order{
-  background:red !important;
-  color:white !important;
-  border:3px solid red !important;
-  opacity:1 !important;
-  visibility:visible !important;
-  display:inline-flex !important;
-}
-
-.btn.primary,
-.btn.ghost{
-  background:red !important;
-  color:white !important;
-  border-color:red !important;
-}
-</style>
-
-<!-- ===================================================== -->
 
 </head>
 
@@ -73,10 +42,6 @@ aria-label="Abrir carrinho">
 
 <main>
 
-<!-- =========================
-     INÍCIO
-========================= -->
-
 <section
 id="inicio"
 class="hero"
@@ -94,11 +59,7 @@ preload="auto">
 
 </video>
 
-<!-- OVERLAY DESATIVADO PARA TESTE -->
-<div
-class="hero-video-overlay"
-style="display:none !important;">
-</div>
+<div class="hero-video-overlay"></div>
 
 <div class="hero-center reveal">
 
@@ -132,10 +93,6 @@ Conheça a nossa história <span>→</span>
 </section>
 
 
-<!-- =========================
-     SOBRE
-========================= -->
-
 <section
 id="sobre"
 class="about reveal">
@@ -168,10 +125,6 @@ De um sonho na calçada para a realização de um grande sonho
 
 </section>
 
-
-<!-- =========================
-     PRONTA ENTREGA
-========================= -->
 
 <section
 id="pronta"
@@ -212,10 +165,6 @@ class="grid">
 
 </section>
 
-
-<!-- =========================
-     ENCOMENDAS
-========================= -->
 
 <section
 id="bolo"
@@ -262,10 +211,6 @@ Ver Cardápio de Encomendas
 </section>
 
 
-<!-- =========================
-     CARDÁPIO
-========================= -->
-
 <section
 id="cardapio"
 class="menu">
@@ -306,10 +251,6 @@ Nenhum produto disponível nesta categoria.
 
 </section>
 
-
-<!-- =========================
-     CONTATO
-========================= -->
 
 <section
 id="contato"
@@ -419,10 +360,6 @@ Buscar no Google
 </section>
 
 
-<!-- =========================
-     AVALIAÇÃO
-========================= -->
-
 <section
 class="review-cta reveal">
 
@@ -453,10 +390,6 @@ Enviar feedback no Google Maps
 </main>
 
 
-<!-- =========================
-     RODAPÉ
-========================= -->
-
 <footer>
 
 <span>
@@ -469,10 +402,6 @@ Feito com carinho. 🩵🧁
 
 </footer>
 
-
-<!-- =========================
-     CARRINHO
-========================= -->
 
 <aside
 class="drawer"
@@ -541,10 +470,6 @@ class="shade"
 id="shade">
 </div>
 
-
-<!-- =========================
-     FINALIZAÇÃO DO PEDIDO
-========================= -->
 
 <dialog id="checkout">
 
@@ -673,19 +598,13 @@ Gerar pedido no WhatsApp
 
 
 <small>
-
 O WhatsApp será aberto com os dados para você revisar e enviar.
-
 </small>
 
 </form>
 
 </dialog>
 
-
-<!-- =========================
-     SCRIPTS
-========================= -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -696,5 +615,4 @@ O WhatsApp será aberto com os dados para você revisar e enviar.
 <script src="script.js"></script>
 
 </body>
-
 </html>
