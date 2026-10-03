@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -27,12 +26,8 @@
     href="logo.png"
   >
 
-  <!-- Fontes -->
-  <link
-    rel="preconnect"
-    href="https://fonts.googleapis.com"
-  >
-
+  <!-- FONTES -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
     rel="preconnect"
     href="https://fonts.gstatic.com"
@@ -47,13 +42,16 @@
   <!-- CSS -->
   <link
     rel="stylesheet"
-    href="style.css?v=20261003-06"
+    href="style.css?v=20261003-07"
   >
 </head>
 
 <body>
 
-  <!-- CABEÇALHO -->
+  <!-- =====================================================
+       CABEÇALHO
+  ====================================================== -->
+
   <header class="top">
 
     <a
@@ -69,20 +67,33 @@
 
     <nav aria-label="Navegação principal">
 
-      <a href="#inicio">Início</a>
+      <a href="#inicio">
+        Início
+      </a>
 
-      <a href="#sobre">Nossa história</a>
+      <a href="#sobre">
+        Nossa História
+      </a>
 
-      <a href="#pronta">Pronta entrega</a>
+      <a href="#bolo">
+        Bolos
+      </a>
 
-      <a href="#bolo">Bolos</a>
+      <a href="encomendas.html">
+        Encomenda
+      </a>
 
-      <a href="#cardapio">Cardápio</a>
+      <a href="#cardapio">
+        Cardápio
+      </a>
 
-      <a href="#contato">Contato</a>
+      <a href="#contato">
+        Contato
+      </a>
 
     </nav>
 
+    <!-- ÚNICO BOTÃO DO CARRINHO NO CABEÇALHO -->
     <button
       type="button"
       class="cart-btn"
@@ -98,7 +109,10 @@
 
   <main>
 
-    <!-- HERO -->
+    <!-- =====================================================
+         INÍCIO
+    ====================================================== -->
+
     <section
       id="inicio"
       class="hero"
@@ -111,6 +125,7 @@
         loop
         playsinline
         preload="metadata"
+        aria-hidden="true"
       >
         <source
           src="loja.mp4"
@@ -122,14 +137,13 @@
 
       <div class="hero-content reveal">
 
+        <!-- LOGO CENTRALIZADA -->
         <div class="hero-logo">
-
           <img
             src="logo.png"
             alt="Martins Confeitaria"
             class="hero-logo-image"
           >
-
         </div>
 
         <p class="hero-kicker">
@@ -145,6 +159,7 @@
           preparados com carinho.
         </p>
 
+        <!-- APENAS UM BOTÃO -->
         <div class="hero-actions">
 
           <a
@@ -154,13 +169,6 @@
             Conheça nossa história
           </a>
 
-          <a
-            href="#cardapio"
-            class="btn ghost"
-          >
-            Ver nosso cardápio
-          </a>
-
         </div>
 
       </div>
@@ -168,7 +176,10 @@
     </section>
 
 
-    <!-- HISTÓRIA -->
+    <!-- =====================================================
+         NOSSA HISTÓRIA
+    ====================================================== -->
+
     <section
       id="sobre"
       class="section about"
@@ -182,11 +193,13 @@
             Nossa história
           </span>
 
+          <!-- FRASE DO SONHO ACIMA DA HISTÓRIA -->
           <h2 id="aboutTitle">
             ✨ De um sonho na calçada para a realização de um grande sonho 🤍
           </h2>
 
         </div>
+
 
         <div class="about-content reveal">
 
@@ -199,10 +212,69 @@
               Por uma vida mais doce e feliz.
             </p>
 
+            <!-- HISTÓRIA FICA AQUI -->
             <div id="aboutText">
 
-              <div class="chef-signature">
-                👨‍🍳 Chef Denilson Martins
+              <p>
+                Minha história com a confeitaria começou em 2020,
+                em meio a um dos momentos mais difíceis que vivemos:
+                a pandemia.
+              </p>
+
+              <p>
+                Foi ali, em meio às incertezas e desafios,
+                que nasceu a coragem de começar.
+              </p>
+
+              <p>
+                Com muito esforço, coloquei meus primeiros bolos
+                afogadinhos e bolos caseiros na calçada da minha casa.
+              </p>
+
+              <p>
+                Depois vieram as vendas no shopping, de porta em porta,
+                cada pedido e cada cliente dando ainda mais força
+                para continuar.
+              </p>
+
+              <p>
+                Para me aperfeiçoar e oferecer cada vez mais qualidade,
+                também busquei conhecimento e fiz o curso técnico
+                profissional de Confeitaria pelo Senac.
+              </p>
+
+              <p>
+                Hoje, olhar para tudo isso é lembrar que nenhum começo
+                é pequeno quando existe um sonho grande por trás.
+              </p>
+
+              <p>
+                Minha confeitaria nasceu de um sonho, cresceu com muito
+                trabalho e continua sendo construída todos os dias
+                com amor, dedicação e propósito.
+              </p>
+
+              <p>
+                E o meu maior propósito continua sendo o mesmo:
+                levar doces para tornar a vida das pessoas um pouquinho
+                mais doce, feliz e especial. 🤍🧁
+              </p>
+
+              <div class="about-signature">
+
+                <span>
+                  🩵 Feito com carinho, sabor e muitos sonhos
+                </span>
+
+                <strong>
+                  👨‍🍳 Chef Denilson Martins ✨
+                </strong>
+
+                <small>
+                  O coração por trás de cada doce da
+                  Martins Confeitaria.
+                </small>
+
               </div>
 
             </div>
@@ -216,7 +288,10 @@
     </section>
 
 
-    <!-- PRONTA ENTREGA -->
+    <!-- =====================================================
+         PRONTA ENTREGA
+    ====================================================== -->
+
     <section
       id="pronta"
       class="section ready-section"
@@ -241,12 +316,14 @@
 
         </div>
 
+        <!-- PRODUTOS -->
         <div
           id="readyProducts"
           class="products-grid reveal"
         >
         </div>
 
+        <!-- BOTÃO CENTRALIZADO -->
         <div class="section-action reveal">
 
           <a
@@ -263,7 +340,10 @@
     </section>
 
 
-    <!-- BOLOS PERSONALIZADOS -->
+    <!-- =====================================================
+         BOLOS / ENCOMENDAS
+    ====================================================== -->
+
     <section
       id="bolo"
       class="section cake-section"
@@ -273,6 +353,7 @@
 
         <div class="cake-feature reveal">
 
+          <!-- VÍDEO CENTRAL -->
           <div class="cake-video">
 
             <video
@@ -282,16 +363,18 @@
               playsinline
               preload="metadata"
             >
-
               <source
                 src="bolos.mp4"
                 type="video/mp4"
               >
-
             </video>
+
+            <div class="cake-video-overlay"></div>
 
           </div>
 
+
+          <!-- CONTEÚDO CENTRALIZADO -->
           <div class="cake-copy">
 
             <span class="eyebrow">
@@ -309,6 +392,7 @@
               personalizada para o seu momento.
             </p>
 
+            <!-- BOTÃO NO CENTRO -->
             <div class="cake-actions">
 
               <a
@@ -329,7 +413,10 @@
     </section>
 
 
-    <!-- CARDÁPIO -->
+    <!-- =====================================================
+         CARDÁPIO
+    ====================================================== -->
+
     <section
       id="cardapio"
       class="section menu-section"
@@ -354,6 +441,8 @@
 
         </div>
 
+
+        <!-- CATEGORIAS -->
         <div
           id="categories"
           class="tabs reveal"
@@ -362,12 +451,16 @@
         >
         </div>
 
+
+        <!-- PRODUTOS -->
         <div
           id="products"
           class="products-grid reveal"
         >
         </div>
 
+
+        <!-- VAZIO -->
         <div
           id="emptyMenu"
           class="empty hidden"
@@ -381,7 +474,10 @@
     </section>
 
 
-    <!-- CONTATO -->
+    <!-- =====================================================
+         CONTATO
+    ====================================================== -->
+
     <section
       id="contato"
       class="section contact-section"
@@ -406,8 +502,11 @@
 
         </div>
 
+
         <div class="contact-grid">
 
+
+          <!-- INFORMAÇÕES -->
           <div class="contact-card reveal">
 
             <h3>
@@ -416,9 +515,13 @@
 
             <div class="contact-info">
 
+
+              <!-- ENDEREÇO -->
               <div class="contact-item">
 
-                <span>📍</span>
+                <span>
+                  📍
+                </span>
 
                 <p id="address">
                   Rua 1018, 65<br>
@@ -430,16 +533,31 @@
 
               </div>
 
+
+              <!-- HORÁRIOS -->
               <div class="contact-item">
 
-                <span>🕐</span>
+                <span>
+                  🕐
+                </span>
 
-                <div id="hours">
+                <div>
+
+                  <div
+                    id="openState"
+                    class="open-state"
+                  >
+                    Verificando horário...
+                  </div>
+
+                  <div id="hours"></div>
+
                 </div>
 
               </div>
 
             </div>
+
 
             <div class="contact-actions">
 
@@ -468,13 +586,22 @@
           </div>
 
 
+          <!-- GOOGLE MAPS -->
           <div class="map-card reveal">
 
             <div class="map-head">
 
-              <h3>
-                Onde estamos
-              </h3>
+              <div>
+
+                <span class="eyebrow">
+                  Localização
+                </span>
+
+                <h3>
+                  Onde estamos
+                </h3>
+
+              </div>
 
               <a
                 id="maps"
@@ -487,6 +614,7 @@
 
             </div>
 
+
             <div class="map-frame">
 
               <iframe
@@ -494,6 +622,7 @@
                 title="Localização da Martins Confeitaria"
                 loading="lazy"
                 src="https://www.google.com/maps?q=Rua%201018%2C%2065%2C%20Conjunto%20Cear%C3%A1%20II%2C%20Fortaleza%20CE&output=embed"
+                allowfullscreen
               ></iframe>
 
             </div>
@@ -503,17 +632,20 @@
         </div>
 
 
-        <!-- AVALIAÇÃO -->
+        <!-- =================================================
+             AVALIAÇÃO — ÚLTIMA PARTE
+        ================================================== -->
+
         <div class="review-card reveal">
 
-          <div>
+          <div class="review-content">
 
             <span class="eyebrow">
               Sua opinião importa
             </span>
 
             <h3>
-              Gostou da experiência?
+              Gostou da experiência? ⭐
             </h3>
 
             <p>
@@ -542,10 +674,14 @@
   </main>
 
 
-  <!-- RODAPÉ -->
+  <!-- =====================================================
+       RODAPÉ
+  ====================================================== -->
+
   <footer class="footer">
 
     <div class="footer-inner">
+
 
       <div class="footer-brand">
 
@@ -560,25 +696,45 @@
 
       </div>
 
+
       <div class="footer-links">
 
-        <a href="#inicio">Início</a>
+        <a href="#inicio">
+          Início
+        </a>
 
-        <a href="#sobre">Nossa história</a>
+        <a href="#sobre">
+          Nossa história
+        </a>
 
-        <a href="#cardapio">Cardápio</a>
+        <a href="#bolo">
+          Bolos
+        </a>
 
-        <a href="#contato">Contato</a>
+        <a href="encomendas.html">
+          Encomenda
+        </a>
+
+        <a href="#cardapio">
+          Cardápio
+        </a>
+
+        <a href="#contato">
+          Contato
+        </a>
 
       </div>
 
     </div>
 
+
     <div class="footer-bottom">
 
       <p>
         ©
-        <span id="year">2026</span>
+        <span id="year">
+          2026
+        </span>
         Martins Confeitaria.
         Todos os direitos reservados.
       </p>
@@ -592,12 +748,17 @@
   </footer>
 
 
-  <!-- CARRINHO -->
+  <!-- =====================================================
+       CARRINHO
+       FICA ESCONDIDO ATÉ CLICAR NO BOTÃO DO CABEÇALHO
+  ====================================================== -->
+
   <div
     id="shade"
     class="shade"
     aria-hidden="true"
   ></div>
+
 
   <aside
     id="drawer"
@@ -631,6 +792,7 @@
 
     </div>
 
+
     <div
       id="cartItems"
       class="cart-items"
@@ -641,6 +803,7 @@
       </div>
 
     </div>
+
 
     <div class="drawer-footer">
 
@@ -656,6 +819,7 @@
 
       </div>
 
+
       <button
         type="button"
         id="clearCart"
@@ -663,6 +827,7 @@
       >
         Limpar carrinho
       </button>
+
 
       <button
         type="button"
@@ -678,7 +843,10 @@
   </aside>
 
 
-  <!-- CHECKOUT -->
+  <!-- =====================================================
+       CHECKOUT
+  ====================================================== -->
+
   <dialog
     id="checkout"
     class="checkout-dialog"
@@ -715,6 +883,7 @@
 
       </div>
 
+
       <label>
         Nome
 
@@ -726,6 +895,7 @@
         >
       </label>
 
+
       <label>
         WhatsApp
 
@@ -736,6 +906,7 @@
           required
         >
       </label>
+
 
       <label>
         Como deseja receber?
@@ -761,6 +932,7 @@
 
       </label>
 
+
       <div
         id="addressWrap"
         class="hidden"
@@ -778,6 +950,7 @@
         </label>
 
       </div>
+
 
       <label>
         Forma de pagamento
@@ -807,6 +980,7 @@
 
       </label>
 
+
       <label>
         Observações
 
@@ -817,6 +991,7 @@
         ></textarea>
 
       </label>
+
 
       <div class="dialog-actions">
 
@@ -842,7 +1017,10 @@
   </dialog>
 
 
-  <!-- SUPABASE -->
+  <!-- =====================================================
+       SCRIPTS
+  ====================================================== -->
+
   <script
     src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
   ></script>
@@ -855,4 +1033,3 @@
 
 </body>
 </html>
-```
