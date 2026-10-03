@@ -1,10 +1,14 @@
 (() => {
   "use strict";
 
+  /* =========================================================
+     CONFIGURAÇÃO
+  ========================================================= */
+
   const D = window.MARTINS_DEFAULTS || {};
   const C = window.MARTINS_CONFIG || {};
 
-  let S = structuredClone(D);
+  let S = JSON.parse(JSON.stringify(D));
 
   let cart = [];
 
@@ -12,9 +16,18 @@
     cart = JSON.parse(
       localStorage.getItem("martins_cart") || "[]"
     );
+
+    if (!Array.isArray(cart)) {
+      cart = [];
+    }
   } catch {
     cart = [];
   }
+
+
+  /* =========================================================
+     HELPERS
+  ========================================================= */
 
   const $ = (selector) =>
     document.querySelector(selector);
@@ -47,11 +60,12 @@
     "?text=" +
     encodeURIComponent(text);
 
-  /* =====================================================
-     SUPABASE
-     ===================================================== */
 
-  const getSupabase = () => {
+  /* =========================================================
+     SUPABASE
+  ========================================================= */
+
+  function getSupabase() {
     if (
       !window.supabase ||
       !C.SUPABASE_URL ||
@@ -73,18 +87,20 @@
 
       return null;
     }
-  };
+  }
 
-  /* =====================================================
-     CARREGAMENTO
-     ===================================================== */
+
+  /* =========================================================
+     CARREGAR DADOS
+  ========================================================= */
 
   async function load() {
     /*
-      Primeiro renderiza os dados padrão.
-      Assim o site nunca fica vazio enquanto
-      o Supabase está carregando.
+      Renderiza imediatamente usando defaults.js.
+      Assim o site não fica branco enquanto
+      o Supabase carrega.
     */
+
     render();
 
     const client = getSupabase();
@@ -94,40 +110,43 @@
     }
 
     try {
-      const [settingsResult, productsResult] =
-        await Promise.all([
-          client
-            .from("settings")
-            .select("value")
-            .eq("key", "site")
-            .maybeSingle(),
+      const [
+        settingsResult,
+        productsResult
+      ] = await Promise.all([
+        client
+          .from("settings")
+          .select("value")
+          .eq("key", "site")
+          .maybeSingle(),
 
-          client
-            .from("products")
-            .select("*")
-            .order("sort")
-        ]);
+        client
+          .from("products")
+          .select("*")
+          .order("sort")
+      ]);
 
-      /*
-        Configurações do site
-      */
-      if (settingsResult?.data?.value) {
+      if (
+        settingsResult &&
+        settingsResult.data &&
+        settingsResult.data.value
+      ) {
         S = {
           ...S,
           ...settingsResult.data.value
         };
       }
 
-      /*
-        Produtos
-      */
       if (
-        Array.isArray(productsResult?.data)
+        productsResult &&
+        Array.isArray(productsResult.data)
       ) {
         S.products =
-          productsResult.data.map((product) => ({
-            ...product
-          }));
+          productsResult.data.map(
+            (product) => ({
+              ...product
+            })
+          );
       }
 
     } catch (error) {
@@ -137,16 +156,13 @@
       );
     }
 
-    /*
-      Renderiza novamente com os dados
-      vindos do banco.
-    */
     render();
   }
 
-  /* =====================================================
-     RENDER PRINCIPAL
-     ===================================================== */
+
+  /* =========================================================
+     RENDER GERAL
+  ========================================================= */
 
   function render() {
     renderBasicInfo();
@@ -155,16 +171,17 @@
     renderHours();
     renderMenu();
     renderReady();
-    renderCake();
     renderCart();
     currentStatus();
   }
 
-  /* =====================================================
+
+  /* =========================================================
      INFORMAÇÕES BÁSICAS
-     ===================================================== */
+  ========================================================= */
 
   function renderBasicInfo() {
+
     const contactWa = $("#contactWa");
 
     if (contactWa) {
@@ -173,11 +190,14 @@
       );
     }
 
+
     const instagram = $("#instagram");
 
     if (instagram) {
-      instagram.href = S.instagram || "#";
+      instagram.href =
+        S.instagram || "#";
     }
+
 
     const year = $("#year");
 
@@ -186,44 +206,43 @@
         new Date().getFullYear();
     }
 
+
     const address = $("#address");
 
-    if (address) {
-      address.innerHTML = (
-        Array.isArray(S.address)
-          ? S.address
-          : []
-      )
-        .map(esc)
-        .join("<br>");
-    }
-
-    const delivery = $("#delivery");
-
-    if (delivery) {
-      delivery.textContent = [
-        ...(S.delivery || []),
-        S.deliveryInfo
-      ]
-        .filter(Boolean)
-        .join(" • ");
+    if (
+      address &&
+      Array.isArray(S.address)
+    ) {
+      address.innerHTML =
+        S.address
+          .map(esc)
+          .join("<br>");
     }
   }
 
-  /* =====================================================
+
+  /* =========================================================
      HISTÓRIA
-     ===================================================== */
+  ========================================================= */
 
   function renderStory() {
-    const title = $("#aboutTitle");
-    const quote = $("#aboutQuote");
-    const aboutText = $("#aboutText");
+
+    const title =
+      $("#aboutTitle");
+
+    const quote =
+      $("#aboutQuote");
+
+    const aboutText =
+      $("#aboutText");
+
 
     if (title) {
       title.textContent =
         S.about?.title ||
         "✨ De um sonho na calçada para a realização de um grande sonho 🤍";
     }
+
 
     if (quote) {
       quote.textContent =
@@ -235,75 +254,93 @@
         "”";
     }
 
+
     if (!aboutText) {
       return;
     }
 
-    const story = String(
-      S.about?.text || ""
-    );
 
-    const paragraphs = story
-      .split(/\n\n+/)
-      .filter(Boolean)
-      .map((paragraph) => {
-        return (
-          "<p>" +
-          esc(paragraph).replace(
-            /\n/g,
-            "<br>"
-          ) +
-          "</p>"
-        );
-      })
-      .join("");
+    const story =
+      String(
+        S.about?.text || ""
+      );
+
+
+    const paragraphs =
+      story
+        .split(/\n\n+/)
+        .filter(Boolean)
+        .map(
+          (paragraph) =>
+            "<p>" +
+            esc(paragraph).replace(
+              /\n/g,
+              "<br>"
+            ) +
+            "</p>"
+        )
+        .join("");
+
 
     /*
-      Nome do chef fica garantido aqui,
-      mesmo se o Supabase estiver com
-      uma versão antiga da história.
+      Chef aparece somente no final.
+      Não duplicamos a assinatura.
     */
+
     aboutText.innerHTML =
-      `
-        <div class="chef-signature">
-          👨‍🍳 Chef Denilson Martins
-        </div>
-      ` +
       paragraphs +
       `
         <div class="about-signature">
+
           <span>
             🩵 Feito com carinho, sabor e muitos sonhos
           </span>
 
           <strong>
-            Chef Denilson Martins ✨
+            👨‍🍳 Chef Denilson Martins ✨
           </strong>
 
           <small>
             O coração por trás de cada doce da Martins Confeitaria.
           </small>
+
         </div>
       `;
   }
 
-  /* =====================================================
-     MAPAS
-     ===================================================== */
+
+  /* =========================================================
+     MAPA / AVALIAÇÃO
+  ========================================================= */
 
   function renderMaps() {
-    const maps = $("#maps");
-    const mapFrame = $("#mapFrame");
-    const review = $("#review");
 
-    if (maps && S.maps) {
-      maps.href = S.maps;
+    const maps =
+      $("#maps");
+
+    const mapFrame =
+      $("#mapFrame");
+
+    const review =
+      $("#review");
+
+
+    if (maps) {
+      maps.href =
+        S.maps || "#";
     }
 
-    if (mapFrame && Array.isArray(S.address)) {
-      const query = encodeURIComponent(
-        S.address.join(", ")
-      );
+
+    if (
+      mapFrame &&
+      Array.isArray(S.address) &&
+      S.address.length
+    ) {
+
+      const query =
+        encodeURIComponent(
+          S.address.join(", ")
+        );
 
       mapFrame.src =
         "https://www.google.com/maps?q=" +
@@ -311,14 +348,17 @@
         "&output=embed";
     }
 
-    if (review && S.review) {
-      review.href = S.review;
+
+    if (review) {
+      review.href =
+        S.review || "#";
     }
   }
 
-  /* =====================================================
+
+  /* =========================================================
      HORÁRIOS
-     ===================================================== */
+  ========================================================= */
 
   const dayNames = [
     "Domingo",
@@ -330,131 +370,237 @@
     "Sábado"
   ];
 
+
   function renderHours() {
-    const hours = $("#hours");
+
+    const hours =
+      $("#hours");
 
     if (!hours) {
       return;
     }
 
-    const list = Array.isArray(S.hours)
-      ? S.hours
-      : [];
 
-    hours.innerHTML = list
-      .map((hour, index) => {
-        const status =
-          hour?.s === "closed"
-            ? "Fechado"
-            : hour?.s === "tbd"
-            ? "A confirmar"
-            : `${hour?.o || ""} – ${
-                hour?.c || ""
-              }`;
+    const list =
+      Array.isArray(S.hours)
+        ? S.hours
+        : [];
 
-        return `
-          <div class="hour">
-            <span>
-              ${dayNames[index] || ""}
-            </span>
 
-            <b>
-              ${esc(status)}
-            </b>
-          </div>
-        `;
-      })
-      .join("");
+    hours.innerHTML =
+      list
+        .map(
+          (hour, index) => {
+
+            let status = "";
+
+            if (
+              hour?.s ===
+              "closed"
+            ) {
+              status =
+                "Fechado";
+
+            } else if (
+              hour?.s ===
+              "tbd"
+            ) {
+              status =
+                "A confirmar";
+
+            } else {
+
+              status =
+                `${hour?.o || ""} – ${
+                  hour?.c || ""
+                }`;
+            }
+
+
+            return `
+              <div class="hour">
+
+                <span>
+                  ${dayNames[index] || ""}
+                </span>
+
+                <b>
+                  ${esc(status)}
+                </b>
+
+              </div>
+            `;
+          }
+        )
+        .join("");
   }
 
-  /* =====================================================
-     STATUS DA LOJA
-     ===================================================== */
+
+  /* =========================================================
+     STATUS ABERTA / FECHADA
+  ========================================================= */
 
   function currentStatus() {
-    const element = $("#openState");
+
+    const element =
+      $("#openState");
 
     if (!element) {
       return;
     }
 
-    const now = new Date(
-      new Date().toLocaleString(
-        "en-US",
-        {
-          timeZone: "America/Fortaleza"
-        }
-      )
-    );
+
+    const now =
+      new Date(
+        new Date().toLocaleString(
+          "en-US",
+          {
+            timeZone:
+              "America/Fortaleza"
+          }
+        )
+      );
+
 
     const hour =
       S.hours?.[now.getDay()];
 
+
     let open = false;
 
-    if (hour?.s === "open") {
+
+    if (
+      hour?.s === "open"
+    ) {
+
       const currentMinutes =
         now.getHours() * 60 +
         now.getMinutes();
 
-      const [openHour, openMinute] =
-        String(hour.o || "00:00")
+
+      const [
+        openHour,
+        openMinute
+      ] =
+        String(
+          hour.o || "00:00"
+        )
           .split(":")
           .map(Number);
 
-      const [closeHour, closeMinute] =
-        String(hour.c || "00:00")
+
+      const [
+        closeHour,
+        closeMinute
+      ] =
+        String(
+          hour.c || "00:00"
+        )
           .split(":")
           .map(Number);
+
 
       const opening =
-        openHour * 60 + openMinute;
+        openHour * 60 +
+        openMinute;
+
 
       const closing =
-        closeHour * 60 + closeMinute;
+        closeHour * 60 +
+        closeMinute;
 
-      open =
-        currentMinutes >= opening &&
-        currentMinutes < closing;
+
+      /*
+        Horários normais.
+      */
+
+      if (closing > opening) {
+
+        open =
+          currentMinutes >=
+            opening &&
+          currentMinutes <
+            closing;
+
+      } else {
+
+        /*
+          Caso algum horário atravesse meia-noite.
+        */
+
+        open =
+          currentMinutes >=
+            opening ||
+          currentMinutes <
+            closing;
+      }
     }
 
-    element.textContent =
-      hour?.s === "tbd"
-        ? "Horário de terça-feira: a confirmar"
-        : open
-        ? "● Aberta agora"
-        : "● Fechada agora";
+
+    if (
+      hour?.s ===
+      "tbd"
+    ) {
+
+      element.textContent =
+        "● Horário a confirmar";
+
+    } else if (open) {
+
+      element.textContent =
+        "● Aberta agora";
+
+    } else {
+
+      element.textContent =
+        "● Fechada agora";
+    }
+
 
     element.className =
       "open-state " +
-      (open ? "is-open" : "");
+      (open
+        ? "is-open"
+        : "");
   }
 
-  /* =====================================================
-     CARDÁPIO
-     ===================================================== */
+
+  /* =========================================================
+     CATEGORIAS DO CARDÁPIO
+  ========================================================= */
 
   let currentCategory = "";
 
+
   function getMenuCategories() {
+
     const categoriesByArea =
-      S.categoriesByArea || {};
+      S.categoriesByArea ||
+      {};
+
 
     if (
       Array.isArray(
         categoriesByArea.cardapio
       ) &&
-      categoriesByArea.cardapio.length
+      categoriesByArea
+        .cardapio.length
     ) {
+
       return categoriesByArea.cardapio;
     }
 
+
     if (
-      Array.isArray(S.categories) &&
+      Array.isArray(
+        S.categories
+      ) &&
       S.categories.length
     ) {
+
       return S.categories;
     }
+
 
     return [
       ...new Set(
@@ -462,7 +608,8 @@
           .filter(
             (product) =>
               !product.area ||
-              product.area === "cardapio"
+              product.area ===
+                "cardapio"
           )
           .map(
             (product) =>
@@ -473,25 +620,34 @@
     ];
   }
 
+
+  /* =========================================================
+     CARDÁPIO
+  ========================================================= */
+
   function renderMenu() {
-    const categories = $(
-      "#categories"
-    );
 
-    const products = $(
-      "#products"
-    );
+    const categories =
+      $("#categories");
 
-    const emptyMenu = $(
-      "#emptyMenu"
-    );
+    const products =
+      $("#products");
 
-    if (!categories || !products) {
+    const emptyMenu =
+      $("#emptyMenu");
+
+
+    if (
+      !categories ||
+      !products
+    ) {
       return;
     }
 
+
     const cats =
       getMenuCategories();
+
 
     if (
       !currentCategory ||
@@ -499,9 +655,11 @@
         currentCategory
       )
     ) {
+
       currentCategory =
         cats[0] || "";
     }
+
 
     categories.innerHTML =
       cats
@@ -518,6 +676,7 @@
               data-cat="${esc(
                 category
               )}"
+              role="tab"
             >
               ${esc(category)}
             </button>
@@ -525,25 +684,40 @@
         )
         .join("");
 
-    $$("#categories .tab")
-      .forEach((button) => {
-        button.onclick = () => {
-          currentCategory =
-            button.dataset.cat || "";
 
-          renderMenu();
-        };
-      });
+    $$("#categories .tab")
+      .forEach(
+        (button) => {
+
+          button.onclick =
+            () => {
+
+              currentCategory =
+                button.dataset
+                  .cat || "";
+
+              renderMenu();
+            };
+        }
+      );
+
 
     const list =
       (S.products || [])
         .filter(
-          (product) =>
-            (!product.area ||
+          (product) => {
+
+            const isCardapio =
+              !product.area ||
               product.area ===
-                "cardapio") &&
-            product.category ===
-              currentCategory
+                "cardapio";
+
+            return (
+              isCardapio &&
+              product.category ===
+                currentCategory
+            );
+          }
         )
         .sort(
           (a, b) =>
@@ -551,13 +725,16 @@
             Number(b.sort || 0)
         );
 
+
     products.innerHTML =
       list
         .map(
           (product) => `
+
             <article class="product">
 
               <div class="product-img">
+
                 ${
                   product.image
                     ? `
@@ -577,16 +754,19 @@
                       </span>
                     `
                 }
+
               </div>
+
 
               <div class="product-body">
 
                 <span class="tag">
                   ${esc(
                     product.category ||
-                      ""
+                    ""
                   )}
                 </span>
+
 
                 <h3>
                   ${esc(
@@ -594,12 +774,14 @@
                   )}
                 </h3>
 
+
                 <p>
                   ${esc(
                     product.description ||
-                      ""
+                    ""
                   )}
                 </p>
+
 
                 <div class="product-row">
 
@@ -609,16 +791,17 @@
                     )}
                   </strong>
 
+
                   ${
                     product.available ===
                     false
+
                       ? `
-                        <span
-                          class="unavailable"
-                        >
+                        <span class="unavailable">
                           Temporariamente indisponível
                         </span>
                       `
+
                       : `
                         <button
                           type="button"
@@ -641,43 +824,57 @@
         )
         .join("");
 
+
     if (emptyMenu) {
+
       emptyMenu.classList.toggle(
         "hidden",
         list.length > 0
       );
     }
 
-    $$(".add").forEach(
-      (button) => {
-        button.onclick = () => {
-          add(
-            button.dataset.id
-          );
-        };
-      }
-    );
+
+    $$(".add")
+      .forEach(
+        (button) => {
+
+          button.onclick =
+            () => {
+
+              add(
+                button.dataset.id
+              );
+            };
+        }
+      );
   }
 
-  /* =====================================================
-     CARRINHO — ADICIONAR
-     ===================================================== */
+
+  /* =========================================================
+     ADICIONAR AO CARRINHO
+  ========================================================= */
 
   function add(id) {
+
     const product =
-      (S.products || []).find(
-        (item) =>
-          String(item.id) ===
-          String(id)
-      );
+      (S.products || [])
+        .find(
+          (item) =>
+            String(item.id) ===
+            String(id)
+        );
+
 
     if (!product) {
       return;
     }
 
+
     if (
-      product.available === false
+      product.available ===
+      false
     ) {
+
       alert(
         "Este produto está temporariamente indisponível."
       );
@@ -685,9 +882,19 @@
       return;
     }
 
+
+    /*
+      Kits não entram diretamente no carrinho.
+      Eles abrem a página de encomenda.
+    */
+
     if (
-      product.category === "Kits"
+      String(
+        product.category || ""
+      ).toLowerCase() ===
+      "kits"
     ) {
+
       window.location.href =
         "encomendas.html?kit=" +
         encodeURIComponent(
@@ -697,73 +904,110 @@
       return;
     }
 
+
     const item =
       cart.find(
         (cartItem) =>
-          String(cartItem.id) ===
+          String(
+            cartItem.id
+          ) ===
           String(id)
       );
 
+
     if (item) {
-      item.qty++;
+
+      item.qty =
+        Number(item.qty || 0) +
+        1;
+
     } else {
+
       cart.push({
         id: product.id,
         qty: 1
       });
     }
 
+
     saveCart();
+
     openDrawer();
   }
 
-  /* =====================================================
-     CARRINHO
-     ===================================================== */
+
+  /* =========================================================
+     SALVAR CARRINHO
+  ========================================================= */
 
   function saveCart() {
+
     try {
+
       localStorage.setItem(
         "martins_cart",
         JSON.stringify(cart)
       );
+
     } catch (error) {
+
       console.warn(
         "Não foi possível salvar o carrinho:",
         error
       );
     }
 
+
     renderCart();
   }
 
+
+  /* =========================================================
+     ITENS DO CARRINHO
+  ========================================================= */
+
   function getCartItems() {
+
     return cart
-      .map((item) => {
-        const product =
-          (S.products || []).find(
-            (productItem) =>
-              String(
-                productItem.id
-              ) ===
-              String(item.id)
-          );
+      .map(
+        (item) => {
 
-        if (!product) {
-          return null;
+          const product =
+            (S.products || [])
+              .find(
+                (productItem) =>
+                  String(
+                    productItem.id
+                  ) ===
+                  String(
+                    item.id
+                  )
+              );
+
+
+          if (!product) {
+            return null;
+          }
+
+
+          return {
+            ...product,
+            qty: Number(
+              item.qty || 1
+            )
+          };
         }
-
-        return {
-          ...product,
-          qty: Number(
-            item.qty || 1
-          )
-        };
-      })
+      )
       .filter(Boolean);
   }
 
+
+  /* =========================================================
+     RENDER CARRINHO
+  ========================================================= */
+
   function renderCart() {
+
     const cartItemsElement =
       $("#cartItems");
 
@@ -776,159 +1020,221 @@
     const checkoutButton =
       $("#checkoutBtn");
 
-    if (
-      !cartItemsElement
-    ) {
+
+    if (!cartItemsElement) {
       return;
     }
 
+
     const items =
       getCartItems();
+
 
     const total =
       items.reduce(
         (sum, item) =>
           sum +
-          Number(item.price || 0) *
-            Number(item.qty || 0),
+          Number(
+            item.price || 0
+          ) *
+          Number(
+            item.qty || 0
+          ),
         0
       );
 
+
     if (cartCount) {
+
       cartCount.textContent =
         items.reduce(
           (sum, item) =>
             sum +
-            Number(item.qty || 0),
+            Number(
+              item.qty || 0
+            ),
           0
         );
     }
 
+
     if (cartTotal) {
+
       cartTotal.textContent =
         money(total);
     }
 
-    cartItemsElement.innerHTML =
-      items.length
-        ? items
-            .map(
-              (item) => `
-                <div class="cart-item">
 
-                  <div>
-                    <b>
-                      ${esc(
-                        item.name
-                      )}
-                    </b>
+    if (!items.length) {
 
-                    <small>
-                      ${money(
-                        item.price
-                      )} cada
-                    </small>
-                  </div>
+      cartItemsElement.innerHTML = `
+        <div class="empty">
+          Seu carrinho está vazio.
+        </div>
+      `;
 
-                  <div class="qty">
+    } else {
 
-                    <button
-                      type="button"
-                      data-dec="${esc(
-                        item.id
-                      )}"
-                    >
-                      −
-                    </button>
+      cartItemsElement.innerHTML =
+        items
+          .map(
+            (item) => `
 
-                    <b>
-                      ${item.qty}
-                    </b>
+              <div class="cart-item">
 
-                    <button
-                      type="button"
-                      data-inc="${esc(
-                        item.id
-                      )}"
-                    >
-                      +
-                    </button>
+                <div>
 
-                  </div>
+                  <b>
+                    ${esc(
+                      item.name
+                    )}
+                  </b>
+
+                  <small>
+                    ${money(
+                      item.price
+                    )} cada
+                  </small>
 
                 </div>
-              `
-            )
-            .join("")
-        : `
-          <div class="empty">
-            Seu carrinho está vazio.
-          </div>
-        `;
 
-    $$("[data-inc]").forEach(
-      (button) => {
-        button.onclick = () => {
-          change(
-            button.dataset.inc,
-            1
-          );
-        };
-      }
-    );
 
-    $$("[data-dec]").forEach(
-      (button) => {
-        button.onclick = () => {
-          change(
-            button.dataset.dec,
-            -1
-          );
-        };
-      }
-    );
+                <div class="qty">
+
+                  <button
+                    type="button"
+                    data-dec="${esc(
+                      item.id
+                    )}"
+                    aria-label="Diminuir quantidade"
+                  >
+                    −
+                  </button>
+
+                  <b>
+                    ${item.qty}
+                  </b>
+
+                  <button
+                    type="button"
+                    data-inc="${esc(
+                      item.id
+                    )}"
+                    aria-label="Aumentar quantidade"
+                  >
+                    +
+                  </button>
+
+                </div>
+
+              </div>
+            `
+          )
+          .join("");
+    }
+
+
+    $$("[data-inc]")
+      .forEach(
+        (button) => {
+
+          button.onclick =
+            () => {
+
+              change(
+                button.dataset.inc,
+                1
+              );
+            };
+        }
+      );
+
+
+    $$("[data-dec]")
+      .forEach(
+        (button) => {
+
+          button.onclick =
+            () => {
+
+              change(
+                button.dataset.dec,
+                -1
+              );
+            };
+        }
+      );
+
 
     if (checkoutButton) {
+
       checkoutButton.disabled =
         !items.length;
     }
   }
 
-  function change(id, delta) {
+
+  /* =========================================================
+     ALTERAR QUANTIDADE
+  ========================================================= */
+
+  function change(
+    id,
+    delta
+  ) {
+
     const item =
       cart.find(
         (cartItem) =>
-          String(cartItem.id) ===
+          String(
+            cartItem.id
+          ) ===
           String(id)
       );
+
 
     if (!item) {
       return;
     }
 
-    item.qty += delta;
+
+    item.qty =
+      Number(item.qty || 0) +
+      Number(delta || 0);
+
 
     if (item.qty < 1) {
+
       cart =
         cart.filter(
           (cartItem) =>
-            String(cartItem.id) !==
+            String(
+              cartItem.id
+            ) !==
             String(id)
         );
     }
 
+
     saveCart();
   }
 
-  /* =====================================================
-     DRAWER
-     ===================================================== */
+
+  /* =========================================================
+     ABRIR CARRINHO
+  ========================================================= */
 
   function openDrawer() {
-    const drawer = $("#drawer");
-    const shade = $("#shade");
+
+    const drawer =
+      $("#drawer");
+
+    const shade =
+      $("#shade");
+
 
     if (drawer) {
+
       drawer.classList.add(
         "show"
       );
@@ -939,18 +1245,40 @@
       );
     }
 
+
     if (shade) {
+
       shade.classList.add(
         "show"
       );
+
+      shade.setAttribute(
+        "aria-hidden",
+        "false"
+      );
     }
+
+
+    document.body.style.overflow =
+      "hidden";
   }
 
+
+  /* =========================================================
+     FECHAR CARRINHO
+  ========================================================= */
+
   function closeDrawer() {
-    const drawer = $("#drawer");
-    const shade = $("#shade");
+
+    const drawer =
+      $("#drawer");
+
+    const shade =
+      $("#shade");
+
 
     if (drawer) {
+
       drawer.classList.remove(
         "show"
       );
@@ -961,18 +1289,31 @@
       );
     }
 
+
     if (shade) {
+
       shade.classList.remove(
         "show"
       );
+
+      shade.setAttribute(
+        "aria-hidden",
+        "true"
+      );
     }
+
+
+    document.body.style.overflow =
+      "";
   }
 
-  /* =====================================================
+
+  /* =========================================================
      PRONTA ENTREGA
-     ===================================================== */
+  ========================================================= */
 
   function renderReady() {
+
     const container =
       $("#readyProducts");
 
@@ -980,20 +1321,44 @@
       return;
     }
 
-    const list =
-      (S.products || []).filter(
-        (product) =>
-          product.area ===
-          "pronta_entrega"
-      );
+
+    let list =
+      (S.products || [])
+        .filter(
+          (product) =>
+            product.area ===
+            "pronta_entrega"
+        );
+
+
+    /*
+      Se o Supabase ainda não tiver
+      area definida, não deixamos
+      a seção quebrada.
+    */
+
+    if (!list.length) {
+
+      list =
+        (S.products || [])
+          .filter(
+            (product) =>
+              product.available !==
+              false
+          )
+          .slice(0, 3);
+    }
+
 
     container.innerHTML =
       list
         .map(
           (product) => `
+
             <article class="product">
 
               <div class="product-img">
+
                 ${
                   product.image
                     ? `
@@ -1013,7 +1378,9 @@
                       </span>
                     `
                 }
+
               </div>
+
 
               <div class="product-body">
 
@@ -1021,10 +1388,11 @@
                   ${
                     product.available ===
                     false
-                      ? "TEMPORARIAMENTE INDISPONÍVEL"
+                      ? "INDISPONÍVEL"
                       : "DISPONÍVEL AGORA"
                   }
                 </span>
+
 
                 <h3>
                   ${esc(
@@ -1032,12 +1400,14 @@
                   )}
                 </h3>
 
+
                 <p>
                   ${esc(
                     product.description ||
-                      ""
+                    "Uma opção deliciosa da Martins Confeitaria."
                   )}
                 </p>
+
 
                 <div class="product-row">
 
@@ -1047,14 +1417,17 @@
                     )}
                   </strong>
 
+
                   ${
                     product.available ===
                     false
+
                       ? `
                         <span class="unavailable">
-                          Temporariamente indisponível
+                          Indisponível
                         </span>
                       `
+
                       : `
                         <button
                           type="button"
@@ -1077,239 +1450,33 @@
         )
         .join("");
 
-    $$(".add-ready").forEach(
-      (button) => {
-        button.onclick = () => {
-          add(
-            button.dataset.id
-          );
-        };
-      }
-    );
-  }
 
-  /* =====================================================
-     BOLO PERSONALIZADO
-     ===================================================== */
+    $$(".add-ready")
+      .forEach(
+        (button) => {
 
-  function renderCake() {
-    const cakeForm =
-      $("#cakeForm");
+          button.onclick =
+            () => {
 
-    if (!cakeForm) {
-      return;
-    }
-
-    const cake =
-      S.cake || D.cake;
-
-    if (!cake) {
-      return;
-    }
-
-    const cakeType =
-      $("#cakeType");
-
-    const cakeMass =
-      $("#cakeMass");
-
-    const cakeFilling =
-      $("#cakeFilling");
-
-    const cakeExtras =
-      $("#cakeExtras");
-
-    if (
-      cakeType &&
-      Array.isArray(cake.types)
-    ) {
-      cakeType.innerHTML =
-        `
-          <option value="">
-            Escolha o tipo e tamanho
-          </option>
-        ` +
-        cake.types
-          .map(
-            ([name, price]) => `
-              <option
-                value="${esc(
-                  name
-                )}"
-                data-price="${Number(
-                  price
-                )}"
-              >
-                ${esc(
-                  name
-                )} — ${money(
-                  price
-                )}
-              </option>
-            `
-          )
-          .join("");
-    }
-
-    if (
-      cakeMass &&
-      Array.isArray(cake.masses)
-    ) {
-      cakeMass.innerHTML =
-        `
-          <option value="">
-            Escolha 1 massa
-          </option>
-        ` +
-        cake.masses
-          .map(
-            (mass) => `
-              <option value="${esc(
-                mass
-              )}">
-                ${esc(mass)}
-              </option>
-            `
-          )
-          .join("");
-    }
-
-    if (
-      cakeFilling &&
-      Array.isArray(
-        cake.fillings
-      )
-    ) {
-      cakeFilling.innerHTML =
-        `
-          <option value="">
-            Escolha 1 recheio
-          </option>
-        ` +
-        cake.fillings
-          .map(
-            (filling) => `
-              <option value="${esc(
-                filling
-              )}">
-                ${esc(
-                  filling
-                )}
-              </option>
-            `
-          )
-          .join("");
-    }
-
-    if (
-      cakeExtras &&
-      Array.isArray(cake.extras)
-    ) {
-      cakeExtras.innerHTML =
-        cake.extras
-          .map(
-            ([name, price]) => `
-              <label class="extra-option">
-
-                <input
-                  type="checkbox"
-                  name="Adicional"
-                  value="${esc(
-                    name
-                  )}"
-                  data-price="${Number(
-                    price
-                  )}"
-                >
-
-                <span>
-                  ${esc(name)}
-                  (+${money(price)})
-                </span>
-
-              </label>
-            `
-          )
-          .join("");
-    }
-
-    const calculate =
-      () => {
-        const selected =
-          cakeType?.selectedOptions
-            ?. [0];
-
-        let total =
-          Number(
-            selected?.dataset
-              ?.price || 0
-          );
-
-        $$("#cakeExtras input:checked")
-          .forEach(
-            (input) => {
-              total += Number(
-                input.dataset
-                  .price || 0
+              add(
+                button.dataset.id
               );
-            }
-          );
-
-        const totalElement =
-          $("#cakeTotal");
-
-        if (totalElement) {
-          totalElement.textContent =
-            money(total);
+            };
         }
-
-        return total;
-      };
-
-    if (cakeType) {
-      cakeType.onchange =
-        calculate;
-    }
-
-    $$("#cakeExtras input")
-      .forEach((input) => {
-        input.onchange =
-          calculate;
-      });
-
-    const openCake =
-      $("#openCake");
-
-    if (openCake) {
-      openCake.onclick = () => {
-        cakeForm.classList.toggle(
-          "hidden"
-        );
-
-        if (
-          !cakeForm.classList.contains(
-            "hidden"
-          )
-        ) {
-          cakeForm.scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-          });
-        }
-      };
-    }
-
-    calculate();
+      );
   }
 
-  /* =====================================================
+
+  /* =========================================================
      CHECKOUT
-     ===================================================== */
+  ========================================================= */
 
   function checkout() {
+
     if (!cart.length) {
       return;
     }
+
 
     const dialog =
       $("#checkout");
@@ -1318,12 +1485,16 @@
       return;
     }
 
+
     if (
       typeof dialog.showModal ===
       "function"
     ) {
+
       dialog.showModal();
+
     } else {
+
       dialog.setAttribute(
         "open",
         ""
@@ -1331,7 +1502,9 @@
     }
   }
 
+
   function closeCheckout() {
+
     const dialog =
       $("#checkout");
 
@@ -1339,23 +1512,250 @@
       return;
     }
 
+
     if (
       typeof dialog.close ===
       "function"
     ) {
+
       dialog.close();
+
     } else {
+
       dialog.removeAttribute(
         "open"
       );
     }
   }
 
-  /* =====================================================
-     CONFIGURAÇÃO DOS EVENTOS
-     ===================================================== */
+
+  /* =========================================================
+     FORMULÁRIO DO PEDIDO
+  ========================================================= */
+
+  function setupCheckoutForm() {
+
+    const form =
+      $("#checkoutForm");
+
+    if (!form) {
+      return;
+    }
+
+
+    form.addEventListener(
+      "change",
+      (event) => {
+
+        if (
+          event.target?.name !==
+          "receiving"
+        ) {
+          return;
+        }
+
+
+        const addressWrap =
+          $("#addressWrap");
+
+        if (!addressWrap) {
+          return;
+        }
+
+
+        addressWrap.classList.toggle(
+          "hidden",
+          event.target.value !==
+            "Entrega"
+        );
+      }
+    );
+
+
+    form.onsubmit =
+      async (event) => {
+
+        event.preventDefault();
+
+
+        const data =
+          new FormData(form);
+
+
+        const items =
+          getCartItems();
+
+
+        if (!items.length) {
+          return;
+        }
+
+
+        const total =
+          items.reduce(
+            (sum, item) =>
+              sum +
+              Number(
+                item.price || 0
+              ) *
+              Number(
+                item.qty || 0
+              ),
+            0
+          );
+
+
+        const lines =
+          items
+            .map(
+              (item) =>
+                `• ${item.qty}x ${
+                  item.name
+                } — ${money(
+                  Number(
+                    item.price || 0
+                  ) *
+                  Number(
+                    item.qty || 0
+                  )
+                )}`
+            )
+            .join("\n");
+
+
+        const customer =
+          data.get(
+            "customer"
+          ) || "";
+
+
+        const phone =
+          data.get(
+            "phone"
+          ) || "";
+
+
+        const receiving =
+          data.get(
+            "receiving"
+          ) || "";
+
+
+        const address =
+          data.get(
+            "address"
+          ) || "";
+
+
+        const payment =
+          data.get(
+            "payment"
+          ) || "";
+
+
+        const notes =
+          data.get(
+            "notes"
+          ) || "";
+
+
+        const message =
+          "Olá! Quero fazer um pedido na Martins Confeitaria.\n\n" +
+
+          `*Cliente:* ${customer}\n` +
+
+          `*WhatsApp:* ${phone}\n` +
+
+          `*Recebimento:* ${receiving}` +
+
+          (
+            address
+              ? `\n*Endereço:* ${address}`
+              : ""
+          ) +
+
+          `\n*Pagamento:* ${payment}\n\n` +
+
+          `*Itens:*\n${lines}\n\n` +
+
+          `*Total:* ${money(
+            total
+          )}\n` +
+
+          `*Observações:* ${
+            notes || "Nenhuma"
+          }`;
+
+
+        const client =
+          getSupabase();
+
+
+        if (client) {
+
+          try {
+
+            await client
+              .from("orders")
+              .insert({
+
+                customer,
+
+                phone,
+
+                receiving,
+
+                address,
+
+                payment,
+
+                notes,
+
+                items,
+
+                total,
+
+                status: "novo"
+
+              });
+
+          } catch (error) {
+
+            console.warn(
+              "Não foi possível salvar o pedido:",
+              error
+            );
+          }
+        }
+
+
+        window.open(
+          wa(message),
+          "_blank",
+          "noopener"
+        );
+
+
+        closeCheckout();
+
+
+        cart = [];
+
+
+        saveCart();
+
+
+        closeDrawer();
+      };
+  }
+
+
+  /* =========================================================
+     EVENTOS
+  ========================================================= */
 
   function setupEvents() {
+
     const openCart =
       $("#openCart");
 
@@ -1371,374 +1771,95 @@
     const checkoutButton =
       $("#checkoutBtn");
 
+
     if (openCart) {
+
       openCart.onclick =
         openDrawer;
     }
 
+
     if (closeCart) {
+
       closeCart.onclick =
         closeDrawer;
     }
 
+
     if (shade) {
+
       shade.onclick =
         closeDrawer;
     }
 
+
     if (clearCart) {
-      clearCart.onclick = () => {
-        cart = [];
-        saveCart();
-      };
+
+      clearCart.onclick =
+        () => {
+
+          cart = [];
+
+          saveCart();
+        };
     }
 
+
     if (checkoutButton) {
+
       checkoutButton.onclick =
         checkout;
     }
 
-    setupCheckoutForm();
-    setupCakeForm();
-  }
 
-  /* =====================================================
-     FORMULÁRIO DO CARRINHO
-     ===================================================== */
+    /*
+      ESC fecha o carrinho.
+    */
 
-  function setupCheckoutForm() {
-    const form =
-      $("#checkoutForm");
-
-    if (!form) {
-      return;
-    }
-
-    form.addEventListener(
-      "change",
+    document.addEventListener(
+      "keydown",
       (event) => {
+
         if (
-          event.target?.name !==
-          "receiving"
+          event.key ===
+          "Escape"
         ) {
-          return;
+
+          closeDrawer();
         }
-
-        const addressWrap =
-          $("#addressWrap");
-
-        if (!addressWrap) {
-          return;
-        }
-
-        addressWrap.classList.toggle(
-          "hidden",
-          event.target.value !==
-            "Entrega"
-        );
       }
     );
 
-    form.onsubmit =
-      async (event) => {
-        event.preventDefault();
 
-        const data =
-          new FormData(
-            form
-          );
-
-        const items =
-          getCartItems();
-
-        if (!items.length) {
-          return;
-        }
-
-        const total =
-          items.reduce(
-            (sum, item) =>
-              sum +
-              Number(
-                item.price || 0
-              ) *
-                Number(
-                  item.qty || 0
-                ),
-            0
-          );
-
-        const lines =
-          items
-            .map(
-              (item) =>
-                `• ${item.qty}x ${item.name} — ${money(
-                  Number(
-                    item.price || 0
-                  ) *
-                    Number(
-                      item.qty || 0
-                    )
-                )}`
-            )
-            .join("\n");
-
-        const customer =
-          data.get(
-            "customer"
-          ) || "";
-
-        const phone =
-          data.get(
-            "phone"
-          ) || "";
-
-        const receiving =
-          data.get(
-            "receiving"
-          ) || "";
-
-        const address =
-          data.get(
-            "address"
-          ) || "";
-
-        const payment =
-          data.get(
-            "payment"
-          ) || "";
-
-        const notes =
-          data.get(
-            "notes"
-          ) || "";
-
-        const message =
-          "Olá! Quero fazer um pedido na Martins Confeitaria.\n\n" +
-          `*Cliente:* ${customer}\n` +
-          `*WhatsApp:* ${phone}\n` +
-          `*Recebimento:* ${receiving}` +
-          (address
-            ? `\n*Endereço:* ${address}`
-            : "") +
-          `\n*Pagamento:* ${payment}\n\n` +
-          `*Itens:*\n${lines}\n\n` +
-          `*Total:* ${money(
-            total
-          )}\n` +
-          `*Observações:* ${
-            notes ||
-            "Nenhuma"
-          }`;
-
-        /*
-          Salva no Supabase sem impedir
-          o envio para o WhatsApp caso
-          o banco apresente algum erro.
-        */
-        const client =
-          getSupabase();
-
-        if (client) {
-          try {
-            await client
-              .from("orders")
-              .insert({
-                customer,
-                phone,
-                receiving,
-                address,
-                payment,
-                notes,
-                items,
-                total,
-                status: "novo"
-              });
-          } catch (error) {
-            console.warn(
-              "Não foi possível salvar o pedido:",
-              error
-            );
-          }
-        }
-
-        window.open(
-          wa(message),
-          "_blank",
-          "noopener"
-        );
-
-        closeCheckout();
-
-        cart = [];
-
-        saveCart();
-        closeDrawer();
-      };
+    setupCheckoutForm();
   }
 
-  /* =====================================================
-     FORMULÁRIO DE BOLO
-     ===================================================== */
 
-  function setupCakeForm() {
-    const form =
-      $("#cakeForm");
-
-    if (!form) {
-      return;
-    }
-
-    form.onsubmit =
-      async (event) => {
-        event.preventDefault();
-
-        const data =
-          new FormData(
-            form
-          );
-
-        const extras =
-          data.getAll(
-            "Adicional"
-          );
-
-        const cakeType =
-          $("#cakeType");
-
-        const selected =
-          cakeType
-            ?.selectedOptions
-            ?.[0];
-
-        let total =
-          Number(
-            selected?.dataset
-              ?.price || 0
-          );
-
-        $$("#cakeExtras input:checked")
-          .forEach(
-            (input) => {
-              total += Number(
-                input.dataset
-                  .price || 0
-              );
-            }
-          );
-
-        const cakeData = {
-          "Tipo e tamanho":
-            data.get(
-              "Tipo e tamanho"
-            ),
-
-          Massa:
-            data.get(
-              "Massa"
-            ),
-
-          Recheio:
-            data.get(
-              "Recheio"
-            ),
-
-          Adicionais:
-            extras.length
-              ? extras.join(", ")
-              : "Nenhum",
-
-          Nome:
-            data.get(
-              "Nome"
-            ),
-
-          WhatsApp:
-            data.get(
-              "WhatsApp"
-            ),
-
-          "Data desejada":
-            data.get(
-              "Data desejada"
-            ),
-
-          Observações:
-            data.get(
-              "Observações"
-            ),
-
-          "Total estimado":
-            money(total)
-        };
-
-        const message =
-          "Olá! Quero encomendar um bolo personalizado.\n\n" +
-          Object.entries(
-            cakeData
-          )
-            .map(
-              ([key, value]) =>
-                `*${key}:* ${
-                  value ||
-                  "Não informado"
-                }`
-            )
-            .join("\n");
-
-        const client =
-          getSupabase();
-
-        if (client) {
-          try {
-            await client
-              .from(
-                "custom_cakes"
-              )
-              .insert({
-                data: cakeData,
-                status: "novo"
-              });
-          } catch (error) {
-            console.warn(
-              "Não foi possível salvar a encomenda do bolo:",
-              error
-            );
-          }
-        }
-
-        window.open(
-          wa(message),
-          "_blank",
-          "noopener"
-        );
-      };
-  }
-
-  /* =====================================================
+  /* =========================================================
      ANIMAÇÕES DE SCROLL
-     ===================================================== */
+  ========================================================= */
 
   function setupReveal() {
+
     const elements =
       $$(".reveal");
 
-    if (
-      !elements.length
-    ) {
+
+    if (!elements.length) {
       return;
     }
 
-    /*
-      Fallback caso o navegador
-      não tenha IntersectionObserver.
-    */
+
     if (
-      !("IntersectionObserver" in
-        window)
+      !(
+        "IntersectionObserver" in
+        window
+      )
     ) {
+
       elements.forEach(
         (element) => {
+
           element.classList.add(
             "visible"
           );
@@ -1748,17 +1869,22 @@
       return;
     }
 
+
     const observer =
       new IntersectionObserver(
         (entries) => {
+
           entries.forEach(
             (entry) => {
+
               if (
                 entry.isIntersecting
               ) {
+
                 entry.target.classList.add(
                   "visible"
                 );
+
 
                 observer.unobserve(
                   entry.target
@@ -1772,8 +1898,10 @@
         }
       );
 
+
     elements.forEach(
       (element) => {
+
         observer.observe(
           element
         );
@@ -1781,25 +1909,65 @@
     );
   }
 
-  /* =====================================================
+
+  /* =========================================================
+     LINK DE ENCOMENDA
+  ========================================================= */
+
+  function setupOrderLinks() {
+
+    $$(
+      'a[href="encomendas.html"]'
+    )
+      .forEach(
+        (link) => {
+
+          link.addEventListener(
+            "click",
+            () => {
+
+              /*
+                Deixa a navegação normal.
+                Apenas garante que o carrinho
+                não fique aberto ao sair.
+              */
+
+              closeDrawer();
+            }
+          );
+        }
+      );
+  }
+
+
+  /* =========================================================
      INICIALIZAÇÃO
-     ===================================================== */
+  ========================================================= */
 
   function init() {
+
     setupEvents();
+
     setupReveal();
+
+    setupOrderLinks();
+
     load();
   }
+
 
   if (
     document.readyState ===
     "loading"
   ) {
+
     document.addEventListener(
       "DOMContentLoaded",
       init
     );
+
   } else {
+
     init();
   }
 
