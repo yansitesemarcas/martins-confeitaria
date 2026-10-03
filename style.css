@@ -582,3 +582,27 @@ footer{
     grid-template-columns:1fr;
   }
 }
+/* CORREÇÃO FINAL DOS BOTÕES */
+a.btn.primary,
+a.btn-primary,
+button.btn.primary,
+button.btn-primary{
+  background:#2b7896 !important;
+  background-color:#2b7896 !important;
+  color:#ffffff !important;
+  border:2px solid #2b7896 !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+
+a.btn.ghost,
+a.btn-secondary,
+button.btn.ghost,
+button.btn-secondary{
+  background:#ffffff !important;
+  background-color:#ffffff !important;
+  color:#1d5d75 !important;
+  border:2px solid #2b7896 !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
