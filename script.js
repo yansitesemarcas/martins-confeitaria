@@ -1,11 +1,883 @@
-(()=>{const D=window.MARTINS_DEFAULTS,C=window.MARTINS_CONFIG||{};let S=structuredClone(D),cart=JSON.parse(localStorage.getItem('martins_cart')||'[]');const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],money=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const wa=t=>`https://wa.me/${S.whatsapp}?text=${encodeURIComponent(t)}`;const sb=()=>window.supabase&&C.SUPABASE_URL&&C.SUPABASE_ANON_KEY?window.supabase.createClient(C.SUPABASE_URL,C.SUPABASE_ANON_KEY):null;
-async function load(){const client=sb();if(client){try{const [st,pr]=await Promise.all([client.from('settings').select('value').eq('key','site').maybeSingle(),client.from('products').select('*').order('sort')]);if(st.data?.value)S={...S,...st.data.value};if(pr.data?.length)S.products=pr.data}catch(e){console.warn('Supabase:',e)}}render()}
-function render(){const set=(id,v)=>{const e=$(id);if(e)e.textContent=v};$('#heroWhatsapp').href=wa('Olá! Vim pelo site da Martins Confeitaria e gostaria de fazer um pedido.');$('#contactWa').href=wa('Olá! Vim pelo site da Martins Confeitaria e gostaria de fazer um pedido.');$('#instagram').href=S.instagram;$('#maps').href=S.maps;set('#year',new Date().getFullYear());$('#address').innerHTML=S.address.map(esc).join('<br>');$('#aboutTitle').textContent=S.about.title;$('#aboutQuote').textContent=`“${S.about.quote}”`;$('#aboutText').innerHTML=String(S.about.text||'').split(/\n\n+/).map(x=>`<p>${esc(x).replace(/\n/g,'<br>')}</p>`).join('');renderHours();renderMenu();renderCake();renderCart();status()}
-const days=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];function renderHours(){$('#hours').innerHTML=S.hours.map((h,i)=>`<div class="hour"><span>${days[i]}</span><b>${h.s==='closed'?'Fechado':h.s==='tbd'?'A confirmar':`${h.o} – ${h.c}`}</b></div>`).join('')}
-function status(){const n=new Date(new Date().toLocaleString('en-US',{timeZone:'America/Fortaleza'})),h=S.hours[n.getDay()],e=$('#openState');if(!e)return;if(h?.s==='tbd'){e.textContent='Horário de terça-feira: a confirmar';return}let open=false;if(h?.s==='open'){const m=n.getHours()*60+n.getMinutes(),[oh,om]=h.o.split(':').map(Number),[ch,cm]=h.c.split(':').map(Number);open=m>=oh*60+om&&m<ch*60+cm}e.textContent=open?'● Aberta agora':'● Fechada agora';e.className='status '+(open?'is-open':'')}
-let cat='';function renderMenu(){const cats=S.categories||[...new Set(S.products.map(p=>p.category))];if(!cat||!cats.includes(cat))cat=cats[0]||'';$('#categories').innerHTML=cats.map(c=>`<button type="button" class="${c===cat?'active':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('');$$('#categories button').forEach(b=>b.onclick=()=>{cat=b.dataset.cat;renderMenu()});const list=S.products.filter(p=>p.available!==false&&p.category===cat);$('#products').innerHTML=list.map(p=>`<article class="product"><div class="product-img">${p.image?`<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy">`:'<span>Martins</span>'}</div><div class="product-body"><span class="tag">${esc(p.category)}</span><h3>${esc(p.name)}</h3><p>${esc(p.description||'')}</p><div class="product-row"><strong>${money(p.price)}</strong><button type="button" class="add" data-id="${esc(p.id)}">Adicionar</button></div></div></article>`).join('');$('#emptyMenu').classList.toggle('hidden',list.length>0);$$('.add').forEach(b=>b.onclick=()=>add(b.dataset.id))}
-function add(id){const p=S.products.find(x=>String(x.id)===String(id));if(!p)return;const x=cart.find(i=>String(i.id)===String(id));x?x.qty++:cart.push({id:p.id,qty:1});saveCart();openDrawer()}function saveCart(){localStorage.setItem('martins_cart',JSON.stringify(cart));renderCart()}function renderCart(){const items=cart.map(i=>{const p=S.products.find(p=>String(p.id)===String(i.id));return p?{...p,qty:i.qty}:null}).filter(Boolean),total=items.reduce((a,i)=>a+i.price*i.qty,0);$('#cartCount').textContent=items.reduce((a,i)=>a+i.qty,0);$('#cartTotal').textContent=money(total);$('#cartItems').innerHTML=items.length?items.map(i=>`<div class="cart-item"><div><b>${esc(i.name)}</b><small>${money(i.price)} cada</small></div><div class="qty"><button type="button" data-d="${i.id}">−</button><b>${i.qty}</b><button type="button" data-i="${i.id}">+</button></div></div>`).join(''):'<div class="empty">Seu carrinho está vazio.</div>';$$('[data-i]').forEach(b=>b.onclick=()=>change(b.dataset.i,1));$$('[data-d]').forEach(b=>b.onclick=()=>change(b.dataset.d,-1));$('#checkoutBtn').disabled=!items.length}function change(id,d){const x=cart.find(i=>String(i.id)===String(id));if(!x)return;x.qty+=d;if(x.qty<1)cart=cart.filter(i=>String(i.id)!==String(id));saveCart()}function openDrawer(){$('#drawer').classList.add('show');$('#shade').classList.add('show')}function closeDrawer(){$('#drawer').classList.remove('show');$('#shade').classList.remove('show')}
-function renderCake(){const c=S.cake;if(!c)return;$('#cakeType').innerHTML='<option value="">Escolha o tipo e tamanho</option>'+c.types.map(([n,v])=>`<option data-price="${v}">${esc(n)} — ${money(v)}</option>`).join('');$('#cakeMass').innerHTML='<option value="">Escolha 1 massa</option>'+c.masses.map(x=>`<option>${esc(x)}</option>`).join('');$('#cakeFilling').innerHTML='<option value="">Escolha 1 recheio</option>'+c.fillings.map(x=>`<option>${esc(x)}</option>`).join('');$('#cakeExtras').innerHTML=c.extras.map(([n,v])=>`<label class="extra-option"><input type="checkbox" name="Adicional" value="${esc(n)}" data-price="${v}"> ${esc(n)} (+${money(v)})</label>`).join('');const calc=()=>{let t=Number($('#cakeType').selectedOptions[0]?.dataset.price||0);$$('#cakeExtras input:checked').forEach(x=>t+=Number(x.dataset.price||0));$('#cakeTotal').textContent=money(t)};$('#cakeType').onchange=calc;$$('#cakeExtras input').forEach(x=>x.onchange=calc);calc()}
-$('#openCart').onclick=openDrawer;$('#closeCart').onclick=closeDrawer;$('#shade').onclick=closeDrawer;$('#clearCart').onclick=()=>{cart=[];saveCart()};$('#openCake').onclick=()=>{$('#cakeForm').classList.toggle('hidden');$('#cakeForm').scrollIntoView({behavior:'smooth',block:'center'})};$('#checkoutBtn').onclick=()=>{if(cart.length)$('#checkout').showModal()};$('#checkoutForm [name="receiving"]').onchange=e=>$('#addressWrap').classList.toggle('hidden',e.target.value!=='Entrega');
-$('#checkoutForm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target),items=cart.map(i=>({...S.products.find(p=>String(p.id)===String(i.id)),qty:i.qty})),total=items.reduce((a,i)=>a+i.price*i.qty,0),lines=items.map(i=>`• ${i.qty}x ${i.name} — ${money(i.price*i.qty)}`).join('\n'),text=`Olá! Quero fazer um pedido na Martins Confeitaria.\n\n*Cliente:* ${f.get('customer')}\n*WhatsApp:* ${f.get('phone')}\n*Recebimento:* ${f.get('receiving')}${f.get('address')?`\n*Endereço:* ${f.get('address')}`:''}\n*Pagamento:* ${f.get('payment')}\n\n*Itens:*\n${lines}\n\n*Total:* ${money(total)}\n*Observações:* ${f.get('notes')||'Nenhuma'}`;window.open(wa(text),'_blank','noopener');$('#checkout').close();cart=[];saveCart();closeDrawer()};
-$('#cakeForm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target),extras=f.getAll('Adicional'),opt=$('#cakeType').selectedOptions[0],total=Number(opt?.dataset.price||0)+extras.reduce((a,n)=>a+Number($(`#cakeExtras input[value="${CSS.escape(n)}"]`)?.dataset.price||0),0),text=`Olá! Quero encomendar um bolo personalizado.\n\n*Tipo:* ${f.get('Tipo e tamanho')}\n*Massa:* ${f.get('Massa')}\n*Recheio:* ${f.get('Recheio')}\n*Adicionais:* ${extras.join(', ')||'Nenhum'}\n*Nome:* ${f.get('Nome')}\n*WhatsApp:* ${f.get('WhatsApp')}\n*Data:* ${f.get('Data desejada')}\n*Observações:* ${f.get('Observações')||'Nenhuma'}\n*Estimativa:* ${money(total)}`;window.open(wa(text),'_blank','noopener')};load()})();
+```javascript
+(() => {
+  const D = window.MARTINS_DEFAULTS || {};
+  const C = window.MARTINS_CONFIG || {};
+
+  let S = structuredClone(D);
+  let cart = JSON.parse(localStorage.getItem("martins_cart") || "[]");
+  let currentCategory = "";
+
+  const $ = (selector) => document.querySelector(selector);
+
+  const $$ = (selector) => [
+    ...document.querySelectorAll(selector)
+  ];
+
+  const money = (value) =>
+    Number(value || 0).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+
+  const esc = (value) =>
+    String(value ?? "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char]));
+
+  const wa = (text) =>
+    `https://wa.me/${S.whatsapp}?text=${encodeURIComponent(text)}`;
+
+  function supabaseClient() {
+    if (
+      !window.supabase ||
+      !C.SUPABASE_URL ||
+      !C.SUPABASE_ANON_KEY
+    ) {
+      return null;
+    }
+
+    return window.supabase.createClient(
+      C.SUPABASE_URL,
+      C.SUPABASE_ANON_KEY
+    );
+  }
+
+  // =========================
+  // CARREGAR DADOS
+  // =========================
+
+  async function load() {
+    const client = supabaseClient();
+
+    if (client) {
+      try {
+        const [settingsResult, productsResult] = await Promise.all([
+          client
+            .from("settings")
+            .select("value")
+            .eq("key", "site")
+            .maybeSingle(),
+
+          client
+            .from("products")
+            .select("*")
+            .order("sort")
+        ]);
+
+        if (settingsResult?.data?.value) {
+          S = {
+            ...S,
+            ...settingsResult.data.value
+          };
+        }
+
+        if (productsResult?.data?.length) {
+          S.products = productsResult.data;
+        }
+
+      } catch (error) {
+        console.warn("Supabase:", error);
+      }
+    }
+
+    render();
+  }
+
+  // =========================
+  // RENDER PRINCIPAL
+  // =========================
+
+  function render() {
+    const year = $("#year");
+
+    if (year) {
+      year.textContent = new Date().getFullYear();
+    }
+
+    // WhatsApp
+    const contactWa = $("#contactWa");
+
+    if (contactWa) {
+      contactWa.href = wa(
+        "Olá! Vim pelo site da Martins Confeitaria e gostaria de fazer um pedido."
+      );
+    }
+
+    // Instagram
+    const instagram = $("#instagram");
+
+    if (instagram) {
+      instagram.href = S.instagram || "#";
+    }
+
+    // Google Maps
+    const maps = $("#maps");
+
+    if (maps) {
+      maps.href = S.maps || "#";
+    }
+
+    // Avaliação
+    const review = $("#review");
+
+    if (review) {
+      review.href = S.review || S.maps || "#";
+    }
+
+    // Endereço
+    const address = $("#address");
+
+    if (address) {
+      address.innerHTML = (S.address || [])
+        .map(esc)
+        .join("<br>");
+    }
+
+    // Mapa
+    const mapFrame = $("#mapFrame");
+
+    if (mapFrame && S.address) {
+      const addressQuery = S.address.join(", ");
+
+      mapFrame.src =
+        `https://www.google.com/maps?q=${encodeURIComponent(addressQuery)}&output=embed`;
+    }
+
+    // História
+    const aboutTitle = $("#aboutTitle");
+
+    if (aboutTitle) {
+      aboutTitle.textContent =
+        S.about?.title || "";
+    }
+
+    const aboutQuote = $("#aboutQuote");
+
+    if (aboutQuote) {
+      aboutQuote.textContent =
+        `“${S.about?.quote || ""}”`;
+    }
+
+    const aboutText = $("#aboutText");
+
+    if (aboutText) {
+      aboutText.innerHTML = String(
+        S.about?.text || ""
+      )
+        .split(/\n\n+/)
+        .map(
+          (paragraph) =>
+            `<p>${esc(paragraph).replace(/\n/g, "<br>")}</p>`
+        )
+        .join("");
+    }
+
+    renderHours();
+    renderMenu();
+    renderCart();
+    updateCartEvents();
+  }
+
+  // =========================
+  // HORÁRIOS
+  // =========================
+
+  const days = [
+    "Domingo",
+    "Segunda-feira",
+    "Terça-feira",
+    "Quarta-feira",
+    "Quinta-feira",
+    "Sexta-feira",
+    "Sábado"
+  ];
+
+  function renderHours() {
+    const hoursElement = $("#hours");
+
+    if (!hoursElement) {
+      return;
+    }
+
+    hoursElement.innerHTML = (S.hours || [])
+      .map((hour, index) => {
+
+        let text = "Fechado";
+
+        if (hour?.s === "open") {
+          text = `${hour.o} – ${hour.c}`;
+        }
+
+        if (hour?.s === "tbd") {
+          text = "A confirmar";
+        }
+
+        return `
+          <div class="hour">
+            <span>${days[index] || ""}</span>
+            <b>${esc(text)}</b>
+          </div>
+        `;
+      })
+      .join("");
+  }
+
+  // =========================
+  // STATUS
+  // =========================
+
+  function status() {
+    const element = $("#openState");
+
+    // Esse elemento não existe no HTML atual.
+    // Portanto, simplesmente ignoramos.
+    if (!element) {
+      return;
+    }
+
+    const now = new Date(
+      new Date().toLocaleString("en-US", {
+        timeZone: "America/Fortaleza"
+      })
+    );
+
+    const hour = S.hours?.[now.getDay()];
+
+    if (!hour) {
+      return;
+    }
+
+    if (hour.s === "tbd") {
+      element.textContent =
+        "Horário de terça-feira: a confirmar";
+
+      return;
+    }
+
+    let isOpen = false;
+
+    if (hour.s === "open") {
+      const currentMinutes =
+        now.getHours() * 60 + now.getMinutes();
+
+      const [openHour, openMinute] =
+        hour.o.split(":").map(Number);
+
+      const [closeHour, closeMinute] =
+        hour.c.split(":").map(Number);
+
+      const opening =
+        openHour * 60 + openMinute;
+
+      const closing =
+        closeHour * 60 + closeMinute;
+
+      isOpen =
+        currentMinutes >= opening &&
+        currentMinutes < closing;
+    }
+
+    element.textContent =
+      isOpen ? "● Aberta agora" : "● Fechada agora";
+
+    element.className =
+      `status ${isOpen ? "is-open" : ""}`;
+  }
+
+  // =========================
+  // CARDÁPIO
+  // =========================
+
+  function renderMenu() {
+    const categoriesElement = $("#categories");
+    const productsElement = $("#products");
+    const emptyMenu = $("#emptyMenu");
+
+    if (!categoriesElement || !productsElement) {
+      return;
+    }
+
+    const products = S.products || [];
+
+    const categories =
+      S.categories?.length
+        ? S.categories
+        : [
+            ...new Set(
+              products.map((product) => product.category)
+            )
+          ];
+
+    if (
+      !currentCategory ||
+      !categories.includes(currentCategory)
+    ) {
+      currentCategory = categories[0] || "";
+    }
+
+    // Categorias
+    categoriesElement.innerHTML = categories
+      .map(
+        (category) => `
+          <button
+            type="button"
+            class="${category === currentCategory ? "active" : ""}"
+            data-category="${esc(category)}"
+          >
+            ${esc(category)}
+          </button>
+        `
+      )
+      .join("");
+
+    $$("#categories button").forEach((button) => {
+      button.addEventListener("click", () => {
+        currentCategory =
+          button.dataset.category || "";
+
+        renderMenu();
+      });
+    });
+
+    // Produtos
+    const list = products.filter(
+      (product) =>
+        product.available !== false &&
+        product.category === currentCategory
+    );
+
+    productsElement.innerHTML = list
+      .map(
+        (product) => `
+          <article class="product">
+
+            <div class="product-img">
+              ${
+                product.image
+                  ? `
+                    <img
+                      src="${esc(product.image)}"
+                      alt="${esc(product.name)}"
+                      loading="lazy"
+                    >
+                  `
+                  : `
+                    <span>Martins</span>
+                  `
+              }
+            </div>
+
+            <div class="product-body">
+
+              <span class="tag">
+                ${esc(product.category)}
+              </span>
+
+              <h3>
+                ${esc(product.name)}
+              </h3>
+
+              ${
+                product.description
+                  ? `
+                    <p>
+                      ${esc(product.description)}
+                    </p>
+                  `
+                  : ""
+              }
+
+              <div class="product-row">
+
+                <strong>
+                  ${money(product.price)}
+                </strong>
+
+                <button
+                  type="button"
+                  class="add"
+                  data-product-id="${esc(product.id)}"
+                >
+                  Adicionar
+                </button>
+
+              </div>
+
+            </div>
+
+          </article>
+        `
+      )
+      .join("");
+
+    if (emptyMenu) {
+      emptyMenu.classList.toggle(
+        "hidden",
+        list.length > 0
+      );
+    }
+
+    $$(".add").forEach((button) => {
+      button.addEventListener("click", () => {
+        addToCart(button.dataset.productId);
+      });
+    });
+  }
+
+  // =========================
+  // CARRINHO
+  // =========================
+
+  function addToCart(id) {
+    const product = S.products?.find(
+      (item) =>
+        String(item.id) === String(id)
+    );
+
+    if (!product) {
+      return;
+    }
+
+    const existing = cart.find(
+      (item) =>
+        String(item.id) === String(id)
+    );
+
+    if (existing) {
+      existing.qty++;
+    } else {
+      cart.push({
+        id: product.id,
+        qty: 1
+      });
+    }
+
+    saveCart();
+    openDrawer();
+  }
+
+  function saveCart() {
+    localStorage.setItem(
+      "martins_cart",
+      JSON.stringify(cart)
+    );
+
+    renderCart();
+  }
+
+  function renderCart() {
+    const cartCount = $("#cartCount");
+    const cartTotal = $("#cartTotal");
+    const cartItems = $("#cartItems");
+    const checkoutButton = $("#checkoutBtn");
+
+    if (!cartItems) {
+      return;
+    }
+
+    const items = cart
+      .map((cartItem) => {
+
+        const product = S.products?.find(
+          (item) =>
+            String(item.id) ===
+            String(cartItem.id)
+        );
+
+        if (!product) {
+          return null;
+        }
+
+        return {
+          ...product,
+          qty: cartItem.qty
+        };
+      })
+      .filter(Boolean);
+
+    const total = items.reduce(
+      (sum, item) =>
+        sum +
+        Number(item.price || 0) *
+        Number(item.qty || 0),
+      0
+    );
+
+    if (cartCount) {
+      cartCount.textContent =
+        items.reduce(
+          (sum, item) =>
+            sum + Number(item.qty || 0),
+          0
+        );
+    }
+
+    if (cartTotal) {
+      cartTotal.textContent =
+        money(total);
+    }
+
+    if (!items.length) {
+
+      cartItems.innerHTML = `
+        <div class="empty">
+          Seu carrinho está vazio.
+        </div>
+      `;
+
+    } else {
+
+      cartItems.innerHTML = items
+        .map(
+          (item) => `
+            <div class="cart-item">
+
+              <div>
+                <b>${esc(item.name)}</b>
+
+                <small>
+                  ${money(item.price)} cada
+                </small>
+              </div>
+
+              <div class="qty">
+
+                <button
+                  type="button"
+                  data-cart-minus="${esc(item.id)}"
+                >
+                  −
+                </button>
+
+                <b>${item.qty}</b>
+
+                <button
+                  type="button"
+                  data-cart-plus="${esc(item.id)}"
+                >
+                  +
+                </button>
+
+              </div>
+
+            </div>
+          `
+        )
+        .join("");
+    }
+
+    if (checkoutButton) {
+      checkoutButton.disabled =
+        !items.length;
+    }
+
+    $$("[data-cart-plus]").forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          () =>
+            changeCart(
+              button.dataset.cartPlus,
+              1
+            )
+        );
+      }
+    );
+
+    $$("[data-cart-minus]").forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          () =>
+            changeCart(
+              button.dataset.cartMinus,
+              -1
+            )
+        );
+      }
+    );
+  }
+
+  function changeCart(id, amount) {
+    const item = cart.find(
+      (cartItem) =>
+        String(cartItem.id) ===
+        String(id)
+    );
+
+    if (!item) {
+      return;
+    }
+
+    item.qty += amount;
+
+    if (item.qty < 1) {
+      cart = cart.filter(
+        (cartItem) =>
+          String(cartItem.id) !==
+          String(id)
+      );
+    }
+
+    saveCart();
+  }
+
+  // =========================
+  // ABRIR / FECHAR CARRINHO
+  // =========================
+
+  function openDrawer() {
+    const drawer = $("#drawer");
+    const shade = $("#shade");
+
+    if (drawer) {
+      drawer.classList.add("open");
+      drawer.setAttribute(
+        "aria-hidden",
+        "false"
+      );
+    }
+
+    if (shade) {
+      shade.classList.add("open");
+    }
+  }
+
+  function closeDrawer() {
+    const drawer = $("#drawer");
+    const shade = $("#shade");
+
+    if (drawer) {
+      drawer.classList.remove("open");
+      drawer.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+    }
+
+    if (shade) {
+      shade.classList.remove("open");
+    }
+  }
+
+  // =========================
+  // CHECKOUT
+  // =========================
+
+  function setupCheckout() {
+    const checkoutForm =
+      $("#checkoutForm");
+
+    const receiving =
+      checkoutForm?.querySelector(
+        '[name="receiving"]'
+      );
+
+    const addressWrap =
+      $("#addressWrap");
+
+    if (receiving && addressWrap) {
+
+      receiving.addEventListener(
+        "change",
+        (event) => {
+
+          addressWrap.classList.toggle(
+            "hidden",
+            event.target.value !== "Entrega"
+          );
+
+        }
+      );
+    }
+
+    if (!checkoutForm) {
+      return;
+    }
+
+    checkoutForm.addEventListener(
+      "submit",
+      (event) => {
+
+        event.preventDefault();
+
+        const form =
+          new FormData(checkoutForm);
+
+        const items = cart
+          .map((cartItem) => {
+
+            const product =
+              S.products?.find(
+                (item) =>
+                  String(item.id) ===
+                  String(cartItem.id)
+              );
+
+            if (!product) {
+              return null;
+            }
+
+            return {
+              ...product,
+              qty: cartItem.qty
+            };
+          })
+          .filter(Boolean);
+
+        if (!items.length) {
+          return;
+        }
+
+        const total =
+          items.reduce(
+            (sum, item) =>
+              sum +
+              Number(item.price || 0) *
+              Number(item.qty || 0),
+            0
+          );
+
+        const lines =
+          items
+            .map(
+              (item) =>
+                `• ${item.qty}x ${item.name} — ${money(
+                  item.price * item.qty
+                )}`
+            )
+            .join("\n");
+
+        const address =
+          form.get("address");
+
+        const message = `
+Olá! Quero fazer um pedido na Martins Confeitaria.
+
+*Cliente:* ${form.get("customer")}
+*WhatsApp:* ${form.get("phone")}
+*Recebimento:* ${form.get("receiving")}
+${address ? `*Endereço:* ${address}` : ""}
+*Pagamento:* ${form.get("payment")}
+
+*Itens:*
+${lines}
+
+*Total:* ${money(total)}
+
+*Observações:* ${
+          form.get("notes") || "Nenhuma"
+        }
+        `.trim();
+
+        window.open(
+          wa(message),
+          "_blank",
+          "noopener"
+        );
+
+        cart = [];
+
+        saveCart();
+        closeDrawer();
+
+        const checkout =
+          $("#checkout");
+
+        if (
+          checkout &&
+          typeof checkout.close ===
+            "function"
+        ) {
+          checkout.close();
+        }
+
+        checkoutForm.reset();
+
+        if (addressWrap) {
+          addressWrap.classList.add(
+            "hidden"
+          );
+        }
+      }
+    );
+  }
+
+  // =========================
+  // EVENTOS
+  // =========================
+
+  function updateCartEvents() {
+
+    const openCart = $("#openCart");
+
+    if (openCart) {
+      openCart.onclick = openDrawer;
+    }
+
+    const closeCart =
+      $("#closeCart");
+
+    if (closeCart) {
+      closeCart.onclick =
+        closeDrawer;
+    }
+
+    const shade = $("#shade");
+
+    if (shade) {
+      shade.onclick =
+        closeDrawer;
+    }
+
+    const clearCart =
+      $("#clearCart");
+
+    if (clearCart) {
+
+      clearCart.onclick = () => {
+
+        cart = [];
+
+        saveCart();
+      };
+    }
+
+    const checkoutButton =
+      $("#checkoutBtn");
+
+    if (checkoutButton) {
+
+      checkoutButton.onclick = () => {
+
+        if (!cart.length) {
+          return;
+        }
+
+        const checkout =
+          $("#checkout");
+
+        if (
+          checkout &&
+          typeof checkout.showModal ===
+            "function"
+        ) {
+          checkout.showModal();
+        }
+      };
+    }
+  }
+
+  // =========================
+  // INICIAR
+  // =========================
+
+  setupCheckout();
+  load();
+
+})();
+```
