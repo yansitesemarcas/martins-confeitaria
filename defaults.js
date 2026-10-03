@@ -1,4 +1,3 @@
-```js
 window.MARTINS_DEFAULTS = {
   name: "Martins Confeitaria",
 
@@ -38,8 +37,7 @@ window.MARTINS_DEFAULTS = {
     quote:
       "Por uma vida mais doce e feliz.",
 
-    text:
-`Minha história com a confeitaria começou em 2020, em meio a um dos momentos mais difíceis que vivemos: a pandemia.
+    text: `Minha história com a confeitaria começou em 2020, em meio a um dos momentos mais difíceis que vivemos: a pandemia.
 
 Foi ali, em meio às incertezas e desafios, que nasceu a coragem de começar. Com muito esforço, coloquei meus primeiros bolos afogadinhos e bolos caseiros na calçada da minha casa. Sem saber exatamente onde aquilo iria me levar, mas com uma certeza no coração: eu queria fazer dar certo.
 
@@ -375,8 +373,3 @@ Vocês não compram apenas os meus doces. Vocês fazem parte do meu sonho.
     ]
   }
 };
-```
-
-Esse arquivo pode substituir **somente o `defaults.js`**. O `index.html` e o `script.js` que você me mandou ficam como estão.
-
-Depois de publicar, dê um **Ctrl + Shift + R** para carregar a nova história.
