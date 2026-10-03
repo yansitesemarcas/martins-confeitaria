@@ -2053,3 +2053,59 @@ a {
     font-size: .78rem;
   }
 }
+body,
+button,
+input,
+textarea,
+select {
+  font-family: 'DM Sans', sans-serif;
+}
+
+body {
+  font-size: 15px;
+}
+
+p,
+li,
+.contact-item,
+.hour,
+.product-body,
+.menu-section,
+.contact-section {
+  font-size: 14px;
+}
+
+.hero h1 {
+  font-size: clamp(32px, 5vw, 52px);
+}
+
+.section-title,
+.section-head h2,
+.about h2,
+.cake-copy h2 {
+  font-size: clamp(25px, 4vw, 36px);
+}
+
+.btn {
+  font-size: 14px;
+}
+
+.top nav a {
+  font-size: 13px;
+}
+
+.product-body h3 {
+  font-size: 17px;
+}
+
+.product-body p {
+  font-size: 13px;
+}
+
+.quote {
+  font-size: 18px;
+}
+
+.about-signature {
+  font-size: 15px;
+}
