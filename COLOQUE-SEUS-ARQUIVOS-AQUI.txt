@@ -1,0 +1,6 @@
+Coloque nesta pasta os arquivos da Martins Confeitaria:
+logo.png
+hero.jpg
+quem-produz.jpg
+loja.mp4
+bolos.mp4

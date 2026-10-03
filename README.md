@@ -1,18 +1,24 @@
-# Martins Confeitaria — atualização de encomendas
+# Martins Confeitaria — versão limpa
 
-Versão atualizada com:
-- Cardápio de Encomendas separado do Delivery/Pronta Entrega.
-- Naked Cake e Chantininho por quantidade de pessoas e valor.
-- Personalização com 1 massa, exatamente 2 recheios, adicionais e personalizações.
-- Brigadeiros Clássicos e Premium, com limite de sabores: 2 para 50 unidades e 4 para 100 unidades.
-- Kits Festa com Petit Brownie e com Pirulitos, com os valores reajustados em R$ 10 conforme solicitado.
-- Mantidas as demais funcionalidades e arquivos do projeto.
+Estrutura simples para GitHub Pages:
 
+- `index.html` — página principal
+- `style.css` — CSS novo, sem blocos de versões antigas
+- `script.js` — navegação, cardápio, carrinho e orçamento de bolo
+- `defaults.js` — dados padrão da loja
+- `config.js` — configuração do Supabase
+- `assets/` — coloque aqui logo, fotos e vídeos
 
-Atualização V22: adicionada ao final do Cardápio de Encomendas a seção “Outros itens” com Petit Brownie (50/100 unidades), Mini Brownie Recheado, Bem Casado (papel crepom/celofane) e Cupcakes com/sem plaquinha. Os subtotais e faixas de preço são calculados automaticamente e enviados no resumo do WhatsApp.
+## Assets esperados
 
+- `assets/logo.png`
+- `assets/hero.jpg`
+- `assets/quem-produz.jpg`
+- `assets/loja.mp4`
+- `assets/bolos.mp4`
 
-V23: adicionados botão de impressão da comanda após confirmação da encomenda e mídia (foto + vídeo) na área de personalização/orçamento.
+As imagens dos produtos podem ser adicionadas ao `defaults.js` usando caminhos como `assets/nome-da-imagem.jpg`.
 
+## GitHub Pages
 
-V-Supabase: configuração conectada ao projeto Supabase da Martins. O site usa a tabela settings, products, orders e custom_cakes; a taxa de entrega permanece 'A consultar pelo WhatsApp'. Execute supabase/migration_site_compat.sql no projeto Supabase antes de usar o painel.
+Envie todos os arquivos mantendo os nomes e pastas. O arquivo inicial é `index.html`.
