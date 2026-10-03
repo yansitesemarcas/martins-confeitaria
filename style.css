@@ -606,3 +606,54 @@ button.btn-secondary{
   opacity:1 !important;
   visibility:visible !important;
 }
+/* ===== BOTÕES PRINCIPAIS ===== */
+
+a.btn,
+button.btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 48px !important;
+  padding: 13px 24px !important;
+  border-radius: 999px !important;
+  border: 2px solid transparent !important;
+  font-weight: 900 !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  box-sizing: border-box !important;
+}
+
+/* AZUL */
+a.btn.btn-primary,
+button.btn.btn-primary {
+  background: #2b7896 !important;
+  background-color: #2b7896 !important;
+  color: #ffffff !important;
+  border-color: #2b7896 !important;
+}
+
+/* BRANCO */
+a.btn.btn-secondary,
+button.btn.btn-secondary {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #1d5d75 !important;
+  border-color: #2b7896 !important;
+}
+
+/* HOVER */
+a.btn.btn-primary:hover,
+button.btn.btn-primary:hover {
+  background: #1d5d75 !important;
+  background-color: #1d5d75 !important;
+  color: #ffffff !important;
+}
+
+a.btn.btn-secondary:hover,
+button.btn.btn-secondary:hover {
+  background: #ffe5ef !important;
+  background-color: #ffe5ef !important;
+  color: #1d5d75 !important;
+}
