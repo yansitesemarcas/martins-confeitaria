@@ -71,254 +71,47 @@ Vocês não compram apenas os meus doces. Vocês fazem parte do meu sonho.
   ],
 
   products: [
-    {
-      id: "d1",
-      name: "Ninho",
-      price: 12,
-      category: "Bolos no Pote",
-      available: true
-    },
-    {
-      id: "d2",
-      name: "Brigadeiro",
-      price: 12,
-      category: "Bolos no Pote",
-      available: true
-    },
-    {
-      id: "d3",
-      name: "Duo",
-      price: 12,
-      category: "Bolos no Pote",
-      available: true
-    },
-    {
-      id: "d4",
-      name: "Chocolatudo",
-      price: 12,
-      category: "Bolos no Pote",
-      available: true
-    },
-    {
-      id: "d5",
-      name: "Chocolate com maracujá",
-      price: 14,
-      category: "Bolos no Pote",
-      available: true
-    },
-    {
-      id: "d6",
-      name: "Red Velvet com creme de nata e geleia de morango",
-      price: 14,
-      category: "Bolos no Pote",
-      available: true
-    },
-    {
-      id: "d7",
-      name: "Red Velvet com Ninho e geleia de morango",
-      price: 14,
-      category: "Bolos no Pote",
-      available: true
-    },
-    {
-      id: "d8",
-      name: "Ninho com geleia de morango",
-      price: 14,
-      category: "Bolos no Pote",
-      available: true
-    },
-    {
-      id: "d9",
-      name: "Creme de 4 leites com Nutella",
-      price: 14,
-      category: "Bolos no Pote",
-      available: true
-    },
-    {
-      id: "d10",
-      name: "Delícia de abacaxi",
-      price: 14,
-      category: "Sobremesas",
-      available: true
-    },
-    {
-      id: "d11",
-      name: "Delícia de uva",
-      price: 15,
-      category: "Sobremesas",
-      available: true
-    },
-    {
-      id: "d12",
-      name: "Delícia de morango",
-      price: 15,
-      category: "Sobremesas",
-      available: true
-    },
-    {
-      id: "d13",
-      name: "Pavê de morango",
-      price: 19.99,
-      category: "Sobremesas",
-      available: true
-    },
-    {
-      id: "d14",
-      name: "Pavê de Nutella",
-      price: 19.99,
-      category: "Sobremesas",
-      available: true
-    },
-    {
-      id: "d15",
-      name: "Supreme",
-      price: 18,
-      category: "Copos da Felicidade",
-      available: true
-    },
-    {
-      id: "d16",
-      name: "Ninho com morango",
-      price: 18,
-      category: "Copos da Felicidade",
-      available: true
-    },
-    {
-      id: "d17",
-      name: "Ninho com Nutella",
-      price: 18,
-      category: "Copos da Felicidade",
-      available: true
-    },
-    {
-      id: "d18",
-      name: "Amanteigado",
-      price: 15,
-      category: "Bolos 8 fatias",
-      available: true
-    },
-    {
-      id: "d19",
-      name: "Chocolate",
-      price: 16,
-      category: "Bolos 8 fatias",
-      available: true
-    },
-    {
-      id: "d20",
-      name: "Cenoura",
-      price: 16,
-      category: "Bolos 8 fatias",
-      available: true
-    },
-    {
-      id: "d21",
-      name: "Laranja",
-      price: 16,
-      category: "Bolos 8 fatias",
-      available: true
-    },
-    {
-      id: "d22",
-      name: "Amanteigado",
-      price: 20,
-      category: "Bolos 10 a 12 fatias",
-      available: true
-    },
-    {
-      id: "d23",
-      name: "Chocolate",
-      price: 21,
-      category: "Bolos 10 a 12 fatias",
-      available: true
-    },
-    {
-      id: "d24",
-      name: "Cenoura",
-      price: 21,
-      category: "Bolos 10 a 12 fatias",
-      available: true
-    },
-    {
-      id: "d25",
-      name: "Laranja",
-      price: 21,
-      category: "Bolos 10 a 12 fatias",
-      available: true
-    },
-    {
-      id: "d26",
-      name: "Ninho",
-      price: 18,
-      category: "Afogadinhos Baby",
-      available: true
-    },
-    {
-      id: "d27",
-      name: "Brigadeiro",
-      price: 18,
-      category: "Afogadinhos Baby",
-      available: true
-    },
-    {
-      id: "d28",
-      name: "Duo",
-      price: 18,
-      category: "Afogadinhos Baby",
-      available: true
-    },
-    {
-      id: "d29",
-      name: "Cenoura com chocolate",
-      price: 18,
-      category: "Afogadinhos Baby",
-      available: true
-    },
-    {
-      id: "d30",
-      name: "Ninho com geleia de morango",
-      price: 20,
-      category: "Afogadinhos Baby",
-      available: true
-    },
-    {
-      id: "d31",
-      name: "Ninho com morango",
-      price: 20,
-      category: "Afogadinhos Baby",
-      available: true
-    },
-    {
-      id: "d32",
-      name: "Ninho com Nutella",
-      price: 20,
-      category: "Afogadinhos Baby",
-      available: true
-    },
-    {
-      id: "b1",
-      name: "Brownie de Brigadeiro",
-      price: 7.5,
-      category: "Brownies",
-      description: "Brownie artesanal com brigadeiro.",
-      available: true
-    },
-    {
-      id: "b2",
-      name: "Brownie de Ninho",
-      price: 7.5,
-      category: "Brownies",
-      description: "Brownie artesanal com Ninho.",
-      available: true
-    },
-    {
-      id: "b3",
-      name: "Brownie de Ninho com Nutella",
-      price: 8,
-      category: "Brownies",
-      description: "Brownie artesanal com Ninho e Nutella.",
-      available: true
-    }
+    { id:"d1", name:"Ninho", price:12, category:"Bolos no Pote", available:true },
+    { id:"d2", name:"Brigadeiro", price:12, category:"Bolos no Pote", available:true },
+    { id:"d3", name:"Duo", price:12, category:"Bolos no Pote", available:true },
+    { id:"d4", name:"Chocolatudo", price:12, category:"Bolos no Pote", available:true },
+    { id:"d5", name:"Chocolate com maracujá", price:14, category:"Bolos no Pote", available:true },
+    { id:"d6", name:"Red Velvet com creme de nata e geleia de morango", price:14, category:"Bolos no Pote", available:true },
+    { id:"d7", name:"Red Velvet com Ninho e geleia de morango", price:14, category:"Bolos no Pote", available:true },
+    { id:"d8", name:"Ninho com geleia de morango", price:14, category:"Bolos no Pote", available:true },
+    { id:"d9", name:"Creme de 4 leites com Nutella", price:14, category:"Bolos no Pote", available:true },
+
+    { id:"d10", name:"Delícia de abacaxi", price:14, category:"Sobremesas", available:true },
+    { id:"d11", name:"Delícia de uva", price:15, category:"Sobremesas", available:true },
+    { id:"d12", name:"Delícia de morango", price:15, category:"Sobremesas", available:true },
+    { id:"d13", name:"Pavê de morango", price:19.99, category:"Sobremesas", available:true },
+    { id:"d14", name:"Pavê de Nutella", price:19.99, category:"Sobremesas", available:true },
+
+    { id:"d15", name:"Supreme", price:18, category:"Copos da Felicidade", available:true },
+    { id:"d16", name:"Ninho com morango", price:18, category:"Copos da Felicidade", available:true },
+    { id:"d17", name:"Ninho com Nutella", price:18, category:"Copos da Felicidade", available:true },
+
+    { id:"d18", name:"Amanteigado", price:15, category:"Bolos 8 fatias", available:true },
+    { id:"d19", name:"Chocolate", price:16, category:"Bolos 8 fatias", available:true },
+    { id:"d20", name:"Cenoura", price:16, category:"Bolos 8 fatias", available:true },
+    { id:"d21", name:"Laranja", price:16, category:"Bolos 8 fatias", available:true },
+
+    { id:"d22", name:"Amanteigado", price:20, category:"Bolos 10 a 12 fatias", available:true },
+    { id:"d23", name:"Chocolate", price:21, category:"Bolos 10 a 12 fatias", available:true },
+    { id:"d24", name:"Cenoura", price:21, category:"Bolos 10 a 12 fatias", available:true },
+    { id:"d25", name:"Laranja", price:21, category:"Bolos 10 a 12 fatias", available:true },
+
+    { id:"d26", name:"Ninho", price:18, category:"Afogadinhos Baby", available:true },
+    { id:"d27", name:"Brigadeiro", price:18, category:"Afogadinhos Baby", available:true },
+    { id:"d28", name:"Duo", price:18, category:"Afogadinhos Baby", available:true },
+    { id:"d29", name:"Cenoura com chocolate", price:18, category:"Afogadinhos Baby", available:true },
+    { id:"d30", name:"Ninho com geleia de morango", price:20, category:"Afogadinhos Baby", available:true },
+    { id:"d31", name:"Ninho com morango", price:20, category:"Afogadinhos Baby", available:true },
+    { id:"d32", name:"Ninho com Nutella", price:20, category:"Afogadinhos Baby", available:true },
+
+    { id:"b1", name:"Brownie de Brigadeiro", price:7.5, category:"Brownies", description:"Brownie artesanal com brigadeiro.", available:true },
+    { id:"b2", name:"Brownie de Ninho", price:7.5, category:"Brownies", description:"Brownie artesanal com Ninho.", available:true },
+    { id:"b3", name:"Brownie de Ninho com Nutella", price:8, category:"Brownies", description:"Brownie artesanal com Ninho e Nutella.", available:true }
   ],
 
   cake: {
