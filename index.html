@@ -2,121 +2,64 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Martins Confeitaria</title>
-
   <meta
     name="description"
     content="Martins Confeitaria — bolos, doces, sobremesas e encomendas em Fortaleza."
   >
 
-  <meta
-    name="theme-color"
-    content="#67b0cb"
-  >
-
-  <link
-    rel="icon"
-    type="image/png"
-    href="logo.png"
-  >
-
-  <!-- FONTES -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
-  >
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600;700&family=Nunito:wght@400;500;600;700;800;900&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   >
 
-  <!-- CSS -->
-  <link
-    rel="stylesheet"
-    href="style.css?v=20261003-07"
-  >
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <!-- =====================================================
-       CABEÇALHO
-  ====================================================== -->
+  <!-- =========================
+       HEADER
+  ========================== -->
+  <header class="site-header">
+    <div class="container nav-wrap">
 
-  <header class="top">
+      <a href="#inicio" class="brand">
+        <img src="assets/logo.png" alt="Martins Confeitaria">
+      </a>
 
-    <a
-      class="brand"
-      href="#inicio"
-      aria-label="Martins Confeitaria - início"
-    >
-      <img
-        src="logo.png"
-        alt="Martins Confeitaria"
+      <nav class="main-nav" aria-label="Navegação principal">
+        <a href="#inicio">Início</a>
+        <a href="#sobre">Nossa História</a>
+        <a href="#pronta">Pronta Entrega</a>
+        <a href="encomendas.html">Encomenda</a>
+        <a href="#cardapio">Cardápio</a>
+        <a href="#contato">Contato</a>
+      </nav>
+
+      <button
+        class="menu-toggle"
+        type="button"
+        aria-label="Abrir menu"
+        aria-expanded="false"
       >
-    </a>
+        ☰
+      </button>
 
-    <nav aria-label="Navegação principal">
-
-      <a href="#inicio">
-        Início
-      </a>
-
-      <a href="#sobre">
-        Nossa História
-      </a>
-
-      <a href="#bolo">
-        Bolos
-      </a>
-
-      <a href="encomendas.html">
-        Encomenda
-      </a>
-
-      <a href="#cardapio">
-        Cardápio
-      </a>
-
-      <a href="#contato">
-        Contato
-      </a>
-
-    </nav>
-
-    <!-- ÚNICO BOTÃO DO CARRINHO NO CABEÇALHO -->
-    <button
-      type="button"
-      class="cart-btn"
-      id="openCart"
-      aria-label="Abrir carrinho"
-    >
-      🛒
-      <span id="cartCount">0</span>
-    </button>
-
+    </div>
   </header>
 
 
   <main>
 
-    <!-- =====================================================
-         INÍCIO
-    ====================================================== -->
-
-    <section
-      id="inicio"
-      class="hero"
-    >
+    <!-- =========================
+         HERO
+    ========================== -->
+    <section id="inicio" class="hero">
 
       <video
         class="hero-video"
@@ -124,285 +67,83 @@
         muted
         loop
         playsinline
-        preload="metadata"
-        aria-hidden="true"
       >
-        <source
-          src="loja.mp4"
-          type="video/mp4"
-        >
+        <source src="assets/loja.mp4" type="video/mp4">
       </video>
 
       <div class="hero-overlay"></div>
 
-      <div class="hero-content reveal">
+      <div class="container hero-content">
 
-        <!-- LOGO CENTRALIZADA -->
-        <div class="hero-logo">
-          <img
-            src="logo.png"
-            alt="Martins Confeitaria"
-            class="hero-logo-image"
-          >
-        </div>
+        <img
+          src="assets/logo.png"
+          alt="Martins Confeitaria"
+          class="hero-logo"
+        >
 
-        <p class="hero-kicker">
-          Martins Confeitaria
-        </p>
-
-        <h1>
+        <p class="hero-subtitle">
           Por uma vida mais doce e feliz 🩵🧁
-        </h1>
-
-        <p class="hero-description">
-          Bolos, doces e momentos especiais
-          preparados com carinho.
         </p>
 
-        <!-- APENAS UM BOTÃO -->
-        <div class="hero-actions">
-
-          <a
-            href="#sobre"
-            class="btn primary"
-          >
-            Conheça nossa história
-          </a>
-
-        </div>
+        <a href="#sobre" class="btn primary">
+          Conheça nossa história
+        </a>
 
       </div>
 
     </section>
 
 
-    <!-- =====================================================
-         NOSSA HISTÓRIA
-    ====================================================== -->
+    <!-- =========================
+         SOBRE / NOSSA HISTÓRIA
+    ========================== -->
+    <section id="sobre" class="section about-section">
 
-    <section
-      id="sobre"
-      class="section about"
-    >
+      <div class="container">
 
-      <div class="section-inner">
-
-        <div class="section-head reveal">
-
-          <span class="eyebrow">
-            Nossa história
-          </span>
-
-          <!-- FRASE DO SONHO ACIMA DA HISTÓRIA -->
-          <h2 id="aboutTitle">
-            ✨ De um sonho na calçada para a realização de um grande sonho 🤍
-          </h2>
-
-        </div>
-
-
-        <div class="about-content reveal">
-
-          <div class="about-copy">
-
-            <p
-              id="aboutQuote"
-              class="quote"
-            >
-              Por uma vida mais doce e feliz.
-            </p>
-
-            <!-- HISTÓRIA FICA AQUI -->
-            <div id="aboutText">
-
-              <p>
-                Minha história com a confeitaria começou em 2020,
-                em meio a um dos momentos mais difíceis que vivemos:
-                a pandemia.
-              </p>
-
-              <p>
-                Foi ali, em meio às incertezas e desafios,
-                que nasceu a coragem de começar.
-              </p>
-
-              <p>
-                Com muito esforço, coloquei meus primeiros bolos
-                afogadinhos e bolos caseiros na calçada da minha casa.
-              </p>
-
-              <p>
-                Depois vieram as vendas no shopping, de porta em porta,
-                cada pedido e cada cliente dando ainda mais força
-                para continuar.
-              </p>
-
-              <p>
-                Para me aperfeiçoar e oferecer cada vez mais qualidade,
-                também busquei conhecimento e fiz o curso técnico
-                profissional de Confeitaria pelo Senac.
-              </p>
-
-              <p>
-                Hoje, olhar para tudo isso é lembrar que nenhum começo
-                é pequeno quando existe um sonho grande por trás.
-              </p>
-
-              <p>
-                Minha confeitaria nasceu de um sonho, cresceu com muito
-                trabalho e continua sendo construída todos os dias
-                com amor, dedicação e propósito.
-              </p>
-
-              <p>
-                E o meu maior propósito continua sendo o mesmo:
-                levar doces para tornar a vida das pessoas um pouquinho
-                mais doce, feliz e especial. 🤍🧁
-              </p>
-
-              <div class="about-signature">
-
-                <span>
-                  🩵 Feito com carinho, sabor e muitos sonhos
-                </span>
-
-                <strong>
-                  👨‍🍳 Chef Denilson Martins ✨
-                </strong>
-
-                <small>
-                  O coração por trás de cada doce da
-                  Martins Confeitaria.
-                </small>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         PRONTA ENTREGA
-    ====================================================== -->
-
-    <section
-      id="pronta"
-      class="section ready-section"
-    >
-
-      <div class="section-inner">
-
-        <div class="section-head reveal">
-
-          <span class="eyebrow">
-            Para adoçar seu dia
-          </span>
+        <div class="section-heading">
+          <span class="eyebrow">Nossa história</span>
 
           <h2>
-            Pronta entrega 🍰
+            Feito com carinho,
+            pensado para adoçar
+            seus momentos.
           </h2>
 
           <p>
-            Confira algumas opções disponíveis
-            para deixar seu momento ainda mais especial.
+            Na Martins Confeitaria, cada produto é preparado com
+            cuidado, carinho e atenção aos detalhes para transformar
+            momentos especiais em lembranças ainda mais doces.
           </p>
-
         </div>
 
-        <!-- PRODUTOS -->
-        <div
-          id="readyProducts"
-          class="products-grid reveal"
-        >
-        </div>
+        <div class="about-grid">
 
-        <!-- BOTÃO CENTRALIZADO -->
-        <div class="section-action reveal">
-
-          <a
-            href="delivery.html"
-            class="btn primary"
-          >
-            Ver pronta entrega
-          </a>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         BOLOS / ENCOMENDAS
-    ====================================================== -->
-
-    <section
-      id="bolo"
-      class="section cake-section"
-    >
-
-      <div class="section-inner">
-
-        <div class="cake-feature reveal">
-
-          <!-- VÍDEO CENTRAL -->
-          <div class="cake-video">
-
-            <video
-              autoplay
-              muted
-              loop
-              playsinline
-              preload="metadata"
+          <div class="about-image">
+            <img
+              src="assets/logo.png"
+              alt="Martins Confeitaria"
             >
-              <source
-                src="bolos.mp4"
-                type="video/mp4"
-              >
-            </video>
-
-            <div class="cake-video-overlay"></div>
-
           </div>
 
+          <div class="about-text">
 
-          <!-- CONTEÚDO CENTRALIZADO -->
-          <div class="cake-copy">
-
-            <span class="eyebrow">
-              Feito especialmente para você
-            </span>
-
-            <h2>
-              Seu bolo,
-              do seu jeito 🎂
-            </h2>
+            <h3>
+              Quem produz os nossos produtos?
+            </h3>
 
             <p>
-              Escolha o tamanho, massa, recheio
-              e adicionais para montar uma encomenda
-              personalizada para o seu momento.
+              Tudo é produzido com dedicação e muito carinho,
+              buscando sempre entregar sabor, qualidade e uma
+              experiência especial para cada cliente.
             </p>
 
-            <!-- BOTÃO NO CENTRO -->
-            <div class="cake-actions">
-
-              <a
-                href="encomendas.html"
-                class="btn primary"
-              >
-                Monte sua encomenda
-              </a>
-
-            </div>
+            <p>
+              Da escolha dos ingredientes até a finalização,
+              cada detalhe é pensado para que você receba
+              um produto bonito, saboroso e feito especialmente
+              para o seu momento.
+            </p>
 
           </div>
 
@@ -413,60 +154,57 @@
     </section>
 
 
-    <!-- =====================================================
-         CARDÁPIO
-    ====================================================== -->
+    <!-- =========================
+         PRONTA ENTREGA
+    ========================== -->
+    <section id="pronta" class="section ready-section">
 
-    <section
-      id="cardapio"
-      class="section menu-section"
-    >
+      <div class="container">
 
-      <div class="section-inner">
-
-        <div class="section-head reveal">
+        <div class="section-heading center">
 
           <span class="eyebrow">
-            Sabores Martins
+            Pronta entrega
           </span>
 
           <h2>
-            Nosso cardápio 🧁
+            Delícias prontinhas para você
           </h2>
 
           <p>
-            Escolha uma categoria e confira
-            nossas opções.
+            Escolha entre os produtos disponíveis
+            e veja o que temos para pronta entrega.
           </p>
 
         </div>
 
+        <div class="ready-content">
 
-        <!-- CATEGORIAS -->
-        <div
-          id="categories"
-          class="tabs reveal"
-          role="tablist"
-          aria-label="Categorias do cardápio"
-        >
-        </div>
+          <div class="ready-card">
 
+            <div class="ready-icon">
+              🧁
+            </div>
 
-        <!-- PRODUTOS -->
-        <div
-          id="products"
-          class="products-grid reveal"
-        >
-        </div>
+            <h3>
+              Produtos disponíveis
+            </h3>
 
+            <p>
+              Confira os produtos disponíveis,
+              quantidades e informações para fazer
+              seu pedido.
+            </p>
 
-        <!-- VAZIO -->
-        <div
-          id="emptyMenu"
-          class="empty hidden"
-        >
-          Nenhum produto encontrado
-          nesta categoria.
+            <a
+              href="delivery.html"
+              class="btn primary"
+            >
+              Ver pronta entrega
+            </a>
+
+          </div>
+
         </div>
 
       </div>
@@ -474,195 +212,236 @@
     </section>
 
 
-    <!-- =====================================================
-         CONTATO
-    ====================================================== -->
+    <!-- =========================
+         BOLOS / ENCOMENDAS
+    ========================== -->
+    <section id="bolo" class="section cakes-section">
 
-    <section
-      id="contato"
-      class="section contact-section"
-    >
+      <div class="container">
 
-      <div class="section-inner">
-
-        <div class="section-head reveal">
+        <div class="section-heading">
 
           <span class="eyebrow">
-            Fale com a gente
+            Bolos
           </span>
 
           <h2>
-            Vamos deixar seu dia mais doce? 🩵
+            Um bolo especial para cada momento
           </h2>
 
           <p>
-            Entre em contato com a Martins Confeitaria
-            para pedidos, encomendas e informações.
+            Escolha o estilo do seu bolo e monte
+            sua encomenda do seu jeito.
           </p>
 
         </div>
 
+        <div class="cake-video-wrap">
+
+          <video
+            class="cake-video"
+            autoplay
+            muted
+            loop
+            playsinline
+            controls
+          >
+            <source src="assets/bolos.mp4" type="video/mp4">
+          </video>
+
+        </div>
+
+        <div class="cake-action">
+
+          <a
+            href="encomendas.html"
+            class="btn primary"
+          >
+            Monte sua encomenda
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         CARDÁPIO
+    ========================== -->
+    <section id="cardapio" class="section menu-section">
+
+      <div class="container">
+
+        <div class="section-heading center">
+
+          <span class="eyebrow">
+            Cardápio
+          </span>
+
+          <h2>
+            Nossas delícias
+          </h2>
+
+          <p>
+            Confira alguns dos produtos preparados
+            pela Martins Confeitaria.
+          </p>
+
+        </div>
+
+        <div
+          id="menu-categories"
+          class="menu-categories"
+        ></div>
+
+        <div
+          id="menu-products"
+          class="menu-products"
+        ></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         CONTATO
+    ========================== -->
+    <section id="contato" class="section contact-section">
+
+      <div class="container">
+
+        <div class="section-heading center">
+
+          <span class="eyebrow">
+            Fale conosco
+          </span>
+
+          <h2>
+            Vamos adoçar seu momento?
+          </h2>
+
+          <p>
+            Entre em contato para fazer seu pedido
+            ou tirar suas dúvidas.
+          </p>
+
+        </div>
 
         <div class="contact-grid">
 
+          <div class="contact-card">
 
-          <!-- INFORMAÇÕES -->
-          <div class="contact-card reveal">
+            <span class="contact-icon">
+              📱
+            </span>
 
             <h3>
-              Martins Confeitaria
+              WhatsApp
             </h3>
 
-            <div class="contact-info">
+            <p>
+              (85) 8156-3070
+            </p>
 
-
-              <!-- ENDEREÇO -->
-              <div class="contact-item">
-
-                <span>
-                  📍
-                </span>
-
-                <p id="address">
-                  Rua 1018, 65<br>
-                  Conjunto Ceará II<br>
-                  Fortaleza - CE<br>
-                  60532-690<br>
-                  Brasil
-                </p>
-
-              </div>
-
-
-              <!-- HORÁRIOS -->
-              <div class="contact-item">
-
-                <span>
-                  🕐
-                </span>
-
-                <div>
-
-                  <div
-                    id="openState"
-                    class="open-state"
-                  >
-                    Verificando horário...
-                  </div>
-
-                  <div id="hours"></div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <div class="contact-actions">
-
-              <a
-                id="contactWa"
-                href="#"
-                class="btn primary"
-                target="_blank"
-                rel="noopener"
-              >
-                💬 Falar pelo WhatsApp
-              </a>
-
-              <a
-                id="instagram"
-                href="#"
-                class="btn ghost"
-                target="_blank"
-                rel="noopener"
-              >
-                📸 Instagram
-              </a>
-
-            </div>
+            <a
+              href="https://wa.me/5585981563070"
+              target="_blank"
+              rel="noopener"
+              class="btn primary"
+            >
+              Falar no WhatsApp
+            </a>
 
           </div>
 
 
-          <!-- GOOGLE MAPS -->
-          <div class="map-card reveal">
+          <div class="contact-card">
 
-            <div class="map-head">
+            <span class="contact-icon">
+              📍
+            </span>
 
-              <div>
+            <h3>
+              Onde estamos
+            </h3>
 
-                <span class="eyebrow">
-                  Localização
-                </span>
+            <p>
+              Rua 1018, 65<br>
+              Conjunto Ceará II<br>
+              Fortaleza - CE<br>
+              60532-690
+            </p>
 
-                <h3>
-                  Onde estamos
-                </h3>
-
-              </div>
-
-              <a
-                id="maps"
-                href="#"
-                target="_blank"
-                rel="noopener"
-              >
-                Abrir no Google Maps
-              </a>
-
-            </div>
+          </div>
 
 
-            <div class="map-frame">
+          <div class="contact-card">
 
-              <iframe
-                id="mapFrame"
-                title="Localização da Martins Confeitaria"
-                loading="lazy"
-                src="https://www.google.com/maps?q=Rua%201018%2C%2065%2C%20Conjunto%20Cear%C3%A1%20II%2C%20Fortaleza%20CE&output=embed"
-                allowfullscreen
-              ></iframe>
+            <span class="contact-icon">
+              📸
+            </span>
 
-            </div>
+            <h3>
+              Instagram
+            </h3>
+
+            <p>
+              @martins_confeitariaartesanal
+            </p>
+
+            <a
+              href="https://www.instagram.com/martins_confeitariaartesanal/"
+              target="_blank"
+              rel="noopener"
+              class="btn primary"
+            >
+              Ver Instagram
+            </a>
 
           </div>
 
         </div>
 
 
-        <!-- =================================================
-             AVALIAÇÃO — ÚLTIMA PARTE
-        ================================================== -->
+        <!-- GOOGLE MAPS -->
+        <div class="map-wrap">
 
-        <div class="review-card reveal">
+          <iframe
+            src="https://www.google.com/maps?q=Rua%201018%2C%2065%2C%20Conjunto%20Cear%C3%A1%20II%2C%20Fortaleza%20CE&output=embed"
+            width="100%"
+            height="380"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Localização Martins Confeitaria"
+          ></iframe>
 
-          <div class="review-content">
+        </div>
 
-            <span class="eyebrow">
-              Sua opinião importa
-            </span>
 
-            <h3>
-              Gostou da experiência? ⭐
-            </h3>
+        <!-- AVALIAÇÃO -->
+        <div class="review-box">
 
-            <p>
-              Conte para outras pessoas como foi
-              sua experiência com a Martins Confeitaria.
-            </p>
+          <h3>
+            Sua opinião é muito importante 💙
+          </h3>
 
-          </div>
+          <p>
+            Se você já comprou com a Martins Confeitaria,
+            deixe sua avaliação no Google.
+          </p>
 
           <a
-            id="review"
-            href="#"
-            class="btn primary"
+            href="https://www.google.com/maps"
             target="_blank"
             rel="noopener"
+            class="btn primary"
           >
-            ⭐ Avaliar no Google
+            Avaliar no Google
           </a>
 
         </div>
@@ -674,24 +453,22 @@
   </main>
 
 
-  <!-- =====================================================
-       RODAPÉ
-  ====================================================== -->
+  <!-- =========================
+       FOOTER
+  ========================== -->
+  <footer class="site-footer">
 
-  <footer class="footer">
-
-    <div class="footer-inner">
-
+    <div class="container footer-grid">
 
       <div class="footer-brand">
 
         <img
-          src="logo.png"
+          src="assets/logo.png"
           alt="Martins Confeitaria"
         >
 
         <p>
-          Por uma vida mais doce e feliz. 🩵🧁
+          Por uma vida mais doce e feliz 🩵🧁
         </p>
 
       </div>
@@ -699,16 +476,20 @@
 
       <div class="footer-links">
 
+        <h3>
+          Navegação
+        </h3>
+
         <a href="#inicio">
           Início
         </a>
 
         <a href="#sobre">
-          Nossa história
+          Nossa História
         </a>
 
-        <a href="#bolo">
-          Bolos
+        <a href="#pronta">
+          Pronta Entrega
         </a>
 
         <a href="encomendas.html">
@@ -725,22 +506,34 @@
 
       </div>
 
+
+      <div class="footer-contact">
+
+        <h3>
+          Contato
+        </h3>
+
+        <p>
+          (85) 8156-3070
+        </p>
+
+        <p>
+          Rua 1018, 65<br>
+          Conjunto Ceará II<br>
+          Fortaleza - CE
+        </p>
+
+      </div>
+
     </div>
 
 
     <div class="footer-bottom">
 
       <p>
-        ©
-        <span id="year">
-          2026
-        </span>
+        © <span id="current-year"></span>
         Martins Confeitaria.
         Todos os direitos reservados.
-      </p>
-
-      <p>
-        Feito com carinho. 🩵
       </p>
 
     </div>
@@ -748,288 +541,61 @@
   </footer>
 
 
-  <!-- =====================================================
-       CARRINHO
-       FICA ESCONDIDO ATÉ CLICAR NO BOTÃO DO CABEÇALHO
-  ====================================================== -->
-
-  <div
-    id="shade"
-    class="shade"
-    aria-hidden="true"
-  ></div>
-
-
-  <aside
-    id="drawer"
-    class="drawer"
-    aria-hidden="true"
-    aria-label="Carrinho de compras"
-  >
-
-    <div class="drawer-head">
-
-      <div>
-
-        <span class="eyebrow">
-          Seu pedido
-        </span>
-
-        <h2>
-          Carrinho 🛒
-        </h2>
-
-      </div>
-
-      <button
-        type="button"
-        id="closeCart"
-        class="icon-btn"
-        aria-label="Fechar carrinho"
-      >
-        ×
-      </button>
-
-    </div>
-
-
-    <div
-      id="cartItems"
-      class="cart-items"
-    >
-
-      <div class="empty">
-        Seu carrinho está vazio.
-      </div>
-
-    </div>
-
-
-    <div class="drawer-footer">
-
-      <div class="cart-total-row">
-
-        <span>
-          Total
-        </span>
-
-        <strong id="cartTotal">
-          R$ 0,00
-        </strong>
-
-      </div>
-
-
-      <button
-        type="button"
-        id="clearCart"
-        class="btn ghost full"
-      >
-        Limpar carrinho
-      </button>
-
-
-      <button
-        type="button"
-        id="checkoutBtn"
-        class="btn primary full"
-        disabled
-      >
-        Finalizar pedido
-      </button>
-
-    </div>
-
-  </aside>
-
-
-  <!-- =====================================================
-       CHECKOUT
-  ====================================================== -->
-
-  <dialog
-    id="checkout"
-    class="checkout-dialog"
-  >
-
-    <form
-      id="checkoutForm"
-      method="dialog"
-      class="checkout-form"
-    >
-
-      <div class="dialog-head">
-
-        <div>
-
-          <span class="eyebrow">
-            Finalizar pedido
-          </span>
-
-          <h2>
-            Seus dados 🩵
-          </h2>
-
-        </div>
-
-        <button
-          type="button"
-          class="icon-btn"
-          onclick="document.getElementById('checkout').close()"
-          aria-label="Fechar"
-        >
-          ×
-        </button>
-
-      </div>
-
-
-      <label>
-        Nome
-
-        <input
-          type="text"
-          name="customer"
-          placeholder="Seu nome"
-          required
-        >
-      </label>
-
-
-      <label>
-        WhatsApp
-
-        <input
-          type="tel"
-          name="phone"
-          placeholder="(85) 99999-9999"
-          required
-        >
-      </label>
-
-
-      <label>
-        Como deseja receber?
-
-        <select
-          name="receiving"
-          required
-        >
-
-          <option value="">
-            Selecione
-          </option>
-
-          <option value="Retirada">
-            Retirada
-          </option>
-
-          <option value="Entrega">
-            Entrega
-          </option>
-
-        </select>
-
-      </label>
-
-
-      <div
-        id="addressWrap"
-        class="hidden"
-      >
-
-        <label>
-          Endereço para entrega
-
-          <textarea
-            name="address"
-            rows="3"
-            placeholder="Rua, número, bairro..."
-          ></textarea>
-
-        </label>
-
-      </div>
-
-
-      <label>
-        Forma de pagamento
-
-        <select
-          name="payment"
-          required
-        >
-
-          <option value="">
-            Selecione
-          </option>
-
-          <option value="Pix">
-            Pix
-          </option>
-
-          <option value="Dinheiro">
-            Dinheiro
-          </option>
-
-          <option value="Cartão">
-            Cartão
-          </option>
-
-        </select>
-
-      </label>
-
-
-      <label>
-        Observações
-
-        <textarea
-          name="notes"
-          rows="4"
-          placeholder="Alguma observação sobre seu pedido?"
-        ></textarea>
-
-      </label>
-
-
-      <div class="dialog-actions">
-
-        <button
-          type="button"
-          class="btn ghost"
-          onclick="document.getElementById('checkout').close()"
-        >
-          Voltar
-        </button>
-
-        <button
-          type="submit"
-          class="btn primary"
-        >
-          Enviar pedido
-        </button>
-
-      </div>
-
-    </form>
-
-  </dialog>
-
-
-  <!-- =====================================================
+  <!-- =========================
        SCRIPTS
-  ====================================================== -->
+  ========================== -->
 
-  <script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-  ></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script src="config.js"></script>
-
   <script src="defaults.js"></script>
-
   <script src="script.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+      const year = document.getElementById("current-year");
+
+      if (year) {
+        year.textContent = new Date().getFullYear();
+      }
+
+      const toggle = document.querySelector(".menu-toggle");
+      const nav = document.querySelector(".main-nav");
+
+      if (toggle && nav) {
+
+        toggle.addEventListener("click", () => {
+
+          const opened =
+            nav.classList.toggle("open");
+
+          toggle.setAttribute(
+            "aria-expanded",
+            opened ? "true" : "false"
+          );
+
+        });
+
+        nav.querySelectorAll("a").forEach(link => {
+
+          link.addEventListener("click", () => {
+
+            nav.classList.remove("open");
+
+            toggle.setAttribute(
+              "aria-expanded",
+              "false"
+            );
+
+          });
+
+        });
+
+      }
+
+    });
+  </script>
 
 </body>
 </html>
