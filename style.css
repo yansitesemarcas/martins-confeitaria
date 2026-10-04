@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600;700&family=Nunito:wght@400;500;600;700;800;900&display=swap');
 
 /* =========================================================
    MARTINS CONFEITARIA
-   CSS COMPATÍVEL COM index.html + encomendas.html
+   CSS DO INDEX.HTML ATUAL
    ========================================================= */
 
 :root {
@@ -45,23 +45,28 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-
   background: var(--cream);
   color: var(--text);
-
   font-family: "Nunito", sans-serif;
   font-size: 16px;
   line-height: 1.6;
-
   overflow-x: hidden;
 }
 
-body,
+body.cart-open {
+  overflow: hidden;
+}
+
 button,
 input,
 textarea,
 select {
-  font-family: "Nunito", sans-serif;
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
 }
 
 img,
@@ -80,35 +85,33 @@ a {
 }
 
 button {
-  font-family: inherit;
+  border: 0;
 }
 
-button,
-a {
-  -webkit-tap-highlight-color: transparent;
-}
-
-.container {
-  width: min(100% - 40px, var(--max-width));
-  margin: 0 auto;
+.hidden {
+  display: none !important;
 }
 
 /* =========================================================
    HEADER
    ========================================================= */
 
-.site-header {
+.top {
   position: fixed;
   top: 0;
   left: 0;
-
   z-index: 1000;
 
   width: 100%;
   min-height: 76px;
 
-  background: rgba(255, 250, 247, 0.97);
+  display: flex;
+  align-items: center;
+  gap: 24px;
 
+  padding: 8px 30px;
+
+  background: rgba(255, 250, 247, 0.97);
   border-bottom: 1px solid rgba(103, 176, 203, 0.16);
 
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.06);
@@ -117,32 +120,18 @@ a {
   -webkit-backdrop-filter: blur(12px);
 }
 
-.nav-wrap {
-  min-height: 76px;
+.top .brand {
+  width: 60px;
+  height: 60px;
 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 25px;
-}
-
-/* =========================================================
-   LOGO
-   ========================================================= */
-
-.brand {
-  width: 62px;
-  height: 62px;
-
-  flex: 0 0 62px;
+  flex: 0 0 60px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.brand img {
+.top .brand img {
   width: 100%;
   height: 100%;
 
@@ -151,21 +140,19 @@ a {
   background: transparent !important;
 }
 
-/* =========================================================
-   NAVEGAÇÃO
-   ========================================================= */
+/* NAV */
 
-.main-nav {
+.top nav {
+  flex: 1;
+
   display: flex;
   align-items: center;
   justify-content: center;
 
   gap: 25px;
-
-  margin-left: auto;
 }
 
-.main-nav a {
+.top nav a {
   position: relative;
 
   color: var(--text);
@@ -180,16 +167,15 @@ a {
     transform 0.2s ease;
 }
 
-.main-nav a:hover {
+.top nav a:hover {
   color: var(--blue-dark);
   transform: translateY(-1px);
 }
 
-.main-nav a::after {
+.top nav a::after {
   content: "";
 
   position: absolute;
-
   left: 0;
   bottom: -7px;
 
@@ -203,40 +189,82 @@ a {
   transition: width 0.2s ease;
 }
 
-.main-nav a:hover::after {
+.top nav a:hover::after {
   width: 100%;
 }
 
 /* =========================================================
-   MENU MOBILE
+   CART BUTTON HEADER
    ========================================================= */
 
-.menu-toggle {
-  display: none;
+.cart-btn {
+  position: relative;
 
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
 
+  flex: 0 0 48px;
+
+  display: flex;
   align-items: center;
   justify-content: center;
 
-  border: 0;
-  border-radius: 12px;
+  border-radius: 50%;
 
-  background: var(--blue);
-  color: #fff;
+  background: var(--blue) !important;
+  color: #fff !important;
 
-  font-size: 22px;
-  line-height: 1;
+  font-size: 21px;
 
   cursor: pointer;
 
   opacity: 1 !important;
   visibility: visible !important;
+
+  box-shadow: 0 8px 20px rgba(43, 120, 150, 0.20);
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
 }
 
-.menu-toggle:hover {
-  background: var(--blue-dark);
+.cart-btn:hover {
+  background: var(--blue-dark) !important;
+  transform: translateY(-2px);
+}
+
+#cartCount {
+  position: absolute;
+
+  top: -5px;
+  right: -5px;
+
+  min-width: 20px;
+  height: 20px;
+
+  padding: 0 5px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: var(--pink-dark);
+  color: #fff;
+
+  font-size: 11px;
+  font-weight: 900;
+
+  line-height: 1;
+}
+
+/* =========================================================
+   MAIN
+   ========================================================= */
+
+main {
+  width: 100%;
 }
 
 /* =========================================================
@@ -261,7 +289,6 @@ a {
 
 .hero-video {
   position: absolute;
-
   inset: 0;
 
   width: 100%;
@@ -276,7 +303,6 @@ a {
 
 .hero-overlay {
   position: absolute;
-
   inset: 0;
 
   z-index: 1;
@@ -284,7 +310,7 @@ a {
   background:
     linear-gradient(
       135deg,
-      rgba(20, 65, 80, 0.70),
+      rgba(20, 65, 80, 0.72),
       rgba(30, 74, 90, 0.42)
     );
 }
@@ -293,6 +319,8 @@ a {
   position: relative;
 
   z-index: 2;
+
+  max-width: 850px;
 
   display: flex;
   flex-direction: column;
@@ -307,31 +335,98 @@ a {
   width: 180px;
   height: 180px;
 
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 
-  object-fit: contain;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  filter: drop-shadow(
-    0 12px 25px rgba(0, 0, 0, 0.18)
-  );
+  filter:
+    drop-shadow(
+      0 12px 25px rgba(0, 0, 0, 0.18)
+    );
 }
 
-.hero-subtitle {
-  margin: 0 0 28px;
+.hero-logo-image {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+}
+
+.hero-kicker {
+  margin: 0 0 8px;
+
+  color: rgba(255, 255, 255, 0.90);
+
+  font-size: 13px;
+  font-weight: 800;
+
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  max-width: 850px;
+
+  margin: 0 0 15px;
 
   color: #fff;
 
   font-family: "Dancing Script", cursive;
 
-  font-size: clamp(1.5rem, 3vw, 2.2rem);
-  font-weight: 600;
+  font-size: clamp(2.8rem, 6vw, 5rem);
+
+  font-weight: 700;
+
+  line-height: 1.05;
 
   text-shadow:
-    0 3px 12px rgba(0, 0, 0, 0.20);
+    0 4px 15px rgba(0, 0, 0, 0.20);
+}
+
+.hero-description {
+  max-width: 620px;
+
+  margin: 0 0 28px;
+
+  color: rgba(255, 255, 255, 0.92);
+
+  font-size: 17px;
+
+  line-height: 1.7;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
 }
 
 /* =========================================================
-   BOTÕES
+   REVEAL
+   ========================================================= */
+
+.reveal {
+  animation: revealUp 0.7s ease both;
+}
+
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   BUTTONS
    ========================================================= */
 
 .btn {
@@ -351,13 +446,12 @@ a {
 
   line-height: 1.2;
 
-  cursor: pointer;
-
   text-align: center;
+
+  cursor: pointer;
 
   opacity: 1 !important;
   visibility: visible !important;
-
   pointer-events: auto !important;
 
   transition:
@@ -368,23 +462,45 @@ a {
 }
 
 .btn.primary {
-  background: var(--blue);
-  color: #fff;
+  background: var(--blue) !important;
+  color: #fff !important;
 
-  border-color: var(--blue);
+  border-color: var(--blue) !important;
 
   box-shadow:
-    0 9px 24px rgba(43, 120, 150, 0.22);
+    0 9px 24px
+    rgba(43, 120, 150, 0.22);
 }
 
 .btn.primary:hover {
-  background: var(--blue-dark);
-  border-color: var(--blue-dark);
+  background: var(--blue-dark) !important;
+  border-color: var(--blue-dark) !important;
+
+  color: #fff !important;
 
   transform: translateY(-2px);
 
   box-shadow:
-    0 13px 30px rgba(43, 120, 150, 0.27);
+    0 13px 30px
+    rgba(43, 120, 150, 0.27);
+}
+
+.btn.ghost {
+  background: #fff !important;
+  color: var(--blue-dark) !important;
+
+  border-color: rgba(103, 176, 203, 0.35) !important;
+}
+
+.btn.ghost:hover {
+  background: #f5fbfd !important;
+  border-color: var(--blue) !important;
+
+  transform: translateY(-2px);
+}
+
+.btn.full {
+  width: 100%;
 }
 
 .btn:active {
@@ -392,18 +508,27 @@ a {
 }
 
 /* =========================================================
-   SEÇÕES
+   SECTIONS
    ========================================================= */
 
 .section {
+  position: relative;
+
   width: 100%;
 
-  padding: 90px 0;
-
-  position: relative;
+  padding: 90px 20px;
 }
 
-.about-section {
+.section-inner {
+  width: min(
+    100%,
+    var(--max-width)
+  );
+
+  margin: 0 auto;
+}
+
+.about {
   background:
     radial-gradient(
       circle at 5% 10%,
@@ -417,7 +542,7 @@ a {
   background: #f5fbfd;
 }
 
-.cakes-section {
+.cake-section {
   background: var(--cream);
 }
 
@@ -435,16 +560,14 @@ a {
 }
 
 /* =========================================================
-   TÍTULOS DAS SEÇÕES
+   SECTION HEAD
    ========================================================= */
 
-.section-heading {
-  max-width: 760px;
+.section-head {
+  max-width: 780px;
 
   margin: 0 auto 45px;
-}
 
-.section-heading.center {
   text-align: center;
 }
 
@@ -459,423 +582,106 @@ a {
   font-weight: 800;
 
   letter-spacing: 0.13em;
+
   text-transform: uppercase;
 }
 
-.section-heading h2 {
-  margin: 0 0 16px;
+.section-head h2 {
+  margin: 0 0 15px;
 
   color: var(--text);
 
   font-family: "Dancing Script", cursive;
 
-  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-size: clamp(
+    2.3rem,
+    5vw,
+    3.6rem
+  );
+
   font-weight: 700;
 
   line-height: 1.15;
 }
 
-.section-heading p {
+.section-head p {
   margin: 0;
 
   color: var(--muted);
 
   font-size: 15px;
-  line-height: 1.8;
-}
-
-/* =========================================================
-   SOBRE
-   ========================================================= */
-
-.about-grid {
-  display: grid;
-
-  grid-template-columns:
-    minmax(280px, 0.9fr)
-    minmax(0, 1.1fr);
-
-  gap: 35px;
-
-  align-items: center;
-}
-
-.about-image {
-  min-height: 360px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 30px;
-
-  border-radius: var(--radius);
-
-  background:
-    linear-gradient(
-      135deg,
-      #eaf8fb,
-      #fdebed
-    );
-
-  box-shadow: var(--shadow);
-
-  overflow: hidden;
-}
-
-.about-image img {
-  width: 100%;
-  height: 100%;
-
-  max-height: 340px;
-
-  object-fit: contain;
-}
-
-.about-text {
-  padding: 35px;
-
-  background: #fff;
-
-  border: 1px solid var(--border);
-
-  border-radius: var(--radius);
-
-  box-shadow: var(--shadow);
-}
-
-.about-text h3 {
-  margin: 0 0 15px;
-
-  color: var(--blue-dark);
-
-  font-family: "Dancing Script", cursive;
-
-  font-size: 30px;
-}
-
-.about-text p {
-  margin: 0 0 15px;
-
-  color: var(--muted);
 
   line-height: 1.8;
 }
 
-.about-text p:last-child {
-  margin-bottom: 0;
-}
-
 /* =========================================================
-   PRONTA ENTREGA
+   ABOUT / NOSSA HISTÓRIA
    ========================================================= */
 
-.ready-content {
-  display: flex;
-  justify-content: center;
-}
-
-.ready-card {
-  width: min(100%, 600px);
-
-  padding: 45px 35px;
-
-  text-align: center;
-
-  background: #fff;
-
-  border: 1px solid var(--border);
-
-  border-radius: var(--radius);
-
-  box-shadow: var(--shadow);
-
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
-}
-
-.ready-card:hover {
-  transform: translateY(-5px);
-
-  box-shadow: var(--shadow-hover);
-}
-
-.ready-icon {
-  width: 70px;
-  height: 70px;
-
-  margin: 0 auto 18px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 50%;
-
-  background: var(--pink-light);
-
-  font-size: 30px;
-}
-
-.ready-card h3 {
-  margin: 0 0 10px;
-
-  color: var(--blue-dark);
-
-  font-family: "Dancing Script", cursive;
-
-  font-size: 30px;
-}
-
-.ready-card p {
-  margin: 0 auto 25px;
-
-  max-width: 500px;
-
-  color: var(--muted);
-}
-
-/* =========================================================
-   BOLOS
-   ========================================================= */
-
-.cake-video-wrap {
+.about-content {
   width: 100%;
 
-  overflow: hidden;
-
-  border-radius: 25px;
-
-  background: #dceff4;
-
-  box-shadow: var(--shadow);
-}
-
-.cake-video {
-  width: 100%;
-
-  height: min(600px, 60vw);
-
-  min-height: 300px;
-
-  display: block;
-
-  object-fit: cover;
-
-  background: #dceff4;
-}
-
-.cake-action {
-  margin-top: 30px;
-
   display: flex;
   justify-content: center;
 }
 
-/* =========================================================
-   CARDÁPIO
-   ========================================================= */
-
-.menu-categories {
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  flex-wrap: wrap;
-
-  gap: 10px;
-
-  margin-bottom: 30px;
-}
-
-.menu-categories button,
-.menu-category,
-.category-btn {
-  padding: 10px 18px;
-
-  border: 1px solid var(--border);
-
-  border-radius: 999px;
-
-  background: #fff;
-  color: var(--blue-dark);
-
-  font-size: 13px;
-  font-weight: 800;
-
-  cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.menu-categories button:hover,
-.menu-category:hover,
-.category-btn:hover,
-.menu-categories button.active,
-.menu-category.active,
-.category-btn.active {
-  background: var(--blue);
-
-  border-color: var(--blue);
-
-  color: #fff;
-}
-
-.menu-products {
-  display: grid;
-
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
-
-  gap: 22px;
-}
-
-.menu-products:empty::before {
-  content: "Carregando cardápio...";
-
-  grid-column: 1 / -1;
+.about-copy {
+  width: min(
+    100%,
+    920px
+  );
 
   padding: 40px;
 
-  text-align: center;
-
-  color: var(--muted);
-}
-
-.menu-product,
-.menu-item,
-.product-card {
-  overflow: hidden;
-
   background: #fff;
 
-  border: 1px solid var(--border);
+  border:
+    1px solid var(--border);
 
   border-radius: var(--radius);
 
   box-shadow: var(--shadow);
-
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
 }
 
-.menu-product:hover,
-.menu-item:hover,
-.product-card:hover {
-  transform: translateY(-5px);
-
-  box-shadow: var(--shadow-hover);
-}
-
-.menu-products img {
-  width: 100%;
-
-  height: 220px;
-
-  object-fit: cover;
-}
-
-/* =========================================================
-   CONTATO
-   ========================================================= */
-
-.contact-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
-
-  gap: 20px;
-
-  margin-bottom: 30px;
-}
-
-.contact-card {
-  padding: 30px 25px;
-
-  background: #fff;
-
-  border: 1px solid var(--border);
-
-  border-radius: var(--radius);
-
-  box-shadow: var(--shadow);
-
-  text-align: center;
-}
-
-.contact-icon {
-  display: block;
-
-  margin-bottom: 10px;
-
-  font-size: 32px;
-}
-
-.contact-card h3 {
-  margin: 0 0 8px;
+.about-copy .quote {
+  margin: 0 0 25px;
 
   color: var(--blue-dark);
 
-  font-family: "Dancing Script", cursive;
+  font-family:
+    "Dancing Script",
+    cursive;
 
-  font-size: 29px;
+  font-size: 30px;
+
+  font-weight: 700;
+
+  text-align: center;
 }
 
-.contact-card p {
-  margin: 0 0 20px;
-
+#aboutText {
   color: var(--muted);
-
-  line-height: 1.7;
 }
 
-.contact-card .btn {
-  width: 100%;
+#aboutText p {
+  margin: 0 0 17px;
+
+  line-height: 1.85;
 }
 
-/* =========================================================
-   MAPA
-   ========================================================= */
+.about-signature {
+  margin-top: 30px;
 
-.map-wrap {
-  width: 100%;
+  padding: 25px;
 
-  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
 
-  overflow: hidden;
+  align-items: center;
 
-  border-radius: var(--radius);
+  text-align: center;
 
-  border: 1px solid var(--border);
-
-  box-shadow: var(--shadow);
-
-  background: #fff;
-}
-
-.map-wrap iframe {
-  width: 100%;
-
-  height: 380px;
-
-  display: block;
-}
-
-/* =========================================================
-   AVALIAÇÃO
-   ========================================================= */
-
-.review-box {
-  margin-top: 25px;
-
-  padding: 35px;
+  border-radius: 18px;
 
   background:
     linear-gradient(
@@ -884,669 +690,77 @@ a {
       #fff3f4
     );
 
-  border: 1px solid var(--border);
-
-  border-radius: var(--radius);
-
-  text-align: center;
+  border:
+    1px solid var(--border);
 }
 
-.review-box h3 {
-  margin: 0 0 10px;
+.about-signature span {
+  margin-bottom: 7px;
 
   color: var(--blue-dark);
 
-  font-family: "Dancing Script", cursive;
-
-  font-size: 30px;
-}
-
-.review-box p {
-  margin: 0 auto 20px;
-
-  color: var(--muted);
-}
-
-/* =========================================================
-   FOOTER
-   ========================================================= */
-
-.site-footer {
-  background: var(--blue-deep);
-
-  color: #fff;
-
-  padding-top: 55px;
-}
-
-.footer-grid {
-  display: grid;
-
-  grid-template-columns:
-    1.3fr 0.8fr 1fr;
-
-  gap: 40px;
-
-  padding-bottom: 40px;
-}
-
-.footer-brand img {
-  width: 100px;
-  height: 100px;
-
-  object-fit: contain;
-
-  margin-bottom: 15px;
-}
-
-.footer-brand p {
-  margin: 0;
-
-  color: rgba(255, 255, 255, 0.85);
-
-  font-family: "Dancing Script", cursive;
-
-  font-size: 22px;
-}
-
-.footer-links,
-.footer-contact {
-  display: flex;
-  flex-direction: column;
-
-  gap: 8px;
-}
-
-.footer-links h3,
-.footer-contact h3 {
-  margin: 0 0 10px;
-
-  color: #fff;
-
-  font-size: 16px;
-}
-
-.footer-links a {
-  color: rgba(255, 255, 255, 0.78);
-
   font-size: 14px;
-
-  transition: color 0.2s ease;
-}
-
-.footer-links a:hover {
-  color: #fff;
-}
-
-.footer-contact p {
-  margin: 0;
-
-  color: rgba(255, 255, 255, 0.78);
-
-  font-size: 14px;
-}
-
-.footer-bottom {
-  padding: 20px;
-
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-
-  text-align: center;
-}
-
-.footer-bottom p {
-  margin: 0;
-
-  color: rgba(255, 255, 255, 0.65);
-
-  font-size: 12px;
-}
-
-/* =========================================================
-   PÁGINA DE ENCOMENDAS
-   ========================================================= */
-
-.order-page {
-  background:
-    radial-gradient(
-      circle at 5% 5%,
-      rgba(103, 176, 203, 0.10),
-      transparent 30%
-    ),
-    var(--cream);
-}
-
-.order-container {
-  width: min(100%, 1100px);
-}
-
-.order-header {
-  text-align: center;
-}
-
-.order-header h1 {
-  color: var(--blue-deep);
-
-  font-family: "Dancing Script", cursive;
-
-  font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 700;
 }
 
-.order-header p {
+.about-signature strong {
+  color: var(--text);
+
+  font-family:
+    "Dancing Script",
+    cursive;
+
+  font-size: 28px;
+}
+
+.about-signature small {
+  margin-top: 4px;
+
   color: var(--muted);
 
-  line-height: 1.8;
-}
-
-.order-form {
-  width: 100%;
-}
-
-.order-card {
-  border: 1px solid rgba(103, 176, 203, 0.14) !important;
-}
-
-.order-card h2 {
-  color: var(--blue-dark);
-
-  font-family: "Dancing Script", cursive;
-
-  font-size: 30px;
-
-  line-height: 1.2;
-}
-
-.order-card-description {
-  color: var(--muted);
+  font-size: 13px;
 }
 
 /* =========================================================
-   OPÇÕES DE ENCOMENDA
+   PRONTA ENTREGA
    ========================================================= */
 
-.options-grid {
-  width: 100%;
+.products-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+
+  gap: 22px;
 }
 
-.option-card {
-  min-width: 0;
-}
+.section-action {
+  margin-top: 35px;
 
-.option-label {
-  color: var(--text);
-
-  background: #fff;
-}
-
-.option-label:hover {
-  background: #f9fdfe;
-}
-
-.option-card input:checked + .option-label {
-  border-color: var(--blue) !important;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(103, 176, 203, 0.13),
-      rgba(243, 183, 187, 0.08)
-    ) !important;
-}
-
-.option-title {
-  color: var(--text);
-}
-
-.option-price {
-  color: var(--blue-dark) !important;
-}
-
-.option-description {
-  color: var(--muted);
+  display: flex;
+  justify-content: center;
 }
 
 /* =========================================================
-   CAMPOS
-   ========================================================= */
-
-.field label {
-  color: var(--text);
-}
-
-.field input,
-.field textarea,
-.field select {
-  color: var(--text);
-
-  background: #fff;
-
-  border-color: rgba(103, 176, 203, 0.30);
-}
-
-.field input::placeholder,
-.field textarea::placeholder {
-  color: #a08f88;
-}
-
-.field input:focus,
-.field textarea:focus,
-.field select:focus {
-  border-color: var(--blue);
-}
-
-/* =========================================================
-   BRIGADEIROS
-   ========================================================= */
-
-.brigadeiro-group h3 {
-  margin: 0 0 12px;
-
-  color: var(--blue-dark);
-
-  font-family: "Dancing Script", cursive;
-
-  font-size: 25px;
-}
-
-.flavor-grid {
-  padding: 15px;
-
-  border-radius: 16px;
-
-  background: #f8fcfd;
-
-  border: 1px solid var(--border);
-}
-
-.flavor-item {
-  color: var(--text);
-
-  cursor: pointer;
-}
-
-.flavor-item input {
-  accent-color: var(--blue);
-}
-
-/* =========================================================
-   TOTAL
-   ========================================================= */
-
-.total-box {
-  border: 1px solid rgba(103, 176, 203, 0.18);
-}
-
-.total-label {
-  color: var(--muted);
-}
-
-.total-value {
-  color: var(--blue-dark) !important;
-
-  font-family: "Nunito", sans-serif;
-}
-
-/* =========================================================
-   BOTÃO FINAL
-   ========================================================= */
-
-.submit-area {
-  padding: 10px 0 30px;
-}
-
-.submit-area .btn {
-  min-height: 52px;
-
-  padding: 13px 30px;
-
-  font-size: 15px;
-}
-
-/* =========================================================
-   LINKS E BOTÕES — CORREÇÃO DE TRANSPARÊNCIA
-   ========================================================= */
-
-button.btn,
-a.btn,
-.btn.primary {
-  opacity: 1 !important;
-  visibility: visible !important;
-
-  background-color: var(--blue) !important;
-  color: #ffffff !important;
-
-  border-color: var(--blue) !important;
-}
-
-button.btn:hover,
-a.btn:hover,
-.btn.primary:hover {
-  background-color: var(--blue-dark) !important;
-  border-color: var(--blue-dark) !important;
-
-  color: #ffffff !important;
-}
-
-/* =========================================================
-   HIDDEN
-   ========================================================= */
-
-.hidden {
-  display: none !important;
-}
-
-/* =========================================================
-   RESPONSIVIDADE
-   ========================================================= */
-
-@media (max-width: 1000px) {
-
-  .main-nav {
-    gap: 15px;
-  }
-
-  .main-nav a {
-    font-size: 13px;
-  }
-
-  .contact-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .contact-card:last-child {
-    grid-column: 1 / -1;
-  }
-
-  .menu-products {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-
-  .footer-grid {
-    grid-template-columns:
-      1fr 1fr;
-  }
-
-  .footer-brand {
-    grid-column: 1 / -1;
-  }
-}
-
-/* =========================================================
-   TABLET / CELULAR
-   ========================================================= */
-
-@media (max-width: 760px) {
-
-  .container {
-    width: min(100% - 30px, var(--max-width));
-  }
-
-  .site-header {
-    min-height: 68px;
-  }
-
-  .nav-wrap {
-    min-height: 68px;
-  }
-
-  .brand {
-    width: 54px;
-    height: 54px;
-
-    flex-basis: 54px;
-  }
-
-  .menu-toggle {
-    display: flex;
-  }
-
-  .main-nav {
-    position: absolute;
-
-    top: 74px;
-    left: 15px;
-    right: 15px;
-
-    display: none;
-
-    flex-direction: column;
-    align-items: stretch;
-
-    gap: 0;
-
-    margin: 0;
-
-    padding: 12px;
-
-    background: #fff;
-
-    border: 1px solid var(--border);
-
-    border-radius: 18px;
-
-    box-shadow:
-      0 20px 50px rgba(0, 0, 0, 0.14);
-  }
-
-  .main-nav.open {
-    display: flex;
-  }
-
-  .main-nav a {
-    padding: 12px 10px;
-
-    font-size: 14px;
-  }
-
-  .main-nav a::after {
-    display: none;
-  }
-
-  .hero {
-    min-height: 760px;
-
-    padding-top: 110px;
-  }
-
-  .hero-logo {
-    width: 135px;
-    height: 135px;
-  }
-
-  .section {
-    padding: 65px 0;
-  }
-
-  .section-heading {
-    margin-bottom: 30px;
-  }
-
-  .section-heading h2 {
-    font-size: 2.5rem;
-  }
-
-  .about-grid {
-    grid-template-columns: 1fr;
-
-    gap: 20px;
-  }
-
-  .about-image {
-    min-height: 280px;
-  }
-
-  .about-text {
-    padding: 25px;
-  }
-
-  .menu-products {
-    grid-template-columns: 1fr;
-  }
-
-  .contact-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .contact-card:last-child {
-    grid-column: auto;
-  }
-
-  .footer-grid {
-    grid-template-columns: 1fr;
-
-    gap: 30px;
-  }
-
-  .footer-brand {
-    grid-column: auto;
-  }
-
-  .cake-video {
-    height: 380px;
-  }
-
-  /* Encomendas */
-
-  .order-page {
-    padding-left: 15px !important;
-    padding-right: 15px !important;
-  }
-
-  .order-container {
-    width: 100%;
-  }
-
-  .options-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  .dynamic-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  .field.full {
-    grid-column: auto;
-  }
-
-  .flavor-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  .total-box {
-    position: static;
-
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .submit-area .btn {
-    width: 100%;
-
-    min-width: 0;
-  }
-}
-
-/* =========================================================
-   CELULAR PEQUENO
-   ========================================================= */
-
-@media (max-width: 480px) {
-
-  .hero {
-    min-height: 700px;
-
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-
-  .hero-logo {
-    width: 110px;
-    height: 110px;
-  }
-
-  .hero-subtitle {
-    font-size: 1.45rem;
-  }
-
-  .section-heading h2 {
-    font-size: 2.2rem;
-  }
-
-  .ready-card {
-    padding: 30px 20px;
-  }
-
-  .about-text {
-    padding: 22px;
-  }
-
-  .cake-video {
-    height: 280px;
-    min-height: 280px;
-  }
-
-  .map-wrap iframe {
-    height: 300px;
-  }
-
-  .review-box {
-    padding: 25px 18px;
-  }
-
-  .order-card {
-    padding: 20px !important;
-  }
-
-  .order-card h2 {
-    font-size: 26px;
-  }
-
-  .option-label {
-    padding: 15px !important;
-  }
-
-  .total-value {
-    font-size: 1.5rem !important;
-  }
-}
-
-/* =========================================================
-   ACESSIBILIDADE
-   ========================================================= */
-
-:focus-visible {
-  outline: 3px solid rgba(103, 176, 203, 0.45);
-  outline-offset: 3px;
-}
-
-/* =========================================================
-   GARANTIA FINAL DOS BOTÕES
-   ========================================================= */
-
-.btn,
-.btn.primary,
-button,
-.menu-toggle,
-a.btn {
-  pointer-events: auto !important;
-  cursor: pointer !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-/* =========================================================
-   PRODUTOS GERADOS PELO SCRIPT.JS
+   PRODUCT CARD
    ========================================================= */
 
 .product-card {
+  min-width: 0;
+
   display: flex;
   flex-direction: column;
+
   overflow: hidden;
 
-  background: #ffffff;
+  background: #fff;
 
-  border: 1px solid var(--border);
+  border:
+    1px solid var(--border);
+
   border-radius: var(--radius);
 
   box-shadow: var(--shadow);
@@ -1558,6 +772,7 @@ a.btn {
 
 .product-card:hover {
   transform: translateY(-5px);
+
   box-shadow: var(--shadow-hover);
 }
 
@@ -1567,16 +782,16 @@ a.btn {
 
   overflow: hidden;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   background:
     linear-gradient(
       135deg,
       #eaf8fb,
       #fdebed
     );
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .product-img img {
@@ -1584,6 +799,14 @@ a.btn {
   height: 100%;
 
   object-fit: cover;
+
+  transition:
+    transform 0.4s ease;
+}
+
+.product-card:hover
+.product-img img {
+  transform: scale(1.035);
 }
 
 .product-placeholder {
@@ -1594,22 +817,22 @@ a.btn {
   align-items: center;
   justify-content: center;
 
-  font-size: 45px;
+  font-size: 48px;
 }
 
 .product-body {
-  padding: 22px;
+  flex: 1;
 
   display: flex;
   flex-direction: column;
 
-  flex: 1;
+  padding: 22px;
 }
 
 .product-tag {
-  display: inline-block;
-
   width: fit-content;
+
+  display: inline-block;
 
   margin-bottom: 8px;
 
@@ -1618,6 +841,7 @@ a.btn {
   border-radius: 999px;
 
   background: var(--pink-light);
+
   color: var(--pink-dark);
 
   font-size: 11px;
@@ -1631,8 +855,10 @@ a.btn {
 
   color: var(--text);
 
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 800;
+
+  line-height: 1.35;
 }
 
 .product-body p {
@@ -1641,6 +867,7 @@ a.btn {
   color: var(--muted);
 
   font-size: 14px;
+
   line-height: 1.6;
 }
 
@@ -1658,7 +885,7 @@ a.btn {
   color: var(--blue-dark);
 
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 900;
 
   white-space: nowrap;
 }
@@ -1678,36 +905,1621 @@ a.btn {
   font-weight: 800;
 }
 
-.menu-empty {
-  grid-column: 1 / -1;
-
-  padding: 45px 20px;
+.menu-empty,
+.empty {
+  padding: 35px 20px;
 
   text-align: center;
 
-  background: #ffffff;
+  background: #fff;
 
-  border: 1px solid var(--border);
+  border:
+    1px solid var(--border);
+
+  border-radius: var(--radius);
+
+  color: var(--muted);
+}
+
+/* =========================================================
+   BOLOS
+   ========================================================= */
+
+.cake-feature {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.05fr)
+    minmax(0, 0.95fr);
+
+  gap: 40px;
+
+  align-items: center;
+}
+
+.cake-video {
+  position: relative;
+
+  width: 100%;
+
+  min-height: 420px;
+
+  overflow: hidden;
+
+  border-radius: 25px;
+
+  background: #dceff4;
+
+  box-shadow: var(--shadow);
+}
+
+.cake-video video {
+  width: 100%;
+  height: 100%;
+
+  min-height: 420px;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+.cake-video-overlay {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      180deg,
+      transparent,
+      rgba(36, 95, 117, 0.12)
+    );
+}
+
+.cake-copy {
+  padding: 15px 5px;
+}
+
+.cake-copy h2 {
+  margin: 0 0 17px;
+
+  color: var(--text);
+
+  font-family:
+    "Dancing Script",
+    cursive;
+
+  font-size:
+    clamp(
+      2.5rem,
+      5vw,
+      4rem
+    );
+
+  line-height: 1.1;
+}
+
+.cake-copy p {
+  max-width: 520px;
+
+  margin: 0 0 25px;
+
+  color: var(--muted);
+
+  font-size: 16px;
+
+  line-height: 1.8;
+}
+
+.cake-actions {
+  display: flex;
+  align-items: center;
+}
+
+/* =========================================================
+   CATEGORIAS
+   ========================================================= */
+
+.tabs {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+  margin-bottom: 30px;
+}
+
+.tabs button,
+.menu-category,
+.category-btn {
+  padding: 10px 18px;
+
+  border:
+    1px solid var(--border);
+
+  border-radius: 999px;
+
+  background: #fff;
+
+  color: var(--blue-dark);
+
+  font-size: 13px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.tabs button:hover,
+.menu-category:hover,
+.category-btn:hover {
+  transform: translateY(-1px);
+
+  background: #f5fbfd;
+
+  border-color: var(--blue);
+}
+
+.tabs button.active,
+.menu-category.active,
+.category-btn.active {
+  background: var(--blue);
+
+  border-color: var(--blue);
+
+  color: #fff;
+}
+
+/* =========================================================
+   CONTATO
+   ========================================================= */
+
+.contact-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 0.8fr)
+    minmax(0, 1.2fr);
+
+  gap: 22px;
+
+  align-items: stretch;
+}
+
+.contact-card,
+.map-card {
+  min-width: 0;
+
+  background: #fff;
+
+  border:
+    1px solid var(--border);
+
+  border-radius: var(--radius);
+
+  box-shadow: var(--shadow);
+}
+
+.contact-card {
+  padding: 30px 25px;
+}
+
+.contact-card h3 {
+  margin: 0 0 22px;
+
+  color: var(--blue-dark);
+
+  font-family:
+    "Dancing Script",
+    cursive;
+
+  font-size: 30px;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+}
+
+.contact-item {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 13px;
+}
+
+.contact-item > span {
+  width: 36px;
+  height: 36px;
+
+  flex: 0 0 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: var(--pink-light);
+
+  font-size: 17px;
+}
+
+.contact-item p {
+  margin: 0;
+
+  color: var(--muted);
+
+  line-height: 1.7;
+}
+
+.open-state {
+  margin-bottom: 8px;
+
+  color: var(--blue-dark);
+
+  font-size: 14px;
+  font-weight: 900;
+}
+
+#hours {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.hours-row {
+  display: flex;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  color: var(--muted);
+
+  font-size: 12px;
+}
+
+.hours-row strong {
+  color: var(--text);
+
+  font-weight: 800;
+
+  text-align: right;
+}
+
+.contact-actions {
+  margin-top: 25px;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 10px;
+}
+
+/* =========================================================
+   MAPA
+   ========================================================= */
+
+.map-card {
+  overflow: hidden;
+}
+
+.map-head {
+  padding: 25px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+.map-head h3 {
+  margin: 0;
+
+  color: var(--text);
+
+  font-family:
+    "Dancing Script",
+    cursive;
+
+  font-size: 30px;
+}
+
+.map-head a {
+  color: var(--blue-dark);
+
+  font-size: 13px;
+  font-weight: 800;
+
+  text-decoration: underline;
+}
+
+.map-head a:hover {
+  color: var(--blue-deep);
+}
+
+.map-frame {
+  width: 100%;
+
+  height: 380px;
+
+  background: #eaf8fb;
+}
+
+.map-frame iframe {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  border: 0;
+}
+
+/* =========================================================
+   AVALIAÇÃO
+   ========================================================= */
+
+.review-card {
+  margin-top: 25px;
+
+  padding: 30px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 25px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #eaf8fb,
+      #fff3f4
+    );
+
+  border:
+    1px solid var(--border);
+
   border-radius: var(--radius);
 }
 
-.menu-empty p {
+.review-content h3 {
+  margin: 0 0 8px;
+
+  color: var(--blue-dark);
+
+  font-family:
+    "Dancing Script",
+    cursive;
+
+  font-size: 30px;
+}
+
+.review-content p {
   margin: 0;
 
   color: var(--muted);
 }
 
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.footer {
+  background: var(--blue-deep);
+
+  color: #fff;
+
+  padding: 55px 20px 0;
+}
+
+.footer-inner {
+  width: min(
+    100%,
+    var(--max-width)
+  );
+
+  margin: 0 auto;
+
+  display: grid;
+
+  grid-template-columns:
+    1.2fr 0.8fr;
+
+  gap: 50px;
+
+  padding-bottom: 40px;
+}
+
+.footer-brand img {
+  width: 100px;
+  height: 100px;
+
+  object-fit: contain;
+
+  margin-bottom: 15px;
+}
+
+.footer-brand p {
+  max-width: 400px;
+
+  margin: 0;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.85
+  );
+
+  font-family:
+    "Dancing Script",
+    cursive;
+
+  font-size: 22px;
+}
+
+.footer-links {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  gap: 9px;
+}
+
+.footer-links a {
+  color: rgba(
+    255,
+    255,
+    255,
+    0.78
+  );
+
+  font-size: 14px;
+
+  transition:
+    color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: #fff;
+}
+
+.footer-bottom {
+  width: 100%;
+
+  padding: 20px;
+
+  border-top:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.12
+    );
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+.footer-bottom p {
+  margin: 0;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.65
+  );
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   CARRINHO — FUNDO
+   ========================================================= */
+
+.shade {
+  position: fixed;
+  inset: 0;
+
+  z-index: 1090;
+
+  background:
+    rgba(
+      25,
+      45,
+      52,
+      0.48
+    );
+
+  opacity: 0;
+
+  visibility: hidden;
+
+  pointer-events: none;
+
+  transition:
+    opacity 0.25s ease,
+    visibility 0.25s ease;
+}
+
+.shade.open {
+  opacity: 1;
+
+  visibility: visible;
+
+  pointer-events: auto;
+}
+
+/* =========================================================
+   DRAWER DO CARRINHO
+   ========================================================= */
+
+.drawer {
+  position: fixed;
+
+  top: 0;
+  right: 0;
+  bottom: 0;
+
+  z-index: 1100;
+
+  width: min(
+    430px,
+    92vw
+  );
+
+  display: flex;
+  flex-direction: column;
+
+  background: #fff;
+
+  box-shadow:
+    -20px 0 60px
+    rgba(0, 0, 0, 0.16);
+
+  transform: translateX(105%);
+
+  transition:
+    transform 0.3s ease;
+
+  visibility: hidden;
+}
+
+.drawer.open {
+  transform: translateX(0);
+
+  visibility: visible;
+}
+
+.drawer-head {
+  padding: 25px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  border-bottom:
+    1px solid var(--border);
+}
+
+.drawer-head h2 {
+  margin: 0;
+
+  color: var(--text);
+
+  font-family:
+    "Dancing Script",
+    cursive;
+
+  font-size: 32px;
+}
+
+.icon-btn {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #f4fafc;
+
+  color: var(--text);
+
+  font-size: 26px;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.icon-btn:hover {
+  background: var(--pink-light);
+
+  color: var(--pink-dark);
+}
+
+.cart-items {
+  flex: 1;
+
+  overflow-y: auto;
+
+  padding: 20px;
+}
+
+.cart-item {
+  padding: 16px 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  border-bottom:
+    1px solid
+    rgba(
+      103,
+      176,
+      203,
+      0.13
+    );
+}
+
+.cart-item-info {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.cart-item-info strong {
+  color: var(--text);
+
+  font-size: 14px;
+
+  line-height: 1.4;
+}
+
+.cart-item-info span {
+  color: var(--blue-dark);
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.cart-item-actions {
+  flex: 0 0 auto;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+}
+
+.cart-qty-btn,
+.cart-remove-btn {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  cursor: pointer;
+
+  font-weight: 900;
+}
+
+.cart-qty-btn {
+  background: #eef8fb;
+
+  color: var(--blue-dark);
+}
+
+.cart-qty-btn:hover {
+  background: var(--blue);
+
+  color: #fff;
+}
+
+.cart-remove-btn {
+  background: var(--pink-light);
+
+  color: var(--pink-dark);
+
+  font-size: 18px;
+}
+
+.cart-remove-btn:hover {
+  background: var(--pink);
+
+  color: #fff;
+}
+
+.drawer-footer {
+  padding: 20px;
+
+  border-top:
+    1px solid var(--border);
+
+  background: #fff;
+}
+
+.cart-total-row {
+  margin-bottom: 15px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+}
+
+.cart-total-row span {
+  color: var(--muted);
+
+  font-weight: 700;
+}
+
+.cart-total-row strong {
+  color: var(--blue-dark);
+
+  font-size: 21px;
+}
+
+/* =========================================================
+   CHECKOUT
+   ========================================================= */
+
+.checkout-dialog {
+  width: min(
+    620px,
+    calc(100% - 30px)
+  );
+
+  max-height: 90vh;
+
+  padding: 0;
+
+  border: 0;
+
+  border-radius: 25px;
+
+  background: #fff;
+
+  box-shadow:
+    0 30px 100px
+    rgba(0, 0, 0, 0.25);
+
+  color: var(--text);
+}
+
+.checkout-dialog::backdrop {
+  background:
+    rgba(
+      25,
+      45,
+      52,
+      0.55
+    );
+}
+
+.checkout-form {
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  padding: 30px;
+}
+
+.dialog-head {
+  margin-bottom: 25px;
+
+  display: flex;
+
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+.dialog-head h2 {
+  margin: 0;
+
+  color: var(--text);
+
+  font-family:
+    "Dancing Script",
+    cursive;
+
+  font-size: 32px;
+}
+
+.checkout-form label {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+
+  margin-bottom: 17px;
+
+  color: var(--text);
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.checkout-form input,
+.checkout-form textarea,
+.checkout-form select {
+  width: 100%;
+
+  padding: 13px 15px;
+
+  border:
+    1px solid
+    rgba(
+      103,
+      176,
+      203,
+      0.30
+    );
+
+  border-radius: 13px;
+
+  outline: none;
+
+  background: #fff;
+
+  color: var(--text);
+
+  font-size: 14px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.checkout-form input::placeholder,
+.checkout-form textarea::placeholder {
+  color: #a08f88;
+}
+
+.checkout-form input:focus,
+.checkout-form textarea:focus,
+.checkout-form select:focus {
+  border-color: var(--blue);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(
+      103,
+      176,
+      203,
+      0.12
+    );
+}
+
+.checkout-form textarea {
+  resize: vertical;
+
+  min-height: 100px;
+}
+
+.dialog-actions {
+  margin-top: 25px;
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+}
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+:focus-visible {
+  outline:
+    3px solid
+    rgba(
+      103,
+      176,
+      203,
+      0.45
+    );
+
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   COMPATIBILIDADE COM ENCOMENDAS.HTML
+   ========================================================= */
+
+.order-page {
+  background:
+    radial-gradient(
+      circle at 5% 5%,
+      rgba(
+        103,
+        176,
+        203,
+        0.10
+      ),
+      transparent 30%
+    ),
+    var(--cream);
+}
+
+.order-container {
+  width: min(
+    100%,
+    1100px
+  );
+}
+
+.order-header {
+  text-align: center;
+}
+
+.order-header h1 {
+  color: var(--blue-deep);
+
+  font-family:
+    "Dancing Script",
+    cursive;
+
+  font-size:
+    clamp(
+      2.5rem,
+      6vw,
+      4rem
+    );
+
+  font-weight: 700;
+}
+
+.order-header p {
+  color: var(--muted);
+
+  line-height: 1.8;
+}
+
+.order-form {
+  width: 100%;
+}
+
+.order-card {
+  border:
+    1px solid
+    rgba(
+      103,
+      176,
+      203,
+      0.14
+    ) !important;
+}
+
+.order-card h2 {
+  color: var(--blue-dark);
+
+  font-family:
+    "Dancing Script",
+    cursive;
+
+  font-size: 30px;
+
+  line-height: 1.2;
+}
+
+.order-card-description {
+  color: var(--muted);
+}
+
+.options-grid {
+  width: 100%;
+}
+
+.option-card {
+  min-width: 0;
+}
+
+.option-label {
+  color: var(--text);
+
+  background: #fff;
+}
+
+.option-label:hover {
+  background: #f9fdfe;
+}
+
+.option-card input:checked
++ .option-label {
+  border-color:
+    var(--blue) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(
+        103,
+        176,
+        203,
+        0.13
+      ),
+      rgba(
+        243,
+        183,
+        187,
+        0.08
+      )
+    ) !important;
+}
+
+.option-title {
+  color: var(--text);
+}
+
+.option-price {
+  color: var(--blue-dark) !important;
+}
+
+.option-description {
+  color: var(--muted);
+}
+
+.field label {
+  color: var(--text);
+}
+
+.field input,
+.field textarea,
+.field select {
+  color: var(--text);
+
+  background: #fff;
+
+  border-color:
+    rgba(
+      103,
+      176,
+      203,
+      0.30
+    );
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: #a08f88;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  border-color: var(--blue);
+}
+
+.brigadeiro-group h3 {
+  color: var(--blue-dark);
+
+  font-family:
+    "Dancing Script",
+    cursive;
+}
+
+.flavor-grid {
+  background: #f8fcfd;
+
+  border:
+    1px solid var(--border);
+}
+
+.flavor-item {
+  color: var(--text);
+}
+
+.flavor-item input {
+  accent-color: var(--blue);
+}
+
+.total-label {
+  color: var(--muted);
+}
+
+.total-value {
+  color: var(--blue-dark) !important;
+}
+
+.submit-area {
+  padding: 10px 0 30px;
+}
+
+.submit-area .btn {
+  min-height: 52px;
+
+  padding: 13px 30px;
+
+  font-size: 15px;
+}
+
+/* =========================================================
+   RESPONSIVO — TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+  .top {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .top nav {
+    gap: 15px;
+  }
+
+  .top nav a {
+    font-size: 13px;
+  }
+
+  .products-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .cake-feature {
+    grid-template-columns: 1fr;
+  }
+
+  .cake-video {
+    min-height: 400px;
+  }
+
+  .cake-video video {
+    min-height: 400px;
+  }
+
+  .footer-inner {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* =========================================================
+   RESPONSIVO — CELULAR
+   ========================================================= */
+
 @media (max-width: 760px) {
+
+  html {
+    scroll-padding-top: 75px;
+  }
+
+  .top {
+    min-height: 68px;
+
+    padding: 7px 15px;
+
+    gap: 10px;
+  }
+
+  .top .brand {
+    width: 54px;
+    height: 54px;
+
+    flex-basis: 54px;
+  }
+
+  .top nav {
+    position: absolute;
+
+    top: 73px;
+    left: 15px;
+    right: 15px;
+
+    display: none;
+
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 0;
+
+    margin: 0;
+
+    padding: 10px;
+
+    background: #fff;
+
+    border:
+      1px solid var(--border);
+
+    border-radius: 18px;
+
+    box-shadow:
+      0 20px 50px
+      rgba(0, 0, 0, 0.14);
+  }
+
+  /*
+    O HTML atual não possui botão
+    de menu mobile. Por isso o menu
+    continua disponível normalmente
+    em telas pequenas através de
+    uma rolagem horizontal.
+  */
+
+  .top nav {
+    overflow-x: auto;
+    scrollbar-width: thin;
+
+    flex-direction: row;
+
+    justify-content: flex-start;
+
+    padding: 8px 4px;
+
+    background: rgba(
+      255,
+      255,
+      255,
+      0.98
+    );
+
+    white-space: nowrap;
+  }
+
+  .top nav a {
+    padding: 9px 7px;
+
+    font-size: 12px;
+
+    white-space: nowrap;
+  }
+
+  .top nav a::after {
+    display: none;
+  }
+
+  .cart-btn {
+    width: 44px;
+    height: 44px;
+
+    flex-basis: 44px;
+  }
+
+  .hero {
+    min-height: 720px;
+
+    padding:
+      115px
+      15px
+      60px;
+  }
+
+  .hero-logo {
+    width: 125px;
+    height: 125px;
+  }
+
+  .hero-kicker {
+    font-size: 11px;
+  }
+
+  .hero h1 {
+    font-size:
+      clamp(
+        2.5rem,
+        12vw,
+        4rem
+      );
+  }
+
+  .hero-description {
+    font-size: 15px;
+  }
+
+  .hero-actions {
+    width: 100%;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+  }
+
+  .section {
+    padding: 65px 15px;
+  }
+
+  .section-head {
+    margin-bottom: 30px;
+  }
+
+  .section-head h2 {
+    font-size: 2.5rem;
+  }
+
+  .about-copy {
+    padding: 25px 20px;
+  }
+
+  .about-copy .quote {
+    font-size: 27px;
+  }
+
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+
   .product-img {
     height: 220px;
   }
 
   .product-footer {
     align-items: stretch;
+
     flex-direction: column;
   }
 
   .product-order-btn {
     width: 100%;
   }
+
+  .cake-video {
+    min-height: 350px;
+  }
+
+  .cake-video video {
+    min-height: 350px;
+  }
+
+  .cake-copy {
+    padding: 0;
+  }
+
+  .cake-actions {
+    width: 100%;
+  }
+
+  .cake-actions .btn {
+    width: 100%;
+  }
+
+  .tabs {
+    justify-content: flex-start;
+
+    overflow-x: auto;
+
+    flex-wrap: nowrap;
+
+    padding-bottom: 5px;
+
+    scrollbar-width: thin;
+  }
+
+  .tabs button {
+    flex: 0 0 auto;
+
+    white-space: nowrap;
+  }
+
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .map-head {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .map-frame {
+    height: 320px;
+  }
+
+  .review-card {
+    flex-direction: column;
+
+    align-items: stretch;
+
+    text-align: center;
+  }
+
+  .review-card .btn {
+    width: 100%;
+  }
+
+  .footer-inner {
+    grid-template-columns: 1fr;
+
+    gap: 30px;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+
+    text-align: center;
+  }
+
+  .drawer {
+    width: min(
+      100%,
+      430px
+    );
+  }
+
+  .checkout-form {
+    padding: 22px 18px;
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .dialog-actions .btn {
+    width: 100%;
+  }
 }
+
+/* =========================================================
+   RESPONSIVO — CELULAR PEQUENO
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+  .top {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .top .brand {
+    width: 50px;
+    height: 50px;
+
+    flex-basis: 50px;
+  }
+
+  .top nav {
+    gap: 2px;
+  }
+
+  .top nav a {
+    font-size: 11px;
+  }
+
+  .hero {
+    min-height: 680px;
+  }
+
+  .hero-logo {
+    width: 105px;
+    height: 105px;
+  }
+
+  .hero h1 {
+    font-size: 2.6rem;
+  }
+
+  .section-head h2 {
+    font-size: 2.2rem;
+  }
+
+  .ready-section .section-action .btn {
+    width: 100%;
+  }
+
+  .about-copy {
+    padding: 22px 17px;
+  }
+
+  .about-signature {
+    padding: 20px 15px;
+  }
+
+  .about-signature strong {
+    font-size: 25px;
+  }
+
+  .cake-video,
+  .cake-video video {
+    min-height: 280px;
+    height: 280px;
+  }
+
+  .map-frame {
+    height: 290px;
+  }
+
+  .review-card {
+    padding: 25px 18px;
+  }
+
+  .cart-item {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .cart-item-actions {
+    width: 100%;
+
+    justify-content: flex-end;
+  }
+}
+
+/* =========================================================
+   GARANTIA CONTRA BOTÕES TRANSPARENTES
+   ========================================================= */
+
+button.btn,
+a.btn,
+.btn.primary,
+.cart-btn,
+.icon-btn {
+  opacity: 1 !important;
+
+  visibility: visible !important;
+
+  pointer-events: auto !important;
+
+  cursor: pointer !important;
+}
+
+/* =========================================================
+   FIM
+   ========================================================= */
