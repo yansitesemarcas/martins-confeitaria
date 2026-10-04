@@ -2,7 +2,6 @@
 <html lang="pt-BR">
 
 <head>
-
   <meta charset="UTF-8">
 
   <meta
@@ -30,6 +29,7 @@
     rel="stylesheet"
   >
 
+  <!-- CSS PRINCIPAL DO SITE -->
   <link
     rel="stylesheet"
     href="style.css"
@@ -42,7 +42,7 @@
     ========================================================= */
 
     .order-page {
-      padding: 130px 20px 70px;
+      padding: 90px 20px 70px;
       min-height: 100vh;
     }
 
@@ -58,11 +58,14 @@
 
     .order-header h1 {
       margin: 10px 0;
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      color: var(--ink);
     }
 
     .order-header p {
       max-width: 700px;
       margin: 0 auto;
+      color: #625653;
     }
 
     .order-form {
@@ -71,10 +74,11 @@
     }
 
     .order-card {
-      background: rgba(255,255,255,.96);
+      background: rgba(255,255,255,.97);
       border-radius: 24px;
       padding: 28px;
-      box-shadow: 0 15px 40px rgba(0,0,0,.08);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--line);
     }
 
     .order-card h2 {
@@ -93,7 +97,7 @@
     }
 
     /* =========================================================
-       CARDS DE OPÇÕES
+       CARDS
     ========================================================= */
 
     .options-grid {
@@ -125,11 +129,11 @@
 
     .option-label:hover {
       transform: translateY(-2px);
-      border-color: #67b0cb;
+      border-color: var(--blue);
     }
 
     .option-card input:checked + .option-label {
-      border-color: #67b0cb;
+      border-color: var(--blue);
       background: rgba(103,176,203,.10);
       box-shadow: 0 8px 25px rgba(103,176,203,.15);
     }
@@ -143,7 +147,7 @@
     .option-price {
       display: block;
       font-weight: 700;
-      color: #2b7896;
+      color: var(--blue-dark);
     }
 
     .option-description {
@@ -196,7 +200,7 @@
     .field input:focus,
     .field textarea:focus,
     .field select:focus {
-      border-color: #67b0cb;
+      border-color: var(--blue);
       box-shadow: 0 0 0 4px rgba(103,176,203,.10);
     }
 
@@ -211,7 +215,7 @@
     }
 
     /* =========================================================
-       DOCINHOS / BRIGADEIROS
+       DOCINHOS
     ========================================================= */
 
     .brigadeiro-group {
@@ -226,10 +230,8 @@
       margin-top: 0;
       margin-bottom: 15px;
       font-size: 1.15rem;
-      color: #2b7896;
+      color: var(--blue-dark);
     }
-
-    /* Cards de quantidade */
 
     .brigadeiro-group .options-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -242,7 +244,6 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      box-sizing: border-box;
     }
 
     .brigadeiro-group .option-title {
@@ -256,7 +257,7 @@
     }
 
     /* =========================================================
-       SABORES DOS DOCINHOS
+       SABORES
     ========================================================= */
 
     .flavor-grid {
@@ -280,7 +281,7 @@
     }
 
     .flavor-item:hover {
-      border-color: #67b0cb;
+      border-color: var(--blue);
       transform: translateY(-1px);
       background: rgba(103,176,203,.06);
     }
@@ -289,7 +290,7 @@
       width: 17px;
       height: 17px;
       margin: 0;
-      accent-color: #67b0cb;
+      accent-color: var(--blue);
       flex-shrink: 0;
     }
 
@@ -299,7 +300,7 @@
     }
 
     .flavor-item:has(input:checked) {
-      border-color: #67b0cb;
+      border-color: var(--blue);
       background: rgba(103,176,203,.10);
     }
 
@@ -320,7 +321,7 @@
 
     .quantity-price {
       font-weight: 800;
-      color: #2b7896;
+      color: var(--blue-dark);
       margin-top: 5px;
     }
 
@@ -341,6 +342,7 @@
       align-items: center;
       gap: 20px;
       flex-wrap: wrap;
+      border: 1px solid var(--line);
     }
 
     .total-label {
@@ -351,7 +353,7 @@
     .total-value {
       font-size: 1.8rem;
       font-weight: 900;
-      color: #2b7896;
+      color: var(--blue-dark);
     }
 
     /* =========================================================
@@ -362,8 +364,8 @@
       text-align: center;
     }
 
-    .submit-area .btn {
-      min-width: 260px;
+    .submit-area .button {
+      min-width: 280px;
     }
 
     /* =========================================================
@@ -373,7 +375,7 @@
     @media (max-width: 760px) {
 
       .order-page {
-        padding-top: 110px;
+        padding-top: 55px;
       }
 
       .order-card {
@@ -403,11 +405,10 @@
         font-size: 1.5rem;
       }
 
-      .submit-area .btn {
+      .submit-area .button {
         width: 100%;
         min-width: 0;
       }
-
     }
 
   </style>
@@ -416,64 +417,68 @@
 
 <body>
 
+  <!-- =========================================================
+       CABEÇALHO
+       USA O MESMO CSS DO SITE PRINCIPAL
+  ========================================================== -->
+
   <header class="site-header">
 
-    <div class="container nav-wrap">
-
-      <a
-        href="index.html"
-        class="brand"
+    <a
+      class="brand"
+      href="index.html#inicio"
+      aria-label="Martins Confeitaria"
+    >
+      <img
+        src="assets/logo.png"
+        alt="Martins Confeitaria"
       >
-        <img
-          src="assets/logo.png"
-          alt="Martins Confeitaria"
-        >
+    </a>
+
+    <nav
+      class="nav"
+      aria-label="Navegação principal"
+    >
+
+      <a href="index.html#inicio">
+        Início
       </a>
 
-      <nav
-        class="main-nav"
-        aria-label="Navegação principal"
-      >
+      <a href="index.html#sobre">
+        Nossa história
+      </a>
 
-        <a href="index.html">
-          Início
-        </a>
+      <a href="index.html#cardapio">
+        Cardápio
+      </a>
 
-        <a href="index.html#sobre">
-          Nossa História
-        </a>
+      <a href="encomendas.html">
+        Encomenda
+      </a>
 
-        <a href="delivery.html">
-          Pronta Entrega
-        </a>
+      <a href="index.html#bolo">
+        Bolo personalizado
+      </a>
 
-        <a href="encomendas.html">
-          Encomenda
-        </a>
+      <a href="index.html#contato">
+        Contato
+      </a>
 
-        <a href="index.html#cardapio">
-          Cardápio
-        </a>
+    </nav>
 
-        <a href="index.html#contato">
-          Contato
-        </a>
-
-      </nav>
-
-      <button
-        class="menu-toggle"
-        type="button"
-        aria-label="Abrir menu"
-        aria-expanded="false"
-      >
-        ☰
-      </button>
-
-    </div>
+    <a
+      class="cart-button"
+      href="index.html#cardapio"
+    >
+      Cardápio
+    </a>
 
   </header>
 
+
+  <!-- =========================================================
+       CONTEÚDO
+  ========================================================== -->
 
   <main class="order-page">
 
@@ -623,7 +628,7 @@
             id="recheioLimit"
             class="limit-message"
           >
-            Escolha 2 recheios.
+            Escolha 2 recheios. (0/2)
           </div>
 
         </section>
@@ -658,10 +663,7 @@
              7. PERSONALIZAÇÃO
         ====================================================== -->
 
-        <section
-          id="personalizationSection"
-          class="order-card"
-        >
+        <section class="order-card">
 
           <h2>
             7. Personalização
@@ -808,8 +810,6 @@
           </p>
 
 
-          <!-- CLÁSSICOS -->
-
           <div class="brigadeiro-group">
 
             <h3>
@@ -828,8 +828,6 @@
 
           </div>
 
-
-          <!-- PREMIUM -->
 
           <div class="brigadeiro-group">
 
@@ -887,11 +885,9 @@
             </div>
 
             <div class="total-value">
-
               <span id="total">
                 R$ 0,00
               </span>
-
             </div>
 
           </div>
@@ -916,7 +912,7 @@
 
           <button
             type="submit"
-            class="btn primary"
+            class="button button-primary"
           >
             Enviar encomenda pelo WhatsApp
           </button>
@@ -937,6 +933,7 @@
     ========================================================= */
 
     const cakes = [
+
       {
         name: "Naked Cake",
         sizes: [
@@ -950,6 +947,7 @@
           ["50/60 Pessoas", 280]
         ]
       },
+
       {
         name: "Chantininho",
         sizes: [
@@ -963,44 +961,52 @@
           ["50/60 Pessoas", 300]
         ]
       }
+
     ];
 
 
     const kits = [
+
       {
         name: "Não escolher kit",
         price: 0
       },
+
       {
         name: "Kit Festa 01",
         price: 150,
         description:
           "Chantininho 10/15 Pessoas — 04 Cupcakes, 20 Petit Brownie, 20 Docinhos"
       },
+
       {
         name: "Kit Festa 02",
         price: 200,
         description:
           "Chantininho 15/20 Pessoas — 05 Cupcakes, 30 Petit Brownie, 30 Docinhos"
       },
+
       {
         name: "Kit Festa 03",
         price: 250,
         description:
           "Chantininho 20/25 Pessoas — 08 Cupcakes, 50 Petit Brownie, 50 Docinhos"
       },
+
       {
         name: "Kit Festa 04",
         price: 430,
         description:
           "Chantininho 30/40 Pessoas — 10 Cupcakes, 60 Petit Brownie, 60 Docinhos"
       },
+
       {
         name: "Kit Festa 05",
         price: 500,
         description:
           "Chantininho 40/50 Pessoas — 12 Cupcakes, 70 Petit Brownie, 70 Docinhos"
       }
+
     ];
 
 
@@ -1047,14 +1053,14 @@
 
     const classicBrigadeiros = [
       ["Não adicionar", 0],
-      ["50 unidades", 62.5],
+      ["50 unidades", 62.50],
       ["100 unidades", 125]
     ];
 
 
     const premiumBrigadeiros = [
       ["Não adicionar", 0],
-      ["50 unidades", 72.5],
+      ["50 unidades", 72.50],
       ["100 unidades", 145]
     ];
 
@@ -1084,6 +1090,7 @@
 
 
     const otherItems = [
+
       {
         name: "Petit Brownie",
         type: "select",
@@ -1095,6 +1102,7 @@
         description:
           "Quadradinho de brownie com uma pitanga de brigadeiro na caixeta de docinho."
       },
+
       {
         name: "Mini Brownie recheado",
         type: "number",
@@ -1102,6 +1110,7 @@
         discountedPrice: 2.8,
         discountFrom: 20
       },
+
       {
         name: "Bem-casado no papel crepom",
         type: "number",
@@ -1109,6 +1118,7 @@
         discountedPrice: 4.8,
         discountFrom: 20
       },
+
       {
         name: "Bem-casado na folha de celofane",
         type: "number",
@@ -1116,16 +1126,19 @@
         discountedPrice: 4,
         discountFrom: 20
       },
+
       {
         name: "Cupcake com plaquinha",
         type: "number",
         unitPrice: 6.5
       },
+
       {
         name: "Cupcake sem plaquinha",
         type: "number",
         unitPrice: 5.5
       }
+
     ];
 
 
@@ -1191,7 +1204,7 @@
 
 
     /* =========================================================
-       RENDER DE CARDS
+       CARDS
     ========================================================= */
 
     function renderOptionCards(
@@ -1231,6 +1244,7 @@
             "option-card";
 
           card.innerHTML = `
+
             <input
               type="${type}"
               id="${id}"
@@ -1309,6 +1323,7 @@
                 "option-card";
 
               card.innerHTML = `
+
                 <input
                   type="radio"
                   id="${id}"
@@ -1337,6 +1352,7 @@
                   </span>
 
                 </label>
+
               `;
 
               cakeOptions.appendChild(card);
@@ -1373,6 +1389,7 @@
             "option-card";
 
           card.innerHTML = `
+
             <input
               type="radio"
               id="${id}"
@@ -1410,6 +1427,7 @@
               }
 
             </label>
+
           `;
 
           kitOptions.appendChild(card);
@@ -1441,6 +1459,7 @@
             "option-card";
 
           card.innerHTML = `
+
             <input
               type="radio"
               id="${id}"
@@ -1459,6 +1478,7 @@
               </span>
 
             </label>
+
           `;
 
           massaOptions.appendChild(card);
@@ -1490,6 +1510,7 @@
             "option-card";
 
           card.innerHTML = `
+
             <input
               type="checkbox"
               id="${id}"
@@ -1507,12 +1528,14 @@
               </span>
 
             </label>
+
           `;
 
           recheioOptions.appendChild(card);
 
         }
       );
+
 
       document
         .querySelectorAll(
@@ -1633,9 +1656,6 @@
       flavors.forEach(
         (flavor, index) => {
 
-          const id =
-            `${groupName}-${index}`;
-
           const label =
             document.createElement("label");
 
@@ -1643,22 +1663,24 @@
             "flavor-item";
 
           label.innerHTML = `
+
             <input
               type="checkbox"
               name="${groupName}"
               value="${flavor}"
-              data-flavor-group="${groupName}"
             >
 
             <span>
               ${flavor}
             </span>
+
           `;
 
           container.appendChild(label);
 
         }
       );
+
 
       container
         .querySelectorAll(
@@ -1762,21 +1784,25 @@
               item.options
                 .map(
                   option => `
+
                     <option value="${option[1]}">
-                      ${
-                        option[0]
-                      }
+
+                      ${option[0]}
+
                       ${
                         option[1] > 0
                           ? ` — ${money(option[1])}`
                           : " — "
                       }
+
                     </option>
+
                   `
                 )
                 .join("");
 
             wrapper.innerHTML = `
+
               <label for="other-${index}">
                 ${item.name}
               </label>
@@ -1786,7 +1812,9 @@
                 name="other-${index}"
                 data-other-index="${index}"
               >
+
                 ${options}
+
               </select>
 
               ${
@@ -1798,11 +1826,13 @@
                   `
                   : ""
               }
+
             `;
 
           } else {
 
             wrapper.innerHTML = `
+
               <label for="other-${index}">
                 ${item.name}
               </label>
@@ -1821,13 +1851,18 @@
                 class="quantity-price"
                 id="other-price-${index}"
               >
+
                 ${money(item.unitPrice)} por unidade.
+
                 ${
                   item.discountedPrice
-                    ? ` A partir de ${item.discountFrom} unidades: ${money(item.discountedPrice)} por unidade.`
+                    ? ` A partir de ${item.discountFrom} unidades:
+                       ${money(item.discountedPrice)} por unidade.`
                     : ""
                 }
+
               </small>
+
             `;
 
           }
@@ -1836,6 +1871,7 @@
 
         }
       );
+
 
       otherItemsContainer
         .querySelectorAll(
@@ -1881,6 +1917,7 @@
       const hasKit =
         kitIndex > 0;
 
+
       document
         .getElementById("topoSection")
         .classList.toggle(
@@ -1921,20 +1958,17 @@
       let total = 0;
 
 
-      /* BOLO */
-
       const cake =
         document.querySelector(
           'input[name="cake"]:checked'
         );
+
 
       const selectedKit =
         document.querySelector(
           'input[name="kit"]:checked'
         );
 
-
-      /* KIT */
 
       if (
         selectedKit &&
@@ -1952,12 +1986,11 @@
       }
 
 
-      /* TOPO */
-
       const topo =
         document.querySelector(
           'input[name="topo"]:checked'
         );
+
 
       if (topo) {
 
@@ -1966,8 +1999,6 @@
 
       }
 
-
-      /* EXTRAS */
 
       document
         .querySelectorAll(
@@ -1982,8 +2013,6 @@
           }
         );
 
-
-      /* DOCINHOS */
 
       const classic =
         document.querySelector(
@@ -2010,8 +2039,6 @@
 
       }
 
-
-      /* OUTROS ITENS */
 
       otherItems.forEach(
         (item, index) => {
@@ -2065,7 +2092,7 @@
 
 
     /* =========================================================
-       KIT EVENTO
+       EVENTOS
     ========================================================= */
 
     document.addEventListener(
@@ -2079,6 +2106,16 @@
         ) {
 
           updateKitVisibility();
+          updateTotal();
+
+        }
+
+        if (
+          event.target.matches(
+            'input[name="cake"], input[name="topo"], input[name="extra"], input[name="classicBrigadeiro"], input[name="premiumBrigadeiro"]'
+          )
+        ) {
+
           updateTotal();
 
         }
@@ -2106,16 +2143,19 @@
               .value
               .trim();
 
+
           const phone =
             document
               .getElementById("customerPhone")
               .value
               .trim();
 
+
           const date =
             document
               .getElementById("requiredDate")
               .value;
+
 
           const address =
             document
@@ -2123,11 +2163,13 @@
               .value
               .trim();
 
+
           const personalization =
             document
               .getElementById("personalization")
               .value
               .trim();
+
 
           const notes =
             document
@@ -2169,8 +2211,6 @@
             kitIndex > 0;
 
 
-          /* RECHEIOS */
-
           const selectedFillings =
             Array.from(
               document.querySelectorAll(
@@ -2196,15 +2236,11 @@
           }
 
 
-          /* BOLO */
-
           const cake =
             document.querySelector(
               'input[name="cake"]:checked'
             );
 
-
-          /* TOPO */
 
           const topo =
             document.querySelector(
@@ -2212,15 +2248,11 @@
             );
 
 
-          /* MASSA */
-
           const dough =
             document.querySelector(
               'input[name="dough"]:checked'
             );
 
-
-          /* EXTRAS */
 
           const selectedExtras =
             Array.from(
@@ -2238,12 +2270,11 @@
             );
 
 
-          /* DOCINHOS */
-
           const classic =
             document.querySelector(
               'input[name="classicBrigadeiro"]:checked'
             );
+
 
           const premium =
             document.querySelector(
@@ -2273,7 +2304,9 @@
             );
 
 
-          /* OUTROS */
+          /* =====================================================
+             OUTROS ITENS
+          ===================================================== */
 
           const otherLines = [];
 
@@ -2298,6 +2331,7 @@
                     element.selectedIndex
                   ];
 
+
                 if (
                   option &&
                   Number(element.value) > 0
@@ -2316,10 +2350,12 @@
                     element.value || 0
                   );
 
+
                 if (quantity > 0) {
 
                   let price =
                     item.unitPrice;
+
 
                   if (
                     item.discountedPrice &&
@@ -2330,6 +2366,7 @@
                       item.discountedPrice;
 
                   }
+
 
                   otherLines.push(
                     `${item.name}: ${quantity} unidades — ${money(quantity * price)}`
@@ -2343,7 +2380,9 @@
           );
 
 
-          /* TOTAL */
+          /* =====================================================
+             TOTAL
+          ===================================================== */
 
           updateTotal();
 
@@ -2352,7 +2391,7 @@
 
 
           /* =====================================================
-             MENSAGEM WHATSAPP
+             WHATSAPP
           ===================================================== */
 
           let message =
@@ -2433,6 +2472,7 @@
                   ?.textContent
                   .trim();
 
+
               message +=
                 `Topo/decoração: ${topoName} — ${money(Number(topo.value))}\n`;
 
@@ -2449,6 +2489,10 @@
           }
 
 
+          /* =====================================================
+             DOCINHOS
+          ===================================================== */
+
           if (classic) {
 
             const classicQuantity =
@@ -2458,12 +2502,14 @@
                 ?.textContent
                 .trim();
 
+
             if (
               Number(classic.value) > 0
             ) {
 
               message +=
                 `\nDocinhos clássicos: ${classicQuantity} — ${money(Number(classic.value))}\n`;
+
 
               if (
                 selectedClassicFlavors.length
@@ -2488,12 +2534,14 @@
                 ?.textContent
                 .trim();
 
+
             if (
               Number(premium.value) > 0
             ) {
 
               message +=
                 `Docinhos premium: ${premiumQuantity} — ${money(Number(premium.value))}\n`;
+
 
               if (
                 selectedPremiumFlavors.length
@@ -2550,7 +2598,7 @@
 
 
           /* =====================================================
-             WHATSAPP
+             NÚMERO DA MARTINS
           ===================================================== */
 
           const whatsappNumber =
@@ -2571,71 +2619,6 @@
 
 
     /* =========================================================
-       MENU MOBILE
-    ========================================================= */
-
-    const menuToggle =
-      document.querySelector(
-        ".menu-toggle"
-      );
-
-    const mainNav =
-      document.querySelector(
-        ".main-nav"
-      );
-
-
-    if (
-      menuToggle &&
-      mainNav
-    ) {
-
-      menuToggle.addEventListener(
-        "click",
-        () => {
-
-          const isOpen =
-            mainNav.classList.toggle(
-              "open"
-            );
-
-          menuToggle.setAttribute(
-            "aria-expanded",
-            isOpen
-          );
-
-        }
-      );
-
-
-      mainNav
-        .querySelectorAll("a")
-        .forEach(
-          link => {
-
-            link.addEventListener(
-              "click",
-              () => {
-
-                mainNav.classList.remove(
-                  "open"
-                );
-
-                menuToggle.setAttribute(
-                  "aria-expanded",
-                  "false"
-                );
-
-              }
-            );
-
-          }
-        );
-
-    }
-
-
-    /* =========================================================
        DATA MÍNIMA
     ========================================================= */
 
@@ -2650,8 +2633,10 @@
       const today =
         new Date();
 
+
       const year =
         today.getFullYear();
+
 
       const month =
         String(
@@ -2661,6 +2646,7 @@
           "0"
         );
 
+
       const day =
         String(
           today.getDate()
@@ -2668,6 +2654,7 @@
           2,
           "0"
         );
+
 
       dateInput.min =
         `${year}-${month}-${day}`;
