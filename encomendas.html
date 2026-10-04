@@ -3,401 +3,1958 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Encomenda | Martins Confeitaria</title>
-  <meta name="description" content="Monte sua encomenda personalizada na Martins Confeitaria.">
+
+  <meta
+    name="description"
+    content="Monte sua encomenda personalizada na Martins Confeitaria."
+  >
+
   <link rel="icon" href="logo.png">
-  <link rel="stylesheet" href="style.css?v=20261004-01">
+
+  <link rel="stylesheet" href="style.css?v=20261004-02">
 </head>
+
 <body>
+
   <header class="top">
-    <a href="index.html#inicio" class="brand" aria-label="Martins Confeitaria">
-      <img src="logo.png" alt="Martins Confeitaria">
+
+    <a
+      href="index.html#inicio"
+      class="brand"
+      aria-label="Martins Confeitaria"
+    >
+      <img
+        src="logo.png"
+        alt="Martins Confeitaria"
+      >
     </a>
+
     <nav>
-      <a href="index.html#inicio">Início</a>
-      <a href="index.html#sobre">Nossa História</a>
-      <a href="index.html#readyProducts">Pronta Entrega</a>
-      <a href="encomendas.html">Encomenda</a>
-      <a href="index.html#cardapio">Cardápio</a>
-      <a href="index.html#contato">Contato</a>
+
+      <a href="index.html#inicio">
+        Início
+      </a>
+
+      <a href="index.html#sobre">
+        Nossa História
+      </a>
+
+      <a href="delivery.html">
+        Pronta Entrega
+      </a>
+
+      <a href="encomendas.html">
+        Encomenda
+      </a>
+
+      <a href="index.html#cardapio">
+        Cardápio
+      </a>
+
+      <a href="index.html#contato">
+        Contato
+      </a>
+
     </nav>
-    <a href="index.html#cardapio" class="cart-btn" aria-label="Voltar ao cardápio">+</a>
+
+    <a
+      href="index.html#cardapio"
+      class="cart-btn"
+      aria-label="Voltar ao cardápio"
+    >
+      +
+    </a>
+
   </header>
 
+
   <main class="custom-page">
+
     <div class="section-head">
-      <span class="eyebrow">Martins Confeitaria</span>
-      <h1>Monte sua encomenda</h1>
-      <p>Escolha os detalhes do seu bolo, decoração e complementos.</p>
+
+      <span class="eyebrow">
+        Martins Confeitaria
+      </span>
+
+      <h1>
+        Monte sua encomenda
+      </h1>
+
+      <p>
+        Escolha os detalhes do seu bolo, decoração e complementos.
+      </p>
+
     </div>
 
-    <form id="cakeForm" class="form cake-builder custom-builder">
+
+    <form
+      id="cakeForm"
+      class="form cake-builder custom-builder"
+    >
+
+      <!-- AGENDAMENTO -->
+
       <div class="order-required-note">
-        <strong>Agendamento obrigatório</strong>
-        <span>Informe a data desejada para que a confeitaria possa confirmar a disponibilidade.</span>
+
+        <strong>
+          Agendamento obrigatório
+        </strong>
+
+        <span>
+          Informe a data desejada para que a confeitaria possa confirmar a disponibilidade.
+        </span>
+
       </div>
 
-      <fieldset id="cakeSizeSection" class="extras">
-        <legend>Escolha o bolo</legend>
-        <div id="cakeType" class="cake-type-list"></div>
+
+      <!-- BOLO -->
+
+      <fieldset
+        id="cakeSizeSection"
+        class="extras"
+      >
+
+        <legend>
+          Escolha o bolo
+        </legend>
+
+        <div
+          id="cakeType"
+          class="cake-type-list"
+        ></div>
+
       </fieldset>
 
-      <div id="kitCakeFixed" class="kit-fixed-cake" hidden>
-        <div>Bolo incluso no kit</div>
+
+      <!-- BOLO DO KIT -->
+
+      <div
+        id="kitCakeFixed"
+        class="kit-fixed-cake"
+        hidden
+      >
+
+        <div>
+          Bolo incluso no kit
+        </div>
+
         <strong id="kitCakeFixedName"></strong>
+
       </div>
-      <input type="hidden" id="kitCakeValue" name="kitCake">
 
-      <fieldset id="topoSection" class="extras">
-        <legend>Decoração — topo do bolo</legend>
+      <input
+        type="hidden"
+        id="kitCakeValue"
+        name="kitCake"
+      >
+
+
+      <!-- TOPO -->
+
+      <fieldset
+        id="topoSection"
+        class="extras"
+      >
+
+        <legend>
+          Decoração — topo do bolo
+        </legend>
+
         <div id="topoOptions"></div>
+
       </fieldset>
 
-      <fieldset id="massaSection" class="extras">
-        <legend>Massa</legend>
+
+      <!-- MASSA -->
+
+      <fieldset
+        id="massaSection"
+        class="extras"
+      >
+
+        <legend>
+          Massa
+        </legend>
+
         <div id="cakeMassOptions"></div>
+
       </fieldset>
 
-      <fieldset id="recheioSection" class="extras">
-        <legend>Recheio</legend>
+
+      <!-- RECHEIO -->
+
+      <fieldset
+        id="recheioSection"
+        class="extras"
+      >
+
+        <legend>
+          Recheio
+        </legend>
+
         <div id="cakeFillings"></div>
+
       </fieldset>
 
-      <fieldset id="adicionalSection" class="extras">
-        <legend>Adicionais</legend>
+
+      <!-- ADICIONAIS -->
+
+      <fieldset
+        id="adicionalSection"
+        class="extras"
+      >
+
+        <legend>
+          Adicionais
+        </legend>
+
         <div id="cakeExtras"></div>
+
       </fieldset>
 
-      <fieldset id="personalizacaoSection" class="extras">
-        <legend>Como deseja personalizar?</legend>
+
+      <!-- PERSONALIZAÇÃO -->
+
+      <fieldset
+        id="personalizacaoSection"
+        class="extras"
+      >
+
+        <legend>
+          Como deseja personalizar?
+        </legend>
+
         <label class="text-field">
-          <span>Descreva a personalização</span>
-          <textarea id="personalizationText" name="personalizationText" rows="3" placeholder="Ex.: nome, idade, tema, frase..."></textarea>
+
+          <span>
+            Descreva a personalização
+          </span>
+
+          <textarea
+            id="personalizationText"
+            name="personalizationText"
+            rows="3"
+            placeholder="Ex.: nome, idade, tema, frase..."
+          ></textarea>
+
         </label>
+
       </fieldset>
+
+
+      <!-- DADOS DO CLIENTE -->
 
       <fieldset class="extras">
-        <legend>Seus dados</legend>
-        <label class="text-field"><span>Nome</span><input type="text" id="customerName" name="customerName" placeholder="Seu nome" autocomplete="name" required></label>
-        <label class="text-field"><span>WhatsApp</span><input type="tel" id="customerPhone" name="customerPhone" placeholder="(85) 99999-9999" autocomplete="tel" required></label>
-        <label class="text-field"><span>Data desejada</span><input type="date" id="customerDate" name="customerDate" required></label>
-        <label class="text-field"><span>Observações</span><textarea id="customerNotes" name="customerNotes" rows="4" placeholder="Alguma informação importante sobre sua encomenda?"></textarea></label>
+
+        <legend>
+          Seus dados
+        </legend>
+
+        <label class="text-field">
+
+          <span>
+            Nome
+          </span>
+
+          <input
+            type="text"
+            id="customerName"
+            name="customerName"
+            placeholder="Seu nome"
+            autocomplete="name"
+            required
+          >
+
+        </label>
+
+
+        <label class="text-field">
+
+          <span>
+            WhatsApp
+          </span>
+
+          <input
+            type="tel"
+            id="customerPhone"
+            name="customerPhone"
+            placeholder="(85) 99999-9999"
+            autocomplete="tel"
+            required
+          >
+
+        </label>
+
+
+        <label class="text-field">
+
+          <span>
+            Data desejada
+          </span>
+
+          <input
+            type="date"
+            id="customerDate"
+            name="customerDate"
+            required
+          >
+
+        </label>
+
+
+        <label class="text-field">
+
+          <span>
+            Observações
+          </span>
+
+          <textarea
+            id="customerNotes"
+            name="customerNotes"
+            rows="4"
+            placeholder="Alguma informação importante sobre sua encomenda?"
+          ></textarea>
+
+        </label>
+
       </fieldset>
 
+
+      <!-- TOTAL -->
+
       <div class="cake-total">
-        <span>Total estimado</span>
-        <strong id="cakeTotal">R$ 0,00</strong>
+
+        <span>
+          Total estimado
+        </span>
+
+        <strong id="cakeTotal">
+          R$ 0,00
+        </strong>
+
       </div>
 
-      <section id="kitSection" class="kit-section">
+
+      <!-- KITS -->
+
+      <section
+        id="kitSection"
+        class="kit-section"
+      >
+
         <div class="section-head">
-          <span class="eyebrow">Kits para sua festa</span>
-          <h2>Escolha um kit</h2>
-          <p>Os kits já possuem bolo, cupcakes, petit brownies e docinhos nas quantidades indicadas.</p>
+
+          <span class="eyebrow">
+            Kits para sua festa
+          </span>
+
+          <h2>
+            Escolha um kit
+          </h2>
+
+          <p>
+            Os kits já possuem bolo, cupcakes, petit brownies e docinhos nas quantidades indicadas.
+          </p>
+
         </div>
-        <div id="kitOptions" class="kit-options"></div>
-        <div id="kitIncluded" class="kit-included" hidden></div>
+
+        <div
+          id="kitOptions"
+          class="kit-options"
+        ></div>
+
+        <div
+          id="kitIncluded"
+          class="kit-included"
+          hidden
+        ></div>
+
       </section>
+
+
+      <!-- BRIGADEIROS -->
 
       <section class="party-title">
+
         <div class="section-head">
-          <span class="eyebrow">Complementos</span>
-          <h2>Brigadeiros</h2>
-          <p>Escolha a linha, a quantidade e os sabores.</p>
+
+          <span class="eyebrow">
+            Complementos
+          </span>
+
+          <h2>
+            Brigadeiros
+          </h2>
+
+          <p>
+            Escolha a linha, a quantidade e os sabores.
+          </p>
+
         </div>
+
       </section>
+
 
       <section class="brigadeiro-section">
-        <div id="brigadeiros" class="brigadeiro-list"></div>
+
+        <div
+          id="brigadeiros"
+          class="brigadeiro-list"
+        ></div>
+
       </section>
+
+
+      <!-- OUTROS ITENS -->
 
       <section class="other-orders-section">
+
         <div class="section-head">
-          <span class="eyebrow">Complementos</span>
-          <h2>Outros itens</h2>
-          <p>Informe exatamente a quantidade que deseja.</p>
+
+          <span class="eyebrow">
+            Complementos
+          </span>
+
+          <h2>
+            Outros itens
+          </h2>
+
+          <p>
+            Informe exatamente a quantidade que deseja.
+          </p>
+
         </div>
-        <div id="otherItems" class="other-order-list"></div>
+
+        <div
+          id="otherItems"
+          class="other-order-list"
+        ></div>
+
       </section>
 
-      <button type="submit" class="btn primary full submit-order">Fazer a encomenda</button>
+
+      <!-- ENVIO -->
+
+      <button
+        type="submit"
+        class="btn primary full submit-order"
+      >
+        Fazer a encomenda
+      </button>
+
     </form>
+
   </main>
 
-<script>
-(() => {
-  const WHATSAPP = "5585981563070";
-  const money = value => Number(value || 0).toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
-  const esc = value => String(value ?? "").replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
 
-  const $ = id => document.getElementById(id);
-  const form = $("cakeForm");
-  const totalEl = $("cakeTotal");
-  const kitOptions = $("kitOptions");
-  const kitIncluded = $("kitIncluded");
-  const kitCakeFixed = $("kitCakeFixed");
-  const kitCakeFixedName = $("kitCakeFixedName");
-  const kitCakeValue = $("kitCakeValue");
+<script>
+
+(() => {
+
+  const WHATSAPP = "5585981563070";
+
+
+  const money = value =>
+    Number(value || 0).toLocaleString(
+      "pt-BR",
+      {
+        style: "currency",
+        currency: "BRL"
+      }
+    );
+
+
+  const esc = value =>
+    String(value ?? "").replace(
+      /[&<>'"]/g,
+      c =>
+        ({
+          "&":"&amp;",
+          "<":"&lt;",
+          ">":"&gt;",
+          "'":"&#39;",
+          '"':"&quot;"
+        }[c])
+    );
+
+
+  const $ = id =>
+    document.getElementById(id);
+
+
+  const form =
+    $("cakeForm");
+
+  const totalEl =
+    $("cakeTotal");
+
+  const kitOptions =
+    $("kitOptions");
+
+  const kitIncluded =
+    $("kitIncluded");
+
+  const kitCakeFixed =
+    $("kitCakeFixed");
+
+  const kitCakeFixedName =
+    $("kitCakeFixedName");
+
+  const kitCakeValue =
+    $("kitCakeValue");
+
 
   let selectedKit = null;
+
   let selectedCakePrice = 0;
 
+
+  /* =========================
+     BOLOS
+  ========================= */
+
   const cakes = [
+
     {
       name: "Naked Cake / Scrap Cake",
+
       sizes: [
-        ["06/08 Pessoas",45],["10/12 Pessoas",70],["15/20 Pessoas",98],["20/25 Pessoas",115],
-        ["25/30 Pessoas",145],["30/40 Pessoas",188],["40/50 Pessoas",240],["50/60 Pessoas",280]
+
+        ["06/08 Pessoas",45],
+        ["10/12 Pessoas",70],
+        ["15/20 Pessoas",98],
+        ["20/25 Pessoas",115],
+        ["25/30 Pessoas",145],
+        ["30/40 Pessoas",188],
+        ["40/50 Pessoas",240],
+        ["50/60 Pessoas",280]
+
       ]
+
     },
+
     {
       name: "Chantininho",
+
       sizes: [
-        ["06/08 Pessoas",60],["10/12 Pessoas",80],["15/20 Pessoas",120],["20/25 Pessoas",140],
-        ["25/30 Pessoas",170],["30/40 Pessoas",220],["40/50 Pessoas",260],["50/60 Pessoas",300]
+
+        ["06/08 Pessoas",60],
+        ["10/12 Pessoas",80],
+        ["15/20 Pessoas",120],
+        ["20/25 Pessoas",140],
+        ["25/30 Pessoas",170],
+        ["30/40 Pessoas",220],
+        ["40/50 Pessoas",260],
+        ["50/60 Pessoas",300]
+
       ]
+
     }
+
   ];
 
+
+  /* =========================
+     KITS
+  ========================= */
+
   const kits = {
-    k1:{name:"Kit Festa 01",price:150,cake:"Chantininho 10/15 Pessoas",items:["04 Cupcakes","20 Petit Brownie","20 Docinhos"]},
-    k2:{name:"Kit Festa 02",price:200,cake:"Chantininho 15/20 Pessoas",items:["05 Cupcakes","30 Petit Brownie","30 Docinhos"]},
-    k3:{name:"Kit Festa 03",price:250,cake:"Chantininho 20/25 Pessoas",items:["08 Cupcakes","50 Petit Brownie","50 Docinhos"]},
-    k4:{name:"Kit Festa 04",price:430,cake:"Chantininho 30/40 Pessoas",items:["10 Cupcakes","60 Petit Brownie","60 Docinhos"]},
-    k5:{name:"Kit Festa 05",price:500,cake:"Chantininho 40/50 Pessoas",items:["12 Cupcakes","70 Petit Brownie","70 Docinhos"]}
+
+    k1: {
+      name: "Kit Festa 01",
+      price: 150,
+      cake: "Chantininho 10/15 Pessoas",
+      items: [
+        "04 Cupcakes",
+        "20 Petit Brownie",
+        "20 Docinhos"
+      ]
+    },
+
+    k2: {
+      name: "Kit Festa 02",
+      price: 200,
+      cake: "Chantininho 15/20 Pessoas",
+      items: [
+        "05 Cupcakes",
+        "30 Petit Brownie",
+        "30 Docinhos"
+      ]
+    },
+
+    k3: {
+      name: "Kit Festa 03",
+      price: 250,
+      cake: "Chantininho 20/25 Pessoas",
+      items: [
+        "08 Cupcakes",
+        "50 Petit Brownie",
+        "50 Docinhos"
+      ]
+    },
+
+    k4: {
+      name: "Kit Festa 04",
+      price: 430,
+      cake: "Chantininho 30/40 Pessoas",
+      items: [
+        "10 Cupcakes",
+        "60 Petit Brownie",
+        "60 Docinhos"
+      ]
+    },
+
+    k5: {
+      name: "Kit Festa 05",
+      price: 500,
+      cake: "Chantininho 40/50 Pessoas",
+      items: [
+        "12 Cupcakes",
+        "70 Petit Brownie",
+        "70 Docinhos"
+      ]
+    }
+
   };
 
-  const classicFlavors = ["Brigadeiro tradicional","Brigadeiro branco Ninho","Casadinho","Limão","Beijinho","Doce de leite"];
-  const premiumFlavors = ["Ninho com Nutella","Moça Cremosa","Surpresa de Uva","Belga ao Leite","Belga Amargo","Creme Brûlée","Brigadeiro com Castanha","Doce de Leite com Castanha","Kit Kat","Oreo"];
 
-  function renderCakes(){
-    $("cakeType").innerHTML = cakes.map((cake, ci) => `
-      <div class="cake-type-card">
-        <h3>${esc(cake.name)}</h3>
-        <div class="cake-size-grid">
-          ${cake.sizes.map((item,i)=>`
-            <label class="extra-option cake-size-option">
-              <input type="radio" name="cakeType" value="${esc(cake.name)} — ${esc(item[0])}" data-price="${item[1]}" ${ci===0&&i===0?"checked":""}>
-              <span><b>${esc(item[0])}</b><small>Serve até ${esc(item[0].split("/").pop().trim())} pessoas</small></span>
-              <strong>${money(item[1])}</strong>
-            </label>`).join("")}
-        </div>
-        <p class="product-note">Gramatura: conforme tamanho e produção da confeitaria.</p>
-      </div>`).join("");
+  /* =========================
+     SABORES
+  ========================= */
+
+  const classicFlavors = [
+
+    "Brigadeiro tradicional",
+    "Brigadeiro branco Ninho",
+    "Casadinho",
+    "Limão",
+    "Beijinho",
+    "Doce de leite"
+
+  ];
+
+
+  const premiumFlavors = [
+
+    "Ninho com Nutella",
+    "Moça Cremosa",
+    "Surpresa de Uva",
+    "Belga ao Leite",
+    "Belga Amargo",
+    "Creme Brûlée",
+    "Brigadeiro com Castanha",
+    "Doce de Leite com Castanha",
+    "Kit Kat",
+    "Oreo"
+
+  ];
+
+
+  /* =========================
+     BOLOS
+  ========================= */
+
+  function renderCakes() {
+
+    $("cakeType").innerHTML =
+      cakes.map(
+        (cake, ci) => `
+
+          <div class="cake-type-card">
+
+            <h3>
+              ${esc(cake.name)}
+            </h3>
+
+            <div class="cake-size-grid">
+
+              ${
+                cake.sizes.map(
+                  (item, i) => `
+
+                    <label class="extra-option cake-size-option">
+
+                      <input
+                        type="radio"
+                        name="cakeType"
+                        value="${esc(cake.name)} — ${esc(item[0])}"
+                        data-price="${item[1]}"
+                        ${ci === 0 && i === 0 ? "checked" : ""}
+                      >
+
+                      <span>
+
+                        <b>
+                          ${esc(item[0])}
+                        </b>
+
+                        <small>
+                          Serve até ${esc(
+                            item[0].split("/").pop().trim()
+                          )} pessoas
+                        </small>
+
+                      </span>
+
+                      <strong>
+                        ${money(item[1])}
+                      </strong>
+
+                    </label>
+
+                  `
+                ).join("")
+              }
+
+            </div>
+
+            <p class="product-note">
+              Gramatura: definida pela confeitaria conforme o tamanho escolhido.
+            </p>
+
+          </div>
+
+        `
+      ).join("");
+
   }
 
-  function renderTopos(){
-    const data = [["Topo simples",20],["Topo 3D",30],["Flores naturais",70],["Scrap Cake",30]];
-    $("topoOptions").innerHTML = data.map((x,i)=>`<label class="extra-option"><input type="radio" name="topo" value="${x[0]}" data-price="${x[1]}" ${i===0?"checked":""}><span>${x[0]}</span><strong>+ ${money(x[1])}</strong></label>`).join("");
-  }
 
-  function renderMasses(){
-    const data = ["Amanteigado","Baunilha","Ninho","Coco","Chocolate","Limão"];
-    $("cakeMassOptions").innerHTML = data.map((x,i)=>`<label class="extra-option"><input type="radio" name="massa" value="${x}" ${i===0?"checked":""}><span>${x}</span></label>`).join("");
-  }
+  /* =========================
+     TOPO
+  ========================= */
 
-  function renderFillings(){
-    const data = ["Ninho","Beijinho","Brigadeiro","Doce de leite","Leite condensado","Limão","Oreo"];
-    $("cakeFillings").innerHTML = data.map((x,i)=>`<label class="extra-option"><input type="radio" name="recheio" value="${x}" ${i===0?"checked":""}><span>${x}</span></label>`).join("");
-  }
+  function renderTopos() {
 
-  function renderExtras(){
-    const data = [["Abacaxi",10],["Crocante de Castanha",10],["Geleia de Morango",16],["Nutella",16],["Morango",16],["Kit Kat",12],["Ouro Branco",10],["Kinder Bueno",16]];
-    $("cakeExtras").innerHTML = data.map(x=>`<label class="extra-option"><input type="checkbox" name="adicional" value="${x[0]}" data-price="${x[1]}"><span>${x[0]}</span><strong>+ ${money(x[1])}</strong></label>`).join("");
-  }
+    const data = [
 
-  function renderKits(){
-    kitOptions.innerHTML = Object.entries(kits).map(([id,kit])=>`<label class="extra-option kit-option"><input type="radio" name="kit" value="${id}"><span><b>${kit.name}</b><small>${kit.cake}</small><small>${kit.items.join(" · ")}</small></span><strong>${money(kit.price)}</strong></label>`).join("") + `<button type="button" id="clearKit" class="btn ghost kit-remove" hidden>Não quero mais este kit</button>`;
-    kitOptions.querySelectorAll("input[name='kit']").forEach(input=>input.addEventListener("change",()=>applyKit(input.value)));
-    $("clearKit").addEventListener("click",clearKit);
-  }
+      ["Topo simples",20],
+      ["Topo 3D",30],
+      ["Flores naturais",70],
+      ["Scrap Cake",30]
 
-  function applyKit(id){
-    const kit = kits[id];
-    if(!kit) return;
-    selectedKit=id;
-    selectedCakePrice=kit.price;
-    kitCakeValue.value=id;
-    kitCakeFixed.hidden=false;
-    kitCakeFixedName.textContent=kit.cake;
-    $("cakeSizeSection").hidden=true;
-    $("topoSection").hidden=true;
-    $("massaSection").hidden=true;
-    $("recheioSection").hidden=true;
-    $("adicionalSection").hidden=true;
-    $("personalizacaoSection").hidden=true;
-    $("clearKit").hidden=false;
-    kitIncluded.hidden=false;
-    kitIncluded.innerHTML=`<div class="kit-included-grid">${kit.items.map(item=>`<div class="kit-included-option"><span>Incluso</span><small>${item}</small></div>`).join("")}</div><p class="kit-choice-help">O kit não inclui escolha de sabores dos docinhos nesta etapa.</p>`;
-    updateTotal();
-  }
-
-  function clearKit(){
-    selectedKit=null;
-    selectedCakePrice=0;
-    kitCakeValue.value="";
-    kitCakeFixed.hidden=true;
-    kitIncluded.hidden=true;
-    kitIncluded.innerHTML="";
-    $("cakeSizeSection").hidden=false;
-    $("topoSection").hidden=false;
-    $("massaSection").hidden=false;
-    $("recheioSection").hidden=false;
-    $("adicionalSection").hidden=false;
-    $("personalizacaoSection").hidden=false;
-    const checked=document.querySelector("input[name='kit']:checked");
-    if(checked) checked.checked=false;
-    $("clearKit").hidden=true;
-    updateTotal();
-  }
-
-  function renderBrigadeiros(){
-    $("brigadeiros").innerHTML = `
-      <div class="brigadeiro-box brigadeiro-line">
-        <h3>Linha Clássica</h3>
-        <p>6 sabores disponíveis. Escolha a quantidade e depois até o limite de sabores.</p>
-        <div class="brigadeiro-quantities">
-          <label class="extra-option"><input type="radio" name="brigadeiroClassicoQtd" value="0" data-price="0" checked><span>Não adicionar</span></label>
-          <label class="extra-option"><input type="radio" name="brigadeiroClassicoQtd" value="50" data-price="62.5"><span>50 unidades</span><strong>R$ 62,50</strong></label>
-          <label class="extra-option"><input type="radio" name="brigadeiroClassicoQtd" value="100" data-price="125"><span>100 unidades</span><strong>R$ 125,00</strong></label>
-        </div>
-        <div class="flavor-choice" data-line="classic" hidden>
-          <strong>Sabores — até 2 sabores para 50 unidades ou até 4 para 100</strong>
-          <div class="flavor-grid">${classicFlavors.map(x=>`<label><input type="checkbox" name="classicFlavor" value="${x}"><span>${x}</span></label>`).join("")}</div>
-        </div>
-      </div>
-      <div class="brigadeiro-box brigadeiro-line">
-        <h3>Linha Premium</h3>
-        <p>10 sabores disponíveis. Escolha a quantidade e depois até o limite de sabores.</p>
-        <div class="brigadeiro-quantities">
-          <label class="extra-option"><input type="radio" name="brigadeiroPremiumQtd" value="0" data-price="0" checked><span>Não adicionar</span></label>
-          <label class="extra-option"><input type="radio" name="brigadeiroPremiumQtd" value="50" data-price="72.5"><span>50 unidades</span><strong>R$ 72,50</strong></label>
-          <label class="extra-option"><input type="radio" name="brigadeiroPremiumQtd" value="100" data-price="145"><span>100 unidades</span><strong>R$ 145,00</strong></label>
-        </div>
-        <div class="flavor-choice" data-line="premium" hidden>
-          <strong>Sabores — até 2 sabores para 50 unidades ou até 4 para 100</strong>
-          <div class="flavor-grid">${premiumFlavors.map(x=>`<label><input type="checkbox" name="premiumFlavor" value="${x}"><span>${x}</span></label>`).join("")}</div>
-        </div>
-      </div>`;
-
-    document.querySelectorAll("input[name='brigadeiroClassicoQtd'],input[name='brigadeiroPremiumQtd']").forEach(input=>input.addEventListener("change",updateBrigadeiroUI));
-    document.querySelectorAll("input[name='classicFlavor'],input[name='premiumFlavor']").forEach(input=>input.addEventListener("change",limitFlavors));
-  }
-
-  function updateBrigadeiroUI(){
-    ["classic","premium"].forEach(line=>{
-      const name=line==="classic"?"brigadeiroClassicoQtd":"brigadeiroPremiumQtd";
-      const qty=Number(document.querySelector(`input[name='${name}']:checked`)?.value||0);
-      const box=document.querySelector(`.flavor-choice[data-line='${line}']`);
-      if(!box) return;
-      box.hidden=qty===0;
-      if(qty===0) box.querySelectorAll("input[type='checkbox']").forEach(i=>i.checked=false);
-      box.dataset.max=qty===50?2:4;
-    });
-    updateTotal();
-  }
-
-  function limitFlavors(event){
-    const input=event.target;
-    const line=input.name.startsWith("classic")?"classic":"premium";
-    const box=document.querySelector(`.flavor-choice[data-line='${line}']`);
-    const max=Number(box?.dataset.max||2);
-    const checked=[...box.querySelectorAll("input[type='checkbox']:checked")];
-    if(checked.length>max){input.checked=false;alert(`Para esta quantidade, escolha no máximo ${max} sabores.`);}
-  }
-
-  function renderOtherItems(){
-    const items=["Cupcakes","Petit Brownie"];
-    $("otherItems").innerHTML=items.map(name=>`<div class="brigadeiro-box other-item-box"><h3>${name}</h3><label class="text-field"><span>Quantidade</span><input class="other-quantity" type="number" min="0" step="1" value="0" data-item="${name}" placeholder="0"></label><p class="other-price">Preço: definido pela confeitaria/admin.</p></div>`).join("");
-  }
-
-  function updateTotal(){
-    let total=selectedCakePrice;
-    if(!selectedKit){
-      document.querySelectorAll("#cakeForm input[type='radio']:checked,#cakeForm input[type='checkbox']:checked").forEach(input=>total+=Number(input.dataset.price||0));
-      document.querySelectorAll(".other-quantity").forEach(input=>{ /* quantidade fica registrada no pedido; preço pode ser definido no admin */ });
-      const c=Number(document.querySelector("input[name='brigadeiroClassicoQtd']:checked")?.dataset.price||0);
-      const p=Number(document.querySelector("input[name='brigadeiroPremiumQtd']:checked")?.dataset.price||0);
-      total+=c+p;
-    }
-    totalEl.textContent=money(total);
-  }
-
-  function getChecked(name){return document.querySelector(`input[name='${name}']:checked`);}
-
-  form.addEventListener("change",event=>{if(event.target.matches("input,select,textarea")){updateTotal();}});
-
-  form.addEventListener("submit",event=>{
-    event.preventDefault();
-    const name=$("customerName").value.trim();
-    const phone=$("customerPhone").value.trim();
-    const date=$("customerDate").value;
-    if(!name||!phone||!date){alert("Preencha seu nome, WhatsApp e a data desejada.");return;}
-
-    const lines=[
-      "Olá! Gostaria de fazer uma encomenda na Martins Confeitaria.",
-      "",
-      `Nome: ${name}`,
-      `WhatsApp: ${phone}`,
-      `Data desejada: ${date}`,
-      ""
     ];
 
-    if(selectedKit){
-      const kit=kits[selectedKit];
-      lines.push(`Kit: ${kit.name}`,`Bolo: ${kit.cake}`,`Inclusos: ${kit.items.join(", ")}`);
-    }else{
-      const cake=getChecked("cakeType");
-      const topo=getChecked("topo");
-      const massa=getChecked("massa");
-      const recheio=getChecked("recheio");
-      if(cake) lines.push(`Bolo: ${cake.value} — ${money(cake.dataset.price)}`);
-      if(topo) lines.push(`Topo: ${topo.value} — ${money(topo.dataset.price)}`);
-      if(massa) lines.push(`Massa: ${massa.value}`);
-      if(recheio) lines.push(`Recheio: ${recheio.value}`);
-      const extras=[...document.querySelectorAll("input[name='adicional']:checked")];
-      if(extras.length) lines.push(`Adicionais: ${extras.map(x=>`${x.value} (+${money(x.dataset.price)})`).join(", ")}`);
+
+    $("topoOptions").innerHTML =
+      data.map(
+        (x, i) => `
+
+          <label class="extra-option">
+
+            <input
+              type="radio"
+              name="topo"
+              value="${x[0]}"
+              data-price="${x[1]}"
+              ${i === 0 ? "checked" : ""}
+            >
+
+            <span>
+              ${x[0]}
+            </span>
+
+            <strong>
+              + ${money(x[1])}
+            </strong>
+
+          </label>
+
+        `
+      ).join("");
+
+  }
+
+
+  /* =========================
+     MASSAS
+  ========================= */
+
+  function renderMasses() {
+
+    const data = [
+
+      "Amanteigado",
+      "Baunilha",
+      "Ninho",
+      "Coco",
+      "Chocolate",
+      "Limão"
+
+    ];
+
+
+    $("cakeMassOptions").innerHTML =
+      data.map(
+        (x, i) => `
+
+          <label class="extra-option">
+
+            <input
+              type="radio"
+              name="massa"
+              value="${x}"
+              ${i === 0 ? "checked" : ""}
+            >
+
+            <span>
+              ${x}
+            </span>
+
+          </label>
+
+        `
+      ).join("");
+
+  }
+
+
+  /* =========================
+     RECHEIOS
+  ========================= */
+
+  function renderFillings() {
+
+    const data = [
+
+      "Ninho",
+      "Beijinho",
+      "Brigadeiro",
+      "Doce de leite",
+      "Leite condensado",
+      "Limão",
+      "Oreo"
+
+    ];
+
+
+    $("cakeFillings").innerHTML =
+      data.map(
+        (x, i) => `
+
+          <label class="extra-option">
+
+            <input
+              type="radio"
+              name="recheio"
+              value="${x}"
+              ${i === 0 ? "checked" : ""}
+            >
+
+            <span>
+              ${x}
+            </span>
+
+          </label>
+
+        `
+      ).join("");
+
+  }
+
+
+  /* =========================
+     ADICIONAIS
+  ========================= */
+
+  function renderExtras() {
+
+    const data = [
+
+      ["Abacaxi",10],
+      ["Crocante de Castanha",10],
+      ["Geleia de Morango",16],
+      ["Nutella",16],
+      ["Morango",16],
+      ["Kit Kat",12],
+      ["Ouro Branco",10],
+      ["Kinder Bueno",16]
+
+    ];
+
+
+    $("cakeExtras").innerHTML =
+      data.map(
+        x => `
+
+          <label class="extra-option">
+
+            <input
+              type="checkbox"
+              name="adicional"
+              value="${x[0]}"
+              data-price="${x[1]}"
+            >
+
+            <span>
+              ${x[0]}
+            </span>
+
+            <strong>
+              + ${money(x[1])}
+            </strong>
+
+          </label>
+
+        `
+      ).join("");
+
+  }
+
+
+  /* =========================
+     KITS
+  ========================= */
+
+  function renderKits() {
+
+    kitOptions.innerHTML =
+
+      Object.entries(kits)
+        .map(
+          ([id, kit]) => `
+
+            <label class="extra-option kit-option">
+
+              <input
+                type="radio"
+                name="kit"
+                value="${id}"
+              >
+
+              <span>
+
+                <b>
+                  ${kit.name}
+                </b>
+
+                <small>
+                  ${kit.cake}
+                </small>
+
+                <small>
+                  ${kit.items.join(" · ")}
+                </small>
+
+              </span>
+
+              <strong>
+                ${money(kit.price)}
+              </strong>
+
+            </label>
+
+          `
+        ).join("")
+
+      +
+
+      `
+        <button
+          type="button"
+          id="clearKit"
+          class="btn ghost kit-remove"
+          hidden
+        >
+          Não quero mais este kit
+        </button>
+      `;
+
+
+    kitOptions
+      .querySelectorAll("input[name='kit']")
+      .forEach(
+        input =>
+          input.addEventListener(
+            "change",
+            () => applyKit(input.value)
+          )
+      );
+
+
+    $("clearKit")
+      .addEventListener(
+        "click",
+        clearKit
+      );
+
+  }
+
+
+  /* =========================
+     APLICAR KIT
+  ========================= */
+
+  function applyKit(id) {
+
+    const kit = kits[id];
+
+    if (!kit) return;
+
+
+    selectedKit = id;
+
+    selectedCakePrice = kit.price;
+
+    kitCakeValue.value = id;
+
+    kitCakeFixed.hidden = false;
+
+    kitCakeFixedName.textContent =
+      kit.cake;
+
+
+    $("cakeSizeSection").hidden = true;
+    $("topoSection").hidden = true;
+    $("massaSection").hidden = true;
+    $("recheioSection").hidden = true;
+    $("adicionalSection").hidden = true;
+    $("personalizacaoSection").hidden = true;
+
+
+    $("clearKit").hidden = false;
+
+
+    kitIncluded.hidden = false;
+
+
+    kitIncluded.innerHTML = `
+
+      <div class="kit-included-grid">
+
+        ${
+          kit.items.map(
+            item => `
+
+              <div class="kit-included-option">
+
+                <span>
+                  Incluso
+                </span>
+
+                <small>
+                  ${item}
+                </small>
+
+              </div>
+
+            `
+          ).join("")
+        }
+
+      </div>
+
+      <p class="kit-choice-help">
+        O kit não inclui escolha de sabores dos docinhos nesta etapa.
+      </p>
+
+    `;
+
+
+    updateTotal();
+
+  }
+
+
+  /* =========================
+     REMOVER KIT
+  ========================= */
+
+  function clearKit() {
+
+    selectedKit = null;
+
+    selectedCakePrice = 0;
+
+    kitCakeValue.value = "";
+
+    kitCakeFixed.hidden = true;
+
+    kitIncluded.hidden = true;
+
+    kitIncluded.innerHTML = "";
+
+
+    $("cakeSizeSection").hidden = false;
+    $("topoSection").hidden = false;
+    $("massaSection").hidden = false;
+    $("recheioSection").hidden = false;
+    $("adicionalSection").hidden = false;
+    $("personalizacaoSection").hidden = false;
+
+
+    const checked =
+      document.querySelector(
+        "input[name='kit']:checked"
+      );
+
+
+    if (checked) {
+      checked.checked = false;
     }
 
-    const classicQty=Number(document.querySelector("input[name='brigadeiroClassicoQtd']:checked")?.value||0);
-    const premiumQty=Number(document.querySelector("input[name='brigadeiroPremiumQtd']:checked")?.value||0);
-    if(classicQty){
-      const flavors=[...document.querySelectorAll("input[name='classicFlavor']:checked")].map(x=>x.value);
-      lines.push(`Brigadeiro Clássico: ${classicQty} unidades — sabores: ${flavors.join(", ")||"a definir"}`);
+
+    $("clearKit").hidden = true;
+
+
+    updateTotal();
+
+  }
+
+
+  /* =========================
+     BRIGADEIROS
+  ========================= */
+
+  function renderBrigadeiros() {
+
+    $("brigadeiros").innerHTML = `
+
+      <div class="brigadeiro-box brigadeiro-line">
+
+        <h3>
+          Linha Clássica
+        </h3>
+
+        <p>
+          6 sabores disponíveis. Escolha a quantidade e depois até o limite de sabores.
+        </p>
+
+
+        <div class="brigadeiro-quantities">
+
+          <label class="extra-option">
+
+            <input
+              type="radio"
+              name="brigadeiroClassicoQtd"
+              value="0"
+              data-price="0"
+              checked
+            >
+
+            <span>
+              Não adicionar
+            </span>
+
+          </label>
+
+
+          <label class="extra-option">
+
+            <input
+              type="radio"
+              name="brigadeiroClassicoQtd"
+              value="50"
+              data-price="62.5"
+            >
+
+            <span>
+              50 unidades
+            </span>
+
+            <strong>
+              R$ 62,50
+            </strong>
+
+          </label>
+
+
+          <label class="extra-option">
+
+            <input
+              type="radio"
+              name="brigadeiroClassicoQtd"
+              value="100"
+              data-price="125"
+            >
+
+            <span>
+              100 unidades
+            </span>
+
+            <strong>
+              R$ 125,00
+            </strong>
+
+          </label>
+
+        </div>
+
+
+        <div
+          class="flavor-choice"
+          data-line="classic"
+          hidden
+        >
+
+          <strong>
+            Sabores — até 2 sabores para 50 unidades ou até 4 para 100
+          </strong>
+
+          <div class="flavor-grid">
+
+            ${
+              classicFlavors.map(
+                x => `
+
+                  <label>
+
+                    <input
+                      type="checkbox"
+                      name="classicFlavor"
+                      value="${x}"
+                    >
+
+                    <span>
+                      ${x}
+                    </span>
+
+                  </label>
+
+                `
+              ).join("")
+            }
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="brigadeiro-box brigadeiro-line">
+
+        <h3>
+          Linha Premium
+        </h3>
+
+        <p>
+          10 sabores disponíveis. Escolha a quantidade e depois até o limite de sabores.
+        </p>
+
+
+        <div class="brigadeiro-quantities">
+
+          <label class="extra-option">
+
+            <input
+              type="radio"
+              name="brigadeiroPremiumQtd"
+              value="0"
+              data-price="0"
+              checked
+            >
+
+            <span>
+              Não adicionar
+            </span>
+
+          </label>
+
+
+          <label class="extra-option">
+
+            <input
+              type="radio"
+              name="brigadeiroPremiumQtd"
+              value="50"
+              data-price="72.5"
+            >
+
+            <span>
+              50 unidades
+            </span>
+
+            <strong>
+              R$ 72,50
+            </strong>
+
+          </label>
+
+
+          <label class="extra-option">
+
+            <input
+              type="radio"
+              name="brigadeiroPremiumQtd"
+              value="100"
+              data-price="145"
+            >
+
+            <span>
+              100 unidades
+            </span>
+
+            <strong>
+              R$ 145,00
+            </strong>
+
+          </label>
+
+        </div>
+
+
+        <div
+          class="flavor-choice"
+          data-line="premium"
+          hidden
+        >
+
+          <strong>
+            Sabores — até 2 sabores para 50 unidades ou até 4 para 100
+          </strong>
+
+          <div class="flavor-grid">
+
+            ${
+              premiumFlavors.map(
+                x => `
+
+                  <label>
+
+                    <input
+                      type="checkbox"
+                      name="premiumFlavor"
+                      value="${x}"
+                    >
+
+                    <span>
+                      ${x}
+                    </span>
+
+                  </label>
+
+                `
+              ).join("")
+            }
+
+          </div>
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    document
+      .querySelectorAll(
+        "input[name='brigadeiroClassicoQtd'],input[name='brigadeiroPremiumQtd']"
+      )
+      .forEach(
+        input =>
+          input.addEventListener(
+            "change",
+            updateBrigadeiroUI
+          )
+      );
+
+
+    document
+      .querySelectorAll(
+        "input[name='classicFlavor'],input[name='premiumFlavor']"
+      )
+      .forEach(
+        input =>
+          input.addEventListener(
+            "change",
+            limitFlavors
+          )
+      );
+
+  }
+
+
+  /* =========================
+     INTERFACE DOS BRIGADEIROS
+  ========================= */
+
+  function updateBrigadeiroUI() {
+
+    ["classic","premium"]
+      .forEach(
+        line => {
+
+          const name =
+            line === "classic"
+              ? "brigadeiroClassicoQtd"
+              : "brigadeiroPremiumQtd";
+
+
+          const qty =
+            Number(
+              document.querySelector(
+                `input[name='${name}']:checked`
+              )?.value || 0
+            );
+
+
+          const box =
+            document.querySelector(
+              `.flavor-choice[data-line='${line}']`
+            );
+
+
+          if (!box) return;
+
+
+          box.hidden =
+            qty === 0;
+
+
+          if (qty === 0) {
+
+            box
+              .querySelectorAll(
+                "input[type='checkbox']"
+              )
+              .forEach(
+                input =>
+                  input.checked = false
+              );
+
+          }
+
+
+          box.dataset.max =
+            qty === 50
+              ? 2
+              : 4;
+
+        }
+      );
+
+
+    updateTotal();
+
+  }
+
+
+  /* =========================
+     LIMITE DE SABORES
+  ========================= */
+
+  function limitFlavors(event) {
+
+    const input =
+      event.target;
+
+
+    const line =
+      input.name.startsWith("classic")
+        ? "classic"
+        : "premium";
+
+
+    const box =
+      document.querySelector(
+        `.flavor-choice[data-line='${line}']`
+      );
+
+
+    const max =
+      Number(
+        box?.dataset.max || 2
+      );
+
+
+    const checked =
+      [
+        ...box.querySelectorAll(
+          "input[type='checkbox']:checked"
+        )
+      ];
+
+
+    if (checked.length > max) {
+
+      input.checked = false;
+
+      alert(
+        `Para esta quantidade, escolha no máximo ${max} sabores.`
+      );
+
     }
-    if(premiumQty){
-      const flavors=[...document.querySelectorAll("input[name='premiumFlavor']:checked")].map(x=>x.value);
-      lines.push(`Brigadeiro Premium: ${premiumQty} unidades — sabores: ${flavors.join(", ")||"a definir"}`);
+
+  }
+
+
+  /* =========================
+     OUTROS ITENS
+  ========================= */
+
+  function renderOtherItems() {
+
+    const items = [
+      "Cupcakes",
+      "Petit Brownie"
+    ];
+
+
+    $("otherItems").innerHTML =
+      items.map(
+        name => `
+
+          <div class="brigadeiro-box other-item-box">
+
+            <h3>
+              ${name}
+            </h3>
+
+            <label class="text-field">
+
+              <span>
+                Quantidade
+              </span>
+
+              <input
+                class="other-quantity"
+                type="number"
+                min="0"
+                step="1"
+                value="0"
+                data-item="${name}"
+                placeholder="0"
+              >
+
+            </label>
+
+            <p class="other-price">
+              Preço: definido pela confeitaria/admin.
+            </p>
+
+          </div>
+
+        `
+      ).join("");
+
+  }
+
+
+  /* =========================
+     TOTAL
+  ========================= */
+
+  function updateTotal() {
+
+    let total =
+      selectedCakePrice;
+
+
+    if (!selectedKit) {
+
+      document
+        .querySelectorAll(
+          "#cakeForm input[type='radio']:checked:not([name='brigadeiroClassicoQtd']):not([name='brigadeiroPremiumQtd']), #cakeForm input[type='checkbox']:checked"
+        )
+        .forEach(
+          input =>
+            total += Number(
+              input.dataset.price || 0
+            )
+        );
+
+
+      const classic =
+        Number(
+          document.querySelector(
+            "input[name='brigadeiroClassicoQtd']:checked"
+          )?.dataset.price || 0
+        );
+
+
+      const premium =
+        Number(
+          document.querySelector(
+            "input[name='brigadeiroPremiumQtd']:checked"
+          )?.dataset.price || 0
+        );
+
+
+      total += classic + premium;
+
     }
 
-    const others=[...document.querySelectorAll(".other-quantity")].filter(x=>Number(x.value)>0);
-    if(others.length) lines.push(`Outros itens: ${others.map(x=>`${x.dataset.item}: ${x.value} unidades`).join(", ")}`);
 
-    const personalization=$("personalizationText").value.trim();
-    if(personalization) lines.push(`Personalização: ${personalization}`);
-    const notes=$("customerNotes").value.trim();
-    if(notes) lines.push(`Observações: ${notes}`);
-    lines.push(`Total estimado: ${totalEl.textContent}`);
+    totalEl.textContent =
+      money(total);
 
-    const url=`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(lines.join("\n"))}`;
-    window.open(url,"_blank","noopener");
-  });
+  }
 
-  // Data mínima para evitar datas passadas.
-  const today=new Date();
-  today.setMinutes(today.getMinutes()-today.getTimezoneOffset());
-  $("customerDate").min=today.toISOString().slice(0,10);
+
+  /* =========================
+     RADIO
+  ========================= */
+
+  function getChecked(name) {
+
+    return document.querySelector(
+      `input[name='${name}']:checked`
+    );
+
+  }
+
+
+  /* =========================
+     ATUALIZAÇÃO
+  ========================= */
+
+  form.addEventListener(
+    "change",
+    event => {
+
+      if (
+        event.target.matches(
+          "input,select,textarea"
+        )
+      ) {
+
+        updateTotal();
+
+      }
+
+    }
+  );
+
+
+  /* =========================
+     ENVIO WHATSAPP
+  ========================= */
+
+  form.addEventListener(
+    "submit",
+    event => {
+
+      event.preventDefault();
+
+
+      const name =
+        $("customerName")
+          .value
+          .trim();
+
+
+      const phone =
+        $("customerPhone")
+          .value
+          .trim();
+
+
+      const date =
+        $("customerDate")
+          .value;
+
+
+      if (
+        !name ||
+        !phone ||
+        !date
+      ) {
+
+        alert(
+          "Preencha seu nome, WhatsApp e a data desejada."
+        );
+
+        return;
+
+      }
+
+
+      const lines = [
+
+        "Olá! Gostaria de fazer uma encomenda na Martins Confeitaria.",
+
+        "",
+
+        `Nome: ${name}`,
+
+        `WhatsApp: ${phone}`,
+
+        `Data desejada: ${date}`,
+
+        ""
+
+      ];
+
+
+      /* KIT */
+
+      if (selectedKit) {
+
+        const kit =
+          kits[selectedKit];
+
+
+        lines.push(
+          `Kit: ${kit.name}`,
+          `Bolo: ${kit.cake}`,
+          `Inclusos: ${kit.items.join(", ")}`
+        );
+
+      }
+
+
+      /* BOLO NORMAL */
+
+      else {
+
+        const cake =
+          getChecked("cakeType");
+
+        const topo =
+          getChecked("topo");
+
+        const massa =
+          getChecked("massa");
+
+        const recheio =
+          getChecked("recheio");
+
+
+        if (cake) {
+
+          lines.push(
+            `Bolo: ${cake.value} — ${money(cake.dataset.price)}`
+          );
+
+        }
+
+
+        if (topo) {
+
+          lines.push(
+            `Topo: ${topo.value} — ${money(topo.dataset.price)}`
+          );
+
+        }
+
+
+        if (massa) {
+
+          lines.push(
+            `Massa: ${massa.value}`
+          );
+
+        }
+
+
+        if (recheio) {
+
+          lines.push(
+            `Recheio: ${recheio.value}`
+          );
+
+        }
+
+
+        const extras =
+          [
+            ...document.querySelectorAll(
+              "input[name='adicional']:checked"
+            )
+          ];
+
+
+        if (extras.length) {
+
+          lines.push(
+            `Adicionais: ${extras.map(
+              x =>
+                `${x.value} (+${money(x.dataset.price)})`
+            ).join(", ")}`
+          );
+
+        }
+
+      }
+
+
+      /* BRIGADEIRO CLÁSSICO */
+
+      const classicQty =
+        Number(
+          document.querySelector(
+            "input[name='brigadeiroClassicoQtd']:checked"
+          )?.value || 0
+        );
+
+
+      const premiumQty =
+        Number(
+          document.querySelector(
+            "input[name='brigadeiroPremiumQtd']:checked"
+          )?.value || 0
+        );
+
+
+      if (classicQty) {
+
+        const flavors =
+          [
+            ...document.querySelectorAll(
+              "input[name='classicFlavor']:checked"
+            )
+          ].map(
+            x => x.value
+          );
+
+
+        lines.push(
+          `Brigadeiro Clássico: ${classicQty} unidades — sabores: ${flavors.join(", ") || "a definir"}`
+        );
+
+      }
+
+
+      /* BRIGADEIRO PREMIUM */
+
+      if (premiumQty) {
+
+        const flavors =
+          [
+            ...document.querySelectorAll(
+              "input[name='premiumFlavor']:checked"
+            )
+          ].map(
+            x => x.value
+          );
+
+
+        lines.push(
+          `Brigadeiro Premium: ${premiumQty} unidades — sabores: ${flavors.join(", ") || "a definir"}`
+        );
+
+      }
+
+
+      /* OUTROS */
+
+      const others =
+        [
+          ...document.querySelectorAll(
+            ".other-quantity"
+          )
+        ]
+        .filter(
+          x => Number(x.value) > 0
+        );
+
+
+      if (others.length) {
+
+        lines.push(
+          `Outros itens: ${others.map(
+            x =>
+              `${x.dataset.item}: ${x.value} unidades`
+          ).join(", ")}`
+        );
+
+      }
+
+
+      /* PERSONALIZAÇÃO */
+
+      const personalization =
+        $("personalizationText")
+          .value
+          .trim();
+
+
+      if (personalization) {
+
+        lines.push(
+          `Personalização: ${personalization}`
+        );
+
+      }
+
+
+      /* OBSERVAÇÕES */
+
+      const notes =
+        $("customerNotes")
+          .value
+          .trim();
+
+
+      if (notes) {
+
+        lines.push(
+          `Observações: ${notes}`
+        );
+
+      }
+
+
+      lines.push(
+        `Total estimado: ${totalEl.textContent}`
+      );
+
+
+      const url =
+        `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
+          lines.join("\n")
+        )}`;
+
+
+      window.open(
+        url,
+        "_blank",
+        "noopener"
+      );
+
+    }
+  );
+
+
+  /* =========================
+     DATA MÍNIMA
+  ========================= */
+
+  const today =
+    new Date();
+
+
+  today.setMinutes(
+    today.getMinutes() -
+    today.getTimezoneOffset()
+  );
+
+
+  $("customerDate").min =
+    today
+      .toISOString()
+      .slice(0,10);
+
+
+  /* =========================
+     INICIALIZAÇÃO
+  ========================= */
 
   renderCakes();
+
   renderTopos();
+
   renderMasses();
+
   renderFillings();
+
   renderExtras();
+
   renderKits();
+
   renderBrigadeiros();
+
   renderOtherItems();
+
   updateTotal();
+
 })();
+
 </script>
+
 </body>
 </html>
