@@ -3114,3 +3114,103 @@
 </body>
 
 </html>
+/* =========================================================
+   DOCINHOS / BRIGADEIROS
+========================================================= */
+
+.brigadeiro-group {
+  margin-top: 10px;
+}
+
+.brigadeiro-group h3 {
+  margin-bottom: 15px;
+  font-size: 1.15rem;
+  color: #2b7896;
+}
+
+/* Cards de quantidade */
+.brigadeiro-group .options-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+/* Card individual */
+.brigadeiro-group .option-label {
+  min-height: 70px;
+  padding: 15px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* Nome */
+.brigadeiro-group .option-title {
+  font-size: .95rem;
+  line-height: 1.25;
+}
+
+/* Preço */
+.brigadeiro-group .option-price {
+  margin-top: 4px;
+  font-size: .9rem;
+}
+
+/* Sabores */
+.flavor-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.flavor-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 13px;
+  border: 1px solid rgba(103,176,203,.25);
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  transition: .2s ease;
+  box-sizing: border-box;
+}
+
+.flavor-item:hover {
+  border-color: #67b0cb;
+  transform: translateY(-1px);
+  background: rgba(103,176,203,.06);
+}
+
+.flavor-item input {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: #67b0cb;
+  flex-shrink: 0;
+}
+
+.flavor-item span {
+  font-size: .9rem;
+  line-height: 1.3;
+}
+
+/* Destaque quando o sabor estiver selecionado */
+.flavor-item:has(input:checked) {
+  border-color: #67b0cb;
+  background: rgba(103,176,203,.10);
+}
+
+/* Celular */
+@media (max-width: 760px) {
+
+  .brigadeiro-group .options-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .flavor-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
