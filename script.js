@@ -3,8 +3,9 @@
 
   /* =========================================================
      MARTINS CONFEITARIA
-     SCRIPT COMPATÍVEL COM O index.html ATUAL
-     ========================================================= */
+     SCRIPT PRINCIPAL
+     Compatível com o index.html + style.css atuais
+  ========================================================= */
 
   const DEFAULTS = window.MARTINS_DEFAULTS || {};
   const CONFIG = window.MARTINS_CONFIG || {};
@@ -13,15 +14,14 @@
   let currentCategory = "";
   let cart = [];
 
+  const CART_STORAGE_KEY = "martins_confeitaria_cart";
+
   /* =========================================================
      HELPERS
-     ========================================================= */
+  ========================================================= */
 
   const $ = (selector) =>
     document.querySelector(selector);
-
-  const $$ = (selector) =>
-    document.querySelectorAll(selector);
 
   const money = (value) => {
     const number = Number(value || 0);
@@ -45,9 +45,29 @@
     );
   };
 
+  const getProductImage = (product) => {
+    return (
+      product?.image ||
+      product?.image_url ||
+      product?.photo ||
+      product?.photo_url ||
+      product?.imagem ||
+      product?.foto ||
+      ""
+    );
+  };
+
+  const normalizeArea = (area) => {
+    return String(area || "")
+      .trim()
+      .toLowerCase()
+      .replace(/_/g, "-")
+      .replace(/\s+/g, "-");
+  };
+
   /* =========================================================
      SUPABASE
-     ========================================================= */
+  ========================================================= */
 
   function getSupabase() {
     if (
@@ -74,19 +94,83 @@
   }
 
   /* =========================================================
+     LOCAL STORAGE
+  ========================================================= */
+
+  function loadCart() {
+    try {
+      const saved =
+        localStorage.getItem(
+          CART_STORAGE_KEY
+        );
+
+      if (!saved) {
+        cart = [];
+        return;
+      }
+
+      const parsed =
+        JSON.parse(saved);
+
+      if (Array.isArray(parsed)) {
+        cart = parsed
+          .filter(
+            (item) =>
+              item &&
+              item.id &&
+              Number(item.quantity) > 0
+          )
+          .map((item) => ({
+            id: item.id,
+            name: String(
+              item.name || "Produto"
+            ),
+            price: Number(
+              item.price || 0
+            ),
+            quantity: Number(
+              item.quantity || 1
+            )
+          }));
+      }
+    } catch (error) {
+      console.warn(
+        "Não foi possível carregar o carrinho:",
+        error
+      );
+
+      cart = [];
+    }
+  }
+
+  function saveCart() {
+    try {
+      localStorage.setItem(
+        CART_STORAGE_KEY,
+        JSON.stringify(cart)
+      );
+    } catch (error) {
+      console.warn(
+        "Não foi possível salvar o carrinho:",
+        error
+      );
+    }
+  }
+
+  /* =========================================================
      CARREGAR DADOS
-     ========================================================= */
+  ========================================================= */
 
   async function loadData() {
     /*
-      Primeiro mostra os dados locais.
-      Assim o site não fica vazio enquanto
-      o Supabase carrega.
+      Renderiza primeiro os dados locais.
+      Assim o site nunca começa vazio.
     */
 
     render();
 
-    const client = getSupabase();
+    const client =
+      getSupabase();
 
     if (!client) {
       return;
@@ -111,28 +195,43 @@
           })
       ]);
 
-      /* -----------------------------
-         CONFIGURAÇÕES
-      ----------------------------- */
+      /* =====================================================
+         SETTINGS
+      ===================================================== */
 
       if (
         settingsResult &&
         settingsResult.data &&
         settingsResult.data.value
       ) {
+        const remote =
+          settingsResult.data.value;
+
         state = {
           ...state,
-          ...settingsResult.data.value
+          ...remote,
+
+          about: {
+            ...(state.about || {}),
+            ...(remote.about || {})
+          },
+
+          cake: {
+            ...(state.cake || {}),
+            ...(remote.cake || {})
+          }
         };
       }
 
-      /* -----------------------------
+      /* =====================================================
          PRODUTOS
-      ----------------------------- */
+      ===================================================== */
 
       if (
         productsResult &&
-        Array.isArray(productsResult.data) &&
+        Array.isArray(
+          productsResult.data
+        ) &&
         productsResult.data.length
       ) {
         state.products =
@@ -155,7 +254,7 @@
 
   /* =========================================================
      RENDER GERAL
-     ========================================================= */
+  ========================================================= */
 
   function render() {
     renderAbout();
@@ -165,81 +264,92 @@
     renderReadyProducts();
     renderYear();
     renderCart();
+    setupReveal();
   }
 
   /* =========================================================
      HISTÓRIA
-     ========================================================= */
+  ========================================================= */
 
   function renderAbout() {
-    const about = state.about || {};
+    const about =
+      state.about || {};
 
-    const title = $("#aboutTitle");
-    const quote = $("#aboutQuote");
-    const text = $("#aboutText");
+    const title =
+      $("#aboutTitle");
 
-    if (title && about.title) {
-      title.textContent = about.title;
-    }
+    const quote =
+      $("#aboutQuote");
 
-    if (quote && about.quote) {
-      quote.textContent = about.quote;
-    }
-
-    /*
-      O texto completo vem do defaults.js /
-      Supabase.
-
-      A história é convertida em parágrafos
-      automaticamente.
-    */
+    const text =
+      $("#aboutText");
 
     if (
-      text &&
-      about.text
+      title &&
+      about.title
     ) {
-      const paragraphs =
-        String(about.text)
-          .split(/\n\s*\n/)
-          .map((paragraph) =>
-            paragraph.trim()
-          )
-          .filter(Boolean);
-
-      const signature = `
-        <div class="about-signature">
-          <span>
-            🩵 Feito com carinho, sabor e muitos sonhos
-          </span>
-
-          <strong>
-            👨‍🍳 Chef Denilson Martins ✨
-          </strong>
-
-          <small>
-            O coração por trás de cada doce da
-            Martins Confeitaria.
-          </small>
-        </div>
-      `;
-
-      text.innerHTML =
-        paragraphs
-          .map(
-            (paragraph) => `
-              <p>
-                ${escapeHTML(paragraph)}
-              </p>
-            `
-          )
-          .join("") +
-        signature;
+      title.textContent =
+        about.title;
     }
+
+    if (
+      quote &&
+      about.quote
+    ) {
+      quote.textContent =
+        about.quote;
+    }
+
+    if (
+      !text ||
+      !about.text
+    ) {
+      return;
+    }
+
+    const paragraphs =
+      String(about.text)
+        .split(/\n\s*\n/)
+        .map((paragraph) =>
+          paragraph.trim()
+        )
+        .filter(Boolean);
+
+    const signature = `
+      <div class="about-signature">
+        <span>
+          🩵 Feito com carinho, sabor e muitos sonhos
+        </span>
+
+        <strong>
+          👨‍🍳 Chef Denilson Martins ✨
+        </strong>
+
+        <small>
+          O coração por trás de cada doce da
+          Martins Confeitaria.
+        </small>
+      </div>
+    `;
+
+    text.innerHTML =
+      paragraphs
+        .map(
+          (paragraph) => `
+            <p>
+              ${escapeHTML(
+                paragraph
+              )}
+            </p>
+          `
+        )
+        .join("") +
+      signature;
   }
 
   /* =========================================================
      ANO
-     ========================================================= */
+  ========================================================= */
 
   function renderYear() {
     const year =
@@ -247,24 +357,22 @@
 
     if (year) {
       year.textContent =
-        new Date().getFullYear();
+        new Date()
+          .getFullYear();
     }
   }
 
   /* =========================================================
      CATEGORIAS
-     ========================================================= */
+  ========================================================= */
 
   function getCategories() {
     const products =
-      Array.isArray(state.products)
+      Array.isArray(
+        state.products
+      )
         ? state.products
         : [];
-
-    /*
-      Primeiro tenta categorias configuradas
-      especificamente para o cardápio.
-    */
 
     if (
       state.categoriesByArea &&
@@ -278,12 +386,10 @@
       ];
     }
 
-    /*
-      Depois usa as categorias do defaults.js.
-    */
-
     if (
-      Array.isArray(state.categories) &&
+      Array.isArray(
+        state.categories
+      ) &&
       state.categories.length
     ) {
       return [
@@ -291,18 +397,18 @@
       ];
     }
 
-    /*
-      Fallback:
-      cria categorias a partir dos produtos.
-    */
-
     return [
       ...new Set(
         products
           .filter((product) => {
+            const area =
+              normalizeArea(
+                product.area
+              );
+
             return (
-              !product.area ||
-              product.area === "cardapio"
+              !area ||
+              area === "cardapio"
             );
           })
           .map(
@@ -316,19 +422,26 @@
 
   /* =========================================================
      PRODUTOS DO CARDÁPIO
-     ========================================================= */
+  ========================================================= */
 
   function getMenuProducts() {
     const products =
-      Array.isArray(state.products)
+      Array.isArray(
+        state.products
+      )
         ? state.products
         : [];
 
     return products
       .filter((product) => {
+        const area =
+          normalizeArea(
+            product.area
+          );
+
         const isMenuProduct =
-          !product.area ||
-          product.area === "cardapio";
+          !area ||
+          area === "cardapio";
 
         const sameCategory =
           !currentCategory ||
@@ -350,15 +463,9 @@
 
   /* =========================================================
      CARDÁPIO
-     ========================================================= */
+  ========================================================= */
 
   function renderMenu() {
-    /*
-      IDs reais do index.html atual:
-      #categories
-      #products
-    */
-
     const categories =
       $("#categories");
 
@@ -378,10 +485,6 @@
     const categoryList =
       getCategories();
 
-    /*
-      Mantém a categoria selecionada.
-    */
-
     if (
       !currentCategory ||
       !categoryList.includes(
@@ -392,40 +495,44 @@
         categoryList[0] || "";
     }
 
-    /* -----------------------------
+    /* =====================================================
        CATEGORIAS
-    ----------------------------- */
+    ===================================================== */
 
-    categories.innerHTML =
-      categoryList
-        .map((category) => {
-          const active =
-            category ===
-            currentCategory;
+    if (!categoryList.length) {
+      categories.innerHTML = "";
+    } else {
+      categories.innerHTML =
+        categoryList
+          .map((category) => {
+            const active =
+              category ===
+              currentCategory;
 
-          return `
-            <button
-              type="button"
-              class="menu-category ${
-                active
-                  ? "active"
-                  : ""
-              }"
-              data-category="${escapeHTML(
-                category
-              )}"
-              role="tab"
-              aria-selected="${
-                active
-              }"
-            >
-              ${escapeHTML(
-                category
-              )}
-            </button>
-          `;
-        })
-        .join("");
+            return `
+              <button
+                type="button"
+                class="tab ${
+                  active
+                    ? "active"
+                    : ""
+                }"
+                data-category="${escapeHTML(
+                  category
+                )}"
+                role="tab"
+                aria-selected="${
+                  active
+                }"
+              >
+                ${escapeHTML(
+                  category
+                )}
+              </button>
+            `;
+          })
+          .join("");
+    }
 
     categories
       .querySelectorAll(
@@ -444,14 +551,16 @@
         );
       });
 
-    /* -----------------------------
+    /* =====================================================
        PRODUTOS
-    ----------------------------- */
+    ===================================================== */
 
     const menuProducts =
       getMenuProducts();
 
-    if (!menuProducts.length) {
+    if (
+      !menuProducts.length
+    ) {
       products.innerHTML = "";
 
       if (emptyMenu) {
@@ -471,123 +580,152 @@
 
     products.innerHTML =
       menuProducts
-        .map((product) => {
-          const available =
-            product.available !== false;
-
-          const image =
-            product.image
-              ? `
-                <img
-                  src="${escapeHTML(
-                    product.image
-                  )}"
-                  alt="${escapeHTML(
-                    product.name ||
-                    "Produto"
-                  )}"
-                  loading="lazy"
-                >
-              `
-              : `
-                <div class="product-placeholder">
-                  <span>🧁</span>
-                </div>
-              `;
-
-          const description =
-            product.description ||
-            "";
-
-          return `
-            <article
-              class="product-card"
-              data-product-id="${escapeHTML(
-                product.id || ""
-              )}"
-            >
-
-              <div class="product-img">
-                ${image}
-              </div>
-
-              <div class="product-body">
-
-                ${
-                  product.category
-                    ? `
-                      <span class="product-tag">
-                        ${escapeHTML(
-                          product.category
-                        )}
-                      </span>
-                    `
-                    : ""
-                }
-
-                <h3>
-                  ${escapeHTML(
-                    product.name ||
-                    "Produto"
-                  )}
-                </h3>
-
-                ${
-                  description
-                    ? `
-                      <p>
-                        ${escapeHTML(
-                          description
-                        )}
-                      </p>
-                    `
-                    : ""
-                }
-
-                <div class="product-footer">
-
-                  <strong class="product-price">
-                    ${money(
-                      product.price
-                    )}
-                  </strong>
-
-                  ${
-                    available
-                      ? `
-                        <button
-                          type="button"
-                          class="btn primary product-order-btn"
-                          data-add-product="${
-                            escapeHTML(
-                              product.id || ""
-                            )
-                          }"
-                        >
-                          Adicionar
-                        </button>
-                      `
-                      : `
-                        <span class="product-unavailable">
-                          Indisponível
-                        </span>
-                      `
-                  }
-
-                </div>
-
-              </div>
-
-            </article>
-          `;
-        })
+        .map((product) =>
+          createProductCard(
+            product
+          )
+        )
         .join("");
 
-    /*
-      Botões de adicionar ao carrinho.
-    */
+    bindProductButtons(
+      products
+    );
+  }
 
-    products
+  /* =========================================================
+     CARD DE PRODUTO
+  ========================================================= */
+
+  function createProductCard(
+    product,
+    ready = false
+  ) {
+    const available =
+      product.available !== false;
+
+    const image =
+      getProductImage(
+        product
+      );
+
+    const imageHTML =
+      image
+        ? `
+          <img
+            src="${escapeHTML(
+              image
+            )}"
+            alt="${escapeHTML(
+              product.name ||
+                "Produto"
+            )}"
+            loading="lazy"
+          >
+        `
+        : `
+          <span>
+            🧁
+          </span>
+        `;
+
+    const description =
+      product.description ||
+      "";
+
+    const buttonClass =
+      ready
+        ? "add-ready"
+        : "add";
+
+    return `
+      <article
+        class="product"
+        data-product-id="${escapeHTML(
+          product.id || ""
+        )}"
+      >
+
+        <div class="product-img">
+          ${imageHTML}
+        </div>
+
+        <div class="product-body">
+
+          ${
+            product.category
+              ? `
+                <span class="tag">
+                  ${escapeHTML(
+                    product.category
+                  )}
+                </span>
+              `
+              : ""
+          }
+
+          <h3>
+            ${escapeHTML(
+              product.name ||
+                "Produto"
+            )}
+          </h3>
+
+          ${
+            description
+              ? `
+                <p>
+                  ${escapeHTML(
+                    description
+                  )}
+                </p>
+              `
+              : ""
+          }
+
+          <div class="product-row">
+
+            <strong>
+              ${money(
+                product.price
+              )}
+            </strong>
+
+            ${
+              available
+                ? `
+                  <button
+                    type="button"
+                    class="${buttonClass}"
+                    data-add-product="${escapeHTML(
+                      product.id || ""
+                    )}"
+                  >
+                    Adicionar
+                  </button>
+                `
+                : `
+                  <span class="unavailable">
+                    Indisponível
+                  </span>
+                `
+            }
+
+          </div>
+
+        </div>
+
+      </article>
+    `;
+  }
+
+  function bindProductButtons(
+    container
+  ) {
+    if (!container) {
+      return;
+    }
+
+    container
       .querySelectorAll(
         "[data-add-product]"
       )
@@ -595,10 +733,10 @@
         button.addEventListener(
           "click",
           () => {
-            const id =
-              button.dataset.addProduct;
-
-            addToCart(id);
+            addToCart(
+              button.dataset
+                .addProduct
+            );
           }
         );
       });
@@ -606,42 +744,61 @@
 
   /* =========================================================
      PRONTA ENTREGA
-     ========================================================= */
+  ========================================================= */
 
   function getReadyProducts() {
     const products =
-      Array.isArray(state.products)
+      Array.isArray(
+        state.products
+      )
         ? state.products
         : [];
 
-    /*
-      Se houver produtos marcados como
-      pronta entrega, usa esses.
-
-      Caso não exista nenhum produto com
-      area="pronta-entrega", mostra alguns
-      produtos disponíveis do cardápio.
-    */
+    const readyAreas = [
+      "pronta-entrega",
+      "pronta",
+      "pronta-entrega",
+      "ready",
+      "delivery"
+    ];
 
     const ready =
-      products.filter((product) => {
-        return (
-          product.area ===
-            "pronta-entrega" &&
-          product.available !== false
-        );
-      });
+      products.filter(
+        (product) => {
+          const area =
+            normalizeArea(
+              product.area
+            );
+
+          return (
+            readyAreas.includes(
+              area
+            ) &&
+            product.available !== false
+          );
+        }
+      );
 
     if (ready.length) {
       return ready;
     }
 
+    /*
+      Se o Supabase ainda não marcou
+      produtos como pronta entrega,
+      mostra até 3 produtos disponíveis.
+    */
+
     return products
       .filter((product) => {
+        const area =
+          normalizeArea(
+            product.area
+          );
+
         return (
-          (!product.area ||
-            product.area ===
-              "cardapio") &&
+          (!area ||
+            area === "cardapio") &&
           product.available !== false
         );
       })
@@ -661,11 +818,9 @@
 
     if (!products.length) {
       container.innerHTML = `
-        <div class="menu-empty">
-          <p>
-            Nenhum produto disponível
-            no momento.
-          </p>
+        <div class="empty">
+          Nenhum produto disponível
+          no momento.
         </div>
       `;
 
@@ -674,111 +829,28 @@
 
     container.innerHTML =
       products
-        .map((product) => {
-          const image =
-            product.image
-              ? `
-                <img
-                  src="${escapeHTML(
-                    product.image
-                  )}"
-                  alt="${escapeHTML(
-                    product.name ||
-                    "Produto"
-                  )}"
-                  loading="lazy"
-                >
-              `
-              : `
-                <div class="product-placeholder">
-                  <span>🧁</span>
-                </div>
-              `;
-
-          return `
-            <article
-              class="product-card"
-            >
-
-              <div class="product-img">
-                ${image}
-              </div>
-
-              <div class="product-body">
-
-                ${
-                  product.category
-                    ? `
-                      <span class="product-tag">
-                        ${escapeHTML(
-                          product.category
-                        )}
-                      </span>
-                    `
-                    : ""
-                }
-
-                <h3>
-                  ${escapeHTML(
-                    product.name ||
-                    "Produto"
-                  )}
-                </h3>
-
-                <div class="product-footer">
-
-                  <strong
-                    class="product-price"
-                  >
-                    ${money(
-                      product.price
-                    )}
-                  </strong>
-
-                  <button
-                    type="button"
-                    class="btn primary product-order-btn"
-                    data-ready-product="${
-                      escapeHTML(
-                        product.id || ""
-                      )
-                    }"
-                  >
-                    Adicionar
-                  </button>
-
-                </div>
-
-              </div>
-
-            </article>
-          `;
-        })
+        .map((product) =>
+          createProductCard(
+            product,
+            true
+          )
+        )
         .join("");
 
-    container
-      .querySelectorAll(
-        "[data-ready-product]"
-      )
-      .forEach((button) => {
-        button.addEventListener(
-          "click",
-          () => {
-            addToCart(
-              button.dataset.readyProduct
-            );
-          }
-        );
-      });
+    bindProductButtons(
+      container
+    );
   }
 
   /* =========================================================
-     CARRINHO
-     ========================================================= */
+     PRODUTOS / CARRINHO
+  ========================================================= */
 
   function findProduct(id) {
     const products =
-      Array.isArray(state.products)
+      Array.isArray(
+        state.products
+      )
         ? state.products
         : [];
 
@@ -794,10 +866,17 @@
       findProduct(id);
 
     if (!product) {
+      console.warn(
+        "Produto não encontrado:",
+        id
+      );
+
       return;
     }
 
-    if (product.available === false) {
+    if (
+      product.available === false
+    ) {
       return;
     }
 
@@ -813,7 +892,9 @@
     } else {
       cart.push({
         id: product.id,
-        name: product.name,
+        name:
+          product.name ||
+          "Produto",
         price: Number(
           product.price || 0
         ),
@@ -821,6 +902,7 @@
       });
     }
 
+    saveCart();
     renderCart();
     openCart();
   }
@@ -833,6 +915,7 @@
           String(id)
       );
 
+    saveCart();
     renderCart();
   }
 
@@ -858,11 +941,14 @@
       return;
     }
 
+    saveCart();
     renderCart();
   }
 
   function clearCart() {
     cart = [];
+
+    saveCart();
     renderCart();
   }
 
@@ -870,7 +956,9 @@
     return cart.reduce(
       (total, item) =>
         total +
-        Number(item.quantity || 0),
+        Number(
+          item.quantity || 0
+        ),
       0
     );
   }
@@ -879,11 +967,19 @@
     return cart.reduce(
       (total, item) =>
         total +
-        Number(item.price || 0) *
-          Number(item.quantity || 0),
+        Number(
+          item.price || 0
+        ) *
+          Number(
+            item.quantity || 0
+          ),
       0
     );
   }
+
+  /* =========================================================
+     RENDER CARRINHO
+  ========================================================= */
 
   function renderCart() {
     const count =
@@ -935,39 +1031,35 @@
           (item) => `
             <div
               class="cart-item"
-              data-cart-item="${
-                escapeHTML(
-                  item.id
-                )
-              }"
+              data-cart-item="${escapeHTML(
+                item.id
+              )}"
             >
 
-              <div class="cart-item-info">
+              <div>
 
-                <strong>
+                <b>
                   ${escapeHTML(
                     item.name
                   )}
-                </strong>
+                </b>
 
-                <span>
+                <small>
                   ${money(
                     item.price
                   )}
-                </span>
+                  cada
+                </small>
 
               </div>
 
-              <div class="cart-item-actions">
+              <div class="qty">
 
                 <button
                   type="button"
-                  class="cart-qty-btn"
-                  data-cart-minus="${
-                    escapeHTML(
-                      item.id
-                    )
-                  }"
+                  data-cart-minus="${escapeHTML(
+                    item.id
+                  )}"
                   aria-label="Diminuir quantidade"
                 >
                   −
@@ -979,28 +1071,12 @@
 
                 <button
                   type="button"
-                  class="cart-qty-btn"
-                  data-cart-plus="${
-                    escapeHTML(
-                      item.id
-                    )
-                  }"
+                  data-cart-plus="${escapeHTML(
+                    item.id
+                  )}"
                   aria-label="Aumentar quantidade"
                 >
                   +
-                </button>
-
-                <button
-                  type="button"
-                  class="cart-remove-btn"
-                  data-cart-remove="${
-                    escapeHTML(
-                      item.id
-                    )
-                  }"
-                  aria-label="Remover item"
-                >
-                  ×
                 </button>
 
               </div>
@@ -1019,7 +1095,8 @@
           "click",
           () => {
             changeQuantity(
-              button.dataset.cartMinus,
+              button.dataset
+                .cartMinus,
               -1
             );
           }
@@ -1035,23 +1112,9 @@
           "click",
           () => {
             changeQuantity(
-              button.dataset.cartPlus,
+              button.dataset
+                .cartPlus,
               1
-            );
-          }
-        );
-      });
-
-    items
-      .querySelectorAll(
-        "[data-cart-remove]"
-      )
-      .forEach((button) => {
-        button.addEventListener(
-          "click",
-          () => {
-            removeFromCart(
-              button.dataset.cartRemove
             );
           }
         );
@@ -1059,8 +1122,8 @@
   }
 
   /* =========================================================
-     ABRIR / FECHAR CARRINHO
-     ========================================================= */
+     ABRIR CARRINHO
+  ========================================================= */
 
   function openCart() {
     const drawer =
@@ -1071,7 +1134,7 @@
 
     if (drawer) {
       drawer.classList.add(
-        "open"
+        "show"
       );
 
       drawer.setAttribute(
@@ -1082,7 +1145,7 @@
 
     if (shade) {
       shade.classList.add(
-        "open"
+        "show"
       );
 
       shade.setAttribute(
@@ -1091,10 +1154,13 @@
       );
     }
 
-    document.body.classList.add(
-      "cart-open"
-    );
+    document.body.style.overflow =
+      "hidden";
   }
+
+  /* =========================================================
+     FECHAR CARRINHO
+  ========================================================= */
 
   function closeCart() {
     const drawer =
@@ -1105,7 +1171,7 @@
 
     if (drawer) {
       drawer.classList.remove(
-        "open"
+        "show"
       );
 
       drawer.setAttribute(
@@ -1116,7 +1182,7 @@
 
     if (shade) {
       shade.classList.remove(
-        "open"
+        "show"
       );
 
       shade.setAttribute(
@@ -1125,14 +1191,13 @@
       );
     }
 
-    document.body.classList.remove(
-      "cart-open"
-    );
+    document.body.style.overflow =
+      "";
   }
 
   /* =========================================================
      CHECKOUT
-     ========================================================= */
+  ========================================================= */
 
   function openCheckout() {
     if (!cart.length) {
@@ -1182,8 +1247,8 @@
   }
 
   /* =========================================================
-     FORMULÁRIO DE CHECKOUT
-     ========================================================= */
+     FORMULÁRIO
+  ========================================================= */
 
   function setupCheckoutForm() {
     const form =
@@ -1234,8 +1299,8 @@
   }
 
   /* =========================================================
-     ENVIAR PEDIDO PELO WHATSAPP
-     ========================================================= */
+     WHATSAPP
+  ========================================================= */
 
   function sendOrder(form) {
     if (!cart.length) {
@@ -1288,60 +1353,47 @@
       ).trim();
 
     let message =
-      "Olá! Gostaria de fazer um pedido na Martins Confeitaria.%0A%0A";
+      "Olá! Gostaria de fazer um pedido na Martins Confeitaria.\n\n";
 
     message +=
-      "*Pedido:*%0A";
+      "*PEDIDO*\n";
 
     cart.forEach((item) => {
       message +=
         `${item.quantity}x ${item.name} — ${money(
-          item.price *
-            item.quantity
-        )}%0A`;
+          Number(item.price) *
+            Number(item.quantity)
+        )}\n`;
     });
 
     message +=
-      `%0A*Total:* ${money(
+      `\n*TOTAL:* ${money(
         getCartTotal()
-      )}%0A`;
+      )}\n`;
 
     message +=
-      `%0A*Nome:* ${encodeURIComponent(
-        customer
-      )}`;
+      `\n*Nome:* ${customer}`;
 
     message +=
-      `%0A*WhatsApp:* ${encodeURIComponent(
-        phone
-      )}`;
+      `\n*WhatsApp:* ${phone}`;
 
     message +=
-      `%0A*Recebimento:* ${encodeURIComponent(
-        receiving
-      )}`;
+      `\n*Recebimento:* ${receiving}`;
 
     if (
-      receiving ===
-        "Entrega" &&
+      receiving === "Entrega" &&
       address
     ) {
       message +=
-        `%0A*Endereço:* ${encodeURIComponent(
-          address
-        )}`;
+        `\n*Endereço:* ${address}`;
     }
 
     message +=
-      `%0A*Pagamento:* ${encodeURIComponent(
-        payment
-      )}`;
+      `\n*Pagamento:* ${payment}`;
 
     if (notes) {
       message +=
-        `%0A*Observações:* ${encodeURIComponent(
-          notes
-        )}`;
+        `\n*Observações:* ${notes}`;
     }
 
     const whatsapp =
@@ -1363,7 +1415,9 @@
     }
 
     const url =
-      `https://wa.me/${whatsapp}?text=${message}`;
+      `https://wa.me/${whatsapp}?text=${encodeURIComponent(
+        message
+      )}`;
 
     window.open(
       url,
@@ -1372,6 +1426,7 @@
     );
 
     clearCart();
+
     form.reset();
 
     const addressWrap =
@@ -1388,7 +1443,7 @@
 
   /* =========================================================
      CONTATO
-     ========================================================= */
+  ========================================================= */
 
   function renderContact() {
     const address =
@@ -1406,12 +1461,9 @@
     const review =
       $("#review");
 
-    const mapFrame =
-      $("#mapFrame");
-
-    /* -----------------------------
+    /* =====================================================
        ENDEREÇO
-    ----------------------------- */
+    ===================================================== */
 
     if (
       address &&
@@ -1428,9 +1480,9 @@
           .join("<br>");
     }
 
-    /* -----------------------------
+    /* =====================================================
        WHATSAPP
-    ----------------------------- */
+    ===================================================== */
 
     const whatsapp =
       String(
@@ -1450,9 +1502,9 @@
         `https://wa.me/${whatsapp}`;
     }
 
-    /* -----------------------------
+    /* =====================================================
        INSTAGRAM
-    ----------------------------- */
+    ===================================================== */
 
     if (
       instagram &&
@@ -1462,9 +1514,9 @@
         state.instagram;
     }
 
-    /* -----------------------------
+    /* =====================================================
        MAPS
-    ----------------------------- */
+    ===================================================== */
 
     if (
       maps &&
@@ -1474,9 +1526,9 @@
         state.maps;
     }
 
-    /* -----------------------------
+    /* =====================================================
        AVALIAÇÃO
-    ----------------------------- */
+    ===================================================== */
 
     if (
       review &&
@@ -1485,26 +1537,11 @@
       review.href =
         state.review;
     }
-
-    /* -----------------------------
-       MAPA EMBUTIDO
-    ----------------------------- */
-
-    if (
-      mapFrame &&
-      state.maps
-    ) {
-      /*
-        Mantém o mapa atual do HTML.
-        Não substituímos por um link
-        externo para não quebrar o iframe.
-      */
-    }
   }
 
   /* =========================================================
      HORÁRIOS
-     ========================================================= */
+  ========================================================= */
 
   function renderHours() {
     const hoursContainer =
@@ -1513,9 +1550,7 @@
     const openState =
       $("#openState");
 
-    if (
-      !hoursContainer
-    ) {
+    if (!hoursContainer) {
       return;
     }
 
@@ -1575,17 +1610,21 @@
           }
 
           return `
-            <div class="hours-row">
+            <div class="hour">
+
               <span>
-                ${dayNames[index] ||
-                  ""}
+                ${escapeHTML(
+                  dayNames[index] ||
+                    ""
+                )}
               </span>
 
-              <strong>
+              <b>
                 ${escapeHTML(
                   value
                 )}
-              </strong>
+              </b>
+
             </div>
           `;
         })
@@ -1614,6 +1653,10 @@
     const current =
       hours[day];
 
+    element.classList.remove(
+      "is-open"
+    );
+
     if (
       !current ||
       current.s ===
@@ -1627,7 +1670,7 @@
 
     if (
       current.s ===
-        "tbd"
+      "tbd"
     ) {
       element.textContent =
         "🟡 Horário a confirmar";
@@ -1637,7 +1680,7 @@
 
     if (
       current.s !==
-        "open"
+      "open"
     ) {
       element.textContent =
         "🟡 Horário não informado";
@@ -1651,14 +1694,14 @@
 
     const [openHour, openMinute] =
       String(
-        current.o
+        current.o || "00:00"
       )
         .split(":")
         .map(Number);
 
     const [closeHour, closeMinute] =
       String(
-        current.c
+        current.c || "00:00"
       )
         .split(":")
         .map(Number);
@@ -1671,6 +1714,10 @@
       closeHour * 60 +
       closeMinute;
 
+    /*
+      Horário normal
+    */
+
     if (
       currentMinutes >=
         openMinutes &&
@@ -1679,6 +1726,10 @@
     ) {
       element.textContent =
         "🟢 Aberto agora";
+
+      element.classList.add(
+        "is-open"
+      );
     } else {
       element.textContent =
         "🔴 Fechado agora";
@@ -1686,13 +1737,80 @@
   }
 
   /* =========================================================
-     EVENTOS DO SITE
-     ========================================================= */
+     ANIMAÇÕES REVEAL
+  ========================================================= */
+
+  function setupReveal() {
+    const elements =
+      document.querySelectorAll(
+        ".reveal"
+      );
+
+    if (!elements.length) {
+      return;
+    }
+
+    if (
+      !("IntersectionObserver" in window)
+    ) {
+      elements.forEach(
+        (element) => {
+          element.classList.add(
+            "visible"
+          );
+        }
+      );
+
+      return;
+    }
+
+    const observer =
+      new IntersectionObserver(
+        (entries) => {
+          entries.forEach(
+            (entry) => {
+              if (
+                entry.isIntersecting
+              ) {
+                entry.target.classList.add(
+                  "visible"
+                );
+
+                observer.unobserve(
+                  entry.target
+                );
+              }
+            }
+          );
+        },
+        {
+          threshold:0.12
+        }
+      );
+
+    elements.forEach(
+      (element) => {
+        if (
+          !element.classList.contains(
+            "visible"
+          )
+        ) {
+          observer.observe(
+            element
+          );
+        }
+      }
+    );
+  }
+
+  /* =========================================================
+     EVENTOS
+  ========================================================= */
 
   function setupEvents() {
-    /* -----------------------------
+    /* =====================================================
        ABRIR CARRINHO
-    ----------------------------- */
+    ===================================================== */
 
     const openCartButton =
       $("#openCart");
@@ -1704,9 +1822,9 @@
       );
     }
 
-    /* -----------------------------
+    /* =====================================================
        FECHAR CARRINHO
-    ----------------------------- */
+    ===================================================== */
 
     const closeCartButton =
       $("#closeCart");
@@ -1718,9 +1836,9 @@
       );
     }
 
-    /* -----------------------------
-       CLICAR NO FUNDO
-    ----------------------------- */
+    /* =====================================================
+       FUNDO
+    ===================================================== */
 
     const shade =
       $("#shade");
@@ -1732,9 +1850,9 @@
       );
     }
 
-    /* -----------------------------
-       LIMPAR CARRINHO
-    ----------------------------- */
+    /* =====================================================
+       LIMPAR
+    ===================================================== */
 
     const clearCartButton =
       $("#clearCart");
@@ -1746,9 +1864,9 @@
       );
     }
 
-    /* -----------------------------
+    /* =====================================================
        FINALIZAR
-    ----------------------------- */
+    ===================================================== */
 
     const checkoutButton =
       $("#checkoutBtn");
@@ -1760,9 +1878,9 @@
       );
     }
 
-    /* -----------------------------
+    /* =====================================================
        ESC
-    ----------------------------- */
+    ===================================================== */
 
     document.addEventListener(
       "keydown",
@@ -1779,7 +1897,7 @@
 
   /* =========================================================
      PROTEÇÃO CONTRA ERROS
-     ========================================================= */
+  ========================================================= */
 
   window.addEventListener(
     "error",
@@ -1787,16 +1905,17 @@
       console.warn(
         "Erro no site:",
         event.error ||
-        event.message
+          event.message
       );
     }
   );
 
   /* =========================================================
      INICIALIZAÇÃO
-     ========================================================= */
+  ========================================================= */
 
   function init() {
+    loadCart();
     setupEvents();
     setupCheckoutForm();
     render();
