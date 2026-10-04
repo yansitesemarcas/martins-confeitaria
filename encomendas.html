@@ -1002,7 +1002,7 @@
 
       {
         id: "k1",
-        name: "Kit 1",
+        name: "Kit Festa 01",
         price: 150,
         cake: "Chantininho 10/15 Pessoas",
         items: "04 Cupcakes, 20 Petit Brownie, 20 Docinhos"
@@ -1010,7 +1010,7 @@
 
       {
         id: "k2",
-        name: "Kit 2",
+        name: "Kit Festa 02",
         price: 200,
         cake: "Chantininho 15/20 Pessoas",
         items: "05 Cupcakes, 30 Petit Brownie, 30 Docinhos"
@@ -1018,7 +1018,7 @@
 
       {
         id: "k3",
-        name: "Kit 3",
+        name: "Kit Festa 03",
         price: 250,
         cake: "Chantininho 20/25 Pessoas",
         items: "08 Cupcakes, 50 Petit Brownie, 50 Docinhos"
@@ -1026,7 +1026,7 @@
 
       {
         id: "k4",
-        name: "Kit 4",
+        name: "Kit Festa 04",
         price: 430,
         cake: "Chantininho 30/40 Pessoas",
         items: "10 Cupcakes, 60 Petit Brownie, 60 Docinhos"
@@ -1034,7 +1034,7 @@
 
       {
         id: "k5",
-        name: "Kit 5",
+        name: "Kit Festa 05",
         price: 500,
         cake: "Chantininho 40/50 Pessoas",
         items: "12 Cupcakes, 70 Petit Brownie, 70 Docinhos"
@@ -1056,6 +1056,9 @@
 
         container.innerHTML = "";
 
+        const noneId =
+          `${container.id}-none`;
+
         container.insertAdjacentHTML(
           "beforeend",
           `
@@ -1064,14 +1067,14 @@
               <input
                 type="radio"
                 name="kit"
-                id="kit-none-${Math.random().toString(36).slice(2)}"
+                id="${noneId}"
                 value=""
                 checked
               >
 
               <label
                 class="option-label"
-                for="${container.id}-none"
+                for="${noneId}"
               >
                 <span class="option-title">
                   Não escolher kit
@@ -1617,7 +1620,9 @@
       if (!input) return;
 
       const quantity =
-        Number(input.value);
+        Number(
+          input.value.replace(/\D/g, "")
+        ) || 0;
 
       const flavors =
         prefix === "classicBrigadeiro"
@@ -2104,7 +2109,9 @@
 
         if (
           classic &&
-          Number(classic.value) > 0
+          Number(
+            classic.value.replace(/\D/g, "")
+          ) > 0
         ) {
 
           const flavors =
@@ -2119,7 +2126,7 @@
           lines.push("");
 
           lines.push(
-            `*Brigadeiros clássicos:* ${classic.value} unidades`
+            `*Brigadeiros clássicos:* ${classic.value}`
           );
 
           if (flavors.length) {
@@ -2140,7 +2147,9 @@
 
         if (
           premium &&
-          Number(premium.value) > 0
+          Number(
+            premium.value.replace(/\D/g, "")
+          ) > 0
         ) {
 
           const flavors =
@@ -2155,7 +2164,7 @@
           lines.push("");
 
           lines.push(
-            `*Brigadeiros premium:* ${premium.value} unidades`
+            `*Brigadeiros premium:* ${premium.value}`
           );
 
           if (flavors.length) {
