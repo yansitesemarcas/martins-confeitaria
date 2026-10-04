@@ -2,1020 +2,1963 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <title>Encomendas | Martins Confeitaria</title>
 
-  <title>Martins Confeitaria</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  <meta
-    name="description"
-    content="Martins Confeitaria — bolos, doces, sobremesas e encomendas em Fortaleza."
-  >
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #faf7f3;
+      color: #3a241b;
+      line-height: 1.5;
+    }
 
-  <meta
-    name="theme-color"
-    content="#67b0cb"
-  >
+    header {
+      background: #fff;
+      border-bottom: 1px solid #eadfd7;
+      padding: 18px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
 
-  <link
-    rel="icon"
-    type="image/png"
-    href="logo.png"
-  >
+    .header-content {
+      max-width: 1100px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
 
-  <!-- FONTES -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
-  >
+    .logo {
+      height: 55px;
+      max-width: 180px;
+      object-fit: contain;
+    }
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600;700&family=Nunito:wght@400;500;600;700;800;900&display=swap"
-    rel="stylesheet"
-  >
+    .back-link {
+      color: #6b3f2d;
+      text-decoration: none;
+      font-weight: 600;
+    }
 
-  <!-- CSS -->
-  <link
-    rel="stylesheet"
-    href="style.css?v=20261003-07"
-  >
+    .container {
+      width: min(1100px, 92%);
+      margin: 0 auto;
+      padding: 40px 0 80px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .hero h1 {
+      font-family: Georgia, serif;
+      font-size: clamp(2rem, 5vw, 3.3rem);
+      color: #4b2b20;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      color: #806b60;
+      font-size: 1rem;
+    }
+
+    .section {
+      background: #fff;
+      border: 1px solid #eadfd7;
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 25px;
+      box-shadow: 0 8px 25px rgba(80, 45, 25, 0.05);
+    }
+
+    .section h2 {
+      font-family: Georgia, serif;
+      font-size: 1.7rem;
+      color: #4b2b20;
+      margin-bottom: 8px;
+    }
+
+    .section-description {
+      color: #806b60;
+      margin-bottom: 25px;
+    }
+
+    /* ESCOLHA DO BOLO */
+
+    .cake-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .cake-option {
+      border: 2px solid #eadfd7;
+      border-radius: 18px;
+      padding: 25px;
+      cursor: pointer;
+      transition: .2s;
+      background: #fff;
+    }
+
+    .cake-option:hover {
+      border-color: #9b6249;
+      transform: translateY(-2px);
+    }
+
+    .cake-option.active {
+      border-color: #6b3f2d;
+      background: #fcf5ef;
+    }
+
+    .cake-option input {
+      display: none;
+    }
+
+    .cake-option h3 {
+      color: #4b2b20;
+      font-family: Georgia, serif;
+      font-size: 1.4rem;
+      margin-bottom: 7px;
+    }
+
+    .cake-option p {
+      color: #806b60;
+      font-size: .95rem;
+    }
+
+    /* FORM */
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .field {
+      margin-bottom: 5px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 7px;
+      color: #4b2b20;
+    }
+
+    select,
+    input[type="text"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="date"],
+    textarea {
+      width: 100%;
+      border: 1px solid #dccbc0;
+      background: #fff;
+      border-radius: 10px;
+      padding: 13px 14px;
+      font-size: 1rem;
+      color: #3a241b;
+      outline: none;
+    }
+
+    select:focus,
+    input:focus,
+    textarea:focus {
+      border-color: #8c5941;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    /* CHECKBOXES */
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .check-item {
+      border: 1px solid #eadfd7;
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #fff;
+    }
+
+    .check-item input {
+      accent-color: #6b3f2d;
+    }
+
+    /* KITS */
+
+    .kits-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .kit-card {
+      border: 2px solid #eadfd7;
+      border-radius: 15px;
+      padding: 20px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .kit-card:hover {
+      border-color: #9b6249;
+    }
+
+    .kit-card.active {
+      border-color: #6b3f2d;
+      background: #fcf5ef;
+    }
+
+    .kit-card input {
+      display: none;
+    }
+
+    .kit-card h3 {
+      color: #4b2b20;
+      margin-bottom: 10px;
+    }
+
+    .kit-price {
+      font-weight: bold;
+      color: #7a4934;
+      font-size: 1.15rem;
+      margin-bottom: 12px;
+    }
+
+    .included {
+      list-style: none;
+      font-size: .9rem;
+      color: #6d5b50;
+    }
+
+    .included li {
+      margin-bottom: 5px;
+    }
+
+    .included li::before {
+      content: "✓";
+      color: #6b3f2d;
+      font-weight: bold;
+      margin-right: 7px;
+    }
+
+    /* ADDITIONALS */
+
+    .additional-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid #eadfd7;
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .additional-item label {
+      margin: 0;
+      font-weight: 500;
+    }
+
+    .additional-item span {
+      color: #7a4934;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    /* BOTÕES */
+
+    .button {
+      border: none;
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .button-primary {
+      background: #6b3f2d;
+      color: white;
+    }
+
+    .button-primary:hover {
+      background: #512e21;
+      transform: translateY(-1px);
+    }
+
+    .button-secondary {
+      background: #eee4dd;
+      color: #4b2b20;
+    }
+
+    .button-secondary:hover {
+      background: #e2d5cb;
+    }
+
+    /* RESUMO */
+
+    .summary {
+      background: #4b2b20;
+      color: white;
+      border-radius: 20px;
+      padding: 28px;
+      position: sticky;
+      bottom: 15px;
+      box-shadow: 0 10px 35px rgba(50, 25, 15, .25);
+    }
+
+    .summary h2 {
+      font-family: Georgia, serif;
+      margin-bottom: 18px;
+    }
+
+    #summaryList {
+      margin-bottom: 20px;
+    }
+
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      border-bottom: 1px solid rgba(255,255,255,.15);
+      padding: 9px 0;
+    }
+
+    .summary-total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-top: 18px;
+    }
+
+    .summary-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .summary .button-primary {
+      background: #fff;
+      color: #4b2b20;
+      flex: 1;
+    }
+
+    .summary .button-secondary {
+      background: rgba(255,255,255,.12);
+      color: white;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .notice {
+      background: #fcf5ef;
+      border-left: 4px solid #8c5941;
+      padding: 13px 15px;
+      border-radius: 8px;
+      color: #6d5b50;
+      margin-bottom: 20px;
+      font-size: .93rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #806b60;
+      font-size: .9rem;
+    }
+
+    @media (max-width: 700px) {
+      .cake-options,
+      .form-grid,
+      .kits-grid,
+      .checkbox-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        padding: 20px;
+      }
+
+      .header-content {
+        flex-direction: column;
+      }
+
+      .summary-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-  <!-- =====================================================
-       CABEÇALHO
-  ====================================================== -->
+<header>
+  <div class="header-content">
+    <a href="index.html" class="back-link">← Voltar</a>
 
-  <header class="top">
-
-    <a
-      class="brand"
-      href="#inicio"
-      aria-label="Martins Confeitaria - início"
+    <img
+      src="logo.png"
+      alt="Martins Confeitaria"
+      class="logo"
+      onerror="this.style.display='none'"
     >
-      <img
-        src="logo.png"
-        alt="Martins Confeitaria"
-      >
-    </a>
+  </div>
+</header>
 
-    <nav aria-label="Navegação principal">
+<main class="container">
 
-      <a href="#inicio">
-        Início
-      </a>
+  <div class="hero">
+    <h1>Monte sua encomenda</h1>
+    <p>Escolha cada detalhe do seu pedido.</p>
+  </div>
 
-      <a href="#sobre">
-        Um pouco da nossa história
-      </a>
+  <!-- PRIMEIRA ETAPA -->
+  <section class="section">
 
-      <a href="delivery.html">
-        Pronta Entrega / Cardápio
-      </a>
+    <h2>Escolha o tipo de bolo</h2>
 
-      <a href="encomendas.html">
-        Encomenda
-      </a>
+    <p class="section-description">
+      Comece escolhendo o estilo do seu bolo.
+    </p>
 
-      <a href="#contato">
-        Contato
-      </a>
+    <div class="cake-options">
 
-    </nav>
+      <label class="cake-option" id="optionNaked">
+        <input type="radio" name="cakeType" value="naked">
+        <h3>Naked Cake / Scrapcake</h3>
+        <p>Bolo com acabamento delicado e elegante.</p>
+      </label>
 
-    <!-- ÚNICO BOTÃO DO CARRINHO NO CABEÇALHO -->
-    <button
-      type="button"
-      class="cart-btn"
-      id="openCart"
-      aria-label="Abrir carrinho"
-    >
-      🛒
-      <span id="cartCount">0</span>
+      <label class="cake-option" id="optionChantininho">
+        <input type="radio" name="cakeType" value="chantininho">
+        <h3>Chantininho</h3>
+        <p>Bolo decorado com acabamento em chantininho.</p>
+      </label>
+
+    </div>
+
+  </section>
+
+  <!-- CONFIGURAÇÃO DO BOLO -->
+  <section class="section hidden" id="cakeSection">
+
+    <h2>Escolha os detalhes do bolo</h2>
+
+    <div class="form-grid">
+
+      <div class="field">
+        <label for="cakeSize">Quantidade de pessoas</label>
+
+        <select id="cakeSize">
+          <option value="">Selecione</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="cakeMass">Massa</label>
+
+        <select id="cakeMass">
+          <option value="">Selecione</option>
+          <option>Amanteigado</option>
+          <option>Baunilha</option>
+          <option>Ninho</option>
+          <option>Coco</option>
+          <option>Chocolate</option>
+          <option>Limão</option>
+        </select>
+      </div>
+
+      <div class="field full">
+        <label for="cakeFilling">Recheio</label>
+
+        <select id="cakeFilling">
+          <option value="">Selecione</option>
+          <option>Ninho</option>
+          <option>Beijinho</option>
+          <option>Brigadeiro</option>
+          <option>Doce de leite</option>
+          <option>Leite condensado</option>
+          <option>Limão</option>
+          <option>Oreo</option>
+        </select>
+      </div>
+
+    </div>
+
+    <br>
+
+    <label>Adicionais</label>
+
+    <div class="checkbox-grid">
+
+      <label class="additional-item">
+        <label>
+          <input type="checkbox" class="cake-extra" value="Abacaxi" data-price="10">
+          Abacaxi
+        </label>
+        <span>+ R$ 10,00</span>
+      </label>
+
+      <label class="additional-item">
+        <label>
+          <input type="checkbox" class="cake-extra" value="Morango" data-price="16">
+          Morango
+        </label>
+        <span>+ R$ 16,00</span>
+      </label>
+
+      <label class="additional-item">
+        <label>
+          <input type="checkbox" class="cake-extra" value="Crocante de Castanha" data-price="10">
+          Crocante de Castanha
+        </label>
+        <span>+ R$ 10,00</span>
+      </label>
+
+      <label class="additional-item">
+        <label>
+          <input type="checkbox" class="cake-extra" value="Kit Kat" data-price="12">
+          Kit Kat
+        </label>
+        <span>+ R$ 12,00</span>
+      </label>
+
+      <label class="additional-item">
+        <label>
+          <input type="checkbox" class="cake-extra" value="Geleia de Morango" data-price="16">
+          Geleia de Morango
+        </label>
+        <span>+ R$ 16,00</span>
+      </label>
+
+      <label class="additional-item">
+        <label>
+          <input type="checkbox" class="cake-extra" value="Ouro Branco" data-price="10">
+          Ouro Branco
+        </label>
+        <span>+ R$ 10,00</span>
+      </label>
+
+      <label class="additional-item">
+        <label>
+          <input type="checkbox" class="cake-extra" value="Nutella" data-price="16">
+          Nutella
+        </label>
+        <span>+ R$ 16,00</span>
+      </label>
+
+      <label class="additional-item">
+        <label>
+          <input type="checkbox" class="cake-extra" value="Kinder Bueno" data-price="16">
+          Kinder Bueno
+        </label>
+        <span>+ R$ 16,00</span>
+      </label>
+
+    </div>
+
+    <br>
+
+    <div class="field">
+      <label for="cakeTopper">Topo do bolo</label>
+
+      <select id="cakeTopper">
+        <option value="">Sem topo</option>
+        <option value="Topo simples" data-price="20">
+          Topo simples - R$ 20,00
+        </option>
+        <option value="Topo 3D" data-price="30">
+          Topo 3D - R$ 30,00
+        </option>
+        <option value="Cores naturais" data-price="70">
+          Cores naturais - R$ 70,00
+        </option>
+        <option value="Scrap cake" data-price="30">
+          Scrap cake - + R$ 30,00
+        </option>
+      </select>
+    </div>
+
+    <br>
+
+    <button class="button button-primary" onclick="addCake()">
+      Adicionar bolo ao pedido
     </button>
 
-  </header>
+  </section>
 
+  <!-- BRIGADEIROS -->
 
-  <main>
+  <section class="section">
 
-    <!-- =====================================================
-         INÍCIO
-    ====================================================== -->
+    <h2>Brigadeiros</h2>
 
-    <section
-      id="inicio"
-      class="hero"
-    >
+    <p class="section-description">
+      Escolha a linha, quantidade e sabores desejados.
+    </p>
 
-      <video
-        class="hero-video"
-        autoplay
-        muted
-        loop
-        playsinline
-        preload="metadata"
-        aria-hidden="true"
-      >
-        <source
-          src="loja.mp4"
-          type="video/mp4"
-        >
-      </video>
+    <div class="form-grid">
 
-      <div class="hero-overlay"></div>
+      <div class="field">
+        <label for="brigadeiroLine">Linha</label>
 
-      <div class="hero-content reveal">
-
-        <!-- LOGO CENTRALIZADA -->
-        <div class="hero-logo">
-          <img
-            src="logo.png"
-            alt="Martins Confeitaria"
-            class="hero-logo-image"
-          >
-        </div>
-
-        <p class="hero-kicker">
-          Martins Confeitaria
-        </p>
-
-        <h1>
-          Por uma vida mais doce e feliz 🩵🧁
-        </h1>
-
-        <p class="hero-description">
-          Bolos, doces e momentos especiais
-          preparados com carinho.
-        </p>
-
-        <!-- APENAS UM BOTÃO -->
-        <div class="hero-actions">
-
-          <a
-            href="#sobre"
-            class="btn primary"
-          >
-            Conheça nossa história
-          </a>
-
-        </div>
-
+        <select id="brigadeiroLine">
+          <option value="classica">Linha Clássica</option>
+          <option value="premium">Linha Premium</option>
+        </select>
       </div>
 
-    </section>
-
-
-    <!-- =====================================================
-         NOSSA HISTÓRIA
-    ====================================================== -->
-
-    <section
-      id="sobre"
-      class="section about"
-    >
-
-      <div class="section-inner">
-
-        <div class="section-head reveal">
-
-          <span class="eyebrow">
-            Nossa história
-          </span>
-
-          <h2 id="aboutTitle">
-            ✨ De um sonho na calçada para a realização de um grande sonho 🤍
-          </h2>
-
-        </div>
-
-
-        <div class="about-content reveal">
-
-          <div class="about-copy">
-
-            <p
-              id="aboutQuote"
-              class="quote"
-            >
-              Por uma vida mais doce e feliz.
-            </p>
-
-            <div id="aboutText">
-
-              <p>
-                Minha história com a confeitaria começou em 2020,
-                em meio a um dos momentos mais difíceis que vivemos:
-                a pandemia.
-              </p>
-
-              <p>
-                Foi ali, em meio às incertezas e desafios,
-                que nasceu a coragem de começar.
-              </p>
-
-              <p>
-                Com muito esforço, coloquei meus primeiros bolos
-                afogadinhos e bolos caseiros na calçada da minha casa.
-              </p>
-
-              <p>
-                Depois vieram as vendas no shopping, de porta em porta,
-                cada pedido e cada cliente dando ainda mais força
-                para continuar.
-              </p>
-
-              <p>
-                Para me aperfeiçoar e oferecer cada vez mais qualidade,
-                também busquei conhecimento e fiz o curso técnico
-                profissional de Confeitaria pelo Senac.
-              </p>
-
-              <p>
-                Hoje, olhar para tudo isso é lembrar que nenhum começo
-                é pequeno quando existe um sonho grande por trás.
-              </p>
-
-              <p>
-                Minha confeitaria nasceu de um sonho, cresceu com muito
-                trabalho e continua sendo construída todos os dias
-                com amor, dedicação e propósito.
-              </p>
-
-              <p>
-                E o meu maior propósito continua sendo o mesmo:
-                levar doces para tornar a vida das pessoas um pouquinho
-                mais doce, feliz e especial. 🤍🧁
-              </p>
-
-              <div class="about-signature">
-
-                <span>
-                  🩵 Feito com carinho, sabor e muitos sonhos
-                </span>
-
-                <strong>
-                  👨‍🍳 Chef Denilson Martins ✨
-                </strong>
-
-                <small>
-                  O coração por trás de cada doce da
-                  Martins Confeitaria.
-                </small>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         PRONTA ENTREGA
-    ====================================================== -->
-
-    <section
-      id="pronta"
-      class="section ready-section"
-    >
-
-      <div class="section-inner">
-
-        <div class="section-head reveal">
-
-          <span class="eyebrow">
-            Para adoçar seu dia
-          </span>
-
-          <h2>
-            Pronta entrega 🍰
-          </h2>
-
-          <p>
-            Confira algumas opções disponíveis
-            para deixar seu momento ainda mais especial.
-          </p>
-
-        </div>
-
-        <!-- PRODUTOS -->
-        <div
-          id="readyProducts"
-          class="products-grid reveal"
-        >
-        </div>
-
-        <!-- BOTÃO CENTRALIZADO -->
-        <div class="section-action reveal">
-
-          <a
-            href="delivery.html"
-            class="btn primary"
-          >
-            Ver pronta entrega
-          </a>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         BOLOS / ENCOMENDAS
-    ====================================================== -->
-
-    <section
-      id="bolo"
-      class="section cake-section"
-    >
-
-      <div class="section-inner">
-
-        <div class="cake-feature reveal">
-
-          <!-- VÍDEO CENTRAL -->
-          <div class="cake-video">
-
-            <video
-              autoplay
-              muted
-              loop
-              playsinline
-              preload="metadata"
-            >
-              <source
-                src="bolos.mp4"
-                type="video/mp4"
-              >
-            </video>
-
-            <div class="cake-video-overlay"></div>
-
-          </div>
-
-
-          <!-- CONTEÚDO CENTRALIZADO -->
-          <div class="cake-copy">
-
-            <span class="eyebrow">
-              Feito especialmente para você
-            </span>
-
-            <h2>
-              Seu bolo,
-              do seu jeito 🎂
-            </h2>
-
-            <p>
-              Escolha o tamanho, massa, recheio
-              e adicionais para montar uma encomenda
-              personalizada para o seu momento.
-            </p>
-
-            <div class="cake-actions">
-
-              <a
-                href="encomendas.html"
-                class="btn primary"
-              >
-                Monte sua encomenda
-              </a>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         CARDÁPIO
-    ====================================================== -->
-
-    <section
-      id="cardapio"
-      class="section menu-section"
-    >
-
-      <div class="section-inner">
-
-        <div class="section-head reveal">
-
-          <span class="eyebrow">
-            Sabores Martins
-          </span>
-
-          <h2>
-            Nosso cardápio 🧁
-          </h2>
-
-          <p>
-            Escolha uma categoria e confira
-            nossas opções.
-          </p>
-
-        </div>
-
-
-        <!-- CATEGORIAS -->
-        <div
-          id="categories"
-          class="tabs reveal"
-          role="tablist"
-          aria-label="Categorias do cardápio"
-        >
-        </div>
-
-
-        <!-- PRODUTOS -->
-        <div
-          id="products"
-          class="products-grid reveal"
-        >
-        </div>
-
-
-        <!-- VAZIO -->
-        <div
-          id="emptyMenu"
-          class="empty hidden"
-        >
-          Nenhum produto encontrado
-          nesta categoria.
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         CONTATO
-    ====================================================== -->
-
-    <section
-      id="contato"
-      class="section contact-section"
-    >
-
-      <div class="section-inner">
-
-        <div class="section-head reveal">
-
-          <span class="eyebrow">
-            Fale com a gente
-          </span>
-
-          <h2>
-            Vamos deixar seu dia mais doce? 🩵
-          </h2>
-
-          <p>
-            Entre em contato com a Martins Confeitaria
-            para pedidos, encomendas e informações.
-          </p>
-
-        </div>
-
-
-        <div class="contact-grid">
-
-          <!-- INFORMAÇÕES -->
-          <div class="contact-card reveal">
-
-            <h3>
-              Martins Confeitaria
-            </h3>
-
-            <div class="contact-info">
-
-              <!-- ENDEREÇO -->
-              <div class="contact-item">
-
-                <span>
-                  📍
-                </span>
-
-                <p id="address">
-                  Rua 1018, 65<br>
-                  Conjunto Ceará II<br>
-                  Fortaleza - CE<br>
-                  60532-690<br>
-                  Brasil
-                </p>
-
-              </div>
-
-
-              <!-- HORÁRIOS -->
-              <div class="contact-item">
-
-                <span>
-                  🕐
-                </span>
-
-                <div>
-
-                  <div
-                    id="openState"
-                    class="open-state"
-                  >
-                    Verificando horário...
-                  </div>
-
-                  <div id="hours"></div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <div class="contact-actions">
-
-              <a
-                id="contactWa"
-                href="#"
-                class="btn primary"
-                target="_blank"
-                rel="noopener"
-              >
-                💬 Falar pelo WhatsApp
-              </a>
-
-              <a
-                id="instagram"
-                href="#"
-                class="btn ghost"
-                target="_blank"
-                rel="noopener"
-              >
-                📸 Instagram
-              </a>
-
-            </div>
-
-          </div>
-
-
-          <!-- GOOGLE MAPS -->
-          <div class="map-card reveal">
-
-            <div class="map-head">
-
-              <div>
-
-                <span class="eyebrow">
-                  Localização
-                </span>
-
-                <h3>
-                  Onde estamos
-                </h3>
-
-              </div>
-
-              <a
-                id="maps"
-                href="#"
-                target="_blank"
-                rel="noopener"
-              >
-                Abrir no Google Maps
-              </a>
-
-            </div>
-
-
-            <div class="map-frame">
-
-              <iframe
-                id="mapFrame"
-                title="Localização da Martins Confeitaria"
-                loading="lazy"
-                src="https://www.google.com/maps?q=Rua%201018%2C%2065%2C%20Conjunto%20Cear%C3%A1%20II%2C%20Fortaleza%20CE&output=embed"
-                allowfullscreen
-              ></iframe>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- =================================================
-             AVALIAÇÃO — ÚLTIMA PARTE
-        ================================================== -->
-
-        <div class="review-card reveal">
-
-          <div class="review-content">
-
-            <span class="eyebrow">
-              Sua opinião importa
-            </span>
-
-            <h3>
-              Gostou da experiência? ⭐
-            </h3>
-
-            <p>
-              Conte para outras pessoas como foi
-              sua experiência com a Martins Confeitaria.
-            </p>
-
-          </div>
-
-          <a
-            id="review"
-            href="#"
-            class="btn primary"
-            target="_blank"
-            rel="noopener"
-          >
-            ⭐ Avaliar no Google
-          </a>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  </main>
-
-
-  <!-- =====================================================
-       RODAPÉ
-  ====================================================== -->
-
-  <footer class="footer">
-
-    <div class="footer-inner">
-
-      <div class="footer-brand">
-
-        <img
-          src="logo.png"
-          alt="Martins Confeitaria"
-        >
-
-        <p>
-          Por uma vida mais doce e feliz. 🩵🧁
-        </p>
-
-      </div>
-
-
-      <div class="footer-links">
-
-        <a href="#inicio">
-          Início
-        </a>
-
-        <a href="#sobre">
-          Um pouco da nossa história
-        </a>
-
-        <a href="delivery.html">
-          Pronta Entrega / Cardápio
-        </a>
-
-        <a href="encomendas.html">
-          Encomenda
-        </a>
-
-        <a href="#contato">
-          Contato
-        </a>
-
+      <div class="field">
+        <label for="brigadeiroQty">Quantidade</label>
+
+        <select id="brigadeiroQty">
+          <option value="50">50 unidades</option>
+          <option value="100">100 unidades</option>
+        </select>
       </div>
 
     </div>
 
+    <br>
 
-    <div class="footer-bottom">
+    <label>Sabores</label>
 
-      <p>
-        ©
-        <span id="year">
-          2026
-        </span>
-        Martins Confeitaria.
-        Todos os direitos reservados.
-      </p>
+    <div class="checkbox-grid" id="brigadeiroFlavors"></div>
 
-      <p>
-        Feito com carinho. 🩵
-      </p>
+    <br>
 
-    </div>
+    <button class="button button-primary" onclick="addBrigadeiros()">
+      Adicionar brigadeiros
+    </button>
 
-  </footer>
+  </section>
 
+  <!-- KITS -->
 
-  <!-- =====================================================
-       CARRINHO
-       FICA ESCONDIDO ATÉ CLICAR NO BOTÃO DO CABEÇALHO
-  ====================================================== -->
+  <section class="section">
 
-  <div
-    id="shade"
-    class="shade"
-    aria-hidden="true"
-  ></div>
+    <h2>Kit Festa</h2>
 
+    <p class="section-description">
+      Ao escolher um kit, todos os itens incluídos ficam automaticamente marcados.
+      Você só precisa escolher o topo do bolo.
+    </p>
 
-  <aside
-    id="drawer"
-    class="drawer"
-    aria-hidden="true"
-    aria-label="Carrinho de compras"
-  >
+    <div class="kits-grid" id="kits"></div>
 
-    <div class="drawer-head">
+    <div id="selectedKitArea" class="hidden">
 
-      <div>
+      <br>
 
-        <span class="eyebrow">
-          Seu pedido
-        </span>
-
-        <h2>
-          Carrinho 🛒
-        </h2>
-
+      <div class="notice">
+        Os itens abaixo já fazem parte do kit e não podem ser alterados.
       </div>
 
-      <button
-        type="button"
-        id="closeCart"
-        class="icon-btn"
-        aria-label="Fechar carrinho"
-      >
-        ×
+      <div id="kitIncluded"></div>
+
+      <br>
+
+      <div class="field">
+        <label for="kitTopper">Topo do bolo</label>
+
+        <select id="kitTopper">
+          <option value="">Selecione</option>
+          <option value="Topo simples" data-price="20">
+            Topo simples - R$ 20,00
+          </option>
+          <option value="Topo 3D" data-price="30">
+            Topo 3D - R$ 30,00
+          </option>
+          <option value="Cores naturais" data-price="70">
+            Cores naturais - R$ 70,00
+          </option>
+          <option value="Scrap cake" data-price="30">
+            Scrap cake - + R$ 30,00
+          </option>
+        </select>
+      </div>
+
+      <br>
+
+      <button class="button button-primary" onclick="addKit()">
+        Adicionar kit ao pedido
       </button>
 
     </div>
 
+  </section>
 
-    <div
-      id="cartItems"
-      class="cart-items"
-    >
+  <!-- PETIT BROWNIE -->
 
-      <div class="empty">
-        Seu carrinho está vazio.
+  <section class="section">
+
+    <h2>Petit Brownie</h2>
+
+    <p class="section-description">
+      Quadradinho de brownie com uma pitanga de brigadeiro na caixeta de docinho.
+    </p>
+
+    <div class="form-grid">
+
+      <div class="field">
+        <label for="petitQty">Quantidade</label>
+
+        <select id="petitQty">
+          <option value="50">50 unidades - R$ 90,00</option>
+          <option value="100">100 unidades - R$ 180,00</option>
+        </select>
       </div>
 
     </div>
 
+    <br>
 
-    <div class="drawer-footer">
+    <button class="button button-primary" onclick="addPetitBrownie()">
+      Adicionar Petit Brownie
+    </button>
 
-      <div class="cart-total-row">
+  </section>
 
-        <span>
-          Total
-        </span>
+  <!-- MINI BROWNIE -->
 
-        <strong id="cartTotal">
-          R$ 0,00
-        </strong>
+  <section class="section">
 
-      </div>
+    <h2>Mini Brownie Recheado</h2>
 
+    <p class="section-description">
+      R$ 3,50 por unidade. A partir de 20 unidades: R$ 2,80 por unidade.
+    </p>
 
-      <button
-        type="button"
-        id="clearCart"
-        class="btn ghost full"
-      >
-        Limpar carrinho
-      </button>
+    <div class="form-grid">
 
+      <div class="field">
+        <label for="miniBrownieQty">Quantidade</label>
 
-      <button
-        type="button"
-        id="checkoutBtn"
-        class="btn primary full"
-        disabled
-      >
-        Finalizar pedido
-      </button>
-
-    </div>
-
-  </aside>
-
-
-  <!-- =====================================================
-       CHECKOUT
-  ====================================================== -->
-
-  <dialog
-    id="checkout"
-    class="checkout-dialog"
-  >
-
-    <form
-      id="checkoutForm"
-      method="dialog"
-      class="checkout-form"
-    >
-
-      <div class="dialog-head">
-
-        <div>
-
-          <span class="eyebrow">
-            Finalizar pedido
-          </span>
-
-          <h2>
-            Seus dados 🩵
-          </h2>
-
-        </div>
-
-        <button
-          type="button"
-          class="icon-btn"
-          onclick="document.getElementById('checkout').close()"
-          aria-label="Fechar"
+        <input
+          type="number"
+          id="miniBrownieQty"
+          min="1"
+          value="1"
         >
-          ×
-        </button>
-
       </div>
 
+    </div>
 
-      <label>
-        Nome
+    <br>
+
+    <button class="button button-primary" onclick="addMiniBrownie()">
+      Adicionar Mini Brownie
+    </button>
+
+  </section>
+
+  <!-- BEM CASADO -->
+
+  <section class="section">
+
+    <h2>Bem Casado</h2>
+
+    <div class="form-grid">
+
+      <div class="field">
+        <label for="bemCasadoType">Embalagem</label>
+
+        <select id="bemCasadoType">
+          <option value="crepom">
+            Papel crepom - R$ 6,00 / R$ 4,80 a partir de 20
+          </option>
+
+          <option value="celofane">
+            Folha de celofane - R$ 5,00 / R$ 4,00 a partir de 20
+          </option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="bemCasadoQty">Quantidade</label>
+
+        <input
+          type="number"
+          id="bemCasadoQty"
+          min="1"
+          value="1"
+        >
+      </div>
+
+    </div>
+
+    <br>
+
+    <button class="button button-primary" onclick="addBemCasado()">
+      Adicionar Bem Casado
+    </button>
+
+  </section>
+
+  <!-- CUPCAKES -->
+
+  <section class="section">
+
+    <h2>Cupcakes</h2>
+
+    <div class="form-grid">
+
+      <div class="field">
+        <label for="cupcakeType">Modelo</label>
+
+        <select id="cupcakeType">
+          <option value="com">Com plaquinha - R$ 6,50</option>
+          <option value="sem">Sem plaquinha - R$ 5,50</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="cupcakeQty">Quantidade</label>
+
+        <input
+          type="number"
+          id="cupcakeQty"
+          min="1"
+          value="1"
+        >
+      </div>
+
+    </div>
+
+    <br>
+
+    <button class="button button-primary" onclick="addCupcakes()">
+      Adicionar Cupcakes
+    </button>
+
+  </section>
+
+  <!-- DADOS DO CLIENTE -->
+
+  <section class="section">
+
+    <h2>Seus dados</h2>
+
+    <p class="section-description">
+      Preencha seus dados para enviar o pedido pelo WhatsApp.
+    </p>
+
+    <div class="form-grid">
+
+      <div class="field">
+        <label for="customerName">Nome</label>
 
         <input
           type="text"
-          name="customer"
+          id="customerName"
           placeholder="Seu nome"
-          required
         >
-      </label>
+      </div>
 
-
-      <label>
-        WhatsApp
+      <div class="field">
+        <label for="customerPhone">WhatsApp</label>
 
         <input
           type="tel"
-          name="phone"
+          id="customerPhone"
           placeholder="(85) 99999-9999"
-          required
         >
-      </label>
-
-
-      <label>
-        Como deseja receber?
-
-        <select
-          name="receiving"
-          required
-        >
-
-          <option value="">
-            Selecione
-          </option>
-
-          <option value="Retirada">
-            Retirada
-          </option>
-
-          <option value="Entrega">
-            Entrega
-          </option>
-
-        </select>
-
-      </label>
-
-
-      <div
-        id="addressWrap"
-        class="hidden"
-      >
-
-        <label>
-          Endereço para entrega
-
-          <textarea
-            name="address"
-            rows="3"
-            placeholder="Rua, número, bairro..."
-          ></textarea>
-
-        </label>
-
       </div>
 
+      <div class="field">
+        <label for="orderDate">Data desejada</label>
 
-      <label>
-        Forma de pagamento
-
-        <select
-          name="payment"
-          required
+        <input
+          type="date"
+          id="orderDate"
         >
+      </div>
 
-          <option value="">
-            Selecione
-          </option>
-
-          <option value="Pix">
-            Pix
-          </option>
-
-          <option value="Dinheiro">
-            Dinheiro
-          </option>
-
-          <option value="Cartão">
-            Cartão
-          </option>
-
-        </select>
-
-      </label>
-
-
-      <label>
-        Observações
+      <div class="field full">
+        <label for="orderNotes">Observações</label>
 
         <textarea
-          name="notes"
-          rows="4"
-          placeholder="Alguma observação sobre seu pedido?"
+          id="orderNotes"
+          placeholder="Tema, cores, detalhes ou outras informações..."
         ></textarea>
+      </div>
 
-      </label>
+    </div>
+
+  </section>
+
+  <!-- RESUMO -->
+
+  <section class="summary">
+
+    <h2>Resumo do pedido</h2>
+
+    <div id="summaryList">
+      <p>Nenhum item adicionado ainda.</p>
+    </div>
+
+    <div class="summary-total">
+      <span>Total</span>
+      <span id="total">R$ 0,00</span>
+    </div>
+
+    <div class="summary-actions">
+
+      <button
+        class="button button-secondary"
+        onclick="clearOrder()"
+      >
+        Limpar pedido
+      </button>
+
+      <button
+        class="button button-primary"
+        onclick="sendWhatsApp()"
+      >
+        Enviar pedido pelo WhatsApp
+      </button>
+
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  Martins Confeitaria
+</footer>
 
 
-      <div class="dialog-actions">
+<script>
 
-        <button
-          type="button"
-          class="btn ghost"
-          onclick="document.getElementById('checkout').close()"
+  /* ================================
+     DADOS
+  ================================= */
+
+  const whatsapp = "5585981563070";
+
+  const cakePrices = {
+
+    naked: {
+      "06/08": 45,
+      "10/12": 70,
+      "15/20": 98,
+      "20/25": 115,
+      "25/30": 145,
+      "30/40": 188,
+      "40/50": 240,
+      "50/60": 280
+    },
+
+    chantininho: {
+      "06/08": 60,
+      "10/12": 80,
+      "15/20": 120,
+      "20/25": 140,
+      "25/30": 170,
+      "30/40": 220,
+      "40/50": 260,
+      "50/60": 300
+    }
+
+  };
+
+
+  const brigadeiros = {
+
+    classica: [
+      "Brigadeiro Tradicional",
+      "Brigadeiro Branco Ninho",
+      "Casadinho",
+      "Limão",
+      "Beijinho",
+      "Doce de Leite"
+    ],
+
+    premium: [
+      "Ninho com Nutella",
+      "Moça Cremoso",
+      "Surpresa de Uva",
+      "Belga ao Leite",
+      "Belga Amargo",
+      "Creme Bruleé",
+      "Brigadeiro com Castanha",
+      "Doce de Leite com Castanha",
+      "Kit Kat",
+      "Oreo"
+    ]
+
+  };
+
+
+  const kits = [
+
+    {
+      group: "Kit Festa",
+      id: "1A",
+      name: "KIT 01",
+      price: 130,
+      items: [
+        "01 Chantininho 10/12 Pessoas",
+        "04 Cupcakes",
+        "04 Pirulitos",
+        "20 Docinhos"
+      ]
+    },
+
+    {
+      group: "Kit Festa",
+      id: "2A",
+      name: "KIT 02",
+      price: 160,
+      items: [
+        "01 Chantininho 15/20 Pessoas",
+        "05 Cupcakes",
+        "05 Pirulitos",
+        "30 Docinhos"
+      ]
+    },
+
+    {
+      group: "Kit Festa",
+      id: "3A",
+      name: "KIT 03",
+      price: 210,
+      items: [
+        "01 Chantininho 20/25 Pessoas",
+        "08 Cupcakes",
+        "08 Pirulitos",
+        "50 Docinhos"
+      ]
+    },
+
+    {
+      group: "Kit Festa",
+      id: "4A",
+      name: "KIT 04",
+      price: 350,
+      items: [
+        "01 Chantininho 30/40 Pessoas",
+        "10 Cupcakes",
+        "10 Pirulitos",
+        "60 Docinhos"
+      ]
+    },
+
+    {
+      group: "Kit Festa",
+      id: "5A",
+      name: "KIT 05",
+      price: 450,
+      items: [
+        "01 Chantininho 40/50 Pessoas",
+        "12 Cupcakes",
+        "12 Pirulitos",
+        "70 Docinhos"
+      ]
+    },
+
+    {
+      group: "Kit Festa + Petit Brownie",
+      id: "1B",
+      name: "KIT 01",
+      price: 150,
+      items: [
+        "01 Chantininho 10/15 Pessoas",
+        "04 Cupcakes",
+        "20 Petit Brownie",
+        "20 Docinhos"
+      ]
+    },
+
+    {
+      group: "Kit Festa + Petit Brownie",
+      id: "2B",
+      name: "KIT 02",
+      price: 200,
+      items: [
+        "01 Chantininho 15/20 Pessoas",
+        "05 Cupcakes",
+        "30 Petit Brownie",
+        "30 Docinhos"
+      ]
+    },
+
+    {
+      group: "Kit Festa + Petit Brownie",
+      id: "3B",
+      name: "KIT 03",
+      price: 250,
+      items: [
+        "01 Chantininho 20/25 Pessoas",
+        "08 Cupcakes",
+        "50 Petit Brownie",
+        "50 Docinhos"
+      ]
+    },
+
+    {
+      group: "Kit Festa + Petit Brownie",
+      id: "4B",
+      name: "KIT 04",
+      price: 430,
+      items: [
+        "01 Chantininho 30/40 Pessoas",
+        "10 Cupcakes",
+        "60 Petit Brownie",
+        "60 Docinhos"
+      ]
+    },
+
+    {
+      group: "Kit Festa + Petit Brownie",
+      id: "5B",
+      name: "KIT 05",
+      price: 500,
+      items: [
+        "01 Chantininho 40/50 Pessoas",
+        "12 Cupcakes",
+        "70 Petit Brownie",
+        "70 Docinhos"
+      ]
+    }
+
+  ];
+
+
+  let order = [];
+
+  let selectedCakeType = null;
+
+  let selectedKit = null;
+
+
+  /* ================================
+     UTILIDADES
+  ================================= */
+
+  function money(value) {
+
+    return value.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+
+  }
+
+
+  /* ================================
+     BOLO
+  ================================= */
+
+  document.querySelectorAll('input[name="cakeType"]').forEach(input => {
+
+    input.addEventListener("change", function() {
+
+      selectedCakeType = this.value;
+
+      document
+        .querySelectorAll(".cake-option")
+        .forEach(card => card.classList.remove("active"));
+
+      this.closest(".cake-option").classList.add("active");
+
+      const cakeSection = document.getElementById("cakeSection");
+
+      cakeSection.classList.remove("hidden");
+
+      const size = document.getElementById("cakeSize");
+
+      size.innerHTML = '<option value="">Selecione</option>';
+
+      Object.entries(cakePrices[selectedCakeType]).forEach(([people, price]) => {
+
+        const option = document.createElement("option");
+
+        option.value = people;
+        option.textContent = `${people} Pessoas - ${money(price)}`;
+
+        size.appendChild(option);
+
+      });
+
+      cakeSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+
+    });
+
+  });
+
+
+  function addCake() {
+
+    if (!selectedCakeType) {
+      alert("Escolha o tipo de bolo.");
+      return;
+    }
+
+    const size = document.getElementById("cakeSize").value;
+    const mass = document.getElementById("cakeMass").value;
+    const filling = document.getElementById("cakeFilling").value;
+    const topper = document.getElementById("cakeTopper");
+
+    if (!size || !mass || !filling) {
+      alert("Preencha o tamanho, a massa e o recheio.");
+      return;
+    }
+
+    let price = cakePrices[selectedCakeType][size];
+
+    const extras = [];
+
+    document.querySelectorAll(".cake-extra:checked").forEach(item => {
+
+      extras.push(item.value);
+
+      price += Number(item.dataset.price);
+
+    });
+
+    let topperName = topper.value;
+
+    if (topperName) {
+
+      const topperPrice =
+        Number(topper.options[topper.selectedIndex].dataset.price || 0);
+
+      price += topperPrice;
+
+    }
+
+    const cakeName =
+      selectedCakeType === "naked"
+        ? "Naked Cake / Scrapcake"
+        : "Chantininho";
+
+    order.push({
+
+      type: "Bolo",
+      name: cakeName,
+      details: `${size} pessoas | Massa: ${mass} | Recheio: ${filling}`,
+      extras,
+      topper: topperName,
+      price
+
+    });
+
+    updateSummary();
+
+    alert("Bolo adicionado ao pedido!");
+
+  }
+
+
+  /* ================================
+     BRIGADEIROS
+  ================================= */
+
+  function renderBrigadeiros() {
+
+    const container =
+      document.getElementById("brigadeiroFlavors");
+
+    const line =
+      document.getElementById("brigadeiroLine").value;
+
+    container.innerHTML = "";
+
+    brigadeiros[line].forEach(flavor => {
+
+      const label = document.createElement("label");
+
+      label.className = "check-item";
+
+      label.innerHTML = `
+        <input
+          type="checkbox"
+          value="${flavor}"
+          class="brigadeiro-flavor"
         >
-          Voltar
-        </button>
+        ${flavor}
+      `;
 
-        <button
-          type="submit"
-          class="btn primary"
+      container.appendChild(label);
+
+    });
+
+  }
+
+
+  document
+    .getElementById("brigadeiroLine")
+    .addEventListener("change", renderBrigadeiros);
+
+
+  renderBrigadeiros();
+
+
+  function addBrigadeiros() {
+
+    const line =
+      document.getElementById("brigadeiroLine").value;
+
+    const qty =
+      Number(document.getElementById("brigadeiroQty").value);
+
+    const flavors =
+      [...document.querySelectorAll(".brigadeiro-flavor:checked")]
+        .map(item => item.value);
+
+    if (flavors.length === 0) {
+
+      alert("Escolha pelo menos um sabor de brigadeiro.");
+
+      return;
+
+    }
+
+    const price =
+      line === "classica"
+        ? qty === 100 ? 125 : 62.5
+        : qty === 100 ? 145 : 72.5;
+
+    order.push({
+
+      type: "Brigadeiros",
+
+      name:
+        line === "classica"
+          ? "Linha Clássica"
+          : "Linha Premium",
+
+      details:
+        `${qty} unidades | Sabores: ${flavors.join(", ")}`,
+
+      price
+
+    });
+
+    updateSummary();
+
+    alert("Brigadeiros adicionados ao pedido!");
+
+  }
+
+
+  /* ================================
+     KITS
+  ================================= */
+
+  function renderKits() {
+
+    const container =
+      document.getElementById("kits");
+
+    container.innerHTML = "";
+
+    kits.forEach(kit => {
+
+      const label = document.createElement("label");
+
+      label.className = "kit-card";
+
+      label.dataset.id = kit.id;
+
+      label.innerHTML = `
+
+        <input
+          type="radio"
+          name="kit"
+          value="${kit.id}"
         >
-          Enviar pedido
-        </button>
+
+        <h3>${kit.group} - ${kit.name}</h3>
+
+        <div class="kit-price">
+          ${money(kit.price)}
+        </div>
+
+        <ul class="included">
+
+          ${kit.items
+            .map(item => `<li>${item}</li>`)
+            .join("")}
+
+        </ul>
+      `;
+
+      label.addEventListener("click", () => {
+
+        selectedKit = kit;
+
+        document
+          .querySelectorAll(".kit-card")
+          .forEach(card => card.classList.remove("active"));
+
+        label.classList.add("active");
+
+        renderSelectedKit();
+
+      });
+
+      container.appendChild(label);
+
+    });
+
+  }
+
+
+  function renderSelectedKit() {
+
+    const area =
+      document.getElementById("selectedKitArea");
+
+    const included =
+      document.getElementById("kitIncluded");
+
+    area.classList.remove("hidden");
+
+    included.innerHTML = `
+
+      <div class="checkbox-grid">
+
+        ${selectedKit.items.map(item => `
+
+          <label class="check-item">
+
+            <input
+              type="checkbox"
+              checked
+              disabled
+            >
+
+            ${item}
+
+          </label>
+
+        `).join("")}
 
       </div>
 
-    </form>
+    `;
 
-  </dialog>
+  }
 
 
-  <!-- =====================================================
-       SCRIPTS
-  ====================================================== -->
+  renderKits();
 
-  <script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-  ></script>
 
-  <script src="config.js"></script>
+  function addKit() {
 
-  <script src="defaults.js"></script>
+    if (!selectedKit) {
 
-  <script src="script.js"></script>
+      alert("Escolha um kit.");
+
+      return;
+
+    }
+
+    const topper =
+      document.getElementById("kitTopper");
+
+    if (!topper.value) {
+
+      alert("Escolha o topo do bolo.");
+
+      return;
+
+    }
+
+    let price = selectedKit.price;
+
+    const topperPrice =
+      Number(
+        topper.options[topper.selectedIndex]
+          .dataset.price || 0
+      );
+
+    price += topperPrice;
+
+    order.push({
+
+      type: "Kit Festa",
+
+      name:
+        `${selectedKit.group} - ${selectedKit.name}`,
+
+      details:
+        `${selectedKit.items.join(" | ")} | Topo: ${topper.value}`,
+
+      price
+
+    });
+
+    updateSummary();
+
+    alert("Kit adicionado ao pedido!");
+
+  }
+
+
+  /* ================================
+     PETIT BROWNIE
+  ================================= */
+
+  function addPetitBrownie() {
+
+    const qty =
+      Number(document.getElementById("petitQty").value);
+
+    const price =
+      qty === 50 ? 90 : 180;
+
+    order.push({
+
+      type: "Petit Brownie",
+
+      name: `${qty} unidades`,
+
+      details:
+        "Quadradinho de brownie com uma pitanga de brigadeiro na caixeta de docinho.",
+
+      price
+
+    });
+
+    updateSummary();
+
+    alert("Petit Brownie adicionado!");
+
+  }
+
+
+  /* ================================
+     MINI BROWNIE
+  ================================= */
+
+  function addMiniBrownie() {
+
+    const qty =
+      Number(document.getElementById("miniBrownieQty").value);
+
+    if (qty < 1) {
+
+      alert("Informe uma quantidade válida.");
+
+      return;
+
+    }
+
+    const unitPrice =
+      qty >= 20 ? 2.8 : 3.5;
+
+    const price =
+      qty * unitPrice;
+
+    order.push({
+
+      type: "Mini Brownie Recheado",
+
+      name:
+        `${qty} unidades`,
+
+      details:
+        `${money(unitPrice)} por unidade`,
+
+      price
+
+    });
+
+    updateSummary();
+
+    alert("Mini Brownie adicionado!");
+
+  }
+
+
+  /* ================================
+     BEM CASADO
+  ================================= */
+
+  function addBemCasado() {
+
+    const type =
+      document.getElementById("bemCasadoType").value;
+
+    const qty =
+      Number(document.getElementById("bemCasadoQty").value);
+
+    if (qty < 1) {
+
+      alert("Informe uma quantidade válida.");
+
+      return;
+
+    }
+
+    let unitPrice;
+
+    let typeName;
+
+    if (type === "crepom") {
+
+      unitPrice =
+        qty >= 20 ? 4.8 : 6;
+
+      typeName =
+        "Papel crepom";
+
+    } else {
+
+      unitPrice =
+        qty >= 20 ? 4 : 5;
+
+      typeName =
+        "Folha de celofane";
+
+    }
+
+    order.push({
+
+      type: "Bem Casado",
+
+      name:
+        `${qty} unidades - ${typeName}`,
+
+      details:
+        `${money(unitPrice)} por unidade`,
+
+      price:
+        qty * unitPrice
+
+    });
+
+    updateSummary();
+
+    alert("Bem Casado adicionado!");
+
+  }
+
+
+  /* ================================
+     CUPCAKES
+  ================================= */
+
+  function addCupcakes() {
+
+    const type =
+      document.getElementById("cupcakeType").value;
+
+    const qty =
+      Number(document.getElementById("cupcakeQty").value);
+
+    if (qty < 1) {
+
+      alert("Informe uma quantidade válida.");
+
+      return;
+
+    }
+
+    const unitPrice =
+      type === "com" ? 6.5 : 5.5;
+
+    const typeName =
+      type === "com"
+        ? "Com plaquinha"
+        : "Sem plaquinha";
+
+    order.push({
+
+      type: "Cupcakes",
+
+      name:
+        `${qty} unidades - ${typeName}`,
+
+      details:
+        `${money(unitPrice)} por unidade`,
+
+      price:
+        qty * unitPrice
+
+    });
+
+    updateSummary();
+
+    alert("Cupcakes adicionados!");
+
+  }
+
+
+  /* ================================
+     RESUMO
+  ================================= */
+
+  function updateSummary() {
+
+    const list =
+      document.getElementById("summaryList");
+
+    const totalElement =
+      document.getElementById("total");
+
+    if (order.length === 0) {
+
+      list.innerHTML =
+        "<p>Nenhum item adicionado ainda.</p>";
+
+      totalElement.textContent =
+        money(0);
+
+      return;
+
+    }
+
+    let total = 0;
+
+    list.innerHTML = "";
+
+    order.forEach((item, index) => {
+
+      total += item.price;
+
+      const line =
+        document.createElement("div");
+
+      line.className = "summary-line";
+
+      line.innerHTML = `
+
+        <div>
+
+          <strong>
+            ${index + 1}. ${item.type}
+          </strong>
+
+          <br>
+
+          <small>
+            ${item.name}
+          </small>
+
+        </div>
+
+        <strong>
+          ${money(item.price)}
+        </strong>
+
+      `;
+
+      list.appendChild(line);
+
+    });
+
+    totalElement.textContent =
+      money(total);
+
+  }
+
+
+  /* ================================
+     LIMPAR PEDIDO
+  ================================= */
+
+  function clearOrder() {
+
+    if (order.length === 0) {
+      return;
+    }
+
+    const confirmed =
+      confirm("Deseja realmente limpar o pedido?");
+
+    if (!confirmed) {
+      return;
+    }
+
+    order = [];
+
+    updateSummary();
+
+  }
+
+
+  /* ================================
+     WHATSAPP
+  ================================= */
+
+  function sendWhatsApp() {
+
+    if (order.length === 0) {
+
+      alert("Adicione pelo menos um item ao pedido.");
+
+      return;
+
+    }
+
+    const name =
+      document.getElementById("customerName").value.trim();
+
+    const phone =
+      document.getElementById("customerPhone").value.trim();
+
+    const date =
+      document.getElementById("orderDate").value;
+
+    const notes =
+      document.getElementById("orderNotes").value.trim();
+
+    if (!name) {
+
+      alert("Informe seu nome.");
+
+      return;
+
+    }
+
+    if (!phone) {
+
+      alert("Informe seu WhatsApp.");
+
+      return;
+
+    }
+
+    let total = 0;
+
+    let message =
+      "🍰 *NOVO PEDIDO - MARTINS CONFEITARIA*%0A%0A";
+
+    message +=
+      `*Cliente:* ${name}%0A`;
+
+    message +=
+      `*WhatsApp:* ${phone}%0A`;
+
+    if (date) {
+
+      const dateFormatted =
+        new Date(date + "T00:00:00")
+          .toLocaleDateString("pt-BR");
+
+      message +=
+        `*Data desejada:* ${dateFormatted}%0A`;
+
+    }
+
+    message += "%0A*ITENS DO PEDIDO:*%0A%0A";
+
+    order.forEach((item, index) => {
+
+      total += item.price;
+
+      message +=
+        `*${index + 1}. ${item.type}*%0A`;
+
+      message +=
+        `${item.name}%0A`;
+
+      if (item.details) {
+
+        message +=
+          `${item.details}%0A`;
+
+      }
+
+      if (item.extras && item.extras.length) {
+
+        message +=
+          `Adicionais: ${item.extras.join(", ")}%0A`;
+
+      }
+
+      if (item.topper) {
+
+        message +=
+          `Topo: ${item.topper}%0A`;
+
+      }
+
+      message +=
+        `Valor: ${money(item.price)}%0A%0A`;
+
+    });
+
+    message +=
+      `*TOTAL: ${money(total)}*%0A`;
+
+    if (notes) {
+
+      message +=
+        `%0A*Observações:*%0A${notes}`;
+
+    }
+
+    const url =
+      `https://wa.me/${whatsapp}?text=${message}`;
+
+    window.open(url, "_blank");
+
+  }
+
+
+  /* ================================
+     DATA MÍNIMA
+  ================================= */
+
+  const dateInput =
+    document.getElementById("orderDate");
+
+  const today =
+    new Date();
+
+  const yyyy =
+    today.getFullYear();
+
+  const mm =
+    String(today.getMonth() + 1)
+      .padStart(2, "0");
+
+  const dd =
+    String(today.getDate())
+      .padStart(2, "0");
+
+  dateInput.min =
+    `${yyyy}-${mm}-${dd}`;
+
+</script>
 
 </body>
 </html>
