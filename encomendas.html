@@ -7,413 +7,593 @@
   <title>Encomendas | Martins Confeitaria</title>
 
   <style>
+    :root {
+      --bg: #f8f5f1;
+      --card: #ffffff;
+      --text: #3d2921;
+      --muted: #7c6a61;
+      --primary: #6f4938;
+      --primary-dark: #563629;
+      --border: #e8ddd6;
+      --soft: #f3ebe5;
+      --success: #55705b;
+      --shadow: 0 8px 25px rgba(60, 35, 25, .06);
+      --radius: 18px;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       font-family: Arial, Helvetica, sans-serif;
-      background: #faf7f3;
-      color: #3a241b;
+      background: var(--bg);
+      color: var(--text);
       line-height: 1.5;
     }
 
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
     header {
-      background: #fff;
-      border-bottom: 1px solid #eadfd7;
-      padding: 18px 20px;
+      background: rgba(255,255,255,.96);
+      border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
       z-index: 100;
+      backdrop-filter: blur(10px);
     }
 
-    .header-content {
-      max-width: 1100px;
+    .header-inner {
+      width: min(1100px, 92%);
       margin: auto;
+      min-height: 72px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 20px;
     }
 
+    .back {
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: .95rem;
+    }
+
     .logo {
-      height: 55px;
-      max-width: 180px;
+      max-width: 170px;
+      max-height: 52px;
       object-fit: contain;
     }
 
-    .back-link {
-      color: #6b3f2d;
-      text-decoration: none;
-      font-weight: 600;
-    }
+    /* =========================
+       PAGE
+    ========================= */
 
     .container {
-      width: min(1100px, 92%);
-      margin: 0 auto;
-      padding: 40px 0 80px;
+      width: min(1000px, 92%);
+      margin: auto;
+      padding: 42px 0 80px;
     }
 
     .hero {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 35px;
     }
 
     .hero h1 {
       font-family: Georgia, serif;
-      font-size: clamp(2rem, 5vw, 3.3rem);
-      color: #4b2b20;
-      margin-bottom: 10px;
-    }
-
-    .hero p {
-      color: #806b60;
-      font-size: 1rem;
-    }
-
-    .section {
-      background: #fff;
-      border: 1px solid #eadfd7;
-      border-radius: 20px;
-      padding: 28px;
-      margin-bottom: 25px;
-      box-shadow: 0 8px 25px rgba(80, 45, 25, 0.05);
-    }
-
-    .section h2 {
-      font-family: Georgia, serif;
-      font-size: 1.7rem;
-      color: #4b2b20;
+      font-size: clamp(2rem, 5vw, 3rem);
+      color: var(--text);
       margin-bottom: 8px;
     }
 
-    .section-description {
-      color: #806b60;
-      margin-bottom: 25px;
+    .hero p {
+      color: var(--muted);
     }
 
-    /* ESCOLHA DO BOLO */
+    /* =========================
+       PROGRESS
+    ========================= */
 
-    .cake-options {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
+    .progress {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 30px;
     }
 
-    .cake-option {
-      border: 2px solid #eadfd7;
-      border-radius: 18px;
-      padding: 25px;
-      cursor: pointer;
-      transition: .2s;
-      background: #fff;
+    .progress-step {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--border);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: .85rem;
     }
 
-    .cake-option:hover {
-      border-color: #9b6249;
-      transform: translateY(-2px);
+    .progress-step.active {
+      background: var(--primary);
+      color: white;
     }
 
-    .cake-option.active {
-      border-color: #6b3f2d;
-      background: #fcf5ef;
+    .progress-line {
+      width: 35px;
+      height: 2px;
+      background: var(--border);
     }
 
-    .cake-option input {
-      display: none;
+    /* =========================
+       SECTIONS
+    ========================= */
+
+    .section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
     }
 
-    .cake-option h3 {
-      color: #4b2b20;
+    .section-title {
       font-family: Georgia, serif;
-      font-size: 1.4rem;
+      font-size: 1.7rem;
       margin-bottom: 7px;
     }
 
-    .cake-option p {
-      color: #806b60;
+    .section-subtitle {
+      color: var(--muted);
+      margin-bottom: 24px;
       font-size: .95rem;
     }
 
-    /* FORM */
+    /* =========================
+       CARDS
+    ========================= */
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .choice {
+      position: relative;
+      border: 2px solid var(--border);
+      background: white;
+      border-radius: 16px;
+      padding: 22px;
+      transition: .2s;
+      cursor: pointer;
+    }
+
+    .choice:hover {
+      border-color: #c8aa98;
+      transform: translateY(-2px);
+    }
+
+    .choice.selected {
+      border-color: var(--primary);
+      background: #fbf6f1;
+    }
+
+    .choice input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .choice h3 {
+      font-family: Georgia, serif;
+      font-size: 1.25rem;
+      margin-bottom: 6px;
+    }
+
+    .choice p {
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .choice .price {
+      margin-top: 10px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .selected-mark {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 23px;
+      height: 23px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      font-weight: bold;
+    }
+
+    .choice.selected .selected-mark {
+      display: flex;
+    }
+
+    /* =========================
+       OPTION GRID
+    ========================= */
+
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .option {
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 13px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: .2s;
+      position: relative;
+    }
+
+    .option:hover {
+      border-color: #c8aa98;
+    }
+
+    .option.selected {
+      border: 2px solid var(--primary);
+      background: #fbf6f1;
+    }
+
+    .option.disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    .option strong {
+      display: block;
+      font-size: .95rem;
+    }
+
+    .option small {
+      display: block;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .option input {
+      display: none;
+    }
+
+    /* =========================
+       INFO
+    ========================= */
+
+    .info {
+      background: var(--soft);
+      border-radius: 12px;
+      padding: 13px 15px;
+      color: var(--muted);
+      font-size: .9rem;
+      margin-bottom: 20px;
+    }
+
+    /* =========================
+       BUTTONS
+    ========================= */
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 11px;
+      padding: 13px 20px;
+      font-weight: 700;
+      transition: .2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: var(--soft);
+      color: var(--primary);
+    }
+
+    .btn-danger {
+      background: #f4e8e5;
+      color: #8a463b;
+    }
+
+    .btn-danger:hover {
+      background: #ead7d2;
+    }
+
+    .btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    /* =========================
+       FORM
+    ========================= */
 
     .form-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-    }
-
-    .field {
-      margin-bottom: 5px;
+      gap: 17px;
     }
 
     .field.full {
       grid-column: 1 / -1;
     }
 
-    label {
+    .field label {
       display: block;
       font-weight: 700;
       margin-bottom: 7px;
-      color: #4b2b20;
     }
 
-    select,
     input[type="text"],
     input[type="tel"],
-    input[type="number"],
     input[type="date"],
     textarea {
       width: 100%;
-      border: 1px solid #dccbc0;
-      background: #fff;
-      border-radius: 10px;
-      padding: 13px 14px;
-      font-size: 1rem;
-      color: #3a241b;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 13px;
       outline: none;
-    }
-
-    select:focus,
-    input:focus,
-    textarea:focus {
-      border-color: #8c5941;
+      background: white;
+      color: var(--text);
     }
 
     textarea {
-      min-height: 100px;
+      min-height: 110px;
       resize: vertical;
     }
 
-    /* CHECKBOXES */
-
-    .checkbox-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+    input:focus,
+    textarea:focus {
+      border-color: var(--primary);
     }
 
-    .check-item {
-      border: 1px solid #eadfd7;
-      border-radius: 10px;
-      padding: 12px;
+    /* =========================
+       KIT
+    ========================= */
+
+    .kit-header {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #fff;
-    }
-
-    .check-item input {
-      accent-color: #6b3f2d;
-    }
-
-    /* KITS */
-
-    .kits-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      justify-content: space-between;
+      align-items: flex-start;
       gap: 15px;
-    }
-
-    .kit-card {
-      border: 2px solid #eadfd7;
-      border-radius: 15px;
-      padding: 20px;
-      cursor: pointer;
-      transition: .2s;
-    }
-
-    .kit-card:hover {
-      border-color: #9b6249;
-    }
-
-    .kit-card.active {
-      border-color: #6b3f2d;
-      background: #fcf5ef;
-    }
-
-    .kit-card input {
-      display: none;
-    }
-
-    .kit-card h3 {
-      color: #4b2b20;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
     }
 
     .kit-price {
-      font-weight: bold;
-      color: #7a4934;
-      font-size: 1.15rem;
-      margin-bottom: 12px;
-    }
-
-    .included {
-      list-style: none;
-      font-size: .9rem;
-      color: #6d5b50;
-    }
-
-    .included li {
-      margin-bottom: 5px;
-    }
-
-    .included li::before {
-      content: "✓";
-      color: #6b3f2d;
-      font-weight: bold;
-      margin-right: 7px;
-    }
-
-    /* ADDITIONALS */
-
-    .additional-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      border: 1px solid #eadfd7;
-      border-radius: 10px;
-      padding: 12px;
-    }
-
-    .additional-item label {
-      margin: 0;
-      font-weight: 500;
-    }
-
-    .additional-item span {
-      color: #7a4934;
-      font-weight: bold;
+      color: var(--primary);
+      font-weight: 700;
       white-space: nowrap;
     }
 
-    /* BOTÕES */
-
-    .button {
-      border: none;
-      border-radius: 12px;
-      padding: 14px 20px;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: .2s;
+    .kit-items {
+      list-style: none;
+      margin-top: 15px;
     }
 
-    .button-primary {
-      background: #6b3f2d;
-      color: white;
+    .kit-items li {
+      color: var(--muted);
+      padding: 5px 0;
+      font-size: .9rem;
     }
 
-    .button-primary:hover {
-      background: #512e21;
-      transform: translateY(-1px);
+    .kit-items li::before {
+      content: "✓";
+      color: var(--success);
+      font-weight: bold;
+      margin-right: 8px;
     }
 
-    .button-secondary {
-      background: #eee4dd;
-      color: #4b2b20;
+    .kit-selected {
+      border-color: var(--primary);
+      background: #fbf6f1;
     }
 
-    .button-secondary:hover {
-      background: #e2d5cb;
+    /* =========================
+       RESET KIT
+    ========================= */
+
+    .selected-kit-box {
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+      background: #fcfaf8;
     }
 
-    /* RESUMO */
-
-    .summary {
-      background: #4b2b20;
-      color: white;
-      border-radius: 20px;
-      padding: 28px;
-      position: sticky;
-      bottom: 15px;
-      box-shadow: 0 10px 35px rgba(50, 25, 15, .25);
-    }
-
-    .summary h2 {
+    .selected-kit-box h3 {
       font-family: Georgia, serif;
+      margin-bottom: 12px;
+    }
+
+    .selected-kit-box ul {
+      list-style: none;
       margin-bottom: 18px;
     }
 
-    #summaryList {
-      margin-bottom: 20px;
+    .selected-kit-box li {
+      padding: 6px 0;
+      color: var(--muted);
     }
 
-    .summary-line {
+    .selected-kit-box li::before {
+      content: "✓";
+      color: var(--success);
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    /* =========================
+       FINAL SUMMARY
+    ========================= */
+
+    .summary {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .summary-item {
+      border-bottom: 1px solid var(--border);
+      padding: 15px 0;
+    }
+
+    .summary-item:last-child {
+      border-bottom: 0;
+    }
+
+    .summary-item-header {
       display: flex;
       justify-content: space-between;
-      gap: 20px;
-      border-bottom: 1px solid rgba(255,255,255,.15);
-      padding: 9px 0;
+      gap: 15px;
+    }
+
+    .summary-item h3 {
+      font-family: Georgia, serif;
+      font-size: 1.05rem;
+    }
+
+    .summary-item p {
+      color: var(--muted);
+      font-size: .9rem;
+      margin-top: 4px;
     }
 
     .summary-total {
+      border-top: 2px solid var(--border);
+      margin-top: 15px;
+      padding-top: 18px;
       display: flex;
       justify-content: space-between;
-      font-size: 1.5rem;
-      font-weight: bold;
-      margin-top: 18px;
+      font-size: 1.35rem;
+      font-weight: 700;
     }
 
-    .summary-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
+    .empty {
+      text-align: center;
+      padding: 20px;
+      color: var(--muted);
     }
 
-    .summary .button-primary {
-      background: #fff;
-      color: #4b2b20;
-      flex: 1;
-    }
-
-    .summary .button-secondary {
-      background: rgba(255,255,255,.12);
-      color: white;
-    }
+    /* =========================
+       HIDDEN
+    ========================= */
 
     .hidden {
       display: none !important;
     }
 
-    .notice {
-      background: #fcf5ef;
-      border-left: 4px solid #8c5941;
-      padding: 13px 15px;
-      border-radius: 8px;
-      color: #6d5b50;
-      margin-bottom: 20px;
-      font-size: .93rem;
-    }
-
     footer {
       text-align: center;
       padding: 30px;
-      color: #806b60;
-      font-size: .9rem;
+      color: var(--muted);
+      font-size: .85rem;
     }
 
-    @media (max-width: 700px) {
-      .cake-options,
-      .form-grid,
-      .kits-grid,
-      .checkbox-grid {
-        grid-template-columns: 1fr;
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 720px) {
+
+      .container {
+        padding-top: 30px;
       }
 
       .section {
         padding: 20px;
       }
 
-      .header-content {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .option-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .field.full {
+        grid-column: auto;
+      }
+
+      .header-inner {
+        min-height: 65px;
+      }
+
+      .logo {
+        max-width: 130px;
+      }
+
+      .actions {
         flex-direction: column;
       }
 
-      .summary-actions {
-        flex-direction: column;
+      .actions .btn {
+        width: 100%;
+      }
+
+      .progress-line {
+        width: 18px;
       }
     }
   </style>
@@ -422,8 +602,11 @@
 <body>
 
 <header>
-  <div class="header-content">
-    <a href="index.html" class="back-link">← Voltar</a>
+  <div class="header-inner">
+
+    <a href="index.html" class="back">
+      ← Voltar
+    </a>
 
     <img
       src="logo.png"
@@ -431,8 +614,10 @@
       class="logo"
       onerror="this.style.display='none'"
     >
+
   </div>
 </header>
+
 
 <main class="container">
 
@@ -441,507 +626,889 @@
     <p>Escolha cada detalhe do seu pedido.</p>
   </div>
 
-  <!-- PRIMEIRA ETAPA -->
-  <section class="section">
 
-    <h2>Escolha o tipo de bolo</h2>
+  <!-- PROGRESSO -->
 
-    <p class="section-description">
-      Comece escolhendo o estilo do seu bolo.
+  <div class="progress">
+    <div class="progress-step active" id="progress1">1</div>
+    <div class="progress-line"></div>
+    <div class="progress-step" id="progress2">2</div>
+    <div class="progress-line"></div>
+    <div class="progress-step" id="progress3">3</div>
+  </div>
+
+
+  <!-- =========================
+       ETAPA 1
+  ========================== -->
+
+  <section class="section" id="step1">
+
+    <h2 class="section-title">
+      Escolha o que deseja
+    </h2>
+
+    <p class="section-subtitle">
+      Comece escolhendo o tipo de encomenda.
     </p>
 
-    <div class="cake-options">
 
-      <label class="cake-option" id="optionNaked">
-        <input type="radio" name="cakeType" value="naked">
-        <h3>Naked Cake / Scrapcake</h3>
-        <p>Bolo com acabamento delicado e elegante.</p>
+    <div class="cards">
+
+      <label class="choice" id="cakeChoice">
+        <input type="radio" name="mainType" value="cake">
+
+        <span class="selected-mark">✓</span>
+
+        <h3>Bolos</h3>
+
+        <p>
+          Monte seu bolo escolhendo tamanho, massa,
+          recheios, adicionais e topo.
+        </p>
       </label>
 
-      <label class="cake-option" id="optionChantininho">
-        <input type="radio" name="cakeType" value="chantininho">
-        <h3>Chantininho</h3>
-        <p>Bolo decorado com acabamento em chantininho.</p>
-      </label>
 
-    </div>
+      <label class="choice" id="kitChoice">
+        <input type="radio" name="mainType" value="kit">
 
-  </section>
+        <span class="selected-mark">✓</span>
 
-  <!-- CONFIGURAÇÃO DO BOLO -->
-  <section class="section hidden" id="cakeSection">
+        <h3>Kit Festa</h3>
 
-    <h2>Escolha os detalhes do bolo</h2>
-
-    <div class="form-grid">
-
-      <div class="field">
-        <label for="cakeSize">Quantidade de pessoas</label>
-
-        <select id="cakeSize">
-          <option value="">Selecione</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="cakeMass">Massa</label>
-
-        <select id="cakeMass">
-          <option value="">Selecione</option>
-          <option>Amanteigado</option>
-          <option>Baunilha</option>
-          <option>Ninho</option>
-          <option>Coco</option>
-          <option>Chocolate</option>
-          <option>Limão</option>
-        </select>
-      </div>
-
-      <div class="field full">
-        <label for="cakeFilling">Recheio</label>
-
-        <select id="cakeFilling">
-          <option value="">Selecione</option>
-          <option>Ninho</option>
-          <option>Beijinho</option>
-          <option>Brigadeiro</option>
-          <option>Doce de leite</option>
-          <option>Leite condensado</option>
-          <option>Limão</option>
-          <option>Oreo</option>
-        </select>
-      </div>
-
-    </div>
-
-    <br>
-
-    <label>Adicionais</label>
-
-    <div class="checkbox-grid">
-
-      <label class="additional-item">
-        <label>
-          <input type="checkbox" class="cake-extra" value="Abacaxi" data-price="10">
-          Abacaxi
-        </label>
-        <span>+ R$ 10,00</span>
-      </label>
-
-      <label class="additional-item">
-        <label>
-          <input type="checkbox" class="cake-extra" value="Morango" data-price="16">
-          Morango
-        </label>
-        <span>+ R$ 16,00</span>
-      </label>
-
-      <label class="additional-item">
-        <label>
-          <input type="checkbox" class="cake-extra" value="Crocante de Castanha" data-price="10">
-          Crocante de Castanha
-        </label>
-        <span>+ R$ 10,00</span>
-      </label>
-
-      <label class="additional-item">
-        <label>
-          <input type="checkbox" class="cake-extra" value="Kit Kat" data-price="12">
-          Kit Kat
-        </label>
-        <span>+ R$ 12,00</span>
-      </label>
-
-      <label class="additional-item">
-        <label>
-          <input type="checkbox" class="cake-extra" value="Geleia de Morango" data-price="16">
-          Geleia de Morango
-        </label>
-        <span>+ R$ 16,00</span>
-      </label>
-
-      <label class="additional-item">
-        <label>
-          <input type="checkbox" class="cake-extra" value="Ouro Branco" data-price="10">
-          Ouro Branco
-        </label>
-        <span>+ R$ 10,00</span>
-      </label>
-
-      <label class="additional-item">
-        <label>
-          <input type="checkbox" class="cake-extra" value="Nutella" data-price="16">
-          Nutella
-        </label>
-        <span>+ R$ 16,00</span>
-      </label>
-
-      <label class="additional-item">
-        <label>
-          <input type="checkbox" class="cake-extra" value="Kinder Bueno" data-price="16">
-          Kinder Bueno
-        </label>
-        <span>+ R$ 16,00</span>
+        <p>
+          Escolha um kit completo e personalize
+          somente o topo do bolo.
+        </p>
       </label>
 
     </div>
 
-    <br>
 
-    <div class="field">
-      <label for="cakeTopper">Topo do bolo</label>
+    <div class="actions">
 
-      <select id="cakeTopper">
-        <option value="">Sem topo</option>
-        <option value="Topo simples" data-price="20">
-          Topo simples - R$ 20,00
-        </option>
-        <option value="Topo 3D" data-price="30">
-          Topo 3D - R$ 30,00
-        </option>
-        <option value="Cores naturais" data-price="70">
-          Cores naturais - R$ 70,00
-        </option>
-        <option value="Scrap cake" data-price="30">
-          Scrap cake - + R$ 30,00
-        </option>
-      </select>
-    </div>
-
-    <br>
-
-    <button class="button button-primary" onclick="addCake()">
-      Adicionar bolo ao pedido
-    </button>
-
-  </section>
-
-  <!-- BRIGADEIROS -->
-
-  <section class="section">
-
-    <h2>Brigadeiros</h2>
-
-    <p class="section-description">
-      Escolha a linha, quantidade e sabores desejados.
-    </p>
-
-    <div class="form-grid">
-
-      <div class="field">
-        <label for="brigadeiroLine">Linha</label>
-
-        <select id="brigadeiroLine">
-          <option value="classica">Linha Clássica</option>
-          <option value="premium">Linha Premium</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="brigadeiroQty">Quantidade</label>
-
-        <select id="brigadeiroQty">
-          <option value="50">50 unidades</option>
-          <option value="100">100 unidades</option>
-        </select>
-      </div>
-
-    </div>
-
-    <br>
-
-    <label>Sabores</label>
-
-    <div class="checkbox-grid" id="brigadeiroFlavors"></div>
-
-    <br>
-
-    <button class="button button-primary" onclick="addBrigadeiros()">
-      Adicionar brigadeiros
-    </button>
-
-  </section>
-
-  <!-- KITS -->
-
-  <section class="section">
-
-    <h2>Kit Festa</h2>
-
-    <p class="section-description">
-      Ao escolher um kit, todos os itens incluídos ficam automaticamente marcados.
-      Você só precisa escolher o topo do bolo.
-    </p>
-
-    <div class="kits-grid" id="kits"></div>
-
-    <div id="selectedKitArea" class="hidden">
-
-      <br>
-
-      <div class="notice">
-        Os itens abaixo já fazem parte do kit e não podem ser alterados.
-      </div>
-
-      <div id="kitIncluded"></div>
-
-      <br>
-
-      <div class="field">
-        <label for="kitTopper">Topo do bolo</label>
-
-        <select id="kitTopper">
-          <option value="">Selecione</option>
-          <option value="Topo simples" data-price="20">
-            Topo simples - R$ 20,00
-          </option>
-          <option value="Topo 3D" data-price="30">
-            Topo 3D - R$ 30,00
-          </option>
-          <option value="Cores naturais" data-price="70">
-            Cores naturais - R$ 70,00
-          </option>
-          <option value="Scrap cake" data-price="30">
-            Scrap cake - + R$ 30,00
-          </option>
-        </select>
-      </div>
-
-      <br>
-
-      <button class="button button-primary" onclick="addKit()">
-        Adicionar kit ao pedido
+      <button
+        class="btn btn-primary"
+        id="continueMain"
+        disabled
+      >
+        Continuar
       </button>
 
     </div>
 
   </section>
 
-  <!-- PETIT BROWNIE -->
 
-  <section class="section">
+  <!-- =========================
+       BOLOS
+  ========================== -->
 
-    <h2>Petit Brownie</h2>
+  <section class="section hidden" id="cakeStep">
 
-    <p class="section-description">
-      Quadradinho de brownie com uma pitanga de brigadeiro na caixeta de docinho.
+    <h2 class="section-title">
+      Escolha o tipo de bolo
+    </h2>
+
+    <p class="section-subtitle">
+      Escolha entre Naked Cake / Scrapcake ou Chantininho.
     </p>
 
-    <div class="form-grid">
 
-      <div class="field">
-        <label for="petitQty">Quantidade</label>
+    <div class="cards">
 
-        <select id="petitQty">
-          <option value="50">50 unidades - R$ 90,00</option>
-          <option value="100">100 unidades - R$ 180,00</option>
-        </select>
+      <label class="choice" data-cake="naked">
+
+        <input type="radio" name="cakeType" value="naked">
+
+        <span class="selected-mark">✓</span>
+
+        <h3>Naked Cake / Scrapcake</h3>
+
+        <p>
+          Acabamento delicado e elegante.
+        </p>
+
+      </label>
+
+
+      <label class="choice" data-cake="chantininho">
+
+        <input type="radio" name="cakeType" value="chantininho">
+
+        <span class="selected-mark">✓</span>
+
+        <h3>Chantininho</h3>
+
+        <p>
+          Bolo com acabamento em chantininho.
+        </p>
+
+      </label>
+
+    </div>
+
+
+    <div id="cakeConfig" class="hidden">
+
+      <!-- TAMANHO -->
+
+      <div style="margin-top:30px;">
+
+        <h3 style="margin-bottom:7px;">
+          1. Quantas pessoas?
+        </h3>
+
+        <p class="section-subtitle">
+          Escolha o tamanho do bolo.
+        </p>
+
+        <div class="option-grid" id="cakeSizes"></div>
+
+      </div>
+
+
+      <!-- MASSA -->
+
+      <div style="margin-top:30px;">
+
+        <h3 style="margin-bottom:7px;">
+          2. Escolha a massa
+        </h3>
+
+        <p class="section-subtitle">
+          Escolha uma massa.
+        </p>
+
+        <div class="option-grid" id="massOptions">
+
+          <label class="option">
+            <input type="radio" name="mass" value="Amanteigado">
+            <strong>Amanteigado</strong>
+          </label>
+
+          <label class="option">
+            <input type="radio" name="mass" value="Baunilha">
+            <strong>Baunilha</strong>
+          </label>
+
+          <label class="option">
+            <input type="radio" name="mass" value="Ninho">
+            <strong>Ninho</strong>
+          </label>
+
+          <label class="option">
+            <input type="radio" name="mass" value="Coco">
+            <strong>Coco</strong>
+          </label>
+
+          <label class="option">
+            <input type="radio" name="mass" value="Chocolate">
+            <strong>Chocolate</strong>
+          </label>
+
+          <label class="option">
+            <input type="radio" name="mass" value="Limão">
+            <strong>Limão</strong>
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <!-- RECHEIOS -->
+
+      <div style="margin-top:30px;">
+
+        <h3 style="margin-bottom:7px;">
+          3. Escolha os recheios
+        </h3>
+
+        <p class="section-subtitle">
+          Você pode escolher até 2 recheios.
+        </p>
+
+        <div class="option-grid" id="fillingOptions">
+
+          <label class="option">
+            <input type="checkbox" value="Ninho">
+            <strong>Ninho</strong>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" value="Beijinho">
+            <strong>Beijinho</strong>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" value="Brigadeiro">
+            <strong>Brigadeiro</strong>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" value="Doce de leite">
+            <strong>Doce de leite</strong>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" value="Leite condensado">
+            <strong>Leite condensado</strong>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" value="Limão">
+            <strong>Limão</strong>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" value="Oreo">
+            <strong>Oreo</strong>
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <!-- ADICIONAIS -->
+
+      <div style="margin-top:30px;">
+
+        <h3 style="margin-bottom:7px;">
+          4. Quer adicionar algo?
+        </h3>
+
+        <p class="section-subtitle">
+          Essa etapa é opcional.
+        </p>
+
+        <div class="option-grid" id="extraOptions">
+
+          <label class="option">
+            <input type="checkbox" value="Abacaxi" data-price="10">
+            <strong>Abacaxi</strong>
+            <small>+ R$ 10,00</small>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" value="Morango" data-price="16">
+            <strong>Morango</strong>
+            <small>+ R$ 16,00</small>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" value="Crocante de Castanha" data-price="10">
+            <strong>Crocante de Castanha</strong>
+            <small>+ R$ 10,00</small>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" value="Kit Kat" data-price="12">
+            <strong>Kit Kat</strong>
+            <small>+ R$ 12,00</small>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" value="Geleia de Morango" data-price="16">
+            <strong>Geleia de Morango</strong>
+            <small>+ R$ 16,00</small>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" value="Ouro Branco" data-price="10">
+            <strong>Ouro Branco</strong>
+            <small>+ R$ 10,00</small>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" value="Nutella" data-price="16">
+            <strong>Nutella</strong>
+            <small>+ R$ 16,00</small>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" value="Kinder Bueno" data-price="16">
+            <strong>Kinder Bueno</strong>
+            <small>+ R$ 16,00</small>
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <!-- TOPO -->
+
+      <div style="margin-top:30px;">
+
+        <h3 style="margin-bottom:7px;">
+          5. Escolha o topo
+        </h3>
+
+        <p class="section-subtitle">
+          Você pode escolher quantos quiser.
+        </p>
+
+        <div class="option-grid" id="topperOptions">
+
+          <label class="option">
+            <input type="checkbox" value="Topo simples" data-price="20">
+            <strong>Topo simples</strong>
+            <small>R$ 20,00</small>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" value="Topo 3D" data-price="30">
+            <strong>Topo 3D</strong>
+            <small>R$ 30,00</small>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" value="Cores naturais" data-price="70">
+            <strong>Cores naturais</strong>
+            <small>R$ 70,00</small>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" value="Scrap cake" data-price="30">
+            <strong>Scrap cake</strong>
+            <small>+ R$ 30,00</small>
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <div class="actions">
+
+        <button
+          class="btn btn-secondary"
+          onclick="backToMain()"
+        >
+          ← Voltar
+        </button>
+
+        <button
+          class="btn btn-primary"
+          onclick="addCakeToOrder()"
+        >
+          Adicionar bolo
+        </button>
+
       </div>
 
     </div>
 
-    <br>
-
-    <button class="button button-primary" onclick="addPetitBrownie()">
-      Adicionar Petit Brownie
-    </button>
-
   </section>
 
-  <!-- MINI BROWNIE -->
 
-  <section class="section">
+  <!-- =========================
+       KIT FESTA
+  ========================== -->
 
-    <h2>Mini Brownie Recheado</h2>
+  <section class="section hidden" id="kitStep">
 
-    <p class="section-description">
-      R$ 3,50 por unidade. A partir de 20 unidades: R$ 2,80 por unidade.
+    <h2 class="section-title">
+      Escolha seu Kit Festa
+    </h2>
+
+    <p class="section-subtitle">
+      Todos os itens do kit já estão incluídos.
+      Você só escolhe o topo do bolo.
     </p>
 
-    <div class="form-grid">
 
-      <div class="field">
-        <label for="miniBrownieQty">Quantidade</label>
+    <div class="cards" id="kitOptions"></div>
 
-        <input
-          type="number"
-          id="miniBrownieQty"
-          min="1"
-          value="1"
+
+    <!-- KIT SELECIONADO -->
+
+    <div id="selectedKitBox" class="selected-kit-box hidden">
+
+      <h3 id="selectedKitTitle"></h3>
+
+      <ul id="selectedKitItems"></ul>
+
+
+      <div class="info">
+        Estes itens fazem parte do kit e não podem ser alterados.
+      </div>
+
+
+      <h3 style="margin-bottom:7px;">
+        Escolha o topo do bolo
+      </h3>
+
+      <p class="section-subtitle">
+        Você pode escolher quantos quiser.
+      </p>
+
+
+      <div class="option-grid" id="kitTopperOptions">
+
+        <label class="option">
+          <input type="checkbox" value="Topo simples" data-price="20">
+          <strong>Topo simples</strong>
+          <small>R$ 20,00</small>
+        </label>
+
+        <label class="option">
+          <input type="checkbox" value="Topo 3D" data-price="30">
+          <strong>Topo 3D</strong>
+          <small>R$ 30,00</small>
+        </label>
+
+        <label class="option">
+          <input type="checkbox" value="Cores naturais" data-price="70">
+          <strong>Cores naturais</strong>
+          <small>R$ 70,00</small>
+        </label>
+
+        <label class="option">
+          <input type="checkbox" value="Scrap cake" data-price="30">
+          <strong>Scrap cake</strong>
+          <small>+ R$ 30,00</small>
+        </label>
+
+      </div>
+
+
+      <div class="actions">
+
+        <button
+          class="btn btn-danger"
+          onclick="resetKit()"
         >
+          Não quero este kit
+        </button>
+
+        <button
+          class="btn btn-primary"
+          onclick="addKitToOrder()"
+        >
+          Adicionar kit
+        </button>
+
       </div>
 
     </div>
 
-    <br>
 
-    <button class="button button-primary" onclick="addMiniBrownie()">
-      Adicionar Mini Brownie
-    </button>
+    <div class="actions">
 
-  </section>
-
-  <!-- BEM CASADO -->
-
-  <section class="section">
-
-    <h2>Bem Casado</h2>
-
-    <div class="form-grid">
-
-      <div class="field">
-        <label for="bemCasadoType">Embalagem</label>
-
-        <select id="bemCasadoType">
-          <option value="crepom">
-            Papel crepom - R$ 6,00 / R$ 4,80 a partir de 20
-          </option>
-
-          <option value="celofane">
-            Folha de celofane - R$ 5,00 / R$ 4,00 a partir de 20
-          </option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="bemCasadoQty">Quantidade</label>
-
-        <input
-          type="number"
-          id="bemCasadoQty"
-          min="1"
-          value="1"
-        >
-      </div>
+      <button
+        class="btn btn-secondary"
+        onclick="backToMain()"
+      >
+        ← Voltar
+      </button>
 
     </div>
 
-    <br>
-
-    <button class="button button-primary" onclick="addBemCasado()">
-      Adicionar Bem Casado
-    </button>
-
   </section>
 
-  <!-- CUPCAKES -->
+
+  <!-- =========================
+       OUTROS PRODUTOS
+  ========================== -->
 
   <section class="section">
 
-    <h2>Cupcakes</h2>
+    <h2 class="section-title">
+      Outros produtos
+    </h2>
 
-    <div class="form-grid">
-
-      <div class="field">
-        <label for="cupcakeType">Modelo</label>
-
-        <select id="cupcakeType">
-          <option value="com">Com plaquinha - R$ 6,50</option>
-          <option value="sem">Sem plaquinha - R$ 5,50</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="cupcakeQty">Quantidade</label>
-
-        <input
-          type="number"
-          id="cupcakeQty"
-          min="1"
-          value="1"
-        >
-      </div>
-
-    </div>
-
-    <br>
-
-    <button class="button button-primary" onclick="addCupcakes()">
-      Adicionar Cupcakes
-    </button>
-
-  </section>
-
-  <!-- DADOS DO CLIENTE -->
-
-  <section class="section">
-
-    <h2>Seus dados</h2>
-
-    <p class="section-description">
-      Preencha seus dados para enviar o pedido pelo WhatsApp.
+    <p class="section-subtitle">
+      Você também pode adicionar outros produtos ao mesmo pedido.
     </p>
 
+
+    <!-- BRIGADEIROS -->
+
+    <div style="margin-bottom:35px;">
+
+      <h3>Brigadeiros</h3>
+
+      <p class="section-subtitle">
+        Linha Clássica ou Premium.
+      </p>
+
+
+      <div class="option-grid" id="brigadeiroLine">
+
+        <label class="option selected">
+          <input type="radio" name="brigLine" value="classica" checked>
+          <strong>Clássica</strong>
+        </label>
+
+        <label class="option">
+          <input type="radio" name="brigLine" value="premium">
+          <strong>Premium</strong>
+        </label>
+
+      </div>
+
+
+      <div style="margin-top:18px;" class="option-grid">
+
+        <label class="option selected">
+          <input type="radio" name="brigQty" value="50" checked>
+          <strong>50 unidades</strong>
+          <small id="brig50">R$ 62,50</small>
+        </label>
+
+        <label class="option">
+          <input type="radio" name="brigQty" value="100">
+          <strong>100 unidades</strong>
+          <small id="brig100">R$ 125,00</small>
+        </label>
+
+      </div>
+
+
+      <div
+        style="margin-top:18px;"
+        class="option-grid"
+        id="brigadeiroFlavors"
+      ></div>
+
+
+      <div class="actions">
+
+        <button
+          class="btn btn-secondary"
+          onclick="addBrigadeiros()"
+        >
+          Adicionar brigadeiros
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- PETIT BROWNIE -->
+
+    <div style="margin-bottom:35px;">
+
+      <h3>Petit Brownie</h3>
+
+      <p class="section-subtitle">
+        Quadradinho de brownie com uma pitanga de brigadeiro na caixeta de docinho.
+      </p>
+
+
+      <div class="option-grid">
+
+        <label class="option selected">
+          <input type="radio" name="petitQty" value="50" checked>
+          <strong>50 unidades</strong>
+          <small>R$ 90,00</small>
+        </label>
+
+        <label class="option">
+          <input type="radio" name="petitQty" value="100">
+          <strong>100 unidades</strong>
+          <small>R$ 180,00</small>
+        </label>
+
+      </div>
+
+
+      <div class="actions">
+
+        <button
+          class="btn btn-secondary"
+          onclick="addPetitBrownie()"
+        >
+          Adicionar Petit Brownie
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- MINI BROWNIE -->
+
+    <div style="margin-bottom:35px;">
+
+      <h3>Mini Brownie Recheado</h3>
+
+      <p class="section-subtitle">
+        R$ 3,50 por unidade. A partir de 20 unidades: R$ 2,80 por unidade.
+      </p>
+
+
+      <input
+        type="number"
+        id="miniQty"
+        min="1"
+        value="1"
+        style="width:100%;max-width:300px;border:1px solid var(--border);border-radius:11px;padding:13px;"
+      >
+
+
+      <div class="actions">
+
+        <button
+          class="btn btn-secondary"
+          onclick="addMiniBrownie()"
+        >
+          Adicionar Mini Brownie
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- BEM CASADO -->
+
+    <div style="margin-bottom:35px;">
+
+      <h3>Bem Casado</h3>
+
+
+      <div class="option-grid" style="margin-top:15px;">
+
+        <label class="option selected">
+          <input type="radio" name="bemType" value="crepom" checked>
+          <strong>Papel crepom</strong>
+          <small>R$ 6,00 / R$ 4,80 a partir de 20</small>
+        </label>
+
+        <label class="option">
+          <input type="radio" name="bemType" value="celofane">
+          <strong>Folha de celofane</strong>
+          <small>R$ 5,00 / R$ 4,00 a partir de 20</small>
+        </label>
+
+      </div>
+
+
+      <input
+        type="number"
+        id="bemQty"
+        min="1"
+        value="1"
+        style="margin-top:15px;width:100%;max-width:300px;border:1px solid var(--border);border-radius:11px;padding:13px;"
+      >
+
+
+      <div class="actions">
+
+        <button
+          class="btn btn-secondary"
+          onclick="addBemCasado()"
+        >
+          Adicionar Bem Casado
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- CUPCAKES -->
+
+    <div>
+
+      <h3>Cupcakes</h3>
+
+
+      <div class="option-grid" style="margin-top:15px;">
+
+        <label class="option selected">
+          <input type="radio" name="cupcakeType" value="com" checked>
+          <strong>Com plaquinha</strong>
+          <small>R$ 6,50</small>
+        </label>
+
+        <label class="option">
+          <input type="radio" name="cupcakeType" value="sem">
+          <strong>Sem plaquinha</strong>
+          <small>R$ 5,50</small>
+        </label>
+
+      </div>
+
+
+      <input
+        type="number"
+        id="cupcakeQty"
+        min="1"
+        value="1"
+        style="margin-top:15px;width:100%;max-width:300px;border:1px solid var(--border);border-radius:11px;padding:13px;"
+      >
+
+
+      <div class="actions">
+
+        <button
+          class="btn btn-secondary"
+          onclick="addCupcakes()"
+        >
+          Adicionar Cupcakes
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       DADOS
+  ========================== -->
+
+  <section class="section">
+
+    <h2 class="section-title">
+      Seus dados
+    </h2>
+
+    <p class="section-subtitle">
+      Preencha os dados para finalizar o pedido.
+    </p>
+
+
     <div class="form-grid">
 
       <div class="field">
-        <label for="customerName">Nome</label>
+
+        <label for="name">
+          Nome
+        </label>
 
         <input
           type="text"
-          id="customerName"
+          id="name"
           placeholder="Seu nome"
         >
+
       </div>
 
+
       <div class="field">
-        <label for="customerPhone">WhatsApp</label>
+
+        <label for="phone">
+          WhatsApp
+        </label>
 
         <input
           type="tel"
-          id="customerPhone"
+          id="phone"
           placeholder="(85) 99999-9999"
         >
+
       </div>
 
+
       <div class="field">
-        <label for="orderDate">Data desejada</label>
+
+        <label for="date">
+          Data desejada
+        </label>
 
         <input
           type="date"
-          id="orderDate"
+          id="date"
         >
+
       </div>
 
+
       <div class="field full">
-        <label for="orderNotes">Observações</label>
+
+        <label for="notes">
+          Observações
+        </label>
 
         <textarea
-          id="orderNotes"
+          id="notes"
           placeholder="Tema, cores, detalhes ou outras informações..."
         ></textarea>
+
       </div>
 
     </div>
 
   </section>
 
-  <!-- RESUMO -->
 
-  <section class="summary">
+  <!-- =========================
+       FINAL
+  ========================== -->
 
-    <h2>Resumo do pedido</h2>
+  <section class="section">
 
-    <div id="summaryList">
-      <p>Nenhum item adicionado ainda.</p>
-    </div>
+    <h2 class="section-title">
+      Finalizar pedido
+    </h2>
+
+    <p class="section-subtitle">
+      Quando terminar suas escolhas, veja o resumo antes de enviar.
+    </p>
+
+
+    <button
+      class="btn btn-primary"
+      onclick="showSummary()"
+      style="width:100%;"
+    >
+      Ver resumo do pedido
+    </button>
+
+  </section>
+
+
+  <!-- =========================
+       RESUMO, SÓ NO FINAL
+  ========================== -->
+
+  <section
+    class="summary hidden"
+    id="summarySection"
+  >
+
+    <h2 class="section-title">
+      Resumo do pedido
+    </h2>
+
+    <p class="section-subtitle">
+      Confira tudo antes de enviar.
+    </p>
+
+
+    <div id="summaryContent"></div>
+
 
     <div class="summary-total">
+
       <span>Total</span>
-      <span id="total">R$ 0,00</span>
+
+      <span id="summaryTotal">
+        R$ 0,00
+      </span>
+
     </div>
 
-    <div class="summary-actions">
+
+    <div class="actions">
 
       <button
-        class="button button-secondary"
-        onclick="clearOrder()"
+        class="btn btn-secondary"
+        onclick="hideSummary()"
       >
-        Limpar pedido
+        ← Voltar e editar
       </button>
 
       <button
-        class="button button-primary"
+        class="btn btn-primary"
         onclick="sendWhatsApp()"
       >
         Enviar pedido pelo WhatsApp
@@ -953,6 +1520,7 @@
 
 </main>
 
+
 <footer>
   Martins Confeitaria
 </footer>
@@ -960,11 +1528,22 @@
 
 <script>
 
-  /* ================================
-     DADOS
-  ================================= */
+  /* =========================
+     CONFIGURAÇÕES
+  ========================= */
 
-  const whatsapp = "5585981563070";
+  const WHATSAPP = "5585981563070";
+
+  let order = [];
+
+  let mainType = "";
+
+  let cakeType = "";
+
+  let selectedSize = null;
+
+  let selectedKit = null;
+
 
   const cakePrices = {
 
@@ -993,7 +1572,7 @@
   };
 
 
-  const brigadeiros = {
+  const brigadeiroFlavors = {
 
     classica: [
       "Brigadeiro Tradicional",
@@ -1023,9 +1602,9 @@
   const kits = [
 
     {
-      group: "Kit Festa",
-      id: "1A",
+      id: "A1",
       name: "KIT 01",
+      group: "Kit Festa",
       price: 130,
       items: [
         "01 Chantininho 10/12 Pessoas",
@@ -1036,9 +1615,9 @@
     },
 
     {
-      group: "Kit Festa",
-      id: "2A",
+      id: "A2",
       name: "KIT 02",
+      group: "Kit Festa",
       price: 160,
       items: [
         "01 Chantininho 15/20 Pessoas",
@@ -1049,9 +1628,9 @@
     },
 
     {
-      group: "Kit Festa",
-      id: "3A",
+      id: "A3",
       name: "KIT 03",
+      group: "Kit Festa",
       price: 210,
       items: [
         "01 Chantininho 20/25 Pessoas",
@@ -1062,9 +1641,9 @@
     },
 
     {
-      group: "Kit Festa",
-      id: "4A",
+      id: "A4",
       name: "KIT 04",
+      group: "Kit Festa",
       price: 350,
       items: [
         "01 Chantininho 30/40 Pessoas",
@@ -1075,9 +1654,9 @@
     },
 
     {
-      group: "Kit Festa",
-      id: "5A",
+      id: "A5",
       name: "KIT 05",
+      group: "Kit Festa",
       price: 450,
       items: [
         "01 Chantininho 40/50 Pessoas",
@@ -1088,9 +1667,9 @@
     },
 
     {
-      group: "Kit Festa + Petit Brownie",
-      id: "1B",
+      id: "B1",
       name: "KIT 01",
+      group: "Kit Festa + Petit Brownie",
       price: 150,
       items: [
         "01 Chantininho 10/15 Pessoas",
@@ -1101,9 +1680,9 @@
     },
 
     {
-      group: "Kit Festa + Petit Brownie",
-      id: "2B",
+      id: "B2",
       name: "KIT 02",
+      group: "Kit Festa + Petit Brownie",
       price: 200,
       items: [
         "01 Chantininho 15/20 Pessoas",
@@ -1114,9 +1693,9 @@
     },
 
     {
-      group: "Kit Festa + Petit Brownie",
-      id: "3B",
+      id: "B3",
       name: "KIT 03",
+      group: "Kit Festa + Petit Brownie",
       price: 250,
       items: [
         "01 Chantininho 20/25 Pessoas",
@@ -1127,9 +1706,9 @@
     },
 
     {
-      group: "Kit Festa + Petit Brownie",
-      id: "4B",
+      id: "B4",
       name: "KIT 04",
+      group: "Kit Festa + Petit Brownie",
       price: 430,
       items: [
         "01 Chantininho 30/40 Pessoas",
@@ -1140,9 +1719,9 @@
     },
 
     {
-      group: "Kit Festa + Petit Brownie",
-      id: "5B",
+      id: "B5",
       name: "KIT 05",
+      group: "Kit Festa + Petit Brownie",
       price: 500,
       items: [
         "01 Chantininho 40/50 Pessoas",
@@ -1155,16 +1734,9 @@
   ];
 
 
-  let order = [];
-
-  let selectedCakeType = null;
-
-  let selectedKit = null;
-
-
-  /* ================================
+  /* =========================
      UTILIDADES
-  ================================= */
+  ========================= */
 
   function money(value) {
 
@@ -1176,153 +1748,738 @@
   }
 
 
-  /* ================================
-     BOLO
-  ================================= */
+  function updateProgress(step) {
 
-  document.querySelectorAll('input[name="cakeType"]').forEach(input => {
+    document
+      .querySelectorAll(".progress-step")
+      .forEach(item => item.classList.remove("active"));
 
-    input.addEventListener("change", function() {
-
-      selectedCakeType = this.value;
-
-      document
-        .querySelectorAll(".cake-option")
-        .forEach(card => card.classList.remove("active"));
-
-      this.closest(".cake-option").classList.add("active");
-
-      const cakeSection = document.getElementById("cakeSection");
-
-      cakeSection.classList.remove("hidden");
-
-      const size = document.getElementById("cakeSize");
-
-      size.innerHTML = '<option value="">Selecione</option>';
-
-      Object.entries(cakePrices[selectedCakeType]).forEach(([people, price]) => {
-
-        const option = document.createElement("option");
-
-        option.value = people;
-        option.textContent = `${people} Pessoas - ${money(price)}`;
-
-        size.appendChild(option);
-
-      });
-
-      cakeSection.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-
-    });
-
-  });
-
-
-  function addCake() {
-
-    if (!selectedCakeType) {
-      alert("Escolha o tipo de bolo.");
-      return;
+    if (step >= 1) {
+      document.getElementById("progress1")
+        .classList.add("active");
     }
 
-    const size = document.getElementById("cakeSize").value;
-    const mass = document.getElementById("cakeMass").value;
-    const filling = document.getElementById("cakeFilling").value;
-    const topper = document.getElementById("cakeTopper");
-
-    if (!size || !mass || !filling) {
-      alert("Preencha o tamanho, a massa e o recheio.");
-      return;
+    if (step >= 2) {
+      document.getElementById("progress2")
+        .classList.add("active");
     }
 
-    let price = cakePrices[selectedCakeType][size];
-
-    const extras = [];
-
-    document.querySelectorAll(".cake-extra:checked").forEach(item => {
-
-      extras.push(item.value);
-
-      price += Number(item.dataset.price);
-
-    });
-
-    let topperName = topper.value;
-
-    if (topperName) {
-
-      const topperPrice =
-        Number(topper.options[topper.selectedIndex].dataset.price || 0);
-
-      price += topperPrice;
-
+    if (step >= 3) {
+      document.getElementById("progress3")
+        .classList.add("active");
     }
-
-    const cakeName =
-      selectedCakeType === "naked"
-        ? "Naked Cake / Scrapcake"
-        : "Chantininho";
-
-    order.push({
-
-      type: "Bolo",
-      name: cakeName,
-      details: `${size} pessoas | Massa: ${mass} | Recheio: ${filling}`,
-      extras,
-      topper: topperName,
-      price
-
-    });
-
-    updateSummary();
-
-    alert("Bolo adicionado ao pedido!");
 
   }
 
 
-  /* ================================
+  /* =========================
+     SELEÇÃO VISUAL
+  ========================= */
+
+  document.addEventListener("change", event => {
+
+    const input = event.target;
+
+    if (
+      input.type === "radio" ||
+      input.type === "checkbox"
+    ) {
+
+      const option =
+        input.closest(".option, .choice");
+
+      if (option) {
+
+        if (input.type === "radio") {
+
+          const group =
+            document.querySelectorAll(
+              `input[name="${input.name}"]`
+            );
+
+          group.forEach(item => {
+
+            const card =
+              item.closest(".option, .choice");
+
+            if (card) {
+              card.classList.toggle(
+                "selected",
+                item.checked
+              );
+            }
+
+          });
+
+        } else {
+
+          option.classList.toggle(
+            "selected",
+            input.checked
+          );
+
+        }
+
+      }
+
+    }
+
+  });
+
+
+  /* =========================
+     TIPO PRINCIPAL
+  ========================= */
+
+  document
+    .querySelectorAll('input[name="mainType"]')
+    .forEach(input => {
+
+      input.addEventListener("change", () => {
+
+        mainType = input.value;
+
+        document
+          .getElementById("continueMain")
+          .disabled = false;
+
+      });
+
+    });
+
+
+  document
+    .getElementById("continueMain")
+    .addEventListener("click", () => {
+
+      document
+        .getElementById("step1")
+        .classList.add("hidden");
+
+      if (mainType === "cake") {
+
+        document
+          .getElementById("cakeStep")
+          .classList.remove("hidden");
+
+        updateProgress(2);
+
+      } else {
+
+        document
+          .getElementById("kitStep")
+          .classList.remove("hidden");
+
+        updateProgress(2);
+
+      }
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+    });
+
+
+  function backToMain() {
+
+    document
+      .getElementById("cakeStep")
+      .classList.add("hidden");
+
+    document
+      .getElementById("kitStep")
+      .classList.add("hidden");
+
+    document
+      .getElementById("step1")
+      .classList.remove("hidden");
+
+    updateProgress(1);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+  }
+
+
+  /* =========================
+     BOLO
+  ========================= */
+
+  document
+    .querySelectorAll("[data-cake]")
+    .forEach(card => {
+
+      card.addEventListener("click", () => {
+
+        cakeType =
+          card.dataset.cake;
+
+        document
+          .querySelectorAll("[data-cake]")
+          .forEach(item =>
+            item.classList.remove("selected")
+          );
+
+        card.classList.add("selected");
+
+        card.querySelector("input").checked = true;
+
+        renderCakeSizes();
+
+        document
+          .getElementById("cakeConfig")
+          .classList.remove("hidden");
+
+      });
+
+    });
+
+
+  function renderCakeSizes() {
+
+    const container =
+      document.getElementById("cakeSizes");
+
+    container.innerHTML = "";
+
+    Object.entries(cakePrices[cakeType])
+      .forEach(([size, price]) => {
+
+        const label =
+          document.createElement("label");
+
+        label.className = "option";
+
+        label.innerHTML = `
+
+          <input
+            type="radio"
+            name="cakeSize"
+            value="${size}"
+          >
+
+          <strong>${size} pessoas</strong>
+
+          <small>${money(price)}</small>
+
+        `;
+
+        label.addEventListener("click", () => {
+
+          document
+            .querySelectorAll("[name='cakeSize']")
+            .forEach(input => {
+
+              input
+                .closest(".option")
+                .classList.remove("selected");
+
+            });
+
+          label.classList.add("selected");
+
+          label.querySelector("input").checked = true;
+
+          selectedSize = size;
+
+        });
+
+        container.appendChild(label);
+
+      });
+
+  }
+
+
+  /* =========================
+     RECHEIOS
+  ========================= */
+
+  document
+    .querySelectorAll("#fillingOptions input")
+    .forEach(input => {
+
+      input.addEventListener("change", () => {
+
+        const checked =
+          document.querySelectorAll(
+            "#fillingOptions input:checked"
+          );
+
+        if (checked.length >= 2) {
+
+          document
+            .querySelectorAll("#fillingOptions input:not(:checked)")
+            .forEach(other => {
+
+              other.disabled = true;
+
+              other
+                .closest(".option")
+                .classList.add("disabled");
+
+            });
+
+        } else {
+
+          document
+            .querySelectorAll("#fillingOptions input")
+            .forEach(other => {
+
+              other.disabled = false;
+
+              other
+                .closest(".option")
+                .classList.remove("disabled");
+
+            });
+
+        }
+
+      });
+
+    });
+
+
+  function addCakeToOrder() {
+
+    if (!cakeType) {
+
+      alert("Escolha o tipo de bolo.");
+
+      return;
+
+    }
+
+    if (!selectedSize) {
+
+      alert("Escolha o tamanho do bolo.");
+
+      return;
+
+    }
+
+
+    const mass =
+      document.querySelector(
+        "#massOptions input:checked"
+      );
+
+    if (!mass) {
+
+      alert("Escolha a massa.");
+
+      return;
+
+    }
+
+
+    const fillings =
+      [...document.querySelectorAll(
+        "#fillingOptions input:checked"
+      )].map(item => item.value);
+
+
+    if (fillings.length === 0) {
+
+      alert("Escolha pelo menos 1 recheio.");
+
+      return;
+
+    }
+
+
+    if (fillings.length > 2) {
+
+      alert("Você pode escolher no máximo 2 recheios.");
+
+      return;
+
+    }
+
+
+    let price =
+      cakePrices[cakeType][selectedSize];
+
+
+    const extras =
+      [...document.querySelectorAll(
+        "#extraOptions input:checked"
+      )].map(item => {
+
+        price += Number(item.dataset.price);
+
+        return item.value;
+
+      });
+
+
+    const toppers =
+      [...document.querySelectorAll(
+        "#topperOptions input:checked"
+      )].map(item => {
+
+        price += Number(item.dataset.price);
+
+        return item.value;
+
+      });
+
+
+    order.push({
+
+      type: "Bolo",
+
+      name:
+        cakeType === "naked"
+          ? "Naked Cake / Scrapcake"
+          : "Chantininho",
+
+      details:
+        `${selectedSize} pessoas | Massa: ${mass.value} | Recheios: ${fillings.join(" + ")}`,
+
+      extras,
+
+      toppers,
+
+      price
+
+    });
+
+
+    alert("Bolo adicionado ao pedido.");
+
+    resetCake();
+
+  }
+
+
+  function resetCake() {
+
+    cakeType = "";
+
+    selectedSize = null;
+
+    document
+      .getElementById("cakeConfig")
+      .classList.add("hidden");
+
+    document
+      .querySelectorAll("[data-cake]")
+      .forEach(item =>
+        item.classList.remove("selected")
+      );
+
+    document
+      .querySelectorAll(
+        "#cakeStep input"
+      )
+      .forEach(input => {
+
+        input.checked = false;
+        input.disabled = false;
+
+        const option =
+          input.closest(".option");
+
+        if (option) {
+
+          option.classList.remove("selected");
+          option.classList.remove("disabled");
+
+        }
+
+      });
+
+  }
+
+
+  /* =========================
+     KITS
+  ========================= */
+
+  function renderKits() {
+
+    const container =
+      document.getElementById("kitOptions");
+
+    container.innerHTML = "";
+
+    kits.forEach(kit => {
+
+      const card =
+        document.createElement("div");
+
+      card.className = "choice";
+
+      card.dataset.kitId = kit.id;
+
+      card.innerHTML = `
+
+        <span class="selected-mark">✓</span>
+
+        <div class="kit-header">
+
+          <div>
+
+            <h3>
+              ${kit.group}
+            </h3>
+
+            <p>
+              ${kit.name}
+            </p>
+
+          </div>
+
+          <div class="kit-price">
+            ${money(kit.price)}
+          </div>
+
+        </div>
+
+        <ul class="kit-items">
+
+          ${kit.items.map(item =>
+            `<li>${item}</li>`
+          ).join("")}
+
+        </ul>
+
+      `;
+
+
+      card.addEventListener("click", () => {
+
+        selectedKit = kit;
+
+        document
+          .querySelectorAll("#kitOptions .choice")
+          .forEach(item =>
+            item.classList.remove("kit-selected")
+          );
+
+        card.classList.add("kit-selected");
+
+        renderSelectedKit();
+
+      });
+
+
+      container.appendChild(card);
+
+    });
+
+  }
+
+
+  renderKits();
+
+
+  function renderSelectedKit() {
+
+    const box =
+      document.getElementById("selectedKitBox");
+
+    document
+      .getElementById("selectedKitTitle")
+      .textContent =
+        `${selectedKit.group} - ${selectedKit.name}`;
+
+
+    document
+      .getElementById("selectedKitItems")
+      .innerHTML =
+        selectedKit.items
+          .map(item => `<li>${item}</li>`)
+          .join("");
+
+
+    box.classList.remove("hidden");
+
+  }
+
+
+  function resetKit() {
+
+    selectedKit = null;
+
+    document
+      .getElementById("selectedKitBox")
+      .classList.add("hidden");
+
+    document
+      .querySelectorAll("#kitOptions .choice")
+      .forEach(item =>
+        item.classList.remove("kit-selected")
+      );
+
+    document
+      .querySelectorAll("#kitTopperOptions input")
+      .forEach(input => {
+
+        input.checked = false;
+
+        input
+          .closest(".option")
+          .classList.remove("selected");
+
+      });
+
+  }
+
+
+  function addKitToOrder() {
+
+    if (!selectedKit) {
+
+      alert("Escolha um kit.");
+
+      return;
+
+    }
+
+
+    const toppers =
+      [...document.querySelectorAll(
+        "#kitTopperOptions input:checked"
+      )];
+
+
+    if (toppers.length === 0) {
+
+      alert("Escolha pelo menos um topo para o bolo.");
+
+      return;
+
+    }
+
+
+    let price =
+      selectedKit.price;
+
+
+    const topperNames =
+      toppers.map(item => {
+
+        price += Number(item.dataset.price);
+
+        return item.value;
+
+      });
+
+
+    order.push({
+
+      type: "Kit Festa",
+
+      name:
+        `${selectedKit.group} - ${selectedKit.name}`,
+
+      details:
+        selectedKit.items.join(" | "),
+
+      toppers:
+        topperNames,
+
+      price
+
+    });
+
+
+    alert("Kit adicionado ao pedido.");
+
+    resetKit();
+
+  }
+
+
+  /* =========================
      BRIGADEIROS
-  ================================= */
+  ========================= */
 
   function renderBrigadeiros() {
+
+    const line =
+      document.querySelector(
+        'input[name="brigLine"]:checked'
+      ).value;
+
 
     const container =
       document.getElementById("brigadeiroFlavors");
 
-    const line =
-      document.getElementById("brigadeiroLine").value;
-
     container.innerHTML = "";
 
-    brigadeiros[line].forEach(flavor => {
 
-      const label = document.createElement("label");
+    brigadeiroFlavors[line]
+      .forEach(flavor => {
 
-      label.className = "check-item";
+        const label =
+          document.createElement("label");
 
-      label.innerHTML = `
-        <input
-          type="checkbox"
-          value="${flavor}"
-          class="brigadeiro-flavor"
-        >
-        ${flavor}
-      `;
+        label.className = "option";
 
-      container.appendChild(label);
+        label.innerHTML = `
 
-    });
+          <input
+            type="checkbox"
+            value="${flavor}"
+          >
+
+          <strong>${flavor}</strong>
+
+        `;
+
+        container.appendChild(label);
+
+      });
+
+
+    updateBrigadeiroPrices();
+
+  }
+
+
+  function updateBrigadeiroPrices() {
+
+    const line =
+      document.querySelector(
+        'input[name="brigLine"]:checked'
+      ).value;
+
+
+    document.getElementById("brig50")
+      .textContent =
+        line === "classica"
+          ? "R$ 62,50"
+          : "R$ 72,50";
+
+
+    document.getElementById("brig100")
+      .textContent =
+        line === "classica"
+          ? "R$ 125,00"
+          : "R$ 145,00";
 
   }
 
 
   document
-    .getElementById("brigadeiroLine")
-    .addEventListener("change", renderBrigadeiros);
+    .querySelectorAll('input[name="brigLine"]')
+    .forEach(input => {
+
+      input.addEventListener(
+        "change",
+        renderBrigadeiros
+      );
+
+    });
 
 
   renderBrigadeiros();
@@ -1331,27 +2488,39 @@
   function addBrigadeiros() {
 
     const line =
-      document.getElementById("brigadeiroLine").value;
+      document.querySelector(
+        'input[name="brigLine"]:checked'
+      ).value;
+
 
     const qty =
-      Number(document.getElementById("brigadeiroQty").value);
+      Number(
+        document.querySelector(
+          'input[name="brigQty"]:checked'
+        ).value
+      );
+
 
     const flavors =
-      [...document.querySelectorAll(".brigadeiro-flavor:checked")]
-        .map(item => item.value);
+      [...document.querySelectorAll(
+        "#brigadeiroFlavors input:checked"
+      )].map(item => item.value);
+
 
     if (flavors.length === 0) {
 
-      alert("Escolha pelo menos um sabor de brigadeiro.");
+      alert("Escolha pelo menos um sabor.");
 
       return;
 
     }
 
+
     const price =
       line === "classica"
-        ? qty === 100 ? 125 : 62.5
-        : qty === 100 ? 145 : 72.5;
+        ? qty === 50 ? 62.5 : 125
+        : qty === 50 ? 72.5 : 145;
+
 
     order.push({
 
@@ -1363,214 +2532,64 @@
           : "Linha Premium",
 
       details:
-        `${qty} unidades | Sabores: ${flavors.join(", ")}`,
+        `${qty} unidades | ${flavors.join(", ")}`,
 
       price
 
     });
 
-    updateSummary();
 
-    alert("Brigadeiros adicionados ao pedido!");
-
-  }
-
-
-  /* ================================
-     KITS
-  ================================= */
-
-  function renderKits() {
-
-    const container =
-      document.getElementById("kits");
-
-    container.innerHTML = "";
-
-    kits.forEach(kit => {
-
-      const label = document.createElement("label");
-
-      label.className = "kit-card";
-
-      label.dataset.id = kit.id;
-
-      label.innerHTML = `
-
-        <input
-          type="radio"
-          name="kit"
-          value="${kit.id}"
-        >
-
-        <h3>${kit.group} - ${kit.name}</h3>
-
-        <div class="kit-price">
-          ${money(kit.price)}
-        </div>
-
-        <ul class="included">
-
-          ${kit.items
-            .map(item => `<li>${item}</li>`)
-            .join("")}
-
-        </ul>
-      `;
-
-      label.addEventListener("click", () => {
-
-        selectedKit = kit;
-
-        document
-          .querySelectorAll(".kit-card")
-          .forEach(card => card.classList.remove("active"));
-
-        label.classList.add("active");
-
-        renderSelectedKit();
-
-      });
-
-      container.appendChild(label);
-
-    });
+    alert("Brigadeiros adicionados ao pedido.");
 
   }
 
 
-  function renderSelectedKit() {
-
-    const area =
-      document.getElementById("selectedKitArea");
-
-    const included =
-      document.getElementById("kitIncluded");
-
-    area.classList.remove("hidden");
-
-    included.innerHTML = `
-
-      <div class="checkbox-grid">
-
-        ${selectedKit.items.map(item => `
-
-          <label class="check-item">
-
-            <input
-              type="checkbox"
-              checked
-              disabled
-            >
-
-            ${item}
-
-          </label>
-
-        `).join("")}
-
-      </div>
-
-    `;
-
-  }
-
-
-  renderKits();
-
-
-  function addKit() {
-
-    if (!selectedKit) {
-
-      alert("Escolha um kit.");
-
-      return;
-
-    }
-
-    const topper =
-      document.getElementById("kitTopper");
-
-    if (!topper.value) {
-
-      alert("Escolha o topo do bolo.");
-
-      return;
-
-    }
-
-    let price = selectedKit.price;
-
-    const topperPrice =
-      Number(
-        topper.options[topper.selectedIndex]
-          .dataset.price || 0
-      );
-
-    price += topperPrice;
-
-    order.push({
-
-      type: "Kit Festa",
-
-      name:
-        `${selectedKit.group} - ${selectedKit.name}`,
-
-      details:
-        `${selectedKit.items.join(" | ")} | Topo: ${topper.value}`,
-
-      price
-
-    });
-
-    updateSummary();
-
-    alert("Kit adicionado ao pedido!");
-
-  }
-
-
-  /* ================================
+  /* =========================
      PETIT BROWNIE
-  ================================= */
+  ========================= */
 
   function addPetitBrownie() {
 
     const qty =
-      Number(document.getElementById("petitQty").value);
+      Number(
+        document.querySelector(
+          'input[name="petitQty"]:checked'
+        ).value
+      );
 
-    const price =
-      qty === 50 ? 90 : 180;
 
     order.push({
 
       type: "Petit Brownie",
 
-      name: `${qty} unidades`,
+      name:
+        `${qty} unidades`,
 
       details:
         "Quadradinho de brownie com uma pitanga de brigadeiro na caixeta de docinho.",
 
-      price
+      price:
+        qty === 50 ? 90 : 180
 
     });
 
-    updateSummary();
 
-    alert("Petit Brownie adicionado!");
+    alert("Petit Brownie adicionado ao pedido.");
 
   }
 
 
-  /* ================================
+  /* =========================
      MINI BROWNIE
-  ================================= */
+  ========================= */
 
   function addMiniBrownie() {
 
     const qty =
-      Number(document.getElementById("miniBrownieQty").value);
+      Number(
+        document.getElementById("miniQty").value
+      );
+
 
     if (qty < 1) {
 
@@ -1580,11 +2599,10 @@
 
     }
 
-    const unitPrice =
+
+    const unit =
       qty >= 20 ? 2.8 : 3.5;
 
-    const price =
-      qty * unitPrice;
 
     order.push({
 
@@ -1594,30 +2612,36 @@
         `${qty} unidades`,
 
       details:
-        `${money(unitPrice)} por unidade`,
+        `${money(unit)} por unidade`,
 
-      price
+      price:
+        qty * unit
 
     });
 
-    updateSummary();
 
-    alert("Mini Brownie adicionado!");
+    alert("Mini Brownie adicionado ao pedido.");
 
   }
 
 
-  /* ================================
+  /* =========================
      BEM CASADO
-  ================================= */
+  ========================= */
 
   function addBemCasado() {
 
     const type =
-      document.getElementById("bemCasadoType").value;
+      document.querySelector(
+        'input[name="bemType"]:checked'
+      ).value;
+
 
     const qty =
-      Number(document.getElementById("bemCasadoQty").value);
+      Number(
+        document.getElementById("bemQty").value
+      );
+
 
     if (qty < 1) {
 
@@ -1627,61 +2651,69 @@
 
     }
 
-    let unitPrice;
 
-    let typeName;
+    let unit;
+
+    let name;
+
 
     if (type === "crepom") {
 
-      unitPrice =
+      unit =
         qty >= 20 ? 4.8 : 6;
 
-      typeName =
+      name =
         "Papel crepom";
 
     } else {
 
-      unitPrice =
+      unit =
         qty >= 20 ? 4 : 5;
 
-      typeName =
+      name =
         "Folha de celofane";
 
     }
+
 
     order.push({
 
       type: "Bem Casado",
 
       name:
-        `${qty} unidades - ${typeName}`,
+        `${qty} unidades - ${name}`,
 
       details:
-        `${money(unitPrice)} por unidade`,
+        `${money(unit)} por unidade`,
 
       price:
-        qty * unitPrice
+        qty * unit
 
     });
 
-    updateSummary();
 
-    alert("Bem Casado adicionado!");
+    alert("Bem Casado adicionado ao pedido.");
 
   }
 
 
-  /* ================================
+  /* =========================
      CUPCAKES
-  ================================= */
+  ========================= */
 
   function addCupcakes() {
 
     const type =
-      document.getElementById("cupcakeType").value;
+      document.querySelector(
+        'input[name="cupcakeType"]:checked'
+      ).value;
+
 
     const qty =
-      Number(document.getElementById("cupcakeQty").value);
+      Number(
+        document.getElementById("cupcakeQty").value
+      );
+
 
     if (qty < 1) {
 
@@ -1691,272 +2723,370 @@
 
     }
 
-    const unitPrice =
+
+    const unit =
       type === "com" ? 6.5 : 5.5;
 
-    const typeName =
+
+    const name =
       type === "com"
         ? "Com plaquinha"
         : "Sem plaquinha";
+
 
     order.push({
 
       type: "Cupcakes",
 
       name:
-        `${qty} unidades - ${typeName}`,
+        `${qty} unidades - ${name}`,
 
       details:
-        `${money(unitPrice)} por unidade`,
+        `${money(unit)} por unidade`,
 
       price:
-        qty * unitPrice
+        qty * unit
 
     });
 
-    updateSummary();
 
-    alert("Cupcakes adicionados!");
+    alert("Cupcakes adicionados ao pedido.");
 
   }
 
 
-  /* ================================
+  /* =========================
      RESUMO
-  ================================= */
+  ========================= */
 
-  function updateSummary() {
-
-    const list =
-      document.getElementById("summaryList");
-
-    const totalElement =
-      document.getElementById("total");
+  function showSummary() {
 
     if (order.length === 0) {
 
-      list.innerHTML =
-        "<p>Nenhum item adicionado ainda.</p>";
-
-      totalElement.textContent =
-        money(0);
+      alert(
+        "Você ainda não adicionou nenhum item ao pedido."
+      );
 
       return;
 
     }
 
-    let total = 0;
-
-    list.innerHTML = "";
-
-    order.forEach((item, index) => {
-
-      total += item.price;
-
-      const line =
-        document.createElement("div");
-
-      line.className = "summary-line";
-
-      line.innerHTML = `
-
-        <div>
-
-          <strong>
-            ${index + 1}. ${item.type}
-          </strong>
-
-          <br>
-
-          <small>
-            ${item.name}
-          </small>
-
-        </div>
-
-        <strong>
-          ${money(item.price)}
-        </strong>
-
-      `;
-
-      list.appendChild(line);
-
-    });
-
-    totalElement.textContent =
-      money(total);
-
-  }
-
-
-  /* ================================
-     LIMPAR PEDIDO
-  ================================= */
-
-  function clearOrder() {
-
-    if (order.length === 0) {
-      return;
-    }
-
-    const confirmed =
-      confirm("Deseja realmente limpar o pedido?");
-
-    if (!confirmed) {
-      return;
-    }
-
-    order = [];
-
-    updateSummary();
-
-  }
-
-
-  /* ================================
-     WHATSAPP
-  ================================= */
-
-  function sendWhatsApp() {
-
-    if (order.length === 0) {
-
-      alert("Adicione pelo menos um item ao pedido.");
-
-      return;
-
-    }
 
     const name =
-      document.getElementById("customerName").value.trim();
+      document.getElementById("name").value.trim();
+
 
     const phone =
-      document.getElementById("customerPhone").value.trim();
+      document.getElementById("phone").value.trim();
+
 
     const date =
-      document.getElementById("orderDate").value;
+      document.getElementById("date").value;
 
-    const notes =
-      document.getElementById("orderNotes").value.trim();
 
     if (!name) {
 
       alert("Informe seu nome.");
 
+      document
+        .getElementById("name")
+        .focus();
+
       return;
 
     }
+
 
     if (!phone) {
 
       alert("Informe seu WhatsApp.");
 
+      document
+        .getElementById("phone")
+        .focus();
+
       return;
 
     }
 
+
+    const summary =
+      document.getElementById("summaryContent");
+
+
+    summary.innerHTML = "";
+
+
     let total = 0;
 
-    let message =
-      "🍰 *NOVO PEDIDO - MARTINS CONFEITARIA*%0A%0A";
-
-    message +=
-      `*Cliente:* ${name}%0A`;
-
-    message +=
-      `*WhatsApp:* ${phone}%0A`;
-
-    if (date) {
-
-      const dateFormatted =
-        new Date(date + "T00:00:00")
-          .toLocaleDateString("pt-BR");
-
-      message +=
-        `*Data desejada:* ${dateFormatted}%0A`;
-
-    }
-
-    message += "%0A*ITENS DO PEDIDO:*%0A%0A";
 
     order.forEach((item, index) => {
 
       total += item.price;
 
-      message +=
-        `*${index + 1}. ${item.type}*%0A`;
 
-      message +=
-        `${item.name}%0A`;
+      const div =
+        document.createElement("div");
 
-      if (item.details) {
+      div.className =
+        "summary-item";
 
-        message +=
-          `${item.details}%0A`;
 
-      }
+      let details =
+        item.details || "";
 
-      if (item.extras && item.extras.length) {
 
-        message +=
-          `Adicionais: ${item.extras.join(", ")}%0A`;
+      if (
+        item.extras &&
+        item.extras.length
+      ) {
 
-      }
-
-      if (item.topper) {
-
-        message +=
-          `Topo: ${item.topper}%0A`;
+        details +=
+          ` | Adicionais: ${item.extras.join(", ")}`;
 
       }
 
-      message +=
-        `Valor: ${money(item.price)}%0A%0A`;
+
+      if (
+        item.toppers &&
+        item.toppers.length
+      ) {
+
+        details +=
+          ` | Topo: ${item.toppers.join(", ")}`;
+
+      }
+
+
+      div.innerHTML = `
+
+        <div class="summary-item-header">
+
+          <div>
+
+            <h3>
+              ${index + 1}. ${item.type}
+            </h3>
+
+            <p>
+              ${item.name}
+            </p>
+
+            <p>
+              ${details}
+            </p>
+
+          </div>
+
+          <strong>
+            ${money(item.price)}
+          </strong>
+
+        </div>
+
+      `;
+
+
+      summary.appendChild(div);
 
     });
 
+
+    document
+      .getElementById("summaryTotal")
+      .textContent =
+        money(total);
+
+
+    document
+      .getElementById("summarySection")
+      .classList.remove("hidden");
+
+
+    updateProgress(3);
+
+
+    document
+      .getElementById("summarySection")
+      .scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+
+  }
+
+
+  function hideSummary() {
+
+    document
+      .getElementById("summarySection")
+      .classList.add("hidden");
+
+    updateProgress(2);
+
+  }
+
+
+  /* =========================
+     WHATSAPP
+  ========================= */
+
+  function sendWhatsApp() {
+
+    if (order.length === 0) {
+
+      alert("Seu pedido está vazio.");
+
+      return;
+
+    }
+
+
+    const name =
+      document.getElementById("name")
+        .value.trim();
+
+
+    const phone =
+      document.getElementById("phone")
+        .value.trim();
+
+
+    const date =
+      document.getElementById("date")
+        .value;
+
+
+    const notes =
+      document.getElementById("notes")
+        .value.trim();
+
+
+    let total = 0;
+
+
+    let message =
+      "🍰 *NOVO PEDIDO - MARTINS CONFEITARIA*\n\n";
+
+
     message +=
-      `*TOTAL: ${money(total)}*%0A`;
+      `*Cliente:* ${name}\n`;
+
+
+    message +=
+      `*WhatsApp:* ${phone}\n`;
+
+
+    if (date) {
+
+      const formatted =
+        new Date(
+          date + "T00:00:00"
+        ).toLocaleDateString("pt-BR");
+
+
+      message +=
+        `*Data desejada:* ${formatted}\n`;
+
+    }
+
+
+    message +=
+      "\n*ITENS DO PEDIDO:*\n\n";
+
+
+    order.forEach((item, index) => {
+
+      total += item.price;
+
+
+      message +=
+        `*${index + 1}. ${item.type}*\n`;
+
+      message +=
+        `${item.name}\n`;
+
+      message +=
+        `${item.details || ""}\n`;
+
+
+      if (
+        item.extras &&
+        item.extras.length
+      ) {
+
+        message +=
+          `Adicionais: ${item.extras.join(", ")}\n`;
+
+      }
+
+
+      if (
+        item.toppers &&
+        item.toppers.length
+      ) {
+
+        message +=
+          `Topo: ${item.toppers.join(", ")}\n`;
+
+      }
+
+
+      message +=
+        `Valor: ${money(item.price)}\n\n`;
+
+    });
+
+
+    message +=
+      `*TOTAL: ${money(total)}*\n`;
+
 
     if (notes) {
 
       message +=
-        `%0A*Observações:*%0A${notes}`;
+        `\n*Observações:*\n${notes}`;
 
     }
 
+
     const url =
-      `https://wa.me/${whatsapp}?text=${message}`;
+      `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(message)}`;
+
 
     window.open(url, "_blank");
 
   }
 
 
-  /* ================================
+  /* =========================
      DATA MÍNIMA
-  ================================= */
+  ========================= */
 
   const dateInput =
-    document.getElementById("orderDate");
+    document.getElementById("date");
+
 
   const today =
     new Date();
 
-  const yyyy =
+
+  const year =
     today.getFullYear();
 
-  const mm =
+
+  const month =
     String(today.getMonth() + 1)
       .padStart(2, "0");
 
-  const dd =
+
+  const day =
     String(today.getDate())
       .padStart(2, "0");
 
+
   dateInput.min =
-    `${yyyy}-${mm}-${dd}`;
+    `${year}-${month}-${day}`;
 
 </script>
 
