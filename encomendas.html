@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link
-    href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   >
 
@@ -26,10 +26,11 @@
       --pink: #f3b7bb;
       --bg: #fffafa;
       --white: #ffffff;
-      --text: #263238;
-      --muted: #68747a;
-      --border: #e5e5e5;
-      --shadow: 0 10px 30px rgba(0, 0, 0, .07);
+      --text: #24323a;
+      --muted: #6d7b82;
+      --border: #dce8ec;
+      --shadow: 0 12px 35px rgba(43, 120, 150, 0.10);
+      --radius: 18px;
     }
 
     * {
@@ -46,7 +47,7 @@
       font-family: "DM Sans", sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     button,
@@ -54,6 +55,21 @@
     textarea,
     select {
       font: inherit;
+    }
+
+    button,
+    label {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
     }
 
     /* =========================
@@ -64,16 +80,15 @@
       position: sticky;
       top: 0;
       z-index: 1000;
-      background: rgba(255, 255, 255, .97);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(10px);
+      background: rgba(255, 250, 250, 0.96);
+      border-bottom: 1px solid rgba(103, 176, 203, 0.18);
+      backdrop-filter: blur(12px);
     }
 
-    .nav {
-      max-width: 1200px;
-      margin: auto;
-      min-height: 76px;
-      padding: 10px 20px;
+    .header-inner {
+      width: min(1200px, calc(100% - 32px));
+      min-height: 78px;
+      margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -83,47 +98,68 @@
     .brand {
       display: flex;
       align-items: center;
-      text-decoration: none;
-      color: var(--text);
-      font-weight: 700;
-      flex-shrink: 0;
+      gap: 12px;
+      min-width: 0;
     }
 
     .brand img {
       width: 58px;
       height: 58px;
       object-fit: contain;
-      display: block;
+      flex-shrink: 0;
     }
 
-    .brand span {
-      margin-left: 10px;
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
     }
 
-    nav {
+    .brand-name {
+      font-family: "Dancing Script", cursive;
+      font-size: 27px;
+      font-weight: 700;
+      color: var(--blue-dark);
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .nav {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 5px;
     }
 
-    nav a {
-      color: var(--text);
-      text-decoration: none;
-      font-weight: 600;
+    .nav a {
+      padding: 10px 12px;
+      border-radius: 10px;
       font-size: 14px;
+      font-weight: 600;
+      color: #42545c;
+      transition: 0.2s ease;
     }
 
-    nav a:hover {
+    .nav a:hover,
+    .nav a.active {
+      background: #eaf7fb;
       color: var(--blue-dark);
     }
 
     .menu-btn {
       display: none;
       border: 0;
-      background: transparent;
-      font-size: 28px;
+      background: var(--blue);
+      color: white;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
       cursor: pointer;
-      color: var(--text);
+      font-size: 22px;
     }
 
     /* =========================
@@ -131,65 +167,66 @@
     ========================== */
 
     main {
-      max-width: 1050px;
-      margin: auto;
-      padding: 45px 20px 80px;
+      width: min(1100px, calc(100% - 32px));
+      margin: 0 auto;
+      padding-bottom: 80px;
     }
 
     .hero {
       text-align: center;
-      margin-bottom: 40px;
+      padding: 65px 15px 45px;
     }
 
     .hero h1 {
       font-family: "Dancing Script", cursive;
-      font-size: clamp(42px, 7vw, 65px);
+      font-size: clamp(42px, 7vw, 68px);
+      line-height: 1;
       color: var(--blue-dark);
-      margin-bottom: 12px;
+      margin-bottom: 18px;
     }
 
     .hero p {
+      max-width: 720px;
+      margin: 0 auto;
       color: var(--muted);
-      max-width: 680px;
-      margin: auto;
       font-size: 16px;
     }
-
-    /* =========================
-       SECTIONS
-    ========================== */
 
     .section {
       background: var(--white);
       border: 1px solid var(--border);
-      border-radius: 22px;
+      border-radius: var(--radius);
       padding: 28px;
       margin-bottom: 24px;
       box-shadow: var(--shadow);
     }
 
-    .section h2 {
-      font-size: 24px;
-      margin-bottom: 8px;
-      color: var(--text);
+    .section-title {
+      margin-bottom: 7px;
+      color: var(--blue-dark);
+      font-size: 25px;
+      font-weight: 800;
     }
 
     .section-description {
-      color: var(--muted);
       margin-bottom: 22px;
+      color: var(--muted);
+      font-size: 14px;
     }
 
     .subsection {
-      margin-top: 25px;
+      margin-top: 26px;
     }
 
     .subsection:first-child {
       margin-top: 0;
     }
 
-    .subsection h3 {
-      margin-bottom: 14px;
-      font-size: 19px;
+    .subsection-title {
+      font-size: 18px;
+      color: var(--text);
+      margin-bottom: 12px;
+      font-weight: 800;
     }
 
     /* =========================
@@ -205,13 +242,17 @@
     .option {
       position: relative;
       display: block;
-      border: 1.5px solid var(--border);
+      min-height: 76px;
+      border: 2px solid var(--border);
       border-radius: 15px;
-      padding: 16px;
-      cursor: pointer;
       background: #fff;
-      transition: .2s ease;
-      min-height: 70px;
+      cursor: pointer;
+      overflow: hidden;
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
     }
 
     .option:hover {
@@ -219,79 +260,69 @@
       transform: translateY(-1px);
     }
 
-    .option:has(input:checked) {
-      border-color: var(--blue-dark);
-      background: #f2fbfe;
-      box-shadow: 0 0 0 2px rgba(103, 176, 203, .12);
-    }
-
     .option input {
       position: absolute;
       opacity: 0;
+      width: 1px;
+      height: 1px;
       pointer-events: none;
     }
 
-    .option-title {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 4px;
+    .option-content {
+      min-height: 76px;
+      padding: 15px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3px;
+    }
+
+    .option-name {
+      font-weight: 800;
+      color: var(--text);
+      font-size: 15px;
+      overflow-wrap: anywhere;
+    }
+
+    .option-info {
+      color: var(--muted);
+      font-size: 13px;
+      overflow-wrap: anywhere;
     }
 
     .option-price {
-      display: block;
+      color: var(--blue-dark);
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .option:has(input:checked) {
+      border-color: var(--blue);
+      background: #f0fbfe;
+      box-shadow: 0 6px 18px rgba(103, 176, 203, 0.15);
+    }
+
+    .option:has(input:checked)::after {
+      content: "✓";
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--blue);
+      color: white;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 13px;
       color: var(--blue-dark);
       font-weight: 700;
-      margin-top: 3px;
-    }
-
-    .option-description {
-      display: block;
-      margin-top: 7px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    /* =========================
-       FLAVORS
-    ========================== */
-
-    .flavor-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .flavor-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 14px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: #fff;
-      cursor: pointer;
-      transition: .2s;
-    }
-
-    .flavor-item:hover {
-      border-color: var(--blue);
-    }
-
-    .flavor-item input {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--blue-dark);
-      flex-shrink: 0;
-    }
-
-    .flavor-item input:disabled {
-      cursor: not-allowed;
-    }
-
-    .limit-message {
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: 14px;
     }
 
     /* =========================
@@ -315,18 +346,27 @@
     }
 
     .field label {
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text);
     }
 
     .field input,
     .field textarea {
       width: 100%;
-      border: 1px solid var(--border);
+      border: 2px solid var(--border);
       border-radius: 12px;
-      padding: 13px 14px;
-      outline: none;
       background: #fff;
       color: var(--text);
+      outline: none;
+      padding: 13px 14px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(103, 176, 203, 0.12);
     }
 
     .field textarea {
@@ -334,107 +374,132 @@
       resize: vertical;
     }
 
-    .field input:focus,
-    .field textarea:focus {
-      border-color: var(--blue-dark);
-      box-shadow: 0 0 0 3px rgba(103, 176, 203, .12);
-    }
-
     /* =========================
-       TOTAL
+       FINAL
     ========================== */
 
+    .order-final {
+      background: linear-gradient(135deg, #eefafd, #fff5f6);
+      border: 1px solid #d5ebf1;
+    }
+
     .total-box {
-      position: sticky;
-      bottom: 15px;
-      z-index: 20;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 18px 22px;
-      margin-top: 30px;
-      box-shadow: 0 10px 35px rgba(0, 0, 0, .12);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 20px;
+      gap: 15px;
+      padding: 20px;
+      margin-bottom: 18px;
+      border-radius: 15px;
+      background: white;
+      border: 1px solid var(--border);
     }
 
     .total-label {
+      font-size: 16px;
+      font-weight: 700;
       color: var(--muted);
-      font-size: 14px;
     }
 
     .total-value {
-      font-size: 28px;
-      font-weight: 800;
       color: var(--blue-dark);
+      font-size: 30px;
+      font-weight: 800;
+      white-space: nowrap;
     }
 
     .whatsapp-btn {
+      width: 100%;
+      min-height: 58px;
       border: 0;
-      border-radius: 13px;
-      padding: 14px 22px;
-      background: var(--blue-dark);
-      color: #fff;
-      font-weight: 700;
+      border-radius: 14px;
+      background: #25d366;
+      color: white;
+      font-weight: 800;
+      font-size: 16px;
       cursor: pointer;
-      transition: .2s;
+      transition: 0.2s ease;
+      box-shadow: 0 10px 25px rgba(37, 211, 102, 0.18);
     }
 
     .whatsapp-btn:hover {
-      background: #225f77;
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      filter: brightness(0.96);
     }
 
-    .note {
+    .required-note {
       margin-top: 10px;
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12px;
+      text-align: center;
     }
 
     /* =========================
-       MOBILE
+       RESPONSIVE
     ========================== */
 
-    @media (max-width: 760px) {
-
-      .nav {
-        min-height: 68px;
-      }
-
-      .brand img {
-        width: 50px;
-        height: 50px;
-      }
-
-      .brand span {
-        font-size: 14px;
-      }
-
-      nav {
-        display: none;
-        position: absolute;
-        top: 68px;
-        left: 0;
-        right: 0;
-        padding: 18px 20px;
-        background: #fff;
-        border-bottom: 1px solid var(--border);
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      nav.open {
-        display: flex;
+    @media (max-width: 850px) {
+      .header-inner {
+        min-height: 70px;
       }
 
       .menu-btn {
         display: block;
       }
 
-      .options,
-      .flavor-grid,
+      .nav {
+        display: none;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        padding: 12px 16px 18px;
+        flex-direction: column;
+        align-items: stretch;
+        background: rgba(255, 250, 250, 0.98);
+        border-bottom: 1px solid var(--border);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.06);
+      }
+
+      .nav.open {
+        display: flex;
+      }
+
+      .nav a {
+        width: 100%;
+      }
+
+      .options {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      main {
+        width: min(100% - 20px, 1100px);
+      }
+
+      .hero {
+        padding: 45px 8px 32px;
+      }
+
+      .hero h1 {
+        font-size: 47px;
+      }
+
+      .hero p {
+        font-size: 14px;
+      }
+
+      .section {
+        padding: 20px 15px;
+        border-radius: 15px;
+      }
+
+      .section-title {
+        font-size: 22px;
+      }
+
       .form-grid {
         grid-template-columns: 1fr;
       }
@@ -443,19 +508,22 @@
         grid-column: auto;
       }
 
-      .section {
-        padding: 20px;
-        border-radius: 17px;
-      }
-
       .total-box {
         flex-direction: column;
-        align-items: stretch;
-        text-align: center;
+        align-items: flex-start;
       }
 
-      .whatsapp-btn {
-        width: 100%;
+      .total-value {
+        font-size: 27px;
+      }
+
+      .brand-text {
+        display: none;
+      }
+
+      .brand img {
+        width: 52px;
+        height: 52px;
       }
     }
   </style>
@@ -463,27 +531,37 @@
 
 <body>
 
-  <!-- =========================
+  <!-- =====================================================
        HEADER
-  ========================== -->
+  ====================================================== -->
 
   <header>
+    <div class="header-inner">
 
-    <div class="nav">
-
-      <a class="brand" href="index.html">
-
+      <a href="index.html" class="brand" aria-label="Martins Confeitaria">
         <img
-          src="assets/logo.png"
+          src="logo.png"
           alt="Martins Confeitaria"
-          onerror="this.onerror=null; this.src='https://yansitesemarcas.github.io/martins-confeitaria/assets/logo.png';"
+          onerror="this.onerror=null;this.src='https://yansitesemarcas.github.io/martins-confeitaria/logo.png';"
         >
 
-        <span>Martins Confeitaria</span>
-
+        <span class="brand-text">
+          <span class="brand-name">Martins Confeitaria</span>
+          <span class="brand-subtitle">Bolos &amp; Doces</span>
+        </span>
       </a>
 
-      <nav id="mainNav">
+      <button
+        class="menu-btn"
+        id="menuBtn"
+        type="button"
+        aria-label="Abrir menu"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
+
+      <nav class="nav" id="mainNav">
 
         <a href="index.html">Início</a>
 
@@ -495,7 +573,7 @@
           Pronta Entrega
         </a>
 
-        <a href="encomendas.html">
+        <a href="encomendas.html" class="active">
           Encomenda
         </a>
 
@@ -509,36 +587,28 @@
 
       </nav>
 
-      <button
-        class="menu-btn"
-        id="menuBtn"
-        type="button"
-        aria-label="Abrir menu"
-      >
-        ☰
-      </button>
-
     </div>
-
   </header>
 
-
-  <!-- =========================
-       CONTEÚDO
-  ========================== -->
+  <!-- =====================================================
+       MAIN
+  ====================================================== -->
 
   <main>
 
-    <div class="hero">
+    <!-- HERO -->
+
+    <section class="hero">
 
       <h1>Monte seu pedido</h1>
 
       <p>
-        Escolha o bolo, sabores, adicionais e personalizações.
-        Depois envie sua encomenda diretamente pelo WhatsApp.
+        Escolha o bolo, sabores, decoração e outros itens para montar
+        sua encomenda. No final, enviaremos todos os detalhes
+        diretamente para o WhatsApp da Martins Confeitaria.
       </p>
 
-    </div>
+    </section>
 
 
     <!-- =====================================================
@@ -547,205 +617,257 @@
 
     <section class="section">
 
-      <h2>1. Escolha seu bolo</h2>
+      <h2 class="section-title">1. Bolo</h2>
 
       <p class="section-description">
-        Selecione o tipo e o tamanho desejado.
+        Escolha o estilo e o tamanho do seu bolo.
       </p>
 
-      <div class="options">
 
-        <label class="option">
-          <input
-            type="radio"
-            name="bolo"
-            value="Naked Cake — 06/08 Pessoas"
-            data-price="45"
-          >
-          <span class="option-title">Naked Cake</span>
-          <span>06/08 Pessoas</span>
-          <span class="option-price">R$ 45,00</span>
-        </label>
+      <div class="subsection">
 
-        <label class="option">
-          <input
-            type="radio"
-            name="bolo"
-            value="Naked Cake — 10/12 Pessoas"
-            data-price="70"
-          >
-          <span class="option-title">Naked Cake</span>
-          <span>10/12 Pessoas</span>
-          <span class="option-price">R$ 70,00</span>
-        </label>
+        <h3 class="subsection-title">
+          Naked Cake
+        </h3>
 
-        <label class="option">
-          <input
-            type="radio"
-            name="bolo"
-            value="Naked Cake — 15/20 Pessoas"
-            data-price="98"
-          >
-          <span class="option-title">Naked Cake</span>
-          <span>15/20 Pessoas</span>
-          <span class="option-price">R$ 98,00</span>
-        </label>
+        <div class="options">
 
-        <label class="option">
-          <input
-            type="radio"
-            name="bolo"
-            value="Naked Cake — 20/25 Pessoas"
-            data-price="115"
-          >
-          <span class="option-title">Naked Cake</span>
-          <span>20/25 Pessoas</span>
-          <span class="option-price">R$ 115,00</span>
-        </label>
+          <label class="option">
+            <input
+              type="radio"
+              name="bolo"
+              value="Naked Cake — 06/08 pessoas"
+              data-price="45"
+            >
+            <span class="option-content">
+              <span class="option-name">06/08 pessoas</span>
+              <span class="option-price">R$ 45,00</span>
+            </span>
+          </label>
 
-        <label class="option">
-          <input
-            type="radio"
-            name="bolo"
-            value="Naked Cake — 25/30 Pessoas"
-            data-price="145"
-          >
-          <span class="option-title">Naked Cake</span>
-          <span>25/30 Pessoas</span>
-          <span class="option-price">R$ 145,00</span>
-        </label>
 
-        <label class="option">
-          <input
-            type="radio"
-            name="bolo"
-            value="Naked Cake — 30/40 Pessoas"
-            data-price="188"
-          >
-          <span class="option-title">Naked Cake</span>
-          <span>30/40 Pessoas</span>
-          <span class="option-price">R$ 188,00</span>
-        </label>
+          <label class="option">
+            <input
+              type="radio"
+              name="bolo"
+              value="Naked Cake — 10/12 pessoas"
+              data-price="70"
+            >
+            <span class="option-content">
+              <span class="option-name">10/12 pessoas</span>
+              <span class="option-price">R$ 70,00</span>
+            </span>
+          </label>
 
-        <label class="option">
-          <input
-            type="radio"
-            name="bolo"
-            value="Naked Cake — 40/50 Pessoas"
-            data-price="240"
-          >
-          <span class="option-title">Naked Cake</span>
-          <span>40/50 Pessoas</span>
-          <span class="option-price">R$ 240,00</span>
-        </label>
 
-        <label class="option">
-          <input
-            type="radio"
-            name="bolo"
-            value="Naked Cake — 50/60 Pessoas"
-            data-price="280"
-          >
-          <span class="option-title">Naked Cake</span>
-          <span>50/60 Pessoas</span>
-          <span class="option-price">R$ 280,00</span>
-        </label>
+          <label class="option">
+            <input
+              type="radio"
+              name="bolo"
+              value="Naked Cake — 15/20 pessoas"
+              data-price="98"
+            >
+            <span class="option-content">
+              <span class="option-name">15/20 pessoas</span>
+              <span class="option-price">R$ 98,00</span>
+            </span>
+          </label>
 
-        <label class="option">
-          <input
-            type="radio"
-            name="bolo"
-            value="Chantininho — 06/08 Pessoas"
-            data-price="60"
-          >
-          <span class="option-title">Chantininho</span>
-          <span>06/08 Pessoas</span>
-          <span class="option-price">R$ 60,00</span>
-        </label>
 
-        <label class="option">
-          <input
-            type="radio"
-            name="bolo"
-            value="Chantininho — 10/12 Pessoas"
-            data-price="80"
-          >
-          <span class="option-title">Chantininho</span>
-          <span>10/12 Pessoas</span>
-          <span class="option-price">R$ 80,00</span>
-        </label>
+          <label class="option">
+            <input
+              type="radio"
+              name="bolo"
+              value="Naked Cake — 20/25 pessoas"
+              data-price="115"
+            >
+            <span class="option-content">
+              <span class="option-name">20/25 pessoas</span>
+              <span class="option-price">R$ 115,00</span>
+            </span>
+          </label>
 
-        <label class="option">
-          <input
-            type="radio"
-            name="bolo"
-            value="Chantininho — 15/20 Pessoas"
-            data-price="120"
-          >
-          <span class="option-title">Chantininho</span>
-          <span>15/20 Pessoas</span>
-          <span class="option-price">R$ 120,00</span>
-        </label>
 
-        <label class="option">
-          <input
-            type="radio"
-            name="bolo"
-            value="Chantininho — 20/25 Pessoas"
-            data-price="140"
-          >
-          <span class="option-title">Chantininho</span>
-          <span>20/25 Pessoas</span>
-          <span class="option-price">R$ 140,00</span>
-        </label>
+          <label class="option">
+            <input
+              type="radio"
+              name="bolo"
+              value="Naked Cake — 25/30 pessoas"
+              data-price="145"
+            >
+            <span class="option-content">
+              <span class="option-name">25/30 pessoas</span>
+              <span class="option-price">R$ 145,00</span>
+            </span>
+          </label>
 
-        <label class="option">
-          <input
-            type="radio"
-            name="bolo"
-            value="Chantininho — 25/30 Pessoas"
-            data-price="170"
-          >
-          <span class="option-title">Chantininho</span>
-          <span>25/30 Pessoas</span>
-          <span class="option-price">R$ 170,00</span>
-        </label>
 
-        <label class="option">
-          <input
-            type="radio"
-            name="bolo"
-            value="Chantininho — 30/40 Pessoas"
-            data-price="220"
-          >
-          <span class="option-title">Chantininho</span>
-          <span>30/40 Pessoas</span>
-          <span class="option-price">R$ 220,00</span>
-        </label>
+          <label class="option">
+            <input
+              type="radio"
+              name="bolo"
+              value="Naked Cake — 30/40 pessoas"
+              data-price="188"
+            >
+            <span class="option-content">
+              <span class="option-name">30/40 pessoas</span>
+              <span class="option-price">R$ 188,00</span>
+            </span>
+          </label>
 
-        <label class="option">
-          <input
-            type="radio"
-            name="bolo"
-            value="Chantininho — 40/50 Pessoas"
-            data-price="260"
-          >
-          <span class="option-title">Chantininho</span>
-          <span>40/50 Pessoas</span>
-          <span class="option-price">R$ 260,00</span>
-        </label>
 
-        <label class="option">
-          <input
-            type="radio"
-            name="bolo"
-            value="Chantininho — 50/60 Pessoas"
-            data-price="300"
-          >
-          <span class="option-title">Chantininho</span>
-          <span>50/60 Pessoas</span>
-          <span class="option-price">R$ 300,00</span>
-        </label>
+          <label class="option">
+            <input
+              type="radio"
+              name="bolo"
+              value="Naked Cake — 40/50 pessoas"
+              data-price="240"
+            >
+            <span class="option-content">
+              <span class="option-name">40/50 pessoas</span>
+              <span class="option-price">R$ 240,00</span>
+            </span>
+          </label>
+
+
+          <label class="option">
+            <input
+              type="radio"
+              name="bolo"
+              value="Naked Cake — 50/60 pessoas"
+              data-price="280"
+            >
+            <span class="option-content">
+              <span class="option-name">50/60 pessoas</span>
+              <span class="option-price">R$ 280,00</span>
+            </span>
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <div class="subsection">
+
+        <h3 class="subsection-title">
+          Chantininho
+        </h3>
+
+        <div class="options">
+
+          <label class="option">
+            <input
+              type="radio"
+              name="bolo"
+              value="Chantininho — 06/08 pessoas"
+              data-price="60"
+            >
+            <span class="option-content">
+              <span class="option-name">06/08 pessoas</span>
+              <span class="option-price">R$ 60,00</span>
+            </span>
+          </label>
+
+
+          <label class="option">
+            <input
+              type="radio"
+              name="bolo"
+              value="Chantininho — 10/12 pessoas"
+              data-price="80"
+            >
+            <span class="option-content">
+              <span class="option-name">10/12 pessoas</span>
+              <span class="option-price">R$ 80,00</span>
+            </span>
+          </label>
+
+
+          <label class="option">
+            <input
+              type="radio"
+              name="bolo"
+              value="Chantininho — 15/20 pessoas"
+              data-price="120"
+            >
+            <span class="option-content">
+              <span class="option-name">15/20 pessoas</span>
+              <span class="option-price">R$ 120,00</span>
+            </span>
+          </label>
+
+
+          <label class="option">
+            <input
+              type="radio"
+              name="bolo"
+              value="Chantininho — 20/25 pessoas"
+              data-price="140"
+            >
+            <span class="option-content">
+              <span class="option-name">20/25 pessoas</span>
+              <span class="option-price">R$ 140,00</span>
+            </span>
+          </label>
+
+
+          <label class="option">
+            <input
+              type="radio"
+              name="bolo"
+              value="Chantininho — 25/30 pessoas"
+              data-price="170"
+            >
+            <span class="option-content">
+              <span class="option-name">25/30 pessoas</span>
+              <span class="option-price">R$ 170,00</span>
+            </span>
+          </label>
+
+
+          <label class="option">
+            <input
+              type="radio"
+              name="bolo"
+              value="Chantininho — 30/40 pessoas"
+              data-price="220"
+            >
+            <span class="option-content">
+              <span class="option-name">30/40 pessoas</span>
+              <span class="option-price">R$ 220,00</span>
+            </span>
+          </label>
+
+
+          <label class="option">
+            <input
+              type="radio"
+              name="bolo"
+              value="Chantininho — 40/50 pessoas"
+              data-price="260"
+            >
+            <span class="option-content">
+              <span class="option-name">40/50 pessoas</span>
+              <span class="option-price">R$ 260,00</span>
+            </span>
+          </label>
+
+
+          <label class="option">
+            <input
+              type="radio"
+              name="bolo"
+              value="Chantininho — 50/60 pessoas"
+              data-price="300"
+            >
+            <span class="option-content">
+              <span class="option-name">50/60 pessoas</span>
+              <span class="option-price">R$ 300,00</span>
+            </span>
+          </label>
+
+        </div>
 
       </div>
 
@@ -758,10 +880,10 @@
 
     <section class="section">
 
-      <h2>2. Kits</h2>
+      <h2 class="section-title">2. Kits Festa</h2>
 
       <p class="section-description">
-        Se preferir, escolha um dos nossos kits completos.
+        Se preferir, acrescente um kit completo à sua encomenda.
       </p>
 
       <div class="options">
@@ -774,82 +896,94 @@
             data-price="0"
             checked
           >
-          <span class="option-title">Não escolher kit</span>
-          <span class="option-price">—</span>
+          <span class="option-content">
+            <span class="option-name">Não escolher kit</span>
+            <span class="option-price">R$ 0,00</span>
+          </span>
         </label>
+
 
         <label class="option">
           <input
             type="radio"
             name="kit"
-            value="Kit Festa 01"
+            value="Kit Festa 01 — Chantininho 10/15 pessoas — 04 Cupcakes, 20 Petit Brownie, 20 Docinhos"
             data-price="150"
           >
-          <span class="option-title">Kit Festa 01</span>
-          <span class="option-price">R$ 150,00</span>
-          <span class="option-description">
-            Chantininho 10/15 Pessoas — 04 Cupcakes,
-            20 Petit Brownie, 20 Docinhos
+          <span class="option-content">
+            <span class="option-name">Kit Festa 01</span>
+            <span class="option-info">
+              Chantininho 10/15 pessoas • 04 Cupcakes • 20 Petit Brownie • 20 Docinhos
+            </span>
+            <span class="option-price">R$ 150,00</span>
           </span>
         </label>
+
 
         <label class="option">
           <input
             type="radio"
             name="kit"
-            value="Kit Festa 02"
+            value="Kit Festa 02 — Chantininho 15/20 pessoas — 05 Cupcakes, 30 Petit Brownie, 30 Docinhos"
             data-price="200"
           >
-          <span class="option-title">Kit Festa 02</span>
-          <span class="option-price">R$ 200,00</span>
-          <span class="option-description">
-            Chantininho 15/20 Pessoas — 05 Cupcakes,
-            30 Petit Brownie, 30 Docinhos
+          <span class="option-content">
+            <span class="option-name">Kit Festa 02</span>
+            <span class="option-info">
+              Chantininho 15/20 pessoas • 05 Cupcakes • 30 Petit Brownie • 30 Docinhos
+            </span>
+            <span class="option-price">R$ 200,00</span>
           </span>
         </label>
+
 
         <label class="option">
           <input
             type="radio"
             name="kit"
-            value="Kit Festa 03"
+            value="Kit Festa 03 — Chantininho 20/25 pessoas — 08 Cupcakes, 50 Petit Brownie, 50 Docinhos"
             data-price="250"
           >
-          <span class="option-title">Kit Festa 03</span>
-          <span class="option-price">R$ 250,00</span>
-          <span class="option-description">
-            Chantininho 20/25 Pessoas — 08 Cupcakes,
-            50 Petit Brownie, 50 Docinhos
+          <span class="option-content">
+            <span class="option-name">Kit Festa 03</span>
+            <span class="option-info">
+              Chantininho 20/25 pessoas • 08 Cupcakes • 50 Petit Brownie • 50 Docinhos
+            </span>
+            <span class="option-price">R$ 250,00</span>
           </span>
         </label>
+
 
         <label class="option">
           <input
             type="radio"
             name="kit"
-            value="Kit Festa 04"
+            value="Kit Festa 04 — Chantininho 30/40 pessoas — 10 Cupcakes, 60 Petit Brownie, 60 Docinhos"
             data-price="430"
           >
-          <span class="option-title">Kit Festa 04</span>
-          <span class="option-price">R$ 430,00</span>
-          <span class="option-description">
-            Chantininho 30/40 Pessoas — 10 Cupcakes,
-            60 Petit Brownie, 60 Docinhos
+          <span class="option-content">
+            <span class="option-name">Kit Festa 04</span>
+            <span class="option-info">
+              Chantininho 30/40 pessoas • 10 Cupcakes • 60 Petit Brownie • 60 Docinhos
+            </span>
+            <span class="option-price">R$ 430,00</span>
           </span>
         </label>
+
 
         <label class="option">
           <input
             type="radio"
             name="kit"
-            value="Kit Festa 05"
+            value="Kit Festa 05 — Chantininho 40/50 pessoas — 12 Cupcakes, 70 Petit Brownie, 70 Docinhos"
             data-price="500"
           >
-          <span class="option-title">Kit Festa 05</span>
-          <span class="option-price">R$ 500,00</span>
-          <span class="option-description">
-            Chantininho 40/50 Pessoas — 12 Cupcakes,
-            70 Petit Brownie, 70 Docinhos
+          <span class="option-content">
+            <span class="option-name">Kit Festa 05</span>
+            <span class="option-info">
+              Chantininho 40/50 pessoas • 12 Cupcakes • 70 Petit Brownie • 70 Docinhos
+            </span>
+            <span class="option-price">R$ 500,00</span>
           </span>
         </label>
 
@@ -859,16 +993,12 @@
 
 
     <!-- =====================================================
-         3. TOPO
+         3. TOPO / DECORAÇÃO
     ====================================================== -->
 
     <section class="section">
 
-      <h2>3. Topo / decoração</h2>
-
-      <p class="section-description">
-        Escolha uma opção para finalizar seu bolo.
-      </p>
+      <h2 class="section-title">3. Topo / Decoração</h2>
 
       <div class="options">
 
@@ -880,9 +1010,12 @@
             data-price="0"
             checked
           >
-          <span class="option-title">Nenhum</span>
-          <span class="option-price">R$ 0,00</span>
+          <span class="option-content">
+            <span class="option-name">Nenhum topo</span>
+            <span class="option-price">R$ 0,00</span>
+          </span>
         </label>
+
 
         <label class="option">
           <input
@@ -891,9 +1024,12 @@
             value="Topo simples"
             data-price="20"
           >
-          <span class="option-title">Topo simples</span>
-          <span class="option-price">R$ 20,00</span>
+          <span class="option-content">
+            <span class="option-name">Topo simples</span>
+            <span class="option-price">R$ 20,00</span>
+          </span>
         </label>
+
 
         <label class="option">
           <input
@@ -902,9 +1038,12 @@
             value="Topo 3D"
             data-price="30"
           >
-          <span class="option-title">Topo 3D</span>
-          <span class="option-price">R$ 30,00</span>
+          <span class="option-content">
+            <span class="option-name">Topo 3D</span>
+            <span class="option-price">R$ 30,00</span>
+          </span>
         </label>
+
 
         <label class="option">
           <input
@@ -913,9 +1052,12 @@
             value="Flores naturais"
             data-price="70"
           >
-          <span class="option-title">Flores naturais</span>
-          <span class="option-price">R$ 70,00</span>
+          <span class="option-content">
+            <span class="option-name">Flores naturais</span>
+            <span class="option-price">R$ 70,00</span>
+          </span>
         </label>
+
 
         <label class="option">
           <input
@@ -924,8 +1066,10 @@
             value="Scrap Cake"
             data-price="30"
           >
-          <span class="option-title">Scrap Cake</span>
-          <span class="option-price">R$ 30,00</span>
+          <span class="option-content">
+            <span class="option-name">Scrap Cake</span>
+            <span class="option-price">R$ 30,00</span>
+          </span>
         </label>
 
       </div>
@@ -939,42 +1083,50 @@
 
     <section class="section">
 
-      <h2>4. Massa</h2>
-
-      <p class="section-description">
-        Escolha o sabor da massa.
-      </p>
+      <h2 class="section-title">4. Massa</h2>
 
       <div class="options">
 
         <label class="option">
-          <input type="radio" name="massa" value="Amanteigado">
-          <span class="option-title">Amanteigado</span>
+          <input type="radio" name="massa" value="Amanteigado" data-price="0">
+          <span class="option-content">
+            <span class="option-name">Amanteigado</span>
+          </span>
         </label>
 
         <label class="option">
-          <input type="radio" name="massa" value="Baunilha">
-          <span class="option-title">Baunilha</span>
+          <input type="radio" name="massa" value="Baunilha" data-price="0">
+          <span class="option-content">
+            <span class="option-name">Baunilha</span>
+          </span>
         </label>
 
         <label class="option">
-          <input type="radio" name="massa" value="Ninho">
-          <span class="option-title">Ninho</span>
+          <input type="radio" name="massa" value="Ninho" data-price="0">
+          <span class="option-content">
+            <span class="option-name">Ninho</span>
+          </span>
         </label>
 
         <label class="option">
-          <input type="radio" name="massa" value="Coco">
-          <span class="option-title">Coco</span>
+          <input type="radio" name="massa" value="Coco" data-price="0">
+          <span class="option-content">
+            <span class="option-name">Coco</span>
+          </span>
         </label>
 
         <label class="option">
-          <input type="radio" name="massa" value="Chocolate">
-          <span class="option-title">Chocolate</span>
+          <input type="radio" name="massa" value="Chocolate" data-price="0">
+          <span class="option-content">
+            <span class="option-name">Chocolate</span>
+          </span>
         </label>
 
         <label class="option">
-          <input type="radio" name="massa" value="Limão">
-          <span class="option-title">Limão</span>
+          <input type="radio" name="massa" value="Limão" data-price="0">
+          <span class="option-content">
+            <span class="option-name">Limão</span>
+          </span>
         </label>
 
       </div>
@@ -988,54 +1140,68 @@
 
     <section class="section">
 
-      <h2>5. Recheio</h2>
+      <h2 class="section-title">5. Recheio</h2>
 
       <p class="section-description">
-        Escolha exatamente 2 recheios para o bolo.
+        Escolha até 2 recheios.
       </p>
 
-      <div class="flavor-grid">
+      <div class="options">
 
-        <label class="flavor-item">
-          <input type="checkbox" name="recheio" value="Ninho">
-          <span>Ninho</span>
+        <label class="option">
+          <input type="checkbox" name="recheio" value="Ninho" data-price="0">
+          <span class="option-content">
+            <span class="option-name">Ninho</span>
+          </span>
         </label>
 
-        <label class="flavor-item">
-          <input type="checkbox" name="recheio" value="Beijinho">
-          <span>Beijinho</span>
+        <label class="option">
+          <input type="checkbox" name="recheio" value="Beijinho" data-price="0">
+          <span class="option-content">
+            <span class="option-name">Beijinho</span>
+          </span>
         </label>
 
-        <label class="flavor-item">
-          <input type="checkbox" name="recheio" value="Brigadeiro">
-          <span>Brigadeiro</span>
+        <label class="option">
+          <input type="checkbox" name="recheio" value="Brigadeiro" data-price="0">
+          <span class="option-content">
+            <span class="option-name">Brigadeiro</span>
+          </span>
         </label>
 
-        <label class="flavor-item">
-          <input type="checkbox" name="recheio" value="Doce de leite">
-          <span>Doce de leite</span>
+        <label class="option">
+          <input type="checkbox" name="recheio" value="Doce de leite" data-price="0">
+          <span class="option-content">
+            <span class="option-name">Doce de leite</span>
+          </span>
         </label>
 
-        <label class="flavor-item">
-          <input type="checkbox" name="recheio" value="Leite condensado">
-          <span>Leite condensado</span>
+        <label class="option">
+          <input type="checkbox" name="recheio" value="Leite condensado" data-price="0">
+          <span class="option-content">
+            <span class="option-name">Leite condensado</span>
+          </span>
         </label>
 
-        <label class="flavor-item">
-          <input type="checkbox" name="recheio" value="Limão">
-          <span>Limão</span>
+        <label class="option">
+          <input type="checkbox" name="recheio" value="Limão" data-price="0">
+          <span class="option-content">
+            <span class="option-name">Limão</span>
+          </span>
         </label>
 
-        <label class="flavor-item">
-          <input type="checkbox" name="recheio" value="Oreo">
-          <span>Oreo</span>
+        <label class="option">
+          <input type="checkbox" name="recheio" value="Oreo" data-price="0">
+          <span class="option-content">
+            <span class="option-name">Oreo</span>
+          </span>
         </label>
 
       </div>
 
-      <p class="limit-message" id="recheioStatus">
+      <div class="status" id="recheioStatus">
         0 de 2 recheios selecionados.
-      </p>
+      </div>
 
     </section>
 
@@ -1046,100 +1212,72 @@
 
     <section class="section">
 
-      <h2>6. Adicionais</h2>
-
-      <p class="section-description">
-        Acrescente opções extras ao seu pedido.
-      </p>
+      <h2 class="section-title">6. Adicionais</h2>
 
       <div class="options">
 
         <label class="option">
-          <input
-            type="checkbox"
-            name="extra"
-            value="Abacaxi"
-            data-price="10"
-          >
-          <span class="option-title">Abacaxi</span>
-          <span class="option-price">R$ 10,00</span>
+          <input type="checkbox" name="adicional" value="Abacaxi" data-price="10">
+          <span class="option-content">
+            <span class="option-name">Abacaxi</span>
+            <span class="option-price">+ R$ 10,00</span>
+          </span>
         </label>
 
         <label class="option">
-          <input
-            type="checkbox"
-            name="extra"
-            value="Crocante de Castanha"
-            data-price="10"
-          >
-          <span class="option-title">Crocante de Castanha</span>
-          <span class="option-price">R$ 10,00</span>
+          <input type="checkbox" name="adicional" value="Crocante de Castanha" data-price="10">
+          <span class="option-content">
+            <span class="option-name">Crocante de Castanha</span>
+            <span class="option-price">+ R$ 10,00</span>
+          </span>
         </label>
 
         <label class="option">
-          <input
-            type="checkbox"
-            name="extra"
-            value="Geleia de Morango"
-            data-price="16"
-          >
-          <span class="option-title">Geleia de Morango</span>
-          <span class="option-price">R$ 16,00</span>
+          <input type="checkbox" name="adicional" value="Geleia de Morango" data-price="16">
+          <span class="option-content">
+            <span class="option-name">Geleia de Morango</span>
+            <span class="option-price">+ R$ 16,00</span>
+          </span>
         </label>
 
         <label class="option">
-          <input
-            type="checkbox"
-            name="extra"
-            value="Nutella"
-            data-price="16"
-          >
-          <span class="option-title">Nutella</span>
-          <span class="option-price">R$ 16,00</span>
+          <input type="checkbox" name="adicional" value="Nutella" data-price="16">
+          <span class="option-content">
+            <span class="option-name">Nutella</span>
+            <span class="option-price">+ R$ 16,00</span>
+          </span>
         </label>
 
         <label class="option">
-          <input
-            type="checkbox"
-            name="extra"
-            value="Morango"
-            data-price="16"
-          >
-          <span class="option-title">Morango</span>
-          <span class="option-price">R$ 16,00</span>
+          <input type="checkbox" name="adicional" value="Morango" data-price="16">
+          <span class="option-content">
+            <span class="option-name">Morango</span>
+            <span class="option-price">+ R$ 16,00</span>
+          </span>
         </label>
 
         <label class="option">
-          <input
-            type="checkbox"
-            name="extra"
-            value="Kit Kat"
-            data-price="12"
-          >
-          <span class="option-title">Kit Kat</span>
-          <span class="option-price">R$ 12,00</span>
+          <input type="checkbox" name="adicional" value="Kit Kat" data-price="12">
+          <span class="option-content">
+            <span class="option-name">Kit Kat</span>
+            <span class="option-price">+ R$ 12,00</span>
+          </span>
         </label>
 
         <label class="option">
-          <input
-            type="checkbox"
-            name="extra"
-            value="Ouro Branco"
-            data-price="10"
-          >
-          <span class="option-title">Ouro Branco</span>
-          <span class="option-price">R$ 10,00</span>
+          <input type="checkbox" name="adicional" value="Ouro Branco" data-price="10">
+          <span class="option-content">
+            <span class="option-name">Ouro Branco</span>
+            <span class="option-price">+ R$ 10,00</span>
+          </span>
         </label>
 
         <label class="option">
-          <input
-            type="checkbox"
-            name="extra"
-            value="Kinder Bueno"
-            data-price="16"
-          >
-          <span class="option-title">Kinder Bueno</span>
-          <span class="option-price">R$ 16,00</span>
+          <input type="checkbox" name="adicional" value="Kinder Bueno" data-price="16">
+          <span class="option-content">
+            <span class="option-name">Kinder Bueno</span>
+            <span class="option-price">+ R$ 16,00</span>
+          </span>
         </label>
 
       </div>
@@ -1153,36 +1291,33 @@
 
     <section class="section">
 
-      <h2>7. Personalização</h2>
-
-      <p class="section-description">
-        Conte como você gostaria que seu pedido fosse.
-      </p>
+      <h2 class="section-title">7. Personalização</h2>
 
       <div class="form-grid">
 
         <div class="field full">
 
           <label for="personalizacao">
-            Como deseja a personalização?
+            Como você gostaria de personalizar seu bolo?
           </label>
 
           <textarea
             id="personalizacao"
-            placeholder="Ex.: cores, tema, nome, idade, decoração..."
+            placeholder="Ex.: cores, tema, nome, idade, frase, estilo da decoração..."
           ></textarea>
 
         </div>
 
+
         <div class="field full">
 
           <label for="observacoes">
-            Observações
+            Observações adicionais
           </label>
 
           <textarea
             id="observacoes"
-            placeholder="Alguma informação importante para a confeitaria?"
+            placeholder="Digite aqui qualquer outra informação importante."
           ></textarea>
 
         </div>
@@ -1193,15 +1328,15 @@
 
 
     <!-- =====================================================
-         8. DADOS
+         8. DADOS DO CLIENTE
     ====================================================== -->
 
     <section class="section">
 
-      <h2>8. Seus dados</h2>
+      <h2 class="section-title">8. Seus dados</h2>
 
       <p class="section-description">
-        Precisamos dessas informações para confirmar sua encomenda.
+        Precisamos dessas informações para enviar seu orçamento pelo WhatsApp.
       </p>
 
       <div class="form-grid">
@@ -1213,12 +1348,14 @@
           </label>
 
           <input
-            id="nome"
             type="text"
+            id="nome"
             placeholder="Seu nome"
+            required
           >
 
         </div>
+
 
         <div class="field">
 
@@ -1227,25 +1364,29 @@
           </label>
 
           <input
-            id="whatsapp"
             type="tel"
+            id="whatsapp"
             placeholder="(85) 99999-9999"
+            required
           >
 
         </div>
+
 
         <div class="field">
 
           <label for="data">
-            Data necessária *
+            Data desejada *
           </label>
 
           <input
-            id="data"
             type="date"
+            id="data"
+            required
           >
 
         </div>
+
 
         <div class="field">
 
@@ -1254,8 +1395,8 @@
           </label>
 
           <input
-            id="endereco"
             type="text"
+            id="endereco"
             placeholder="Endereço para entrega, se necessário"
           >
 
@@ -1272,149 +1413,149 @@
 
     <section class="section">
 
-      <h2>9. Docinhos</h2>
-
-      <p class="section-description">
-        Escolha quantidade e sabores.
-      </p>
-
+      <h2 class="section-title">9. Docinhos</h2>
 
       <!-- CLÁSSICOS -->
 
       <div class="subsection">
 
-        <h3>Clássicos</h3>
+        <h3 class="subsection-title">
+          Docinhos clássicos
+        </h3>
 
         <div class="options">
 
           <label class="option">
-
             <input
               type="radio"
-              name="classicoQtd"
+              name="docinhos_classicos_qtd"
               value="Não adicionar"
               data-price="0"
               checked
             >
-
-            <span class="option-title">
-              Não adicionar
+            <span class="option-content">
+              <span class="option-name">Não adicionar</span>
+              <span class="option-price">R$ 0,00</span>
             </span>
-
-            <span class="option-price">
-              —
-            </span>
-
           </label>
 
-          <label class="option">
 
+          <label class="option">
             <input
               type="radio"
-              name="classicoQtd"
+              name="docinhos_classicos_qtd"
               value="50 unidades"
               data-price="62.50"
             >
-
-            <span class="option-title">
-              50 unidades
+            <span class="option-content">
+              <span class="option-name">50 unidades</span>
+              <span class="option-price">R$ 62,50</span>
             </span>
-
-            <span class="option-price">
-              R$ 62,50
-            </span>
-
           </label>
 
-          <label class="option">
 
+          <label class="option">
             <input
               type="radio"
-              name="classicoQtd"
+              name="docinhos_classicos_qtd"
               value="100 unidades"
               data-price="125"
             >
-
-            <span class="option-title">
-              100 unidades
+            <span class="option-content">
+              <span class="option-name">100 unidades</span>
+              <span class="option-price">R$ 125,00</span>
             </span>
-
-            <span class="option-price">
-              R$ 125,00
-            </span>
-
           </label>
 
         </div>
 
 
-        <div
-          class="flavor-grid"
-          style="margin-top:15px;"
-        >
+        <div class="subsection">
 
-          <label class="flavor-item">
-            <input
-              type="checkbox"
-              name="classicoSabor"
-              value="Brigadeiro tradicional"
-            >
-            <span>Brigadeiro tradicional</span>
-          </label>
+          <h3 class="subsection-title">
+            Sabores clássicos
+          </h3>
 
-          <label class="flavor-item">
-            <input
-              type="checkbox"
-              name="classicoSabor"
-              value="Brigadeiro branco Ninho"
-            >
-            <span>Brigadeiro branco Ninho</span>
-          </label>
+          <div class="options">
 
-          <label class="flavor-item">
-            <input
-              type="checkbox"
-              name="classicoSabor"
-              value="Casadinho"
-            >
-            <span>Casadinho</span>
-          </label>
+            <label class="option">
+              <input
+                type="checkbox"
+                name="docinhos_classicos_sabor"
+                value="Brigadeiro tradicional"
+              >
+              <span class="option-content">
+                <span class="option-name">Brigadeiro tradicional</span>
+              </span>
+            </label>
 
-          <label class="flavor-item">
-            <input
-              type="checkbox"
-              name="classicoSabor"
-              value="Limão"
-            >
-            <span>Limão</span>
-          </label>
 
-          <label class="flavor-item">
-            <input
-              type="checkbox"
-              name="classicoSabor"
-              value="Beijinho"
-            >
-            <span>Beijinho</span>
-          </label>
+            <label class="option">
+              <input
+                type="checkbox"
+                name="docinhos_classicos_sabor"
+                value="Brigadeiro branco Ninho"
+              >
+              <span class="option-content">
+                <span class="option-name">Brigadeiro branco Ninho</span>
+              </span>
+            </label>
 
-          <label class="flavor-item">
-            <input
-              type="checkbox"
-              name="classicoSabor"
-              value="Doce de leite"
-            >
-            <span>Doce de leite</span>
-          </label>
+
+            <label class="option">
+              <input
+                type="checkbox"
+                name="docinhos_classicos_sabor"
+                value="Casadinho"
+              >
+              <span class="option-content">
+                <span class="option-name">Casadinho</span>
+              </span>
+            </label>
+
+
+            <label class="option">
+              <input
+                type="checkbox"
+                name="docinhos_classicos_sabor"
+                value="Limão"
+              >
+              <span class="option-content">
+                <span class="option-name">Limão</span>
+              </span>
+            </label>
+
+
+            <label class="option">
+              <input
+                type="checkbox"
+                name="docinhos_classicos_sabor"
+                value="Beijinho"
+              >
+              <span class="option-content">
+                <span class="option-name">Beijinho</span>
+              </span>
+            </label>
+
+
+            <label class="option">
+              <input
+                type="checkbox"
+                name="docinhos_classicos_sabor"
+                value="Doce de leite"
+              >
+              <span class="option-content">
+                <span class="option-name">Doce de leite</span>
+              </span>
+            </label>
+
+          </div>
+
+          <div class="status" id="classicosStatus">
+            Selecione a quantidade para escolher os sabores.
+          </div>
 
         </div>
-
-        <p
-          class="limit-message"
-          id="classicoStatus"
-        >
-          Selecione a quantidade para escolher os sabores.
-        </p>
 
       </div>
 
@@ -1423,174 +1564,191 @@
 
       <div class="subsection">
 
-        <h3>Premium</h3>
+        <h3 class="subsection-title">
+          Docinhos premium
+        </h3>
 
         <div class="options">
 
           <label class="option">
-
             <input
               type="radio"
-              name="premiumQtd"
+              name="docinhos_premium_qtd"
               value="Não adicionar"
               data-price="0"
               checked
             >
-
-            <span class="option-title">
-              Não adicionar
+            <span class="option-content">
+              <span class="option-name">Não adicionar</span>
+              <span class="option-price">R$ 0,00</span>
             </span>
-
-            <span class="option-price">
-              —
-            </span>
-
           </label>
 
-          <label class="option">
 
+          <label class="option">
             <input
               type="radio"
-              name="premiumQtd"
+              name="docinhos_premium_qtd"
               value="50 unidades"
               data-price="72.50"
             >
-
-            <span class="option-title">
-              50 unidades
+            <span class="option-content">
+              <span class="option-name">50 unidades</span>
+              <span class="option-price">R$ 72,50</span>
             </span>
-
-            <span class="option-price">
-              R$ 72,50
-            </span>
-
           </label>
 
-          <label class="option">
 
+          <label class="option">
             <input
               type="radio"
-              name="premiumQtd"
+              name="docinhos_premium_qtd"
               value="100 unidades"
               data-price="145"
             >
-
-            <span class="option-title">
-              100 unidades
+            <span class="option-content">
+              <span class="option-name">100 unidades</span>
+              <span class="option-price">R$ 145,00</span>
             </span>
-
-            <span class="option-price">
-              R$ 145,00
-            </span>
-
           </label>
 
         </div>
 
 
-        <div
-          class="flavor-grid"
-          style="margin-top:15px;"
-        >
+        <div class="subsection">
 
-          <label class="flavor-item">
-            <input
-              type="checkbox"
-              name="premiumSabor"
-              value="Ninho com Nutella"
-            >
-            <span>Ninho com Nutella</span>
-          </label>
+          <h3 class="subsection-title">
+            Sabores premium
+          </h3>
 
-          <label class="flavor-item">
-            <input
-              type="checkbox"
-              name="premiumSabor"
-              value="Moça Cremosa"
-            >
-            <span>Moça Cremosa</span>
-          </label>
+          <div class="options">
 
-          <label class="flavor-item">
-            <input
-              type="checkbox"
-              name="premiumSabor"
-              value="Surpresa de Uva"
-            >
-            <span>Surpresa de Uva</span>
-          </label>
+            <label class="option">
+              <input
+                type="checkbox"
+                name="docinhos_premium_sabor"
+                value="Ninho com Nutella"
+              >
+              <span class="option-content">
+                <span class="option-name">Ninho com Nutella</span>
+              </span>
+            </label>
 
-          <label class="flavor-item">
-            <input
-              type="checkbox"
-              name="premiumSabor"
-              value="Belga ao Leite"
-            >
-            <span>Belga ao Leite</span>
-          </label>
 
-          <label class="flavor-item">
-            <input
-              type="checkbox"
-              name="premiumSabor"
-              value="Belga Amargo"
-            >
-            <span>Belga Amargo</span>
-          </label>
+            <label class="option">
+              <input
+                type="checkbox"
+                name="docinhos_premium_sabor"
+                value="Moça Cremosa"
+              >
+              <span class="option-content">
+                <span class="option-name">Moça Cremosa</span>
+              </span>
+            </label>
 
-          <label class="flavor-item">
-            <input
-              type="checkbox"
-              name="premiumSabor"
-              value="Creme Brûlée"
-            >
-            <span>Creme Brûlée</span>
-          </label>
 
-          <label class="flavor-item">
-            <input
-              type="checkbox"
-              name="premiumSabor"
-              value="Brigadeiro com Castanha"
-            >
-            <span>Brigadeiro com Castanha</span>
-          </label>
+            <label class="option">
+              <input
+                type="checkbox"
+                name="docinhos_premium_sabor"
+                value="Surpresa de Uva"
+              >
+              <span class="option-content">
+                <span class="option-name">Surpresa de Uva</span>
+              </span>
+            </label>
 
-          <label class="flavor-item">
-            <input
-              type="checkbox"
-              name="premiumSabor"
-              value="Doce de Leite com Castanha"
-            >
-            <span>Doce de Leite com Castanha</span>
-          </label>
 
-          <label class="flavor-item">
-            <input
-              type="checkbox"
-              name="premiumSabor"
-              value="Kit Kat"
-            >
-            <span>Kit Kat</span>
-          </label>
+            <label class="option">
+              <input
+                type="checkbox"
+                name="docinhos_premium_sabor"
+                value="Belga ao Leite"
+              >
+              <span class="option-content">
+                <span class="option-name">Belga ao Leite</span>
+              </span>
+            </label>
 
-          <label class="flavor-item">
-            <input
-              type="checkbox"
-              name="premiumSabor"
-              value="Oreo"
-            >
-            <span>Oreo</span>
-          </label>
+
+            <label class="option">
+              <input
+                type="checkbox"
+                name="docinhos_premium_sabor"
+                value="Belga Amargo"
+              >
+              <span class="option-content">
+                <span class="option-name">Belga Amargo</span>
+              </span>
+            </label>
+
+
+            <label class="option">
+              <input
+                type="checkbox"
+                name="docinhos_premium_sabor"
+                value="Creme Brûlée"
+              >
+              <span class="option-content">
+                <span class="option-name">Creme Brûlée</span>
+              </span>
+            </label>
+
+
+            <label class="option">
+              <input
+                type="checkbox"
+                name="docinhos_premium_sabor"
+                value="Brigadeiro com Castanha"
+              >
+              <span class="option-content">
+                <span class="option-name">Brigadeiro com Castanha</span>
+              </span>
+            </label>
+
+
+            <label class="option">
+              <input
+                type="checkbox"
+                name="docinhos_premium_sabor"
+                value="Doce de Leite com Castanha"
+              >
+              <span class="option-content">
+                <span class="option-name">Doce de Leite com Castanha</span>
+              </span>
+            </label>
+
+
+            <label class="option">
+              <input
+                type="checkbox"
+                name="docinhos_premium_sabor"
+                value="Kit Kat"
+              >
+              <span class="option-content">
+                <span class="option-name">Kit Kat</span>
+              </span>
+            </label>
+
+
+            <label class="option">
+              <input
+                type="checkbox"
+                name="docinhos_premium_sabor"
+                value="Oreo"
+              >
+              <span class="option-content">
+                <span class="option-name">Oreo</span>
+              </span>
+            </label>
+
+          </div>
+
+          <div class="status" id="premiumStatus">
+            Selecione a quantidade para escolher os sabores.
+          </div>
 
         </div>
-
-        <p
-          class="limit-message"
-          id="premiumStatus"
-        >
-          Selecione a quantidade para escolher os sabores.
-        </p>
 
       </div>
 
@@ -1603,10 +1761,10 @@
 
     <section class="section">
 
-      <h2>10. Outros itens</h2>
+      <h2 class="section-title">10. Outros itens</h2>
 
       <p class="section-description">
-        Escolha os itens que deseja adicionar à sua encomenda.
+        Acrescente outros produtos à sua encomenda.
       </p>
 
 
@@ -1614,128 +1772,112 @@
 
       <div class="subsection">
 
-        <h3>Petit Brownie</h3>
+        <h3 class="subsection-title">
+          Petit Brownie
+        </h3>
 
         <div class="options">
 
           <label class="option">
             <input
               type="radio"
-              name="petitBrownie"
-              value="Não adicionar"
+              name="petit_brownie"
+              value="Não adicionar Petit Brownie"
               data-price="0"
               checked
             >
-
-            <span class="option-title">
-              Não adicionar
-            </span>
-
-            <span class="option-price">
-              —
+            <span class="option-content">
+              <span class="option-name">Não adicionar</span>
+              <span class="option-price">R$ 0,00</span>
             </span>
           </label>
+
 
           <label class="option">
             <input
               type="radio"
-              name="petitBrownie"
-              value="50 unidades"
+              name="petit_brownie"
+              value="Petit Brownie — 50 unidades"
               data-price="90"
             >
-
-            <span class="option-title">
-              50 unidades
-            </span>
-
-            <span class="option-price">
-              R$ 90,00
+            <span class="option-content">
+              <span class="option-name">50 unidades</span>
+              <span class="option-price">R$ 90,00</span>
             </span>
           </label>
+
 
           <label class="option">
             <input
               type="radio"
-              name="petitBrownie"
-              value="100 unidades"
+              name="petit_brownie"
+              value="Petit Brownie — 100 unidades"
               data-price="180"
             >
-
-            <span class="option-title">
-              100 unidades
-            </span>
-
-            <span class="option-price">
-              R$ 180,00
+            <span class="option-content">
+              <span class="option-name">100 unidades</span>
+              <span class="option-price">R$ 180,00</span>
             </span>
           </label>
 
         </div>
 
-        <p class="note">
+        <div class="status">
           Quadradinho de brownie com uma pitanga de brigadeiro na caixeta de docinho.
-        </p>
+        </div>
 
       </div>
 
 
-      <!-- MINI BROWNIE -->
+      <!-- MINI BROWNIE RECHEADO -->
 
       <div class="subsection">
 
-        <h3>Mini Brownie recheado</h3>
+        <h3 class="subsection-title">
+          Mini Brownie recheado
+        </h3>
 
         <div class="options">
 
           <label class="option">
             <input
               type="radio"
-              name="miniBrownie"
-              value="Não adicionar"
+              name="mini_brownie"
+              value="Não adicionar Mini Brownie recheado"
               data-price="0"
               checked
             >
-
-            <span class="option-title">
-              Não adicionar
-            </span>
-
-            <span class="option-price">
-              —
+            <span class="option-content">
+              <span class="option-name">Não adicionar</span>
+              <span class="option-price">R$ 0,00</span>
             </span>
           </label>
+
 
           <label class="option">
             <input
               type="radio"
-              name="miniBrownie"
-              value="Mini Brownie recheado — R$ 3,50 por unidade"
+              name="mini_brownie"
+              value="Mini Brownie recheado — por unidade"
               data-price="3.50"
             >
-
-            <span class="option-title">
-              Por unidade
-            </span>
-
-            <span class="option-price">
-              R$ 3,50 por unidade
+            <span class="option-content">
+              <span class="option-name">Por unidade</span>
+              <span class="option-price">R$ 3,50</span>
             </span>
           </label>
+
 
           <label class="option">
             <input
               type="radio"
-              name="miniBrownie"
+              name="mini_brownie"
               value="Mini Brownie recheado — a partir de 20 unidades"
               data-price="2.80"
             >
-
-            <span class="option-title">
-              A partir de 20 unidades
-            </span>
-
-            <span class="option-price">
-              R$ 2,80 por unidade
+            <span class="option-content">
+              <span class="option-name">A partir de 20 unidades</span>
+              <span class="option-price">R$ 2,80 por unidade</span>
             </span>
           </label>
 
@@ -1744,63 +1886,55 @@
       </div>
 
 
-      <!-- BEM-CASADO PAPEL -->
+      <!-- BEM-CASADO PAPEL CREPOM -->
 
       <div class="subsection">
 
-        <h3>Bem-casado no papel crepom</h3>
+        <h3 class="subsection-title">
+          Bem-casado no papel crepom
+        </h3>
 
         <div class="options">
 
           <label class="option">
             <input
               type="radio"
-              name="bemCasadoPapel"
-              value="Não adicionar"
+              name="bem_casado_crepom"
+              value="Não adicionar Bem-casado no papel crepom"
               data-price="0"
               checked
             >
-
-            <span class="option-title">
-              Não adicionar
-            </span>
-
-            <span class="option-price">
-              —
+            <span class="option-content">
+              <span class="option-name">Não adicionar</span>
+              <span class="option-price">R$ 0,00</span>
             </span>
           </label>
+
 
           <label class="option">
             <input
               type="radio"
-              name="bemCasadoPapel"
-              value="Bem-casado no papel crepom — R$ 6,00 por unidade"
+              name="bem_casado_crepom"
+              value="Bem-casado no papel crepom — por unidade"
               data-price="6"
             >
-
-            <span class="option-title">
-              Por unidade
-            </span>
-
-            <span class="option-price">
-              R$ 6,00 por unidade
+            <span class="option-content">
+              <span class="option-name">Por unidade</span>
+              <span class="option-price">R$ 6,00</span>
             </span>
           </label>
+
 
           <label class="option">
             <input
               type="radio"
-              name="bemCasadoPapel"
+              name="bem_casado_crepom"
               value="Bem-casado no papel crepom — a partir de 20 unidades"
               data-price="4.80"
             >
-
-            <span class="option-title">
-              A partir de 20 unidades
-            </span>
-
-            <span class="option-price">
-              R$ 4,80 por unidade
+            <span class="option-content">
+              <span class="option-name">A partir de 20 unidades</span>
+              <span class="option-price">R$ 4,80 por unidade</span>
             </span>
           </label>
 
@@ -1813,59 +1947,51 @@
 
       <div class="subsection">
 
-        <h3>Bem-casado na folha de celofane</h3>
+        <h3 class="subsection-title">
+          Bem-casado na folha de celofane
+        </h3>
 
         <div class="options">
 
           <label class="option">
             <input
               type="radio"
-              name="bemCasadoCelofane"
-              value="Não adicionar"
+              name="bem_casado_celofane"
+              value="Não adicionar Bem-casado na folha de celofane"
               data-price="0"
               checked
             >
-
-            <span class="option-title">
-              Não adicionar
-            </span>
-
-            <span class="option-price">
-              —
+            <span class="option-content">
+              <span class="option-name">Não adicionar</span>
+              <span class="option-price">R$ 0,00</span>
             </span>
           </label>
+
 
           <label class="option">
             <input
               type="radio"
-              name="bemCasadoCelofane"
-              value="Bem-casado na folha de celofane — R$ 5,00 por unidade"
+              name="bem_casado_celofane"
+              value="Bem-casado na folha de celofane — por unidade"
               data-price="5"
             >
-
-            <span class="option-title">
-              Por unidade
-            </span>
-
-            <span class="option-price">
-              R$ 5,00 por unidade
+            <span class="option-content">
+              <span class="option-name">Por unidade</span>
+              <span class="option-price">R$ 5,00</span>
             </span>
           </label>
+
 
           <label class="option">
             <input
               type="radio"
-              name="bemCasadoCelofane"
+              name="bem_casado_celofane"
               value="Bem-casado na folha de celofane — a partir de 20 unidades"
               data-price="4"
             >
-
-            <span class="option-title">
-              A partir de 20 unidades
-            </span>
-
-            <span class="option-price">
-              R$ 4,00 por unidade
+            <span class="option-content">
+              <span class="option-name">A partir de 20 unidades</span>
+              <span class="option-price">R$ 4,00 por unidade</span>
             </span>
           </label>
 
@@ -1878,47 +2004,38 @@
 
       <div class="subsection">
 
-        <h3>Cupcake com plaquinha</h3>
+        <h3 class="subsection-title">
+          Cupcake com plaquinha
+        </h3>
 
         <div class="options">
 
           <label class="option">
-
             <input
               type="radio"
-              name="cupcakePlaquinha"
-              value="Não adicionar"
+              name="cupcake_plaquinha"
+              value="Não adicionar Cupcake com plaquinha"
               data-price="0"
               checked
             >
-
-            <span class="option-title">
-              Não adicionar
+            <span class="option-content">
+              <span class="option-name">Não adicionar</span>
+              <span class="option-price">R$ 0,00</span>
             </span>
-
-            <span class="option-price">
-              —
-            </span>
-
           </label>
 
-          <label class="option">
 
+          <label class="option">
             <input
               type="radio"
-              name="cupcakePlaquinha"
-              value="Cupcake com plaquinha — R$ 6,50 por unidade"
+              name="cupcake_plaquinha"
+              value="Cupcake com plaquinha — por unidade"
               data-price="6.50"
             >
-
-            <span class="option-title">
-              Cupcake com plaquinha
+            <span class="option-content">
+              <span class="option-name">Por unidade</span>
+              <span class="option-price">R$ 6,50 por unidade</span>
             </span>
-
-            <span class="option-price">
-              R$ 6,50 por unidade
-            </span>
-
           </label>
 
         </div>
@@ -1930,47 +2047,38 @@
 
       <div class="subsection">
 
-        <h3>Cupcake sem plaquinha</h3>
+        <h3 class="subsection-title">
+          Cupcake sem plaquinha
+        </h3>
 
         <div class="options">
 
           <label class="option">
-
             <input
               type="radio"
-              name="cupcakeSemPlaquinha"
-              value="Não adicionar"
+              name="cupcake_sem_plaquinha"
+              value="Não adicionar Cupcake sem plaquinha"
               data-price="0"
               checked
             >
-
-            <span class="option-title">
-              Não adicionar
+            <span class="option-content">
+              <span class="option-name">Não adicionar</span>
+              <span class="option-price">R$ 0,00</span>
             </span>
-
-            <span class="option-price">
-              —
-            </span>
-
           </label>
 
-          <label class="option">
 
+          <label class="option">
             <input
               type="radio"
-              name="cupcakeSemPlaquinha"
-              value="Cupcake sem plaquinha — R$ 5,50 por unidade"
+              name="cupcake_sem_plaquinha"
+              value="Cupcake sem plaquinha — por unidade"
               data-price="5.50"
             >
-
-            <span class="option-title">
-              Cupcake sem plaquinha
+            <span class="option-content">
+              <span class="option-name">Por unidade</span>
+              <span class="option-price">R$ 5,50 por unidade</span>
             </span>
-
-            <span class="option-price">
-              R$ 5,50 por unidade
-            </span>
-
           </label>
 
         </div>
@@ -1981,66 +2089,82 @@
 
 
     <!-- =====================================================
-         TOTAL
+         TOTAL / WHATSAPP
     ====================================================== -->
 
-    <div class="total-box">
+    <section class="section order-final">
 
-      <div>
+      <h2 class="section-title">
+        Finalizar encomenda
+      </h2>
 
-        <div class="total-label">
-          Total dos itens com preço definido
-        </div>
+      <p class="section-description">
+        Confira o valor estimado e envie seu pedido pelo WhatsApp.
+      </p>
 
-        <div
-          class="total-value"
-          id="total"
-        >
+      <div class="total-box">
+
+        <span class="total-label">
+          Total estimado
+        </span>
+
+        <span class="total-value" id="total">
           R$ 0,00
-        </div>
+        </span>
 
       </div>
 
+
       <button
+        type="button"
         class="whatsapp-btn"
         id="whatsappBtn"
-        type="button"
       >
-        Enviar encomenda pelo WhatsApp
+        Enviar pedido pelo WhatsApp
       </button>
 
-    </div>
+      <p class="required-note">
+        * Preencha nome, WhatsApp e data desejada antes de enviar.
+      </p>
 
-    <p class="note">
-      Alguns produtos têm preço definido pela confeitaria/admin.
-    </p>
+    </section>
 
   </main>
 
 
-  <!-- =========================
+  <!-- =====================================================
        JAVASCRIPT
-  ========================== -->
+  ====================================================== -->
 
   <script>
-
     const WHATSAPP = "5585981563070";
 
-
     /* =========================
-       MENU
+       MENU MOBILE
     ========================== */
 
     const menuBtn = document.getElementById("menuBtn");
     const mainNav = document.getElementById("mainNav");
 
-    if (menuBtn && mainNav) {
+    menuBtn.addEventListener("click", () => {
+      const aberto = mainNav.classList.toggle("open");
 
-      menuBtn.addEventListener("click", () => {
-        mainNav.classList.toggle("open");
+      menuBtn.setAttribute(
+        "aria-expanded",
+        aberto ? "true" : "false"
+      );
+
+      menuBtn.textContent = aberto ? "✕" : "☰";
+    });
+
+
+    document.querySelectorAll("#mainNav a").forEach(link => {
+      link.addEventListener("click", () => {
+        mainNav.classList.remove("open");
+        menuBtn.setAttribute("aria-expanded", "false");
+        menuBtn.textContent = "☰";
       });
-
-    }
+    });
 
 
     /* =========================
@@ -2049,320 +2173,299 @@
 
     const dataInput = document.getElementById("data");
 
-    if (dataInput) {
+    const hoje = new Date();
 
-      const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+    const dia = String(hoje.getDate()).padStart(2, "0");
 
-      const ano = hoje.getFullYear();
+    dataInput.min = `${ano}-${mes}-${dia}`;
 
-      const mes = String(
-        hoje.getMonth() + 1
-      ).padStart(2, "0");
 
-      const dia = String(
-        hoje.getDate()
-      ).padStart(2, "0");
+    /* =========================
+       FORMATAÇÃO DE VALOR
+    ========================== */
 
-      dataInput.min =
-        `${ano}-${mes}-${dia}`;
-
+    function formatarMoeda(valor) {
+      return valor.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      });
     }
+
+
+    /* =========================
+       RECHEIOS DO BOLO
+       MÁXIMO 2
+    ========================== */
+
+    const recheios = document.querySelectorAll(
+      'input[name="recheio"]'
+    );
+
+    const recheioStatus =
+      document.getElementById("recheioStatus");
+
+    function atualizarRecheios() {
+
+      const selecionados = document.querySelectorAll(
+        'input[name="recheio"]:checked'
+      );
+
+      if (selecionados.length >= 2) {
+
+        recheios.forEach(input => {
+          if (!input.checked) {
+            input.disabled = true;
+          }
+        });
+
+      } else {
+
+        recheios.forEach(input => {
+          input.disabled = false;
+        });
+
+      }
+
+      recheioStatus.textContent =
+        `${selecionados.length} de 2 recheios selecionados.`;
+
+      calcularTotal();
+    }
+
+
+    recheios.forEach(input => {
+      input.addEventListener("change", atualizarRecheios);
+    });
+
+
+    /* =========================
+       CONTROLE DOS SABORES
+    ========================== */
+
+    function controlarSabores(
+      quantidadeName,
+      saborName,
+      statusId
+    ) {
+
+      const quantidadeInputs = document.querySelectorAll(
+        `input[name="${quantidadeName}"]`
+      );
+
+      const saborInputs = document.querySelectorAll(
+        `input[name="${saborName}"]`
+      );
+
+      const status = document.getElementById(statusId);
+
+      function atualizar() {
+
+        const selecionado = document.querySelector(
+          `input[name="${quantidadeName}"]:checked`
+        );
+
+        let limite = 0;
+
+        if (selecionado) {
+
+          const valor = selecionado.value.toLowerCase();
+
+          if (valor.includes("50")) {
+            limite = 2;
+          }
+
+          if (valor.includes("100")) {
+            limite = 4;
+          }
+        }
+
+
+        saborInputs.forEach(input => {
+          input.disabled = limite === 0;
+
+          if (limite === 0) {
+            input.checked = false;
+          }
+        });
+
+
+        const saboresSelecionados = () => {
+          return document.querySelectorAll(
+            `input[name="${saborName}"]:checked`
+          );
+        };
+
+
+        saborInputs.forEach(input => {
+
+          input.addEventListener("change", () => {
+
+            const selecionados =
+              saboresSelecionados();
+
+            if (selecionados.length >= limite && limite > 0) {
+
+              saborInputs.forEach(item => {
+                if (!item.checked) {
+                  item.disabled = true;
+                }
+              });
+
+            } else {
+
+              saborInputs.forEach(item => {
+                if (limite > 0) {
+                  item.disabled = false;
+                }
+              });
+
+            }
+
+            status.textContent =
+              limite > 0
+                ? `${selecionados.length} de ${limite} sabores selecionados.`
+                : "Selecione a quantidade para escolher os sabores.";
+
+            calcularTotal();
+          });
+
+        });
+
+
+        const atuais = saboresSelecionados();
+
+        if (limite === 0) {
+          status.textContent =
+            "Selecione a quantidade para escolher os sabores.";
+        } else {
+          status.textContent =
+            `${atuais.length} de ${limite} sabores selecionados.`;
+        }
+
+        calcularTotal();
+      }
+
+
+      quantidadeInputs.forEach(input => {
+        input.addEventListener("change", atualizar);
+      });
+
+      atualizar();
+    }
+
+
+    controlarSabores(
+      "docinhos_classicos_qtd",
+      "docinhos_classicos_sabor",
+      "classicosStatus"
+    );
+
+
+    controlarSabores(
+      "docinhos_premium_qtd",
+      "docinhos_premium_sabor",
+      "premiumStatus"
+    );
 
 
     /* =========================
        TOTAL
     ========================== */
 
-    function atualizarTotal() {
+    function calcularTotal() {
 
       let total = 0;
 
-      document
-        .querySelectorAll(
-          'input[type="radio"]:checked, input[type="checkbox"]:checked'
-        )
-        .forEach(input => {
+      const selecionados = document.querySelectorAll(
+        'input[type="radio"]:checked, input[type="checkbox"]:checked'
+      );
 
-          const preco =
-            Number(input.dataset.price || 0);
+      selecionados.forEach(input => {
 
-          total += preco;
-
-        });
-
-      const totalElement =
-        document.getElementById("total");
-
-      if (totalElement) {
-
-        totalElement.textContent =
-          total.toLocaleString(
-            "pt-BR",
-            {
-              style: "currency",
-              currency: "BRL"
-            }
-          );
-
-      }
-
-    }
-
-
-    document
-      .querySelectorAll("input")
-      .forEach(input => {
-
-        input.addEventListener(
-          "change",
-          atualizarTotal
+        const preco = Number(
+          input.dataset.price || 0
         );
 
+        total += preco;
       });
 
 
-    /* =========================
-       RECHEIOS
-    ========================== */
+      document.getElementById("total").textContent =
+        formatarMoeda(total);
 
-    const recheios =
-      document.querySelectorAll(
-        'input[name="recheio"]'
-      );
-
-    const recheioStatus =
-      document.getElementById(
-        "recheioStatus"
-      );
+      return total;
+    }
 
 
-    recheios.forEach(input => {
+    document.querySelectorAll(
+      'input[type="radio"], input[type="checkbox"]'
+    ).forEach(input => {
 
       input.addEventListener(
         "change",
-        () => {
-
-          const selecionados =
-            document.querySelectorAll(
-              'input[name="recheio"]:checked'
-            );
-
-          if (selecionados.length > 2) {
-
-            input.checked = false;
-
-            alert(
-              "Você pode escolher no máximo 2 recheios."
-            );
-
-          }
-
-          const quantidade =
-            document.querySelectorAll(
-              'input[name="recheio"]:checked'
-            ).length;
-
-          if (recheioStatus) {
-
-            recheioStatus.textContent =
-              `${quantidade} de 2 recheios selecionados.`;
-
-          }
-
-          atualizarTotal();
-
-        }
+        calcularTotal
       );
 
     });
 
 
+    calcularTotal();
+
+
     /* =========================
-       SABORES DOS DOCINHOS
+       PEGAR VALOR SELECIONADO
     ========================== */
 
-    function controlarSabores(
-      nomeQuantidade,
-      nomeSabor,
-      statusId
-    ) {
+    function obterValorRadio(nome) {
 
-      const quantidade =
-        document.querySelector(
-          `input[name="${nomeQuantidade}"]:checked`
-        );
+      const input = document.querySelector(
+        `input[name="${nome}"]:checked`
+      );
 
-      const sabores =
-        document.querySelectorAll(
-          `input[name="${nomeSabor}"]`
-        );
-
-      const status =
-        document.getElementById(statusId);
-
-      let limite = 0;
-
-
-      if (quantidade) {
-
-        if (
-          quantidade.value ===
-          "50 unidades"
-        ) {
-
-          limite = 2;
-
-        }
-
-        if (
-          quantidade.value ===
-          "100 unidades"
-        ) {
-
-          limite = 4;
-
-        }
-
-      }
-
-
-      sabores.forEach(sabor => {
-
-        sabor.disabled =
-          limite === 0;
-
-        if (limite === 0) {
-
-          sabor.checked = false;
-
-        }
-
-        sabor.onchange = () => {
-
-          const selecionados =
-            document.querySelectorAll(
-              `input[name="${nomeSabor}"]:checked`
-            );
-
-          if (
-            selecionados.length >
-            limite
-          ) {
-
-            sabor.checked = false;
-
-            alert(
-              `Para essa quantidade você pode escolher no máximo ${limite} sabores.`
-            );
-
-          }
-
-          atualizarStatus();
-          atualizarTotal();
-
-        };
-
-      });
-
-
-      function atualizarStatus() {
-
-        const selecionados =
-          document.querySelectorAll(
-            `input[name="${nomeSabor}"]:checked`
-          );
-
-        if (!status) {
-          return;
-        }
-
-        if (limite === 0) {
-
-          status.textContent =
-            "Selecione a quantidade para escolher os sabores.";
-
-        } else {
-
-          status.textContent =
-            `${selecionados.length} de ${limite} sabores selecionados.`;
-
-        }
-
-      }
-
-
-      atualizarStatus();
-
+      return input ? input.value : "";
     }
 
 
-    document
-      .querySelectorAll(
-        'input[name="classicoQtd"]'
-      )
-      .forEach(input => {
+    function obterValoresCheckbox(nome) {
 
-        input.addEventListener(
-          "change",
-          () => {
-
-            controlarSabores(
-              "classicoQtd",
-              "classicoSabor",
-              "classicoStatus"
-            );
-
-            atualizarTotal();
-
-          }
-        );
-
-      });
+      return Array.from(
+        document.querySelectorAll(
+          `input[name="${nome}"]:checked`
+        )
+      ).map(input => input.value);
+    }
 
 
-    document
-      .querySelectorAll(
-        'input[name="premiumQtd"]'
-      )
-      .forEach(input => {
+    function adicionarLista(
+      mensagem,
+      titulo,
+      valores
+    ) {
 
-        input.addEventListener(
-          "change",
-          () => {
+      if (!valores || valores.length === 0) {
+        return mensagem;
+      }
 
-            controlarSabores(
-              "premiumQtd",
-              "premiumSabor",
-              "premiumStatus"
-            );
+      const filtrados = valores.filter(valor => {
 
-            atualizarTotal();
-
-          }
-        );
+        return !valor
+          .toLowerCase()
+          .includes("não adicionar");
 
       });
 
+      if (filtrados.length === 0) {
+        return mensagem;
+      }
 
-    controlarSabores(
-      "classicoQtd",
-      "classicoSabor",
-      "classicoStatus"
-    );
-
-
-    controlarSabores(
-      "premiumQtd",
-      "premiumSabor",
-      "premiumStatus"
-    );
-
-
-    /* =========================
-       ATUALIZA TOTAL INICIAL
-    ========================== */
-
-    atualizarTotal();
+      return (
+        mensagem +
+        `\n*${titulo}:*\n` +
+        filtrados.map(valor => `• ${valor}`).join("\n")
+      );
+    }
 
 
     /* =========================
@@ -2370,469 +2473,311 @@
     ========================== */
 
     const whatsappBtn =
-      document.getElementById(
-        "whatsappBtn"
-      );
+      document.getElementById("whatsappBtn");
 
 
-    if (whatsappBtn) {
+    whatsappBtn.addEventListener(
+      "click",
+      () => {
 
-      whatsappBtn.addEventListener(
-        "click",
-        () => {
+        const nome =
+          document.getElementById("nome").value.trim();
 
-          const nome =
-            document
-              .getElementById("nome")
-              .value
-              .trim();
+        const telefone =
+          document.getElementById("whatsapp").value.trim();
 
+        const data =
+          document.getElementById("data").value;
 
-          const whatsapp =
-            document
-              .getElementById("whatsapp")
-              .value
-              .trim();
+        const endereco =
+          document.getElementById("endereco").value.trim();
 
+        const personalizacao =
+          document.getElementById("personalizacao").value.trim();
 
-          const data =
-            document
-              .getElementById("data")
-              .value;
+        const observacoes =
+          document.getElementById("observacoes").value.trim();
 
 
-          const endereco =
-            document
-              .getElementById("endereco")
-              .value
-              .trim();
+        if (!nome) {
+          alert("Digite seu nome.");
+          document.getElementById("nome").focus();
+          return;
+        }
 
 
-          const personalizacao =
-            document
-              .getElementById("personalizacao")
-              .value
-              .trim();
+        if (!telefone) {
+          alert("Digite seu WhatsApp.");
+          document.getElementById("whatsapp").focus();
+          return;
+        }
 
 
-          const observacoes =
-            document
-              .getElementById("observacoes")
-              .value
-              .trim();
+        if (!data) {
+          alert("Escolha a data desejada.");
+          document.getElementById("data").focus();
+          return;
+        }
 
 
-          if (!nome) {
+        const bolo =
+          obterValorRadio("bolo");
 
-            alert(
-              "Informe seu nome."
-            );
+        const kit =
+          obterValorRadio("kit");
 
-            document
-              .getElementById("nome")
-              .focus();
+        const topo =
+          obterValorRadio("topo");
 
-            return;
+        const massa =
+          obterValorRadio("massa");
 
-          }
+        const recheiosSelecionados =
+          obterValoresCheckbox("recheio");
 
+        const adicionais =
+          obterValoresCheckbox("adicional");
 
-          if (!whatsapp) {
+        const classicosQtd =
+          obterValorRadio("docinhos_classicos_qtd");
 
-            alert(
-              "Informe seu WhatsApp."
-            );
+        const classicosSabores =
+          obterValoresCheckbox(
+            "docinhos_classicos_sabor"
+          );
 
-            document
-              .getElementById("whatsapp")
-              .focus();
+        const premiumQtd =
+          obterValorRadio("docinhos_premium_qtd");
 
-            return;
+        const premiumSabores =
+          obterValoresCheckbox(
+            "docinhos_premium_sabor"
+          );
 
-          }
 
+        const petitBrownie =
+          obterValorRadio("petit_brownie");
 
-          if (!data) {
+        const miniBrownie =
+          obterValorRadio("mini_brownie");
 
-            alert(
-              "Informe a data necessária."
-            );
+        const bemCasadoCrepom =
+          obterValorRadio("bem_casado_crepom");
 
-            document
-              .getElementById("data")
-              .focus();
+        const bemCasadoCelofane =
+          obterValorRadio("bem_casado_celofane");
 
-            return;
+        const cupcakePlaquinha =
+          obterValorRadio("cupcake_plaquinha");
 
-          }
+        const cupcakeSemPlaquinha =
+          obterValorRadio("cupcake_sem_plaquinha");
 
 
-          const bolo =
-            document.querySelector(
-              'input[name="bolo"]:checked'
-            );
+        const dataFormatada =
+          new Date(
+            `${data}T12:00:00`
+          ).toLocaleDateString(
+            "pt-BR"
+          );
 
 
-          const kit =
-            document.querySelector(
-              'input[name="kit"]:checked'
-            );
+        let mensagem =
+          `*NOVO PEDIDO — MARTINS CONFEITARIA*`;
 
 
-          const topo =
-            document.querySelector(
-              'input[name="topo"]:checked'
-            );
+        mensagem +=
+          `\n\n*Dados do cliente:*` +
+          `\n• Nome: ${nome}` +
+          `\n• WhatsApp: ${telefone}` +
+          `\n• Data desejada: ${dataFormatada}`;
 
 
-          const massa =
-            document.querySelector(
-              'input[name="massa"]:checked'
-            );
-
-
-          const recheiosSelecionados =
-            [
-              ...document.querySelectorAll(
-                'input[name="recheio"]:checked'
-              )
-            ].map(
-              el => el.value
-            );
-
-
-          const extras =
-            [
-              ...document.querySelectorAll(
-                'input[name="extra"]:checked'
-              )
-            ].map(
-              el => el.value
-            );
-
-
-          const classicoQtd =
-            document.querySelector(
-              'input[name="classicoQtd"]:checked'
-            );
-
-
-          const premiumQtd =
-            document.querySelector(
-              'input[name="premiumQtd"]:checked'
-            );
-
-
-          const classicoSabores =
-            [
-              ...document.querySelectorAll(
-                'input[name="classicoSabor"]:checked'
-              )
-            ].map(
-              el => el.value
-            );
-
-
-          const premiumSabores =
-            [
-              ...document.querySelectorAll(
-                'input[name="premiumSabor"]:checked'
-              )
-            ].map(
-              el => el.value
-            );
-
-
-          const petit =
-            document.querySelector(
-              'input[name="petitBrownie"]:checked'
-            );
-
-
-          const miniBrownie =
-            document.querySelector(
-              'input[name="miniBrownie"]:checked'
-            );
-
-
-          const bemCasadoPapel =
-            document.querySelector(
-              'input[name="bemCasadoPapel"]:checked'
-            );
-
-
-          const bemCasadoCelofane =
-            document.querySelector(
-              'input[name="bemCasadoCelofane"]:checked'
-            );
-
-
-          const cupcakePlaquinha =
-            document.querySelector(
-              'input[name="cupcakePlaquinha"]:checked'
-            );
-
-
-          const cupcakeSemPlaquinha =
-            document.querySelector(
-              'input[name="cupcakeSemPlaquinha"]:checked'
-            );
-
-
-          let mensagem = "";
+        if (endereco) {
 
           mensagem +=
-            "🍰 *ENCOMENDA — MARTINS CONFEITARIA*\n\n";
-
-
-          mensagem +=
-            "*DADOS DO CLIENTE*\n";
-
-          mensagem +=
-            `Nome: ${nome}\n`;
-
-          mensagem +=
-            `WhatsApp: ${whatsapp}\n`;
-
-          mensagem +=
-            `Data necessária: ${data}\n`;
-
-
-          if (endereco) {
-
-            mensagem +=
-              `Endereço: ${endereco}\n`;
-
-          }
-
-
-          mensagem += "\n";
-
-
-          if (bolo) {
-
-            mensagem +=
-              "*BOLO*\n";
-
-            mensagem +=
-              `${bolo.value}\n\n`;
-
-          }
-
-
-          if (
-            kit &&
-            kit.value !== "Não escolher kit"
-          ) {
-
-            mensagem +=
-              "*KIT*\n";
-
-            mensagem +=
-              `${kit.value}\n\n`;
-
-          }
-
-
-          if (
-            topo &&
-            topo.value !== "Nenhum topo"
-          ) {
-
-            mensagem +=
-              "*TOPO / DECORAÇÃO*\n";
-
-            mensagem +=
-              `${topo.value}\n\n`;
-
-          }
-
-
-          if (massa) {
-
-            mensagem +=
-              "*MASSA*\n";
-
-            mensagem +=
-              `${massa.value}\n\n`;
-
-          }
-
-
-          if (
-            recheiosSelecionados.length
-          ) {
-
-            mensagem +=
-              "*RECHEIOS*\n";
-
-            mensagem +=
-              `${recheiosSelecionados.join(", ")}\n\n`;
-
-          }
-
-
-          if (extras.length) {
-
-            mensagem +=
-              "*ADICIONAIS*\n";
-
-            mensagem +=
-              `${extras.join(", ")}\n\n`;
-
-          }
-
-
-          if (
-            classicoQtd &&
-            classicoQtd.value !== "Não adicionar"
-          ) {
-
-            mensagem +=
-              "*DOCINHOS CLÁSSICOS*\n";
-
-            mensagem +=
-              `Quantidade: ${classicoQtd.value}\n`;
-
-            if (classicoSabores.length) {
-
-              mensagem +=
-                `Sabores: ${classicoSabores.join(", ")}\n`;
-
-            }
-
-            mensagem += "\n";
-
-          }
-
-
-          if (
-            premiumQtd &&
-            premiumQtd.value !== "Não adicionar"
-          ) {
-
-            mensagem +=
-              "*DOCINHOS PREMIUM*\n";
-
-            mensagem +=
-              `Quantidade: ${premiumQtd.value}\n`;
-
-            if (premiumSabores.length) {
-
-              mensagem +=
-                `Sabores: ${premiumSabores.join(", ")}\n`;
-
-            }
-
-            mensagem += "\n";
-
-          }
-
-
-          function adicionarItem(
-            titulo,
-            item
-          ) {
-
-            if (
-              item &&
-              item.value !== "Não adicionar" &&
-              !item.value.includes("não adicionar")
-            ) {
-
-              mensagem +=
-                `*${titulo}*\n`;
-
-              mensagem +=
-                `${item.value}\n\n`;
-
-            }
-
-          }
-
-
-          adicionarItem(
-            "PETIT BROWNIE",
-            petit
-          );
-
-
-          adicionarItem(
-            "MINI BROWNIE RECHEADO",
-            miniBrownie
-          );
-
-
-          adicionarItem(
-            "BEM-CASADO NO PAPEL CREPOM",
-            bemCasadoPapel
-          );
-
-
-          adicionarItem(
-            "BEM-CASADO NA FOLHA DE CELOFANE",
-            bemCasadoCelofane
-          );
-
-
-          adicionarItem(
-            "CUPCAKE COM PLAQUINHA",
-            cupcakePlaquinha
-          );
-
-
-          adicionarItem(
-            "CUPCAKE SEM PLAQUINHA",
-            cupcakeSemPlaquinha
-          );
-
-
-          if (personalizacao) {
-
-            mensagem +=
-              "*PERSONALIZAÇÃO*\n";
-
-            mensagem +=
-              `${personalizacao}\n\n`;
-
-          }
-
-
-          if (observacoes) {
-
-            mensagem +=
-              "*OBSERVAÇÕES*\n";
-
-            mensagem +=
-              `${observacoes}\n\n`;
-
-          }
-
-
-          const total =
-            document
-              .getElementById("total")
-              .textContent;
-
-
-          mensagem +=
-            `*TOTAL DOS ITENS COM PREÇO DEFINIDO: ${total}*`;
-
-
-          const url =
-            `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(mensagem)}`;
-
-
-          window.open(
-            url,
-            "_blank"
-          );
+            `\n• Endereço: ${endereco}`;
 
         }
-      );
 
-    }
 
+        if (bolo) {
+
+          mensagem +=
+            `\n\n*Bolo:*` +
+            `\n• ${bolo}`;
+
+        }
+
+
+        if (kit) {
+
+          const kitValido =
+            !kit
+              .toLowerCase()
+              .includes("não escolher");
+
+          if (kitValido) {
+
+            mensagem +=
+              `\n\n*Kit:*` +
+              `\n• ${kit}`;
+
+          }
+
+        }
+
+
+        if (topo) {
+
+          mensagem +=
+            `\n\n*Topo / decoração:*` +
+            `\n• ${topo}`;
+
+        }
+
+
+        if (massa) {
+
+          mensagem +=
+            `\n\n*Massa:*` +
+            `\n• ${massa}`;
+
+        }
+
+
+        mensagem =
+          adicionarLista(
+            mensagem,
+            "Recheios",
+            recheiosSelecionados
+          );
+
+
+        mensagem =
+          adicionarLista(
+            mensagem,
+            "Adicionais",
+            adicionais
+          );
+
+
+        if (
+          classicosQtd &&
+          !classicosQtd
+            .toLowerCase()
+            .includes("não adicionar")
+        ) {
+
+          mensagem +=
+            `\n\n*Docinhos clássicos:*` +
+            `\n• Quantidade: ${classicosQtd}`;
+
+          if (classicosSabores.length) {
+
+            mensagem +=
+              `\n• Sabores: ${classicosSabores.join(", ")}`;
+
+          }
+
+        }
+
+
+        if (
+          premiumQtd &&
+          !premiumQtd
+            .toLowerCase()
+            .includes("não adicionar")
+        ) {
+
+          mensagem +=
+            `\n\n*Docinhos premium:*` +
+            `\n• Quantidade: ${premiumQtd}`;
+
+          if (premiumSabores.length) {
+
+            mensagem +=
+              `\n• Sabores: ${premiumSabores.join(", ")}`;
+
+          }
+
+        }
+
+
+        const outrosItens = [
+          petitBrownie,
+          miniBrownie,
+          bemCasadoCrepom,
+          bemCasadoCelofane,
+          cupcakePlaquinha,
+          cupcakeSemPlaquinha
+        ].filter(valor => {
+
+          if (!valor) {
+            return false;
+          }
+
+          return !valor
+            .toLowerCase()
+            .includes("não adicionar");
+
+        });
+
+
+        if (outrosItens.length) {
+
+          mensagem +=
+            `\n\n*Outros itens:*` +
+            `\n` +
+            outrosItens
+              .map(item => `• ${item}`)
+              .join("\n");
+
+        }
+
+
+        if (personalizacao) {
+
+          mensagem +=
+            `\n\n*Personalização:*` +
+            `\n${personalizacao}`;
+
+        }
+
+
+        if (observacoes) {
+
+          mensagem +=
+            `\n\n*Observações:*` +
+            `\n${observacoes}`;
+
+        }
+
+
+        const total =
+          calcularTotal();
+
+
+        mensagem +=
+          `\n\n*Total estimado:* ${formatarMoeda(total)}`;
+
+
+        mensagem +=
+          `\n\nAguardo confirmação da encomenda e informações sobre pagamento.`;
+
+
+        const url =
+          `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(mensagem)}`;
+
+
+        window.open(
+          url,
+          "_blank",
+          "noopener,noreferrer"
+        );
+
+      }
+    );
   </script>
 
 </body>
