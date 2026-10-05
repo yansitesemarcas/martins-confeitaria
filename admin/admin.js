@@ -252,53 +252,158 @@
   ========================= */
 
   /*
-    SOMENTE ESTAS CLASSIFICAÇÕES:
+    CATEGORIAS PADRÃO:
 
     - Bolos
     - Brownies
     - Bolos no pote
     - Copos de felicidade
-    - Brigadeiros clássicos
-    - Brigadeiros premium
+
+    O administrador também pode criar
+    novas categorias manualmente.
+
+    "Brigadeiros clássicos" e
+    "Brigadeiros premium" foram removidos
+    das categorias padrão e também não
+    serão adicionados novamente.
   */
 
   const PRODUCT_CLASSIFICATIONS = [
     "Bolos",
     "Brownies",
     "Bolos no pote",
-    "Copos de felicidade",
-    "Brigadeiros clássicos",
-    "Brigadeiros premium"
+    "Copos de felicidade"
   ];
 
-  function isAllowedCategory(category) {
-    return PRODUCT_CLASSIFICATIONS.some(
-      (item) =>
-        normalize(item) ===
-        normalize(category)
+  const BLOCKED_CATEGORIES = [
+    "brigadeiros clássicos",
+    "brigadeiros classicos",
+    "brigadeiros premium"
+  ];
+
+  function isBlockedCategory(category) {
+    return BLOCKED_CATEGORIES.includes(
+      normalize(category)
     );
   }
 
   function getCategories() {
-    return [...PRODUCT_CLASSIFICATIONS];
+    const categories = [];
+
+    /*
+      Primeiro entram as quatro categorias
+      padrão.
+    */
+    PRODUCT_CLASSIFICATIONS.forEach(
+      (category) => {
+        if (
+          !isBlockedCategory(category) &&
+          !categories.some(
+            (item) =>
+              normalize(item) ===
+              normalize(category)
+          )
+        ) {
+          categories.push(category);
+        }
+      }
+    );
+
+    /*
+      Depois entram categorias personalizadas
+      já salvas em S.categories.
+    */
+    if (Array.isArray(S.categories)) {
+      S.categories.forEach(
+        (category) => {
+          const value =
+            String(category || "").trim();
+
+          if (!value) return;
+
+          if (isBlockedCategory(value)) {
+            return;
+          }
+
+          if (
+            !categories.some(
+              (item) =>
+                normalize(item) ===
+                normalize(value)
+            )
+          ) {
+            categories.push(value);
+          }
+        }
+      );
+    }
+
+    /*
+      Também verifica categorias que estejam
+      diretamente nos produtos.
+    */
+    if (Array.isArray(S.products)) {
+      S.products.forEach(
+        (product) => {
+          const value =
+            String(
+              product?.category || ""
+            ).trim();
+
+          if (!value) return;
+
+          if (isBlockedCategory(value)) {
+            return;
+          }
+
+          if (
+            !categories.some(
+              (item) =>
+                normalize(item) ===
+                normalize(value)
+            )
+          ) {
+            categories.push(value);
+          }
+        }
+      );
+    }
+
+    return categories;
   }
 
   function addCategory(category) {
+    const value =
+      String(category || "").trim();
+
+    if (!value) {
+      return false;
+    }
+
     /*
-      Mantido para compatibilidade com o restante
-      do painel, mas nenhuma categoria fora das
-      seis permitidas será adicionada.
+      As duas categorias removidas não podem
+      voltar para a lista.
     */
-
-    if (!category) return;
-
-    if (!isAllowedCategory(category)) {
-      return;
+    if (isBlockedCategory(value)) {
+      return false;
     }
 
-    if (!S.categories.includes(category)) {
-      S.categories.push(category);
+    if (!Array.isArray(S.categories)) {
+      S.categories = [];
     }
+
+    const exists =
+      S.categories.some(
+        (item) =>
+          normalize(item) ===
+          normalize(value)
+      );
+
+    if (!exists) {
+      S.categories.push(value);
+    }
+
+    return true;
   }
 
   /* =========================
@@ -524,16 +629,35 @@
         ? S.categories
         : [];
 
+    /*
+      Recupera categorias personalizadas
+      que já estejam nos produtos.
+
+      As duas categorias removidas são
+      ignoradas.
+    */
     for (const product of S.products) {
       if (
         product.category &&
-        isAllowedCategory(product.category)
+        !isBlockedCategory(
+          product.category
+        )
       ) {
         addCategory(
           product.category
         );
       }
     }
+
+    /*
+      Remove da lista salva as categorias
+      antigas que foram descontinuadas.
+    */
+    S.categories =
+      S.categories.filter(
+        (category) =>
+          !isBlockedCategory(category)
+      );
 
     renderLogo();
   }
@@ -1218,29 +1342,66 @@
             `
         )
         .join("")}
+
+      <option value="__new__">
+        + Nova categoria
+      </option>
     `;
 
+    /*
+      Se o produto já possuir uma categoria
+      personalizada que não esteja na lista,
+      adiciona temporariamente essa categoria
+      ao seletor.
+
+      As categorias bloqueadas nunca voltam.
+    */
     if (
       selected &&
+      !isBlockedCategory(selected) &&
       !categories.some(
         (category) =>
           normalize(category) ===
           normalize(selected)
       )
     ) {
-      /*
-        Produto antigo com classificação
-        que não faz mais parte das permitidas.
+      addCategory(selected);
 
-        Não adicionamos essa classificação
-        novamente ao seletor.
-      */
+      const option =
+        document.createElement("option");
 
-      select.value = "";
-    } else {
-      select.value =
-        selected || "";
+      option.value = selected;
+      option.textContent = selected;
+
+      const newOption =
+        select.querySelector(
+          'option[value="__new__"]'
+        );
+
+      if (newOption) {
+        select.insertBefore(
+          option,
+          newOption
+        );
+      } else {
+        select.appendChild(option);
+      }
     }
+
+    /*
+      Se o produto antigo estiver usando
+      uma das categorias removidas,
+      não deixa ela aparecer novamente.
+    */
+    if (
+      selected &&
+      isBlockedCategory(selected)
+    ) {
+      select.value = "";
+      return;
+    }
+
+    select.value = selected || "";
   }
 
   /* =========================
@@ -1374,8 +1535,40 @@
         $("#productArea").value
       );
 
-    const category =
+    let category =
       $("#productCategory").value;
+
+    /*
+      Se o administrador escolher
+      "+ Nova categoria", usa o campo
+      de nova categoria.
+    */
+    if (category === "__new__") {
+      category =
+        $("#newCategory")
+          ?.value
+          ?.trim() || "";
+
+      if (!category) {
+        toast(
+          "Digite o nome da nova categoria.",
+          "error"
+        );
+
+        return;
+      }
+
+      if (isBlockedCategory(category)) {
+        toast(
+          "Essa categoria não está disponível.",
+          "error"
+        );
+
+        return;
+      }
+
+      addCategory(category);
+    }
 
     const price =
       Number(
@@ -1450,10 +1643,10 @@
 
     if (
       category &&
-      !isAllowedCategory(category)
+      isBlockedCategory(category)
     ) {
       toast(
-        "Escolha uma classificação válida.",
+        "Essa categoria não está disponível.",
         "error"
       );
 
@@ -4210,25 +4403,46 @@
       );
 
     /*
-      Como as classificações agora são fixas,
-      não existe mais criação de categoria.
+      Criação de categorias continua
+      disponível através da opção
+      "+ Nova categoria".
     */
 
     $("#productCategory")
       ?.addEventListener(
         "change",
         (event) => {
-          if (
-            event.target.value ===
-            "__new__"
-          ) {
-            event.target.value = "";
+          const value =
+            event.target.value;
+
+          const newCategoryField =
+            $("#newCategoryField");
+
+          const newCategoryInput =
+            $("#newCategory");
+
+          if (value === "__new__") {
+            newCategoryField
+              ?.classList.remove(
+                "hidden"
+              );
+
+            if (newCategoryInput) {
+              newCategoryInput.focus();
+            }
+
+            return;
           }
 
-          $("#newCategoryField")
+          newCategoryField
             ?.classList.add(
               "hidden"
             );
+
+          if (newCategoryInput) {
+            newCategoryInput.value =
+              "";
+          }
         }
       );
 
@@ -4310,4 +4524,4 @@
 
   init();
 
-})();v
+})();
