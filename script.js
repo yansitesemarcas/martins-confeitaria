@@ -10,11 +10,15 @@
   const DEFAULTS = window.MARTINS_DEFAULTS || {};
   const CONFIG = window.MARTINS_CONFIG || {};
 
-  let state = JSON.parse(JSON.stringify(DEFAULTS));
+  let state = JSON.parse(
+    JSON.stringify(DEFAULTS)
+  );
+
   let currentCategory = "";
   let cart = [];
 
-  const CART_STORAGE_KEY = "martins_confeitaria_cart";
+  const CART_STORAGE_KEY =
+    "martins_confeitaria_cart";
 
   /* =========================================================
      HELPERS
@@ -64,6 +68,94 @@
       .replace(/_/g, "-")
       .replace(/\s+/g, "-");
   };
+
+  /* =========================================================
+     DESCONTO / PREÇO FINAL
+  ========================================================= */
+
+  function getDiscountPercent(product) {
+    const value = Number(
+      product?.discount_percent || 0
+    );
+
+    if (!Number.isFinite(value)) {
+      return 0;
+    }
+
+    return Math.max(
+      0,
+      Math.min(100, value)
+    );
+  }
+
+  function getProductFinalPrice(product) {
+    const price =
+      Number(product?.price || 0);
+
+    const discount =
+      getDiscountPercent(product);
+
+    return (
+      price *
+      (1 - discount / 100)
+    );
+  }
+
+  /* =========================================================
+     INFORMAÇÕES DO PRODUTO
+  ========================================================= */
+
+  function getProductMeta(product) {
+    const parts = [];
+
+    /* Gramatura */
+
+    if (
+      product?.gramatura !== null &&
+      product?.gramatura !== undefined &&
+      product?.gramatura !== ""
+    ) {
+      const grams =
+        Number(product.gramatura);
+
+      if (
+        Number.isFinite(grams) &&
+        grams > 0
+      ) {
+        parts.push(
+          `${grams} g`
+        );
+      }
+    }
+
+    /* Serve até */
+
+    if (
+      product?.serve_ate !== null &&
+      product?.serve_ate !== undefined &&
+      product?.serve_ate !== ""
+    ) {
+      const people =
+        Math.round(
+          Number(product.serve_ate)
+        );
+
+      if (
+        Number.isFinite(people) &&
+        people > 0
+      ) {
+        parts.push(
+          `Serve até ${people} ${
+            people === 1
+              ? "pessoa"
+              : "pessoas"
+          }`
+        );
+      }
+    }
+
+    return parts;
+  }
 
   /* =========================================================
      SUPABASE
@@ -122,15 +214,24 @@
           )
           .map((item) => ({
             id: item.id,
+
             name: String(
-              item.name || "Produto"
+              item.name ||
+                "Produto"
             ),
+
             price: Number(
               item.price || 0
             ),
+
             quantity: Number(
               item.quantity || 1
-            )
+            ),
+
+            appointment_required:
+              Boolean(
+                item.appointment_required
+              )
           }));
       }
     } catch (error) {
@@ -162,9 +263,11 @@
   ========================================================= */
 
   async function loadData() {
+
     /*
       Renderiza primeiro os dados locais.
-      Assim o site nunca começa vazio.
+      Assim o site não começa vazio enquanto
+      o Supabase responde.
     */
 
     render();
@@ -177,10 +280,12 @@
     }
 
     try {
+
       const [
         settingsResult,
         productsResult
       ] = await Promise.all([
+
         client
           .from("settings")
           .select("value")
@@ -193,6 +298,7 @@
           .order("sort", {
             ascending: true
           })
+
       ]);
 
       /* =====================================================
@@ -204,6 +310,7 @@
         settingsResult.data &&
         settingsResult.data.value
       ) {
+
         const remote =
           settingsResult.data.value;
 
@@ -221,6 +328,7 @@
             ...(remote.cake || {})
           }
         };
+
       }
 
       /* =====================================================
@@ -231,25 +339,47 @@
         productsResult &&
         Array.isArray(
           productsResult.data
-        ) &&
-        productsResult.data.length
+        )
       ) {
+
+        /*
+          IMPORTANTE:
+
+          O Supabase é a fonte oficial
+          dos produtos.
+
+          Mesmo que o banco esteja vazio,
+          usamos [].
+
+          Isso impede que produtos antigos
+          de defaults.js voltem depois
+          de apagar tudo no painel.
+        */
+
         state.products =
           productsResult.data.map(
             (product) => ({
               ...product
             })
           );
+
+      } else {
+
+        state.products = [];
+
       }
 
     } catch (error) {
+
       console.warn(
         "Não foi possível carregar os dados do Supabase:",
         error
       );
+
     }
 
     render();
+
   }
 
   /* =========================================================
@@ -257,6 +387,7 @@
   ========================================================= */
 
   function render() {
+
     renderAbout();
     renderContact();
     renderHours();
@@ -265,6 +396,7 @@
     renderYear();
     renderCart();
     setupReveal();
+
   }
 
   /* =========================================================
@@ -272,6 +404,7 @@
   ========================================================= */
 
   function renderAbout() {
+
     const about =
       state.about || {};
 
@@ -317,6 +450,7 @@
 
     const signature = `
       <div class="about-signature">
+
         <span>
           🩵 Feito com carinho, sabor e muitos sonhos
         </span>
@@ -329,6 +463,7 @@
           O coração por trás de cada doce da
           Martins Confeitaria.
         </small>
+
       </div>
     `;
 
@@ -345,6 +480,7 @@
         )
         .join("") +
       signature;
+
   }
 
   /* =========================================================
@@ -352,14 +488,18 @@
   ========================================================= */
 
   function renderYear() {
+
     const year =
       $("#year");
 
     if (year) {
+
       year.textContent =
         new Date()
           .getFullYear();
+
     }
+
   }
 
   /* =========================================================
@@ -367,6 +507,7 @@
   ========================================================= */
 
   function getCategories() {
+
     const products =
       Array.isArray(
         state.products
@@ -381,9 +522,11 @@
       ) &&
       state.categoriesByArea.cardapio.length
     ) {
+
       return [
         ...state.categoriesByArea.cardapio
       ];
+
     }
 
     if (
@@ -392,15 +535,18 @@
       ) &&
       state.categories.length
     ) {
+
       return [
         ...state.categories
       ];
+
     }
 
     return [
       ...new Set(
         products
           .filter((product) => {
+
             const area =
               normalizeArea(
                 product.area
@@ -410,6 +556,7 @@
               !area ||
               area === "cardapio"
             );
+
           })
           .map(
             (product) =>
@@ -418,6 +565,7 @@
           .filter(Boolean)
       )
     ];
+
   }
 
   /* =========================================================
@@ -425,6 +573,7 @@
   ========================================================= */
 
   function getMenuProducts() {
+
     const products =
       Array.isArray(
         state.products
@@ -434,6 +583,7 @@
 
     return products
       .filter((product) => {
+
         const area =
           normalizeArea(
             product.area
@@ -452,13 +602,17 @@
           isMenuProduct &&
           sameCategory
         );
+
       })
       .sort((a, b) => {
+
         return (
           Number(a.sort || 0) -
           Number(b.sort || 0)
         );
+
       });
+
   }
 
   /* =========================================================
@@ -466,6 +620,7 @@
   ========================================================= */
 
   function renderMenu() {
+
     const categories =
       $("#categories");
 
@@ -491,8 +646,10 @@
         currentCategory
       )
     ) {
+
       currentCategory =
         categoryList[0] || "";
+
     }
 
     /* =====================================================
@@ -500,11 +657,16 @@
     ===================================================== */
 
     if (!categoryList.length) {
-      categories.innerHTML = "";
+
+      categories.innerHTML =
+        "";
+
     } else {
+
       categories.innerHTML =
         categoryList
           .map((category) => {
+
             const active =
               category ===
               currentCategory;
@@ -530,8 +692,10 @@
                 )}
               </button>
             `;
+
           })
           .join("");
+
     }
 
     categories
@@ -539,16 +703,20 @@
         "[data-category]"
       )
       .forEach((button) => {
+
         button.addEventListener(
           "click",
           () => {
+
             currentCategory =
               button.dataset.category ||
               "";
 
             renderMenu();
+
           }
         );
+
       });
 
     /* =====================================================
@@ -561,21 +729,27 @@
     if (
       !menuProducts.length
     ) {
-      products.innerHTML = "";
+
+      products.innerHTML =
+        "";
 
       if (emptyMenu) {
+
         emptyMenu.classList.remove(
           "hidden"
         );
+
       }
 
       return;
     }
 
     if (emptyMenu) {
+
       emptyMenu.classList.add(
         "hidden"
       );
+
     }
 
     products.innerHTML =
@@ -590,6 +764,7 @@
     bindProductButtons(
       products
     );
+
   }
 
   /* =========================================================
@@ -600,6 +775,7 @@
     product,
     ready = false
   ) {
+
     const available =
       product.available !== false;
 
@@ -636,6 +812,75 @@
       ready
         ? "add-ready"
         : "add";
+
+    const originalPrice =
+      Number(
+        product.price || 0
+      );
+
+    const discount =
+      getDiscountPercent(
+        product
+      );
+
+    const finalPrice =
+      getProductFinalPrice(
+        product
+      );
+
+    const meta =
+      getProductMeta(
+        product
+      );
+
+    const metaHTML =
+      meta.length
+        ? `
+          <div class="product-meta">
+
+            ${meta
+              .map(
+                (item) => `
+                  <span>
+                    ${escapeHTML(
+                      item
+                    )}
+                  </span>
+                `
+              )
+              .join("")}
+
+          </div>
+        `
+        : "";
+
+    const discountHTML =
+      discount > 0
+        ? `
+          <div class="product-discount">
+
+            <span class="old-price">
+              ${money(
+                originalPrice
+              )}
+            </span>
+
+            <span class="discount-badge">
+              ${discount}% OFF
+            </span>
+
+          </div>
+        `
+        : "";
+
+    const appointmentHTML =
+      product.appointment_required
+        ? `
+          <div class="appointment-required">
+            📅 Agendamento obrigatório
+          </div>
+        `
+        : "";
 
     return `
       <article
@@ -682,13 +927,23 @@
               : ""
           }
 
+          ${metaHTML}
+
+          ${appointmentHTML}
+
           <div class="product-row">
 
-            <strong>
-              ${money(
-                product.price
-              )}
-            </strong>
+            <div class="product-price">
+
+              ${discountHTML}
+
+              <strong>
+                ${money(
+                  finalPrice
+                )}
+              </strong>
+
+            </div>
 
             ${
               available
@@ -716,11 +971,13 @@
 
       </article>
     `;
+
   }
 
   function bindProductButtons(
     container
   ) {
+
     if (!container) {
       return;
     }
@@ -730,16 +987,21 @@
         "[data-add-product]"
       )
       .forEach((button) => {
+
         button.addEventListener(
           "click",
           () => {
+
             addToCart(
               button.dataset
                 .addProduct
             );
+
           }
         );
+
       });
+
   }
 
   /* =========================================================
@@ -747,6 +1009,7 @@
   ========================================================= */
 
   function getReadyProducts() {
+
     const products =
       Array.isArray(
         state.products
@@ -757,7 +1020,6 @@
     const readyAreas = [
       "pronta-entrega",
       "pronta",
-      "pronta-entrega",
       "ready",
       "delivery"
     ];
@@ -765,6 +1027,7 @@
     const ready =
       products.filter(
         (product) => {
+
           const area =
             normalizeArea(
               product.area
@@ -776,6 +1039,7 @@
             ) &&
             product.available !== false
           );
+
         }
       );
 
@@ -784,13 +1048,14 @@
     }
 
     /*
-      Se o Supabase ainda não marcou
-      produtos como pronta entrega,
-      mostra até 3 produtos disponíveis.
+      Se nenhum produto foi marcado
+      como pronta-entrega, usamos até
+      3 produtos disponíveis do cardápio.
     */
 
     return products
       .filter((product) => {
+
         const area =
           normalizeArea(
             product.area
@@ -801,11 +1066,14 @@
             area === "cardapio") &&
           product.available !== false
         );
+
       })
       .slice(0, 3);
+
   }
 
   function renderReadyProducts() {
+
     const container =
       $("#readyProducts");
 
@@ -817,6 +1085,7 @@
       getReadyProducts();
 
     if (!products.length) {
+
       container.innerHTML = `
         <div class="empty">
           Nenhum produto disponível
@@ -840,6 +1109,7 @@
     bindProductButtons(
       container
     );
+
   }
 
   /* =========================================================
@@ -847,6 +1117,7 @@
   ========================================================= */
 
   function findProduct(id) {
+
     const products =
       Array.isArray(
         state.products
@@ -859,13 +1130,16 @@
         String(product.id) ===
         String(id)
     );
+
   }
 
   function addToCart(id) {
+
     const product =
       findProduct(id);
 
     if (!product) {
+
       console.warn(
         "Produto não encontrado:",
         id
@@ -887,27 +1161,63 @@
           String(id)
       );
 
+    const finalPrice =
+      getProductFinalPrice(
+        product
+      );
+
     if (existing) {
+
       existing.quantity += 1;
+
+      /*
+        Atualiza o preço caso o
+        estabelecimento tenha alterado
+        o desconto no painel.
+      */
+
+      existing.price =
+        finalPrice;
+
+      existing.appointment_required =
+        Boolean(
+          product.appointment_required
+        );
+
     } else {
+
       cart.push({
-        id: product.id,
+
+        id:
+          product.id,
+
         name:
           product.name ||
           "Produto",
-        price: Number(
-          product.price || 0
-        ),
-        quantity: 1
+
+        price:
+          finalPrice,
+
+        quantity:
+          1,
+
+        appointment_required:
+          Boolean(
+            product.appointment_required
+          )
+
       });
+
     }
 
     saveCart();
     renderCart();
     openCart();
+
   }
 
   function removeFromCart(id) {
+
     cart =
       cart.filter(
         (item) =>
@@ -917,12 +1227,14 @@
 
     saveCart();
     renderCart();
+
   }
 
   function changeQuantity(
     id,
     amount
   ) {
+
     const item =
       cart.find(
         (product) =>
@@ -937,22 +1249,28 @@
     item.quantity += amount;
 
     if (item.quantity <= 0) {
+
       removeFromCart(id);
+
       return;
     }
 
     saveCart();
     renderCart();
+
   }
 
   function clearCart() {
+
     cart = [];
 
     saveCart();
     renderCart();
+
   }
 
   function getCartCount() {
+
     return cart.reduce(
       (total, item) =>
         total +
@@ -961,9 +1279,11 @@
         ),
       0
     );
+
   }
 
   function getCartTotal() {
+
     return cart.reduce(
       (total, item) =>
         total +
@@ -975,6 +1295,16 @@
           ),
       0
     );
+
+  }
+
+  function cartRequiresAppointment() {
+
+    return cart.some(
+      (item) =>
+        item.appointment_required
+    );
+
   }
 
   /* =========================================================
@@ -982,6 +1312,7 @@
   ========================================================= */
 
   function renderCart() {
+
     const count =
       $("#cartCount");
 
@@ -995,20 +1326,26 @@
       $("#checkoutBtn");
 
     if (count) {
+
       count.textContent =
         getCartCount();
+
     }
 
     if (total) {
+
       total.textContent =
         money(
           getCartTotal()
         );
+
     }
 
     if (checkoutBtn) {
+
       checkoutBtn.disabled =
         cart.length === 0;
+
     }
 
     if (!items) {
@@ -1016,6 +1353,7 @@
     }
 
     if (!cart.length) {
+
       items.innerHTML = `
         <div class="empty">
           Seu carrinho está vazio.
@@ -1025,7 +1363,19 @@
       return;
     }
 
+    const appointmentNotice =
+      cartRequiresAppointment()
+        ? `
+          <div class="cart-appointment-notice">
+            📅 Este pedido possui produto com
+            agendamento obrigatório.
+          </div>
+        `
+        : "";
+
     items.innerHTML =
+      appointmentNotice +
+
       cart
         .map(
           (item) => `
@@ -1091,16 +1441,20 @@
         "[data-cart-minus]"
       )
       .forEach((button) => {
+
         button.addEventListener(
           "click",
           () => {
+
             changeQuantity(
               button.dataset
                 .cartMinus,
               -1
             );
+
           }
         );
+
       });
 
     items
@@ -1108,17 +1462,22 @@
         "[data-cart-plus]"
       )
       .forEach((button) => {
+
         button.addEventListener(
           "click",
           () => {
+
             changeQuantity(
               button.dataset
                 .cartPlus,
               1
             );
+
           }
         );
+
       });
+
   }
 
   /* =========================================================
@@ -1126,6 +1485,7 @@
   ========================================================= */
 
   function openCart() {
+
     const drawer =
       $("#drawer");
 
@@ -1133,6 +1493,7 @@
       $("#shade");
 
     if (drawer) {
+
       drawer.classList.add(
         "show"
       );
@@ -1141,9 +1502,11 @@
         "aria-hidden",
         "false"
       );
+
     }
 
     if (shade) {
+
       shade.classList.add(
         "show"
       );
@@ -1152,10 +1515,12 @@
         "aria-hidden",
         "false"
       );
+
     }
 
     document.body.style.overflow =
       "hidden";
+
   }
 
   /* =========================================================
@@ -1163,6 +1528,7 @@
   ========================================================= */
 
   function closeCart() {
+
     const drawer =
       $("#drawer");
 
@@ -1170,6 +1536,7 @@
       $("#shade");
 
     if (drawer) {
+
       drawer.classList.remove(
         "show"
       );
@@ -1178,9 +1545,11 @@
         "aria-hidden",
         "true"
       );
+
     }
 
     if (shade) {
+
       shade.classList.remove(
         "show"
       );
@@ -1189,10 +1558,12 @@
         "aria-hidden",
         "true"
       );
+
     }
 
     document.body.style.overflow =
       "";
+
   }
 
   /* =========================================================
@@ -1200,6 +1571,7 @@
   ========================================================= */
 
   function openCheckout() {
+
     if (!cart.length) {
       return;
     }
@@ -1217,16 +1589,22 @@
       typeof checkout.showModal ===
       "function"
     ) {
+
       checkout.showModal();
+
     } else {
+
       checkout.setAttribute(
         "open",
         ""
       );
+
     }
+
   }
 
   function closeCheckout() {
+
     const checkout =
       $("#checkout");
 
@@ -1238,12 +1616,17 @@
       typeof checkout.close ===
       "function"
     ) {
+
       checkout.close();
+
     } else {
+
       checkout.removeAttribute(
         "open"
       );
+
     }
+
   }
 
   /* =========================================================
@@ -1251,6 +1634,7 @@
   ========================================================= */
 
   function setupCheckoutForm() {
+
     const form =
       $("#checkoutForm");
 
@@ -1265,9 +1649,11 @@
       $("#addressWrap");
 
     if (receiving) {
+
       receiving.addEventListener(
         "change",
         () => {
+
           if (!addressWrap) {
             return;
           }
@@ -1276,26 +1662,35 @@
             receiving.value ===
             "Entrega"
           ) {
+
             addressWrap.classList.remove(
               "hidden"
             );
+
           } else {
+
             addressWrap.classList.add(
               "hidden"
             );
+
           }
+
         }
       );
+
     }
 
     form.addEventListener(
       "submit",
       (event) => {
+
         event.preventDefault();
 
         sendOrder(form);
+
       }
     );
+
   }
 
   /* =========================================================
@@ -1303,6 +1698,7 @@
   ========================================================= */
 
   function sendOrder(form) {
+
     if (!cart.length) {
       return;
     }
@@ -1359,17 +1755,39 @@
       "*PEDIDO*\n";
 
     cart.forEach((item) => {
+
       message +=
         `${item.quantity}x ${item.name} — ${money(
           Number(item.price) *
             Number(item.quantity)
-        )}\n`;
+        )}`;
+
+      if (
+        item.appointment_required
+      ) {
+
+        message +=
+          " — *AGENDAMENTO OBRIGATÓRIO*";
+
+      }
+
+      message += "\n";
+
     });
 
     message +=
       `\n*TOTAL:* ${money(
         getCartTotal()
       )}\n`;
+
+    if (
+      cartRequiresAppointment()
+    ) {
+
+      message +=
+        "\n📅 *ATENÇÃO:* Este pedido possui produto com agendamento obrigatório.\n";
+
+    }
 
     message +=
       `\n*Nome:* ${customer}`;
@@ -1384,16 +1802,20 @@
       receiving === "Entrega" &&
       address
     ) {
+
       message +=
         `\n*Endereço:* ${address}`;
+
     }
 
     message +=
       `\n*Pagamento:* ${payment}`;
 
     if (notes) {
+
       message +=
         `\n*Observações:* ${notes}`;
+
     }
 
     const whatsapp =
@@ -1407,6 +1829,7 @@
       );
 
     if (!whatsapp) {
+
       alert(
         "Número de WhatsApp não configurado."
       );
@@ -1433,12 +1856,15 @@
       $("#addressWrap");
 
     if (addressWrap) {
+
       addressWrap.classList.add(
         "hidden"
       );
+
     }
 
     closeCheckout();
+
   }
 
   /* =========================================================
@@ -1446,6 +1872,7 @@
   ========================================================= */
 
   function renderContact() {
+
     const address =
       $("#address");
 
@@ -1471,6 +1898,7 @@
         state.address
       )
     ) {
+
       address.innerHTML =
         state.address
           .map(
@@ -1478,6 +1906,7 @@
               escapeHTML(line)
           )
           .join("<br>");
+
     }
 
     /* =====================================================
@@ -1498,8 +1927,10 @@
       contactWa &&
       whatsapp
     ) {
+
       contactWa.href =
         `https://wa.me/${whatsapp}`;
+
     }
 
     /* =====================================================
@@ -1510,8 +1941,10 @@
       instagram &&
       state.instagram
     ) {
+
       instagram.href =
         state.instagram;
+
     }
 
     /* =====================================================
@@ -1522,8 +1955,10 @@
       maps &&
       state.maps
     ) {
+
       maps.href =
         state.maps;
+
     }
 
     /* =====================================================
@@ -1534,9 +1969,12 @@
       review &&
       state.review
     ) {
+
       review.href =
         state.review;
+
     }
+
   }
 
   /* =========================================================
@@ -1544,6 +1982,7 @@
   ========================================================= */
 
   function renderHours() {
+
     const hoursContainer =
       $("#hours");
 
@@ -1572,12 +2011,15 @@
     ];
 
     if (!hours.length) {
+
       hoursContainer.innerHTML =
         "";
 
       if (openState) {
+
         openState.textContent =
           "Consulte nossos horários.";
+
       }
 
       return;
@@ -1586,6 +2028,7 @@
     hoursContainer.innerHTML =
       hours
         .map((day, index) => {
+
           let value =
             "Horário não informado";
 
@@ -1593,20 +2036,26 @@
             day &&
             day.s === "closed"
           ) {
+
             value =
               "Fechado";
+
           } else if (
             day &&
             day.s === "open"
           ) {
+
             value =
               `${day.o} às ${day.c}`;
+
           } else if (
             day &&
             day.s === "tbd"
           ) {
+
             value =
               "A confirmar";
+
           }
 
           return `
@@ -1627,6 +2076,7 @@
 
             </div>
           `;
+
         })
         .join("");
 
@@ -1634,12 +2084,14 @@
       hours,
       openState
     );
+
   }
 
   function updateOpenState(
     hours,
     element
   ) {
+
     if (!element) {
       return;
     }
@@ -1662,6 +2114,7 @@
       current.s ===
         "closed"
     ) {
+
       element.textContent =
         "🔴 Fechado agora";
 
@@ -1672,6 +2125,7 @@
       current.s ===
       "tbd"
     ) {
+
       element.textContent =
         "🟡 Horário a confirmar";
 
@@ -1682,6 +2136,7 @@
       current.s !==
       "open"
     ) {
+
       element.textContent =
         "🟡 Horário não informado";
 
@@ -1714,26 +2169,27 @@
       closeHour * 60 +
       closeMinute;
 
-    /*
-      Horário normal
-    */
-
     if (
       currentMinutes >=
         openMinutes &&
       currentMinutes <=
         closeMinutes
     ) {
+
       element.textContent =
         "🟢 Aberto agora";
 
       element.classList.add(
         "is-open"
       );
+
     } else {
+
       element.textContent =
         "🔴 Fechado agora";
+
     }
+
   }
 
   /* =========================================================
@@ -1741,6 +2197,7 @@
   ========================================================= */
 
   function setupReveal() {
+
     const elements =
       document.querySelectorAll(
         ".reveal"
@@ -1753,11 +2210,14 @@
     if (
       !("IntersectionObserver" in window)
     ) {
+
       elements.forEach(
         (element) => {
+
           element.classList.add(
             "visible"
           );
+
         }
       );
 
@@ -1767,11 +2227,14 @@
     const observer =
       new IntersectionObserver(
         (entries) => {
+
           entries.forEach(
             (entry) => {
+
               if (
                 entry.isIntersecting
               ) {
+
                 entry.target.classList.add(
                   "visible"
                 );
@@ -1779,9 +2242,12 @@
                 observer.unobserve(
                   entry.target
                 );
+
               }
+
             }
           );
+
         },
         {
           threshold:0.12
@@ -1790,17 +2256,22 @@
 
     elements.forEach(
       (element) => {
+
         if (
           !element.classList.contains(
             "visible"
           )
         ) {
+
           observer.observe(
             element
           );
+
         }
+
       }
     );
+
   }
 
   /* =========================================================
@@ -1808,6 +2279,7 @@
   ========================================================= */
 
   function setupEvents() {
+
     /* =====================================================
        ABRIR CARRINHO
     ===================================================== */
@@ -1816,10 +2288,12 @@
       $("#openCart");
 
     if (openCartButton) {
+
       openCartButton.addEventListener(
         "click",
         openCart
       );
+
     }
 
     /* =====================================================
@@ -1830,10 +2304,12 @@
       $("#closeCart");
 
     if (closeCartButton) {
+
       closeCartButton.addEventListener(
         "click",
         closeCart
       );
+
     }
 
     /* =====================================================
@@ -1844,10 +2320,12 @@
       $("#shade");
 
     if (shade) {
+
       shade.addEventListener(
         "click",
         closeCart
       );
+
     }
 
     /* =====================================================
@@ -1858,10 +2336,12 @@
       $("#clearCart");
 
     if (clearCartButton) {
+
       clearCartButton.addEventListener(
         "click",
         clearCart
       );
+
     }
 
     /* =====================================================
@@ -1872,10 +2352,12 @@
       $("#checkoutBtn");
 
     if (checkoutButton) {
+
       checkoutButton.addEventListener(
         "click",
         openCheckout
       );
+
     }
 
     /* =====================================================
@@ -1885,14 +2367,19 @@
     document.addEventListener(
       "keydown",
       (event) => {
+
         if (
           event.key ===
           "Escape"
         ) {
+
           closeCart();
+
         }
+
       }
     );
+
   }
 
   /* =========================================================
@@ -1902,11 +2389,13 @@
   window.addEventListener(
     "error",
     (event) => {
+
       console.warn(
         "Erro no site:",
         event.error ||
           event.message
       );
+
     }
   );
 
@@ -1915,23 +2404,33 @@
   ========================================================= */
 
   function init() {
+
     loadCart();
+
     setupEvents();
+
     setupCheckoutForm();
+
     render();
+
     loadData();
+
   }
 
   if (
     document.readyState ===
     "loading"
   ) {
+
     document.addEventListener(
       "DOMContentLoaded",
       init
     );
+
   } else {
+
     init();
+
   }
 
 })();
