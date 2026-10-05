@@ -2,24 +2,26 @@
    MARTINS CONFEITARIA
    PAINEL ADMINISTRATIVO
    CSS PRINCIPAL
+   IDENTIDADE VISUAL OFICIAL
    ========================================================= */
 
 :root {
-  --primary: #7a3e2b;
-  --primary-dark: #5b2b1d;
-  --primary-light: #f3e3da;
+  /* CORES MARTINS CONFEITARIA */
+  --primary: #67b0cb;
+  --primary-dark: #2b7896;
+  --primary-light: #e8f6fa;
 
-  --secondary: #b87952;
-  --secondary-light: #f4e8df;
+  --secondary: #f3b7bb;
+  --secondary-light: #fdeff0;
 
-  --cream: #faf7f4;
+  --cream: #fafcfd;
   --white: #ffffff;
 
-  --text: #2d211c;
-  --text-light: #756963;
-  --text-muted: #9b8e87;
+  --text: #263238;
+  --text-light: #66757c;
+  --text-muted: #94a2a8;
 
-  --border: #e7dcd5;
+  --border: #dce9ed;
 
   --success: #2e7d4f;
   --success-bg: #e7f5ec;
@@ -33,9 +35,9 @@
   --info: #386c91;
   --info-bg: #e9f3fa;
 
-  --shadow-sm: 0 2px 8px rgba(74, 43, 30, 0.06);
-  --shadow: 0 8px 25px rgba(74, 43, 30, 0.08);
-  --shadow-lg: 0 20px 60px rgba(50, 30, 20, 0.15);
+  --shadow-sm: 0 2px 8px rgba(43, 120, 150, 0.07);
+  --shadow: 0 8px 25px rgba(43, 120, 150, 0.10);
+  --shadow-lg: 0 20px 60px rgba(43, 120, 150, 0.16);
 
   --radius-sm: 8px;
   --radius: 14px;
@@ -117,12 +119,12 @@ a {
   background:
     radial-gradient(
       circle at 15% 15%,
-      rgba(184, 121, 82, 0.14),
+      rgba(103, 176, 203, 0.20),
       transparent 30%
     ),
     radial-gradient(
       circle at 85% 85%,
-      rgba(122, 62, 43, 0.12),
+      rgba(243, 183, 187, 0.20),
       transparent 35%
     ),
     var(--cream);
@@ -234,14 +236,14 @@ a {
 }
 
 .form-control:hover {
-  border-color: #d5c6bd;
+  border-color: #b9d7e1;
 }
 
 .form-control:focus {
   border-color: var(--primary);
 
   box-shadow:
-    0 0 0 3px rgba(122, 62, 43, 0.11);
+    0 0 0 3px rgba(103, 176, 203, 0.16);
 }
 
 textarea.form-control {
@@ -301,7 +303,7 @@ textarea::placeholder {
 
 .btn-primary:hover {
   background: var(--primary-dark);
-  box-shadow: 0 5px 15px rgba(122, 62, 43, 0.18);
+  box-shadow: 0 5px 15px rgba(43, 120, 150, 0.20);
 }
 
 .btn-secondary {
@@ -313,7 +315,7 @@ textarea::placeholder {
 
 .btn-secondary:hover {
   background: var(--primary-light);
-  border-color: #d9c5ba;
+  border-color: #b9d7e1;
 }
 
 .btn-danger {
@@ -396,7 +398,7 @@ textarea::placeholder {
 
   color: var(--white);
 
-  box-shadow: 5px 0 25px rgba(50, 25, 15, 0.08);
+  box-shadow: 5px 0 25px rgba(43, 120, 150, 0.12);
 }
 
 .sidebar-brand {
@@ -409,7 +411,7 @@ textarea::placeholder {
 
   padding: 6px 9px 18px;
 
-  border-bottom: 1px solid rgba(255,255,255,0.14);
+  border-bottom: 1px solid rgba(255,255,255,0.20);
 
   margin-bottom: 18px;
 }
@@ -446,7 +448,7 @@ textarea::placeholder {
 
   margin-top: 3px;
 
-  color: rgba(255,255,255,0.7);
+  color: rgba(255,255,255,0.78);
 
   font-size: 11px;
 }
@@ -472,7 +474,7 @@ textarea::placeholder {
   padding: 11px 12px;
 
   background: transparent;
-  color: rgba(255,255,255,0.78);
+  color: rgba(255,255,255,0.82);
 
   border: 0;
   border-radius: 10px;
@@ -489,12 +491,12 @@ textarea::placeholder {
 }
 
 .nav-btn:hover {
-  background: rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.12);
   color: var(--white);
 }
 
 .nav-btn.active {
-  background: rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.20);
   color: var(--white);
 }
 
@@ -513,7 +515,7 @@ textarea::placeholder {
 
   padding-top: 15px;
 
-  border-top: 1px solid rgba(255,255,255,0.14);
+  border-top: 1px solid rgba(255,255,255,0.20);
 }
 
 .logout-btn {
@@ -521,10 +523,10 @@ textarea::placeholder {
 
   padding: 11px;
 
-  border: 1px solid rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.22);
   border-radius: 10px;
 
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.07);
   color: var(--white);
 
   font-size: 12px;
@@ -534,7 +536,7 @@ textarea::placeholder {
 }
 
 .logout-btn:hover {
-  background: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.15);
 }
 
 /* =========================================================
@@ -1091,7 +1093,7 @@ tbody tr:last-child td {
 
   padding: 20px;
 
-  background: rgba(39, 23, 16, 0.62);
+  background: rgba(43, 120, 150, 0.42);
 
   backdrop-filter: blur(5px);
 }
@@ -1461,11 +1463,11 @@ textarea:focus-visible {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbb8ac;
+  background: #a8cbd6;
 
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--secondary);
+  background: var(--primary-dark);
 }
