@@ -708,3 +708,114 @@
 
 </body>
 </html>
+/* ===== CORREÇÃO VISUAL DOS BOTÕES DO ADMIN ===== */
+
+button,
+.btn,
+button[type="button"],
+button[type="submit"] {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid #333 !important;
+  background: #1b1b1b !important;
+  color: #ffffff !important;
+  padding: 10px 14px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+button:hover,
+.btn:hover {
+  background: #292929 !important;
+  border-color: #555 !important;
+}
+
+button:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+/* Botões da navegação lateral */
+nav button,
+.sidebar button,
+.tabs button,
+[data-tab] {
+  color: #ffffff !important;
+  background: #181818 !important;
+  border: 1px solid #2d2d2d !important;
+  width: 100%;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+/* Botão ativo */
+nav button.active,
+.sidebar button.active,
+.tabs button.active,
+[data-tab].active {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+
+/* Inputs */
+input,
+select,
+textarea {
+  background: #111111 !important;
+  color: #ffffff !important;
+  border: 1px solid #333333 !important;
+  border-radius: 8px !important;
+  padding: 10px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #888888 !important;
+}
+
+select option {
+  background: #111111;
+  color: #ffffff;
+}
+
+/* Links que funcionam como botão */
+a.button,
+a.btn {
+  display: inline-flex !important;
+  background: #1b1b1b !important;
+  color: #ffffff !important;
+  border: 1px solid #333333 !important;
+  padding: 10px 14px !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+}
+
+/* Área principal */
+#main {
+  color: #ffffff;
+}
+
+/* Cards */
+.card,
+.panel,
+.box,
+.section {
+  color: #ffffff;
+}
+
+/* Textos secundários */
+small,
+.muted,
+.hint {
+  color: #aaa !important;
+}
