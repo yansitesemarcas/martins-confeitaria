@@ -1,1139 +1,3309 @@
-const { createClient } = window.supabase;
+(() => {
 
-const CONFIG = window.MARTINS_CONFIG || {};
+  const C = window.MARTINS_CONFIG || {};
+  const D = window.MARTINS_DEFAULTS || {};
 
-const client = createClient(
-  CONFIG.url,
-  CONFIG.anonKey
-);
+  const client =
+    C.SUPABASE_URL && C.SUPABASE_ANON_KEY
+      ? supabase.createClient(
+          C.SUPABASE_URL,
+          C.SUPABASE_ANON_KEY
+        )
+      : null;
 
-const view = document.getElementById("view");
-const login = document.getElementById("login");
-const app = document.getElementById("app");
-const loginForm = document.getElementById("loginForm");
-const loginMsg = document.getElementById("loginMsg");
-const title = document.getElementById("title");
+  const $ = s =>
+    document.querySelector(s);
 
-const S = {
-  products: [],
-  categories: [],
-  settings: {},
-  currentTab: "products",
-  editingId: null
-};
+  const esc = s =>
+    String(s ?? '').replace(
+      /[&<>"']/g,
+      m => ({
+        '&':'&amp;',
+        '<':'&lt;',
+        '>':'&gt;',
+        '"':'&quot;',
+        "'":'&#39;'
+      }[m])
+    );
 
-const AREAS = [
-  {
-    value: "cardapio",
-    label: "Cardápio / Delivery"
-  },
-  {
-    value: "pronta-entrega",
-    label: "Pronta-entrega"
-  },
-  {
-    value: "bolo-personalizado",
-    label: "Bolo personalizado"
-  },
-  {
-    value: "encomendas",
-    label: "Encomendas"
-  }
-];
+  let S = structuredClone(D);
+  let tab = 'products';
 
 
-/* =========================================================
-   AUTH
-========================================================= */
+  /* =========================================================
+     ÁREAS DOS PRODUTOS
+  ========================================================= */
 
-async function checkSession() {
-  const { data, error } = await client.auth.getSession();
-
-  if (error) {
-    console.error(error);
-    showLogin();
-    return;
-  }
-
-  if (data.session) {
-    showApp();
-    await load();
-  } else {
-    showLogin();
-  }
-}
+  const AREAS = [
+    {
+      value:'cardapio',
+      label:'Delivery'
+    },
+    {
+      value:'pronta-entrega',
+      label:'Pronta entrega'
+    },
+    {
+      value:'encomendas',
+      label:'Encomendas'
+    }
+  ];
 
 
-loginForm?.addEventListener("submit", async (event) => {
-  event.preventDefault();
+  function normalizeArea(area){
 
-  loginMsg.textContent = "Entrando...";
+    const value =
+      String(area || 'cardapio')
+        .trim()
+        .toLowerCase()
+        .replace(/_/g,'-')
+        .replace(/\s+/g,'-');
 
-  const email = loginForm.email.value.trim();
-  const password = loginForm.password.value;
-
-  const { error } = await client.auth.signInWithPassword({
-    email,
-    password
-  });
-
-  if (error) {
-    loginMsg.textContent = error.message;
-    return;
-  }
-
-  loginMsg.textContent = "";
-
-  showApp();
-  await load();
-});
-
-
-document.getElementById("logout")?.addEventListener("click", async () => {
-  await client.auth.signOut();
-  showLogin();
-});
-
-
-client.auth.onAuthStateChange((event, session) => {
-  if (session) {
-    showApp();
-  } else {
-    showLogin();
-  }
-});
-
-
-function showLogin() {
-  login?.classList.remove("hidden");
-  app?.classList.add("hidden");
-}
-
-
-function showApp() {
-  login?.classList.add("hidden");
-  app?.classList.remove("hidden");
-}
-
-
-/* =========================================================
-   LOAD
-========================================================= */
-
-async function load() {
-  await Promise.all([
-    loadProducts(),
-    loadCategories(),
-    loadSettings()
-  ]);
-
-  render();
-}
-
-
-async function loadProducts() {
-  const { data, error } = await client
-    .from("products")
-    .select("*")
-    .order("sort", { ascending: true })
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Erro ao carregar produtos:", error);
-    S.products = [];
-    return;
-  }
-
-  S.products = Array.isArray(data) ? data : [];
-}
-
-
-async function loadCategories() {
-  const { data, error } = await client
-    .from("categories")
-    .select("*")
-    .eq("active", true)
-    .order("sort", { ascending: true })
-    .order("name", { ascending: true });
-
-  if (error) {
-    console.error("Erro ao carregar categorias:", error);
-    S.categories = [];
-    return;
-  }
-
-  S.categories = Array.isArray(data) ? data : [];
-}
-
-
-async function loadSettings() {
-  const { data, error } = await client
-    .from("settings")
-    .select("*")
-    .limit(1)
-    .maybeSingle();
-
-  if (error) {
-    console.error("Erro ao carregar configurações:", error);
-    S.settings = {};
-    return;
-  }
-
-  S.settings = data || {};
-}
-
-
-/* =========================================================
-   TABS
-========================================================= */
-
-document.querySelectorAll("[data-tab]").forEach(button => {
-  button.addEventListener("click", () => {
-    S.currentTab = button.dataset.tab;
-
-    if (S.currentTab !== "products") {
-      S.editingId = null;
+    if(
+      value === 'pronta' ||
+      value === 'ready'
+    ){
+      return 'pronta-entrega';
     }
 
-    render();
-  });
-});
+    if(
+      value === 'encomenda' ||
+      value === 'bolo-personalizado'
+    ){
+      return 'encomendas';
+    }
 
-
-function render() {
-  switch (S.currentTab) {
-    case "products":
-      title.textContent = "Produtos";
-      renderProducts();
-      break;
-
-    case "content":
-      title.textContent = "Conteúdo";
-      renderContent();
-      break;
-
-    case "orders":
-      title.textContent = "Pedidos";
-      renderPlaceholder("Pedidos");
-      break;
-
-    case "cakes":
-      title.textContent = "Bolos personalizados";
-      renderPlaceholder("Bolos personalizados");
-      break;
-
-    case "hours":
-      title.textContent = "Horários e regras";
-      renderPlaceholder("Horários e regras");
-      break;
-
-    case "media":
-      title.textContent = "Mídia";
-      renderPlaceholder("Mídia");
-      break;
-
-    default:
-      title.textContent = "Produtos";
-      renderProducts();
+    return 'cardapio';
   }
-}
 
 
-/* =========================================================
-   PRODUCTS
-========================================================= */
+  function areaLabel(area){
 
-function renderProducts() {
-  const editing = S.products.find(
-    product => product.id === S.editingId
-  );
+    const normalized =
+      normalizeArea(area);
 
-  view.innerHTML = `
-    <div class="panel">
+    const found =
+      AREAS.find(
+        x => x.value === normalized
+      );
 
-      <div class="panel-head">
-        <div>
-          <h2>${editing ? "Editar produto" : "Novo produto"}</h2>
-          <p>
-            Cadastre o produto e escolha exatamente onde ele aparecerá.
-          </p>
+    return found
+      ? found.label
+      : 'Delivery';
+  }
+
+
+  function categoryNames(current = ''){
+
+    const list =
+      Array.isArray(S.categories)
+        ? [...S.categories]
+        : [];
+
+    if(
+      current &&
+      !list.some(
+        x =>
+          String(x).toLowerCase() ===
+          String(current).toLowerCase()
+      )
+    ){
+      list.push(current);
+    }
+
+    return [
+      ...new Set(
+        list
+          .map(
+            x =>
+              String(x || '').trim()
+          )
+          .filter(Boolean)
+      )
+    ];
+  }
+
+
+  /* =========================================================
+     INICIALIZAÇÃO
+  ========================================================= */
+
+  async function init(){
+
+    if(!client){
+
+      $('#loginMsg').textContent =
+        'Configure SUPABASE_URL e SUPABASE_ANON_KEY em config.js.';
+
+      return;
+    }
+
+    const {data} =
+      await client.auth.getSession();
+
+    if(data.session){
+      show();
+    }
+
+    client.auth.onAuthStateChange(
+      (_, s) => {
+
+        if(s){
+          show();
+        }else{
+          hide();
+        }
+
+      }
+    );
+
+  }
+
+
+  /* =========================================================
+     LOGIN / PAINEL
+  ========================================================= */
+
+  function show(){
+
+    $('#login')
+      .classList
+      .add('hidden');
+
+    $('#app')
+      .classList
+      .remove('hidden');
+
+    load();
+
+    if(!window.__martinsRealtime){
+
+      window.__martinsRealtime = true;
+
+      client
+        .channel('admin-live')
+
+        .on(
+          'postgres_changes',
+          {
+            event:'INSERT',
+            schema:'public',
+            table:'orders'
+          },
+          () => {
+
+            if(tab === 'orders'){
+              orders();
+            }
+
+            try{
+
+              new Audio(
+                'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA='
+              ).play();
+
+            }catch(e){}
+
+            alert(
+              'Novo pedido recebido!'
+            );
+
+          }
+        )
+
+        .on(
+          'postgres_changes',
+          {
+            event:'INSERT',
+            schema:'public',
+            table:'custom_cakes'
+          },
+          () => {
+
+            if(tab === 'cakes'){
+              cakes();
+            }
+
+            alert(
+              'Novo pedido de bolo personalizado!'
+            );
+
+          }
+        )
+
+        .subscribe();
+
+    }
+
+  }
+
+
+  function hide(){
+
+    $('#app')
+      .classList
+      .add('hidden');
+
+    $('#login')
+      .classList
+      .remove('hidden');
+
+  }
+
+
+  $('#loginForm').onsubmit =
+    async e => {
+
+      e.preventDefault();
+
+      const f =
+        new FormData(e.target);
+
+      const {error} =
+        await client.auth.signInWithPassword({
+
+          email:
+            f.get('email'),
+
+          password:
+            f.get('password')
+
+        });
+
+      if(error){
+
+        $('#loginMsg').textContent =
+          error.message;
+
+      }
+
+    };
+
+
+  $('#logout').onclick =
+    () => client.auth.signOut();
+
+
+  document
+    .querySelectorAll('[data-tab]')
+    .forEach(button => {
+
+      button.onclick = () => {
+
+        tab =
+          button.dataset.tab;
+
+        document
+          .querySelectorAll('[data-tab]')
+          .forEach(x =>
+            x.classList.toggle(
+              'active',
+              x === button
+            )
+          );
+
+        render();
+
+      };
+
+    });
+
+
+  /* =========================================================
+     CARREGAR DADOS
+  ========================================================= */
+
+  async function load(){
+
+    const [
+      st,
+      pr
+    ] = await Promise.all([
+
+      client
+        .from('settings')
+        .select('value')
+        .eq('key','site')
+        .maybeSingle(),
+
+      client
+        .from('products')
+        .select('*')
+        .order('sort')
+
+    ]);
+
+
+    if(st.error){
+
+      console.error(
+        'Erro ao carregar configurações:',
+        st.error
+      );
+
+    }
+
+
+    if(pr.error){
+
+      console.error(
+        'Erro ao carregar produtos:',
+        pr.error
+      );
+
+      alert(
+        'Erro ao carregar produtos: ' +
+        pr.error.message
+      );
+
+      return;
+    }
+
+
+    if(st.data?.value){
+
+      S = {
+        ...S,
+        ...st.data.value
+      };
+
+    }
+
+
+    /*
+      O banco é a fonte oficial dos produtos.
+    */
+
+    S.products =
+      Array.isArray(pr.data)
+        ? pr.data
+        : [];
+
+
+    render();
+
+  }
+
+
+  /* =========================================================
+     RENDER PRINCIPAL
+  ========================================================= */
+
+  function render(){
+
+    const names = {
+
+      products:'Produtos',
+
+      orders:'Pedidos',
+
+      cakes:'Bolos personalizados',
+
+      content:'Conteúdo',
+
+      hours:'Horários e regras',
+
+      media:'Mídia'
+
+    };
+
+
+    $('#title').textContent =
+      names[tab];
+
+
+    ({
+      products,
+      orders,
+      cakes,
+      content,
+      hours,
+      media
+    })[tab]();
+
+  }
+
+
+  /* =========================================================
+     PRODUTOS
+  ========================================================= */
+
+  function products(){
+
+    const groups = [
+
+      {
+        key:'cardapio',
+        title:'Delivery',
+        className:'delivery'
+      },
+
+      {
+        key:'pronta-entrega',
+        title:'Pronta entrega',
+        className:'ready'
+      },
+
+      {
+        key:'encomendas',
+        title:'Encomendas',
+        className:'orders'
+      }
+
+    ];
+
+
+    $('#view').innerHTML = `
+
+      <div class="card">
+
+        <div class="toolbar">
+
+          <div>
+
+            <h2>
+              Produtos
+            </h2>
+
+            <p>
+              Organize os produtos
+              entre Delivery,
+              Pronta entrega e
+              Encomendas.
+            </p>
+
+          </div>
+
+          <button
+            class="btn"
+            id="new"
+          >
+            + Novo produto
+          </button>
+
         </div>
 
-        ${
-          editing
-            ? `<button class="secondary" id="cancelEdit">
-                Cancelar edição
-              </button>`
-            : ""
-        }
       </div>
 
-      <form id="productForm">
 
-        <div class="grid">
+      <div class="product-groups">
 
-          <label>
+        ${groups.map(group => {
+
+          const items =
+            S.products.filter(
+              p =>
+                normalizeArea(p.area) ===
+                group.key
+            );
+
+
+          return `
+
+            <section
+              class="
+                card
+                area-section
+              "
+            >
+
+              <div
+                class="
+                  area-section-head
+                "
+              >
+
+                <div>
+
+                  <span
+                    class="
+                      area-badge
+                      ${group.className}
+                    "
+                  >
+                    ${group.title}
+                  </span>
+
+                  <h2>
+                    ${group.title}
+                  </h2>
+
+                  <p>
+                    ${items.length}
+                    produto(s)
+                  </p>
+
+                </div>
+
+
+                <button
+                  class="btn alt"
+                  data-new-area="${group.key}"
+                >
+                  + Adicionar aqui
+                </button>
+
+              </div>
+
+
+              <div class="table-wrap">
+
+                <table class="table">
+
+                  <thead>
+
+                    <tr>
+
+                      <th>
+                        Foto
+                      </th>
+
+                      <th>
+                        Produto
+                      </th>
+
+                      <th>
+                        Categoria
+                      </th>
+
+                      <th>
+                        Preço
+                      </th>
+
+                      <th>
+                        Desconto
+                      </th>
+
+                      <th>
+                        Disponível
+                      </th>
+
+                      <th>
+                        Ações
+                      </th>
+
+                    </tr>
+
+                  </thead>
+
+
+                  <tbody>
+
+                    ${
+                      items.length
+
+                        ? items.map(p => {
+
+                            const discount =
+                              Number(
+                                p.discount_percent ||
+                                0
+                              );
+
+
+                            const finalPrice =
+                              Number(
+                                p.price || 0
+                              ) *
+                              (
+                                1 -
+                                discount / 100
+                              );
+
+
+                            return `
+
+                              <tr>
+
+                                <td>
+
+                                  ${
+                                    p.image
+
+                                      ? `
+                                        <img
+                                          src="${esc(p.image)}"
+                                          alt="${esc(p.name)}"
+                                        >
+                                      `
+
+                                      : `
+                                        <span
+                                          class="status"
+                                        >
+                                          Sem foto
+                                        </span>
+                                      `
+                                  }
+
+                                </td>
+
+
+                                <td>
+
+                                  <b>
+                                    ${esc(p.name)}
+                                  </b>
+
+                                  <br>
+
+                                  <small>
+                                    ${esc(
+                                      p.description ||
+                                      ''
+                                    )}
+                                  </small>
+
+                                </td>
+
+
+                                <td>
+                                  ${esc(
+                                    p.category ||
+                                    'Sem categoria'
+                                  )}
+                                </td>
+
+
+                                <td>
+
+                                  ${
+                                    discount > 0
+
+                                      ? `
+
+                                        <del>
+                                          R$
+                                          ${Number(
+                                            p.price || 0
+                                          )
+                                            .toFixed(2)
+                                            .replace(
+                                              '.',
+                                              ','
+                                            )}
+                                        </del>
+
+                                        <br>
+
+                                        <b>
+                                          R$
+                                          ${finalPrice
+                                            .toFixed(2)
+                                            .replace(
+                                              '.',
+                                              ','
+                                            )}
+                                        </b>
+
+                                      `
+
+                                      : `
+
+                                        R$
+                                        ${Number(
+                                          p.price || 0
+                                        )
+                                          .toFixed(2)
+                                          .replace(
+                                            '.',
+                                            ','
+                                          )}
+
+                                      `
+                                  }
+
+                                </td>
+
+
+                                <td>
+
+                                  ${
+                                    discount > 0
+                                      ? discount + '%'
+                                      : 'Sem desconto'
+                                  }
+
+                                </td>
+
+
+                                <td>
+
+                                  ${
+                                    p.available !== false
+                                      ? 'Sim'
+                                      : 'Não'
+                                  }
+
+                                </td>
+
+
+                                <td>
+
+                                  <button
+                                    class="btn alt edit"
+                                    data-id="${p.id}"
+                                  >
+                                    Editar
+                                  </button>
+
+                                  <button
+                                    class="btn alt del"
+                                    data-id="${p.id}"
+                                  >
+                                    Excluir
+                                  </button>
+
+                                </td>
+
+                              </tr>
+
+                            `;
+
+                          }).join('')
+
+                        : `
+
+                            <tr>
+
+                              <td
+                                colspan="7"
+                              >
+
+                                <div
+                                  class="empty"
+                                >
+                                  Nenhum produto
+                                  nesta área.
+                                </div>
+
+                              </td>
+
+                            </tr>
+
+                          `
+                    }
+
+                  </tbody>
+
+                </table>
+
+              </div>
+
+            </section>
+
+          `;
+
+        }).join('')}
+
+      </div>
+
+    `;
+
+
+    $('#new').onclick =
+      () => editProduct();
+
+
+    document
+      .querySelectorAll(
+        '[data-new-area]'
+      )
+      .forEach(button => {
+
+        button.onclick = () => {
+
+          editProduct({
+
+            name:'',
+            description:'',
+            price:'',
+            category:'',
+            image:'',
+
+            available:true,
+            featured:false,
+            sort:0,
+
+            area:
+              button.dataset.newArea,
+
+            gramatura:'',
+            serve_ate:'',
+
+            discount_percent:0,
+
+            appointment_required:false
+
+          });
+
+        };
+
+      });
+
+
+    document
+      .querySelectorAll('.edit')
+      .forEach(button => {
+
+        button.onclick = () => {
+
+          editProduct(
+            S.products.find(
+              p =>
+                String(p.id) ===
+                String(button.dataset.id)
+            )
+          );
+
+        };
+
+      });
+
+
+    document
+      .querySelectorAll('.del')
+      .forEach(button => {
+
+        button.onclick =
+          async () => {
+
+            if(
+              !confirm(
+                'Excluir este produto?'
+              )
+            ){
+              return;
+            }
+
+
+            const {error} =
+              await client
+                .from('products')
+                .delete()
+                .eq(
+                  'id',
+                  button.dataset.id
+                );
+
+
+            if(error){
+
+              alert(
+                'Erro ao excluir produto: ' +
+                error.message
+              );
+
+              return;
+            }
+
+
+            await load();
+
+          };
+
+      });
+
+  }
+
+
+  /* =========================================================
+     EDITAR / CRIAR PRODUTO
+  ========================================================= */
+
+  function editProduct(
+
+    p = {
+
+      name:'',
+      description:'',
+      price:'',
+
+      category:
+        S.categories?.[0] || '',
+
+      image:'',
+
+      available:true,
+      featured:false,
+      sort:0,
+
+      area:'cardapio',
+
+      gramatura:'',
+      serve_ate:'',
+
+      discount_percent:0,
+
+      appointment_required:false
+
+    }
+
+  ){
+
+    const currentArea =
+      normalizeArea(p.area);
+
+
+    $('#view').innerHTML = `
+
+      <div class="card">
+
+        <div class="toolbar">
+
+          <div>
+
+            <span
+              class="
+                area-badge
+                ${
+                  currentArea ===
+                  'pronta-entrega'
+                    ? 'ready'
+                    :
+                  currentArea ===
+                  'encomendas'
+                    ? 'orders'
+                    : 'delivery'
+                }
+              "
+            >
+              ${areaLabel(currentArea)}
+            </span>
+
+            <h2>
+              ${
+                p.id
+                  ? 'Editar produto'
+                  : 'Novo produto'
+              }
+            </h2>
+
+            <p>
+              Escolha a área,
+              categoria e foto.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <form
+          id="pf"
+          class="formgrid"
+        >
+
+
+          <label class="field">
+
             Nome
+
             <input
               name="name"
               required
-              value="${escapeAttr(editing?.name || "")}"
-              placeholder="Ex.: Brownie Ninho"
+              maxlength="120"
+              value="${esc(p.name)}"
             >
+
           </label>
 
 
-          <label>
-            Área
-            <select name="area" id="productArea" required>
-              ${renderAreaOptions(editing?.area || "")}
-            </select>
-          </label>
+          <label class="field">
 
-
-          <label>
-            Categoria
-            <div class="category-row">
-
-              <select
-                name="category"
-                id="productCategory"
-                required
-              ></select>
-
-              <button
-                type="button"
-                class="secondary"
-                id="newCategory"
-              >
-                + Nova categoria
-              </button>
-
-            </div>
-          </label>
-
-
-          <label>
             Preço
+
             <input
               name="price"
               type="number"
               step="0.01"
               min="0"
               required
-              value="${editing?.price ?? ""}"
-              placeholder="0,00"
+              value="${p.price}"
             >
+
           </label>
 
 
-          <label>
-            Gramatura
+          <label class="field">
+
+            Área
+
+            <select
+              name="area"
+            >
+
+              ${AREAS.map(area => `
+
+                <option
+                  value="${area.value}"
+                  ${
+                    currentArea ===
+                    area.value
+                      ? 'selected'
+                      : ''
+                  }
+                >
+                  ${area.label}
+                </option>
+
+              `).join('')}
+
+            </select>
+
+          </label>
+
+
+          <label class="field">
+
+            Categoria
+
+            <select
+              name="category"
+              id="productCategory"
+              required
+            >
+
+              ${
+                categoryNames(
+                  p.category
+                )
+                .map(category => `
+
+                  <option
+                    value="${esc(category)}"
+                    ${
+                      String(category) ===
+                      String(
+                        p.category || ''
+                      )
+                        ? 'selected'
+                        : ''
+                    }
+                  >
+                    ${esc(category)}
+                  </option>
+
+                `)
+                .join('')
+              }
+
+              <option
+                value="__new__"
+              >
+                + Criar nova categoria
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <label
+            class="
+              field
+              full
+              category-new
+              hidden
+            "
+            id="newCategoryWrap"
+          >
+
+            Nova categoria
+
+            <input
+              name="new_category"
+              id="newCategory"
+              maxlength="80"
+              placeholder="Ex.: Bolos"
+            >
+
+            <small>
+              A nova categoria será
+              adicionada às categorias
+              do site.
+            </small>
+
+          </label>
+
+
+          <label class="field">
+
+            Tamanho da porção /
+            Gramatura (g)
+
             <input
               name="gramatura"
               type="number"
-              step="1"
               min="0"
-              value="${editing?.gramatura ?? ""}"
+              step="1"
+              value="${p.gramatura ?? ''}"
               placeholder="Ex.: 220"
             >
+
           </label>
 
 
-          <label>
-            Serve até
+          <label class="field">
+
+            Serve até (pessoas)
+
             <input
               name="serve_ate"
               type="number"
               min="1"
-              value="${editing?.serve_ate ?? ""}"
+              step="1"
+              value="${p.serve_ate ?? ''}"
               placeholder="Ex.: 5"
             >
+
           </label>
 
 
-          <label>
+          <label class="field">
+
             Desconto (%)
+
             <input
               name="discount_percent"
               type="number"
               min="0"
               max="100"
               step="0.01"
-              value="${editing?.discount_percent ?? 0}"
-              placeholder="0"
+              value="${p.discount_percent ?? 0}"
+              placeholder="Ex.: 15"
             >
+
           </label>
 
 
-          <label>
-            Imagem
-            <input
-              name="image"
-              value="${escapeAttr(editing?.image || "")}"
-              placeholder="URL da imagem"
-            >
-          </label>
+          <label class="field">
 
-
-          <label>
             Ordem
+
             <input
               name="sort"
               type="number"
               min="0"
-              value="${editing?.sort ?? ""}"
-              placeholder="Automático"
+              value="${p.sort || 0}"
             >
+
+          </label>
+
+
+          <label class="field full">
+
+            Foto do produto
+
+            <div
+              class="
+                product-image-box
+              "
+            >
+
+              <img
+                id="productImagePreview"
+                class="
+                  product-image-preview
+                "
+                src="${esc(p.image || '')}"
+                alt="Prévia da foto"
+                ${
+                  p.image
+                    ? ''
+                    : 'hidden'
+                }
+              >
+
+
+              <input
+                id="productImageFile"
+                type="file"
+                accept="image/*"
+              >
+
+
+              <small>
+                Escolha uma foto do
+                celular ou computador.
+                Ela será enviada
+                automaticamente.
+              </small>
+
+
+              <input
+                name="image"
+                id="productImageUrl"
+                value="${esc(p.image || '')}"
+                placeholder="Ou cole uma URL pública"
+              >
+
+            </div>
+
+          </label>
+
+
+          <label class="field full">
+
+            Descrição
+
+            <textarea
+              name="description"
+              maxlength="500"
+            >${esc(
+              p.description || ''
+            )}</textarea>
+
           </label>
 
 
           <label>
-            Agendamento obrigatório
-            <select name="appointment_required">
-              <option
-                value="false"
-                ${editing?.appointment_required === true ? "" : "selected"}
-              >
-                Não
-              </option>
 
-              <option
-                value="true"
-                ${editing?.appointment_required === true ? "selected" : ""}
-              >
-                Sim
-              </option>
-            </select>
-          </label>
+            <input
+              name="available"
+              type="checkbox"
+              ${
+                p.available !== false
+                  ? 'checked'
+                  : ''
+              }
+            >
 
-
-          <label>
             Disponível
-            <select name="available">
-              <option
-                value="true"
-                ${editing?.available === false ? "" : "selected"}
-              >
-                Sim
-              </option>
 
-              <option
-                value="false"
-                ${editing?.available === false ? "selected" : ""}
-              >
-                Não
-              </option>
-            </select>
           </label>
 
-        </div>
+
+          <label>
+
+            <input
+              name="featured"
+              type="checkbox"
+              ${
+                p.featured
+                  ? 'checked'
+                  : ''
+              }
+            >
+
+            Destaque
+
+          </label>
 
 
-        <label>
-          Descrição
-          <textarea
-            name="description"
-            rows="4"
-            placeholder="Descrição do produto"
-          >${escapeHtml(editing?.description || "")}</textarea>
-        </label>
+          <label>
+
+            <input
+              name="appointment_required"
+              type="checkbox"
+              ${
+                p.appointment_required
+                  ? 'checked'
+                  : ''
+              }
+            >
+
+            Agendamento obrigatório
+
+          </label>
 
 
-        <div class="form-actions">
+          <div class="row">
 
-          <button type="submit">
-            ${editing ? "Salvar alterações" : "Adicionar produto"}
-          </button>
+            <button class="btn">
+              Salvar
+            </button>
 
-          ${
-            editing
-              ? `<button
-                   type="button"
-                   class="danger"
-                   id="deleteProduct"
-                 >
-                   Excluir produto
-                 </button>`
-              : ""
+            <button
+              type="button"
+              class="btn alt"
+              id="back"
+            >
+              Cancelar
+            </button>
+
+          </div>
+
+
+          <small
+            id="productMsg"
+            class="field full"
+          ></small>
+
+
+        </form>
+
+      </div>
+
+    `;
+
+
+    const categorySelect =
+      $('#productCategory');
+
+    const newCategoryWrap =
+      $('#newCategoryWrap');
+
+    const newCategoryInput =
+      $('#newCategory');
+
+
+    function syncCategoryField(){
+
+      const isNew =
+        categorySelect.value ===
+        '__new__';
+
+      newCategoryWrap
+        .classList
+        .toggle(
+          'hidden',
+          !isNew
+        );
+
+      newCategoryInput.required =
+        isNew;
+
+    }
+
+
+    categorySelect.onchange =
+      syncCategoryField;
+
+    syncCategoryField();
+
+
+    const imageFile =
+      $('#productImageFile');
+
+    const imagePreview =
+      $('#productImagePreview');
+
+    const imageUrl =
+      $('#productImageUrl');
+
+
+    imageFile.onchange =
+      () => {
+
+        const file =
+          imageFile.files?.[0];
+
+        if(!file){
+          return;
+        }
+
+        imagePreview.src =
+          URL.createObjectURL(
+            file
+          );
+
+        imagePreview.hidden =
+          false;
+
+      };
+
+
+    imageUrl.oninput =
+      () => {
+
+        const value =
+          imageUrl.value.trim();
+
+        if(value){
+
+          imagePreview.src =
+            value;
+
+          imagePreview.hidden =
+            false;
+
+        }
+
+      };
+
+
+    $('#back').onclick =
+      products;
+
+
+    $('#pf').onsubmit =
+      async e => {
+
+        e.preventDefault();
+
+
+        const msg =
+          $('#productMsg');
+
+        const f =
+          new FormData(
+            e.target
+          );
+
+
+        msg.textContent =
+          'Salvando...';
+
+
+        const area =
+          normalizeArea(
+            f.get('area')
+          );
+
+
+        let category =
+          String(
+            f.get('category') || ''
+          ).trim();
+
+
+        if(
+          category ===
+          '__new__'
+        ){
+
+          category =
+            String(
+              f.get(
+                'new_category'
+              ) || ''
+            ).trim();
+
+
+          if(!category){
+
+            msg.textContent =
+              'Informe o nome da nova categoria.';
+
+            return;
+
           }
 
-        </div>
 
-        <small id="productMsg"></small>
+          if(
+            !Array.isArray(
+              S.categories
+            )
+          ){
 
-      </form>
+            S.categories = [];
 
-    </div>
+          }
 
 
-    <div class="panel">
+          if(
+            !S.categories.some(
+              x =>
+                String(x)
+                  .toLowerCase() ===
+                category.toLowerCase()
+            )
+          ){
 
-      <div class="panel-head">
-        <div>
-          <h2>Produtos cadastrados</h2>
-          <p>${S.products.length} produto(s)</p>
-        </div>
-      </div>
+            S.categories.push(
+              category
+            );
 
-      <div class="product-list">
 
-        ${
-          S.products.length
-            ? S.products.map(renderProductItem).join("")
-            : `<p>Nenhum produto cadastrado.</p>`
+            const saved =
+              await saveSite();
+
+
+            if(!saved){
+
+              msg.textContent =
+                'Não foi possível salvar a nova categoria.';
+
+              return;
+
+            }
+
+          }
+
         }
 
-      </div>
 
-    </div>
-  `;
+        if(!category){
 
+          msg.textContent =
+            'Selecione uma categoria.';
 
-  const areaSelect = document.getElementById("productArea");
-  const categorySelect = document.getElementById("productCategory");
+          return;
 
-  function refreshCategories(selectedValue = "") {
-    const area = areaSelect.value;
-
-    const categories = S.categories
-      .filter(category => category.area === area)
-      .sort((a, b) => {
-        if (a.sort !== b.sort) {
-          return a.sort - b.sort;
         }
 
-        return a.name.localeCompare(
-          b.name,
-          "pt-BR",
-          { sensitivity: "base" }
-        );
-      });
 
-    categorySelect.innerHTML = `
-      <option value="">Selecione uma categoria</option>
+        const discount =
+          Math.max(
+            0,
+            Math.min(
+              100,
+              Number(
+                f.get(
+                  'discount_percent'
+                ) || 0
+              )
+            )
+          );
 
-      ${categories.map(category => `
-        <option
-          value="${escapeAttr(category.name)}"
-          ${category.name === selectedValue ? "selected" : ""}
-        >
-          ${escapeHtml(category.name)}
-        </option>
-      `).join("")}
-    `;
+
+        let image =
+          String(
+            f.get('image') || ''
+          ).trim();
+
+
+        const file =
+          imageFile.files?.[0];
+
+
+        if(file){
+
+          const safeName =
+            file.name
+              .normalize('NFD')
+              .replace(
+                /[\u0300-\u036f]/g,
+                ''
+              )
+              .replace(
+                /[^a-zA-Z0-9._-]/g,
+                '-'
+              );
+
+
+          const path =
+            `products/${Date.now()}-${safeName}`;
+
+
+          const {
+            error:uploadError
+          } =
+            await client
+              .storage
+              .from('media')
+              .upload(
+                path,
+                file,
+                {
+                  cacheControl:'3600',
+                  upsert:false,
+                  contentType:
+                    file.type ||
+                    undefined
+                }
+              );
+
+
+          if(uploadError){
+
+            msg.textContent =
+              'Erro ao enviar a foto: ' +
+              uploadError.message;
+
+            return;
+
+          }
+
+
+          const {
+            data:publicData
+          } =
+            client
+              .storage
+              .from('media')
+              .getPublicUrl(
+                path
+              );
+
+
+          image =
+            publicData?.publicUrl ||
+            image;
+
+        }
+
+
+        const obj = {
+
+          name:
+            String(
+              f.get('name') || ''
+            ).trim(),
+
+          description:
+            String(
+              f.get(
+                'description'
+              ) || ''
+            ).trim(),
+
+          price:
+            Number(
+              f.get('price')
+            ) || 0,
+
+          category,
+
+          image,
+
+          available:
+            f.has('available'),
+
+          featured:
+            f.has('featured'),
+
+          sort:
+            Number(
+              f.get('sort') || 0
+            ),
+
+          area,
+
+          gramatura:
+            f.get(
+              'gramatura'
+            ) === ''
+              ? null
+              : Number(
+                  f.get(
+                    'gramatura'
+                  )
+                ),
+
+          serve_ate:
+            f.get(
+              'serve_ate'
+            ) === ''
+              ? null
+              : Number(
+                  f.get(
+                    'serve_ate'
+                  )
+                ),
+
+          discount_percent:
+            discount,
+
+          appointment_required:
+            f.has(
+              'appointment_required'
+            )
+
+        };
+
+
+        let result;
+
+
+        if(p.id){
+
+          result =
+            await client
+              .from('products')
+              .update(obj)
+              .eq(
+                'id',
+                p.id
+              );
+
+        }else{
+
+          result =
+            await client
+              .from('products')
+              .insert(obj);
+
+        }
+
+
+        if(result.error){
+
+          msg.textContent =
+            'Erro ao salvar produto: ' +
+            result.error.message;
+
+          return;
+
+        }
+
+
+        await load();
+
+      };
+
   }
 
 
-  refreshCategories(editing?.category || "");
+  /* =========================================================
+     SALVAR CONFIGURAÇÕES
+  ========================================================= */
+
+  async function saveSite(){
+
+    const payload =
+      structuredClone(S);
+
+    delete payload.products;
 
 
-  areaSelect.addEventListener("change", () => {
-    refreshCategories("");
-  });
+    const {error} =
+      await client
+        .from('settings')
+        .upsert({
 
+          key:'site',
 
-  document
-    .getElementById("newCategory")
-    ?.addEventListener("click", async () => {
+          value:payload
 
-      const area = areaSelect.value;
-
-      if (!area) {
-        alert("Selecione primeiro a área do produto.");
-        return;
-      }
-
-      const name = prompt(
-        `Nome da nova categoria para "${getAreaLabel(area)}":`
-      );
-
-      if (!name) {
-        return;
-      }
-
-      const cleanName = name.trim();
-
-      if (!cleanName) {
-        return;
-      }
-
-      const existing = S.categories.find(category =>
-        category.area === area &&
-        category.name.toLowerCase() === cleanName.toLowerCase()
-      );
-
-      if (existing) {
-        refreshCategories(existing.name);
-        categorySelect.value = existing.name;
-        return;
-      }
-
-      const maxSort = S.categories
-        .filter(category => category.area === area)
-        .reduce(
-          (max, category) =>
-            Math.max(max, Number(category.sort) || 0),
-          0
-        );
-
-      const { error } = await client
-        .from("categories")
-        .insert({
-          name: cleanName,
-          area,
-          sort: maxSort + 1,
-          active: true
         });
 
-      if (error) {
-        console.error(error);
 
-        alert(
-          "Não foi possível criar a categoria:\n\n" +
-          error.message
-        );
+    if(error){
 
-        return;
-      }
-
-      await loadCategories();
-
-      refreshCategories(cleanName);
-
-      categorySelect.value = cleanName;
-    });
-
-
-  document
-    .getElementById("cancelEdit")
-    ?.addEventListener("click", () => {
-      S.editingId = null;
-      renderProducts();
-    });
-
-
-  document
-    .getElementById("deleteProduct")
-    ?.addEventListener("click", async () => {
-
-      if (!S.editingId) {
-        return;
-      }
-
-      const product = S.products.find(
-        item => item.id === S.editingId
+      alert(
+        'Erro ao salvar configurações: ' +
+        error.message
       );
 
-      if (!product) {
-        return;
-      }
+      return false;
 
-      const confirmed = confirm(
-        `Excluir "${product.name}"?\n\nEssa ação não pode ser desfeita.`
+    }
+
+
+    return true;
+
+  }
+
+
+  /* =========================================================
+     CONTEÚDO
+  ========================================================= */
+
+  async function content(){
+
+    const a =
+      S.about || {};
+
+
+    $('#view').innerHTML = `
+
+      <div class="card">
+
+        <h2>
+          Conteúdo do site
+        </h2>
+
+
+        <form
+          id="cf"
+          class="formgrid"
+        >
+
+
+          <label class="field">
+
+            Nome da pessoa responsável
+
+            <input
+              name="about.name"
+              value="${esc(a.name)}"
+            >
+
+          </label>
+
+
+          <label class="field">
+
+            Foto (URL)
+
+            <input
+              name="about.photo"
+              value="${esc(a.photo)}"
+            >
+
+          </label>
+
+
+          <label class="field full">
+
+            Título
+
+            <input
+              name="about.title"
+              value="${esc(a.title)}"
+            >
+
+          </label>
+
+
+          <label class="field full">
+
+            Frase
+
+            <input
+              name="about.quote"
+              value="${esc(a.quote)}"
+            >
+
+          </label>
+
+
+          <label class="field full">
+
+            História
+
+            <textarea
+              name="about.text"
+            >${esc(a.text)}</textarea>
+
+          </label>
+
+
+          <label class="field">
+
+            Instagram
+
+            <input
+              name="instagram"
+              value="${esc(
+                S.instagram
+              )}"
+            >
+
+          </label>
+
+
+          <label class="field">
+
+            WhatsApp
+
+            <input
+              name="whatsapp"
+              value="${esc(
+                S.whatsapp
+              )}"
+            >
+
+          </label>
+
+
+          <label class="field">
+
+            Google Maps (URL)
+
+            <input
+              name="maps"
+              value="${esc(
+                S.maps
+              )}"
+            >
+
+          </label>
+
+
+          <label class="field">
+
+            Google Avaliações (URL)
+
+            <input
+              name="review"
+              value="${esc(
+                S.review
+              )}"
+            >
+
+          </label>
+
+
+          <div class="row">
+
+            <button class="btn">
+              Salvar
+            </button>
+
+          </div>
+
+
+        </form>
+
+      </div>
+
+    `;
+
+
+    $('#cf').onsubmit =
+      saveSettings;
+
+  }
+
+
+  async function saveSettings(e){
+
+    e.preventDefault();
+
+    const f =
+      new FormData(e.target);
+
+
+    S.instagram =
+      f.get('instagram');
+
+    S.whatsapp =
+      f.get('whatsapp');
+
+    S.maps =
+      f.get('maps');
+
+    S.review =
+      f.get('review');
+
+
+    S.about = {
+
+      ...S.about,
+
+      name:
+        f.get(
+          'about.name'
+        ),
+
+      photo:
+        f.get(
+          'about.photo'
+        ),
+
+      title:
+        f.get(
+          'about.title'
+        ),
+
+      quote:
+        f.get(
+          'about.quote'
+        ),
+
+      text:
+        f.get(
+          'about.text'
+        )
+
+    };
+
+
+    const saved =
+      await saveSite();
+
+
+    if(saved){
+      alert('Salvo!');
+    }
+
+  }
+
+
+  /* =========================================================
+     HORÁRIOS
+  ========================================================= */
+
+  function hours(){
+
+    const days = [
+
+      'Domingo',
+      'Segunda-feira',
+      'Terça-feira',
+      'Quarta-feira',
+      'Quinta-feira',
+      'Sexta-feira',
+      'Sábado'
+
+    ];
+
+
+    $('#view').innerHTML = `
+
+      <div class="card">
+
+        <h2>
+          Horários
+        </h2>
+
+
+        <form id="hf">
+
+          ${(
+            S.hours || []
+          ).map(
+            (h,i) => `
+
+              <div class="formgrid">
+
+                <label class="field">
+
+                  ${days[i]}
+
+                  <select
+                    name="s${i}"
+                  >
+
+                    <option
+                      value="open"
+                      ${
+                        h.s === 'open'
+                          ? 'selected'
+                          : ''
+                      }
+                    >
+                      Aberto
+                    </option>
+
+                    <option
+                      value="closed"
+                      ${
+                        h.s === 'closed'
+                          ? 'selected'
+                          : ''
+                      }
+                    >
+                      Fechado
+                    </option>
+
+                    <option
+                      value="tbd"
+                      ${
+                        h.s === 'tbd'
+                          ? 'selected'
+                          : ''
+                      }
+                    >
+                      A confirmar
+                    </option>
+
+                  </select>
+
+                </label>
+
+
+                <label class="field">
+
+                  Abertura
+
+                  <input
+                    name="o${i}"
+                    type="time"
+                    value="${h.o || ''}"
+                  >
+
+                </label>
+
+
+                <label class="field">
+
+                  Fechamento
+
+                  <input
+                    name="c${i}"
+                    type="time"
+                    value="${h.c || ''}"
+                  >
+
+                </label>
+
+              </div>
+
+            `
+          ).join('')}
+
+
+          <hr>
+
+
+          <label class="field">
+
+            Opções de recebimento
+            (uma por linha)
+
+            <textarea
+              name="delivery"
+            >${(
+              S.delivery || []
+            ).join('\n')}</textarea>
+
+          </label>
+
+
+          <label class="field">
+
+            Informação de entrega
+
+            <textarea
+              name="deliveryInfo"
+            >${esc(
+              S.deliveryInfo || ''
+            )}</textarea>
+
+          </label>
+
+
+          <label class="field">
+
+            Formas de pagamento
+            (uma por linha)
+
+            <textarea
+              name="payments"
+            >${(
+              S.payments || []
+            ).join('\n')}</textarea>
+
+          </label>
+
+
+          <label class="field">
+
+            Categorias
+            (uma por linha)
+
+            <textarea
+              name="categories"
+            >${(
+              S.categories || []
+            ).join('\n')}</textarea>
+
+          </label>
+
+
+          <button class="btn">
+            Salvar
+          </button>
+
+
+        </form>
+
+      </div>
+
+    `;
+
+
+    $('#hf').onsubmit =
+      saveHours;
+
+  }
+
+
+  async function saveHours(e){
+
+    e.preventDefault();
+
+    const f =
+      new FormData(e.target);
+
+
+    S.hours =
+      S.hours.map(
+        (_,i) => ({
+
+          s:f.get(
+            's' + i
+          ),
+
+          o:f.get(
+            'o' + i
+          ),
+
+          c:f.get(
+            'c' + i
+          )
+
+        })
       );
 
-      if (!confirmed) {
-        return;
-      }
 
-      const { error } = await client
-        .from("products")
-        .delete()
-        .eq("id", product.id);
+    S.delivery =
+      String(
+        f.get(
+          'delivery'
+        ) || ''
+      )
+        .split('\n')
+        .map(
+          x => x.trim()
+        )
+        .filter(Boolean);
 
-      if (error) {
-        console.error(error);
 
-        alert(
-          "Não foi possível excluir o produto:\n\n" +
-          error.message
+    S.deliveryInfo =
+      f.get(
+        'deliveryInfo'
+      );
+
+
+    S.payments =
+      String(
+        f.get(
+          'payments'
+        ) || ''
+      )
+        .split('\n')
+        .map(
+          x => x.trim()
+        )
+        .filter(Boolean);
+
+
+    S.categories =
+      String(
+        f.get(
+          'categories'
+        ) || ''
+      )
+        .split('\n')
+        .map(
+          x => x.trim()
+        )
+        .filter(Boolean);
+
+
+    const saved =
+      await saveSite();
+
+
+    if(saved){
+      alert('Salvo!');
+    }
+
+  }
+
+
+  /* =========================================================
+     IMPRESSÃO DE COMANDA
+  ========================================================= */
+
+  function printComanda(
+    title,
+    data,
+    total=''
+  ){
+
+    const escPrint =
+      v =>
+        String(v ?? '')
+          .replace(
+            /[&<>"']/g,
+            m => ({
+              '&':'&amp;',
+              '<':'&lt;',
+              '>':'&gt;',
+              '"':'&quot;',
+              "'":'&#039;'
+            }[m])
+          );
+
+
+    const rows =
+      Object
+        .entries(
+          data || {}
+        )
+        .map(
+          ([k,v]) => `
+
+            <div class="pr">
+
+              <b>
+                ${escPrint(k)}
+              </b>
+
+              <span>
+                ${escPrint(v)
+                  .replace(
+                    /\n/g,
+                    '<br>'
+                  )}
+              </span>
+
+            </div>
+
+          `
+        )
+        .join('');
+
+
+    const w =
+      window.open(
+        '',
+        '_blank',
+        'width=850,height=900'
+      );
+
+
+    if(!w){
+
+      alert(
+        'Permita pop-ups no navegador para imprimir a comanda.'
+      );
+
+      return;
+
+    }
+
+
+    w.document.write(`
+
+      <!doctype html>
+
+      <html lang="pt-BR">
+
+      <head>
+
+        <meta charset="utf-8">
+
+        <title>
+          ${escPrint(title)}
+        </title>
+
+
+        <style>
+
+          body{
+            font-family:Arial,sans-serif;
+            color:#222;
+            margin:28px;
+            max-width:760px
+          }
+
+          .head{
+            text-align:center;
+            border-bottom:2px solid #222;
+            padding-bottom:12px;
+            margin-bottom:14px
+          }
+
+          .head h1{
+            font-size:20px;
+            margin:0 0 4px
+          }
+
+          .head p{
+            margin:3px 0;
+            font-size:12px
+          }
+
+          .pr{
+            display:grid;
+            grid-template-columns:180px 1fr;
+            gap:12px;
+            padding:8px 0;
+            border-bottom:1px solid #ddd;
+            white-space:pre-wrap
+          }
+
+          .total{
+            margin-top:16px;
+            border-top:3px solid #222;
+            padding-top:12px;
+            text-align:right;
+            font-size:18px;
+            font-weight:bold
+          }
+
+          @media print{
+
+            body{
+              margin:12mm
+            }
+
+            button{
+              display:none
+            }
+
+          }
+
+        </style>
+
+      </head>
+
+
+      <body>
+
+        <div class="head">
+
+          <h1>
+            MARTINS CONFEITARIA ARTESANAL
+          </h1>
+
+          <p>
+            ${escPrint(title)}
+          </p>
+
+          <p>
+            ${new Date()
+              .toLocaleString(
+                'pt-BR'
+              )}
+          </p>
+
+        </div>
+
+
+        ${rows}
+
+
+        ${
+          total
+            ? `
+              <div class="total">
+
+                TOTAL:
+                ${escPrint(total)}
+
+              </div>
+            `
+            : ''
+        }
+
+
+        <script>
+
+          window.onload = () => {
+
+            window.print();
+
+            window.onafterprint =
+              () => window.close();
+
+          }
+
+        <\/script>
+
+
+      </body>
+
+      </html>
+
+    `);
+
+
+    w.document.close();
+
+  }
+
+
+  /* =========================================================
+     PEDIDOS
+  ========================================================= */
+
+  async function orders(){
+
+    const {
+      data,
+      error
+    } =
+      await client
+        .from('orders')
+        .select('*')
+        .order(
+          'created_at',
+          {
+            ascending:false
+          }
         );
 
-        return;
-      }
 
-      S.editingId = null;
+    if(error){
 
-      await loadProducts();
+      $('#view').innerHTML = `
 
-      renderProducts();
-    });
+        <div class="card">
+
+          <p>
+            Erro ao carregar pedidos:
+            ${esc(error.message)}
+          </p>
+
+        </div>
+
+      `;
+
+      return;
+
+    }
 
 
-  document
-    .getElementById("productForm")
-    ?.addEventListener("submit", saveProduct);
+    $('#view').innerHTML = `
+
+      <div class="card">
+
+        <h2>
+          Pedidos
+        </h2>
 
 
-  document
-    .querySelectorAll("[data-edit-product]")
-    .forEach(button => {
+        <div class="table-wrap">
 
-      button.addEventListener("click", () => {
+          <table class="table">
 
-        S.editingId = button.dataset.editProduct;
+            <thead>
 
-        renderProducts();
+              <tr>
+
+                <th>
+                  Data
+                </th>
+
+                <th>
+                  Cliente
+                </th>
+
+                <th>
+                  Itens
+                </th>
+
+                <th>
+                  Total
+                </th>
+
+                <th>
+                  Status
+                </th>
+
+                <th>
+                  Ação
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              ${(data || [])
+                .map(
+                  o => `
+
+                    <tr>
+
+                      <td>
+                        ${new Date(
+                          o.created_at
+                        )
+                          .toLocaleString(
+                            'pt-BR'
+                          )}
+                      </td>
+
+
+                      <td>
+
+                        <b>
+                          ${esc(
+                            o.customer
+                          )}
+                        </b>
+
+                        <br>
+
+                        📱
+                        ${esc(
+                          o.phone
+                        )}
+
+                        <br>
+
+                        📦
+                        ${esc(
+                          o.receiving || ''
+                        )}
+
+                        <br>
+
+                        ${
+                          o.address
+                            ? '📍 ' +
+                              esc(
+                                o.address
+                              ) +
+                              '<br>'
+                            : ''
+                        }
+
+                        ${
+                          o.payment
+                            ? '💳 ' +
+                              esc(
+                                o.payment
+                              ) +
+                              '<br>'
+                            : ''
+                        }
+
+                        ${
+                          o.notes
+                            ? '📝 ' +
+                              esc(
+                                o.notes
+                              )
+                            : ''
+                        }
+
+                      </td>
+
+
+                      <td>
+
+                        ${(o.items || [])
+                          .map(
+                            i =>
+                              `${i.qty}x ${esc(
+                                i.name
+                              )}`
+                          )
+                          .join(
+                            '<br>'
+                          )}
+
+                      </td>
+
+
+                      <td>
+
+                        R$
+
+                        ${Number(
+                          o.total
+                        )
+                          .toFixed(2)
+                          .replace(
+                            '.',
+                            ','
+                          )}
+
+                      </td>
+
+
+                      <td>
+
+                        <select
+                          class="order-status"
+                          data-id="${o.id}"
+                        >
+
+                          ${
+                            [
+                              'novo',
+                              'em preparo',
+                              'pronto',
+                              'concluído',
+                              'cancelado'
+                            ]
+                              .map(
+                                s =>
+                                  `<option
+                                    ${
+                                      o.status === s
+                                        ? 'selected'
+                                        : ''
+                                    }
+                                  >
+                                    ${s}
+                                  </option>`
+                              )
+                              .join('')
+                          }
+
+                        </select>
+
+                      </td>
+
+
+                      <td>
+
+                        <button
+                          class="
+                            btn
+                            alt
+                            print-order
+                          "
+                          data-id="${o.id}"
+                        >
+                          🖨️ Imprimir
+                        </button>
+
+                      </td>
+
+                    </tr>
+
+                  `
+                )
+                .join('')}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    document
+      .querySelectorAll(
+        '.order-status'
+      )
+      .forEach(select => {
+
+        select.onchange =
+          async () => {
+
+            const {error} =
+              await client
+                .from('orders')
+                .update({
+                  status:
+                    select.value
+                })
+                .eq(
+                  'id',
+                  select.dataset.id
+                );
+
+
+            if(error){
+
+              alert(
+                'Erro ao atualizar pedido: ' +
+                error.message
+              );
+
+            }
+
+          };
+
       });
 
-    });
-}
+
+    document
+      .querySelectorAll(
+        '.print-order'
+      )
+      .forEach(button => {
+
+        button.onclick = () => {
+
+          const o =
+            (data || [])
+              .find(
+                x =>
+                  String(x.id) ===
+                  String(
+                    button.dataset.id
+                  )
+              );
 
 
-async function saveProduct(event) {
-  event.preventDefault();
-
-  const form = event.currentTarget;
-  const msg = document.getElementById("productMsg");
-
-  msg.textContent = "Salvando...";
-
-  const data = new FormData(form);
-
-  const name = String(data.get("name") || "").trim();
-  const area = String(data.get("area") || "").trim();
-  const category = String(data.get("category") || "").trim();
-
-  if (!name) {
-    msg.textContent = "Informe o nome do produto.";
-    return;
-  }
-
-  if (!area) {
-    msg.textContent = "Selecione uma área.";
-    return;
-  }
-
-  if (!category) {
-    msg.textContent = "Selecione uma categoria.";
-    return;
-  }
+          if(!o){
+            return;
+          }
 
 
-  let sort = Number(data.get("sort"));
-
-  if (!Number.isFinite(sort) || sort <= 0) {
-    sort = getNextProductSort(area);
-  }
-
-
-  const product = {
-    name,
-    area,
-    category,
-
-    price: Number(data.get("price")) || 0,
-
-    gramatura:
-      data.get("gramatura")
-        ? Number(data.get("gramatura"))
-        : null,
-
-    serve_ate:
-      data.get("serve_ate")
-        ? Number(data.get("serve_ate"))
-        : null,
-
-    discount_percent:
-      Number(data.get("discount_percent")) || 0,
-
-    image: String(data.get("image") || "").trim(),
-
-    description:
-      String(data.get("description") || "").trim(),
-
-    appointment_required:
-      data.get("appointment_required") === "true",
-
-    available:
-      data.get("available") === "true",
-
-    sort
-  };
+          const items =
+            (o.items || [])
+              .map(
+                i =>
+                  `${i.qty}x ${i.name} — R$ ${
+                    Number(
+                      i.price *
+                      i.qty || 0
+                    )
+                      .toFixed(2)
+                      .replace(
+                        '.',
+                        ','
+                      )
+                  }`
+              )
+              .join('\n') ||
+            'Nenhum';
 
 
-  let result;
+          printComanda(
 
-  if (S.editingId) {
+            'COMANDA DE PEDIDO',
 
-    result = await client
-      .from("products")
-      .update(product)
-      .eq("id", S.editingId);
+            {
 
-  } else {
+              Cliente:
+                o.customer ||
+                'Não informado',
 
-    result = await client
-      .from("products")
-      .insert(product);
+              WhatsApp:
+                o.phone ||
+                'Não informado',
 
-  }
+              Recebimento:
+                o.receiving ||
+                'Não informado',
 
+              Endereço:
+                o.address ||
+                'Não informado',
 
-  if (result.error) {
+              Pagamento:
+                o.payment ||
+                'Não informado',
 
-    console.error(result.error);
+              Itens:
+                items,
 
-    msg.textContent =
-      "Erro ao salvar: " +
-      result.error.message;
+              Observações:
+                o.notes ||
+                'Nenhuma'
 
-    return;
+            },
+
+            `R$ ${
+              Number(
+                o.total || 0
+              )
+                .toFixed(2)
+                .replace(
+                  '.',
+                  ','
+                )
+            }`
+
+          );
+
+        };
+
+      });
+
   }
 
 
-  msg.textContent = "Produto salvo com sucesso.";
+  /* =========================================================
+     BOLOS PERSONALIZADOS
+  ========================================================= */
 
-  S.editingId = null;
+  async function cakes(){
 
-  await loadProducts();
-
-  renderProducts();
-}
-
-
-/* =========================================================
-   PRODUCT LIST
-========================================================= */
-
-function renderProductItem(product) {
-
-  const discount =
-    Number(product.discount_percent) || 0;
-
-  const price =
-    Number(product.price) || 0;
-
-  const finalPrice =
-    price * (1 - discount / 100);
+    const {
+      data,
+      error
+    } =
+      await client
+        .from('custom_cakes')
+        .select('*')
+        .order(
+          'created_at',
+          {
+            ascending:false
+          }
+        );
 
 
-  const metadata = [];
+    if(error){
 
-  if (product.gramatura) {
-    metadata.push(`${product.gramatura} g`);
-  }
+      $('#view').innerHTML = `
 
-  if (product.serve_ate) {
-    metadata.push(`serve até ${product.serve_ate}`);
-  }
+        <div class="card">
 
-  if (product.appointment_required) {
-    metadata.push("agendamento obrigatório");
-  }
+          <p>
+            Erro ao carregar bolos:
+            ${esc(error.message)}
+          </p>
 
-
-  return `
-    <div class="product-item">
-
-      <div>
-
-        <strong>
-          ${escapeHtml(product.name || "Sem nome")}
-        </strong>
-
-        <div>
-          <small>
-            ${escapeHtml(getAreaLabel(product.area))}
-            /
-            ${escapeHtml(product.category || "Sem categoria")}
-          </small>
         </div>
 
+      `;
+
+      return;
+
+    }
+
+
+    $('#view').innerHTML = `
+
+      <div class="card">
+
+        <h2>
+          Solicitações de bolo personalizado
+        </h2>
+
+
         ${
-          metadata.length
-            ? `
-              <small>
-                ${metadata
-                  .map(escapeHtml)
-                  .join(" • ")}
-              </small>
-            `
-            : ""
+          (data || [])
+            .map(
+              o => `
+
+                <article class="card">
+
+                  <b>
+
+                    ${new Date(
+                      o.created_at
+                    )
+                      .toLocaleString(
+                        'pt-BR'
+                      )}
+
+                  </b>
+
+
+                  <p>
+
+                    ${Object
+                      .entries(
+                        o.data || {}
+                      )
+                      .map(
+                        ([k,v]) =>
+                          `
+                            <b>
+                              ${esc(k)}:
+                            </b>
+
+                            ${esc(v)}
+                          `
+                      )
+                      .join('<br>')}
+
+                  </p>
+
+
+                  <div class="row">
+
+                    <select
+                      class="cake-status"
+                      data-id="${o.id}"
+                    >
+
+                      ${
+                        [
+                          'novo',
+                          'em contato',
+                          'orçamento enviado',
+                          'concluído',
+                          'cancelado'
+                        ]
+                          .map(
+                            s =>
+                              `
+                                <option
+                                  ${
+                                    o.status === s
+                                      ? 'selected'
+                                      : ''
+                                  }
+                                >
+                                  ${s}
+                                </option>
+                              `
+                          )
+                          .join('')
+                      }
+
+                    </select>
+
+
+                    <button
+                      class="
+                        btn
+                        alt
+                        print-cake
+                      "
+                      data-id="${o.id}"
+                    >
+                      🖨️ Imprimir comanda
+                    </button>
+
+                  </div>
+
+                </article>
+
+              `
+            )
+            .join('') ||
+
+          `
+            <div class="empty">
+              Nenhuma solicitação ainda.
+            </div>
+          `
         }
 
       </div>
 
-
-      <div>
-
-        ${
-          discount > 0
-            ? `
-              <small>
-                <s>
-                  ${formatMoney(price)}
-                </s>
-              </small>
-
-              <strong>
-                ${formatMoney(finalPrice)}
-              </strong>
-
-              <small>
-                -${discount}%
-              </small>
-            `
-            : `
-              <strong>
-                ${formatMoney(price)}
-              </strong>
-            `
-        }
-
-      </div>
+    `;
 
 
-      <button
-        type="button"
-        class="secondary"
-        data-edit-product="${escapeAttr(product.id)}"
-      >
-        Editar
-      </button>
+    document
+      .querySelectorAll(
+        '.cake-status'
+      )
+      .forEach(select => {
 
-    </div>
-  `;
-}
+        select.onchange =
+          async () => {
+
+            const {error} =
+              await client
+                .from('custom_cakes')
+                .update({
+                  status:
+                    select.value
+                })
+                .eq(
+                  'id',
+                  select.dataset.id
+                );
 
 
-/* =========================================================
-   CONTENT
-========================================================= */
+            if(error){
 
-function renderContent() {
+              alert(
+                'Erro ao atualizar bolo: ' +
+                error.message
+              );
 
-  view.innerHTML = `
-    <div class="panel">
+            }
 
-      <div class="panel-head">
-        <div>
-          <h2>Conteúdo do site</h2>
-          <p>Configurações gerais.</p>
+          };
+
+      });
+
+
+    document
+      .querySelectorAll(
+        '.print-cake'
+      )
+      .forEach(button => {
+
+        button.onclick = () => {
+
+          const o =
+            (data || [])
+              .find(
+                x =>
+                  String(x.id) ===
+                  String(
+                    button.dataset.id
+                  )
+              );
+
+
+          if(!o){
+            return;
+          }
+
+
+          const d =
+            o.data || {};
+
+
+          printComanda(
+
+            'COMANDA DE BOLO PERSONALIZADO',
+
+            d,
+
+            d[
+              'Total estimado'
+            ] || ''
+
+          );
+
+        };
+
+      });
+
+  }
+
+
+  /* =========================================================
+     MÍDIA
+  ========================================================= */
+
+  async function media(){
+
+    const {
+      data,
+      error
+    } =
+      await client
+        .storage
+        .from('media')
+        .list(
+          '',
+          {
+            limit:100
+          }
+        );
+
+
+    if(error){
+
+      $('#view').innerHTML = `
+
+        <div class="card">
+
+          <p>
+            Erro ao carregar mídia:
+            ${esc(error.message)}
+          </p>
+
         </div>
-      </div>
 
-      <form id="contentForm">
+      `;
 
-        <label>
-          Nome da confeitaria
-          <input
-            name="business_name"
-            value="${escapeAttr(
-              S.settings.business_name || ""
-            )}"
-          >
-        </label>
+      return;
 
-        <label>
-          WhatsApp
-          <input
-            name="whatsapp"
-            value="${escapeAttr(
-              S.settings.whatsapp || ""
-            )}"
-          >
-        </label>
+    }
 
-        <label>
-          Instagram
-          <input
-            name="instagram"
-            value="${escapeAttr(
-              S.settings.instagram || ""
-            )}"
-          >
-        </label>
 
-        <label>
-          Descrição
-          <textarea name="description" rows="5">${escapeHtml(
-            S.settings.description || ""
-          )}</textarea>
-        </label>
+    $('#view').innerHTML = `
 
-        <button type="submit">
-          Salvar conteúdo
+      <div class="card">
+
+        <h2>
+          Enviar mídia
+        </h2>
+
+
+        <p>
+
+          Envie fotos e vídeos
+          para usar no site.
+
+        </p>
+
+
+        <input
+          id="file"
+          type="file"
+          accept="image/*,video/*"
+        >
+
+
+        <button
+          class="btn"
+          id="up"
+        >
+          Enviar
         </button>
 
-        <small id="contentMsg"></small>
-
-      </form>
-
-    </div>
-  `;
+      </div>
 
 
-  document
-    .getElementById("contentForm")
-    ?.addEventListener("submit", saveContent);
-}
+      <div class="media-list">
+
+        ${(data || [])
+          .map(
+            x => `
+
+              <div class="card">
+
+                <b>
+                  ${esc(x.name)}
+                </b>
+
+              </div>
+
+            `
+          )
+          .join('')}
+
+      </div>
+
+    `;
 
 
-async function saveContent(event) {
+    $('#up').onclick =
+      async () => {
 
-  event.preventDefault();
-
-  const form = event.currentTarget;
-  const msg = document.getElementById("contentMsg");
-
-  msg.textContent = "Salvando...";
-
-  const data = new FormData(form);
-
-  const payload = {
-    business_name:
-      String(data.get("business_name") || "").trim(),
-
-    whatsapp:
-      String(data.get("whatsapp") || "").trim(),
-
-    instagram:
-      String(data.get("instagram") || "").trim(),
-
-    description:
-      String(data.get("description") || "").trim()
-  };
+        const file =
+          $('#file').files[0];
 
 
-  /*
-    IMPORTANTE:
-    Os produtos NÃO são salvos em settings.
-    Eles pertencem à tabela products.
-  */
+        if(!file){
 
-  const { error } = await client
-    .from("settings")
-    .upsert(payload);
+          alert(
+            'Selecione um arquivo.'
+          );
+
+          return;
+
+        }
 
 
-  if (error) {
+        const path =
+          `${Date.now()}-${file.name
+            .replace(
+              /[^a-zA-Z0-9._-]/g,
+              '-'
+            )}`;
 
-    console.error(error);
 
-    msg.textContent =
-      "Erro ao salvar: " +
-      error.message;
+        const {error} =
+          await client
+            .storage
+            .from('media')
+            .upload(
+              path,
+              file,
+              {
+                upsert:false
+              }
+            );
 
-    return;
+
+        if(error){
+
+          alert(
+            error.message
+          );
+
+          return;
+
+        }
+
+
+        const {
+          data:u
+        } =
+          client
+            .storage
+            .from('media')
+            .getPublicUrl(
+              path
+            );
+
+
+        await navigator
+          .clipboard
+          ?.writeText(
+            u.publicUrl
+          );
+
+
+        alert(
+          'Enviado. URL copiada quando o navegador permitiu.'
+        );
+
+      };
+
   }
 
 
-  S.settings = {
-    ...S.settings,
-    ...payload
-  };
+  /* =========================================================
+     INICIAR
+  ========================================================= */
 
-  msg.textContent = "Salvo com sucesso.";
-}
+  init();
 
-
-/* =========================================================
-   PLACEHOLDER
-========================================================= */
-
-function renderPlaceholder(name) {
-
-  view.innerHTML = `
-    <div class="panel">
-
-      <h2>${escapeHtml(name)}</h2>
-
-      <p>
-        Esta seção será configurada posteriormente.
-      </p>
-
-    </div>
-  `;
-}
-
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-function renderAreaOptions(selected) {
-
-  return `
-    <option value="">
-      Selecione uma área
-    </option>
-
-    ${AREAS.map(area => `
-      <option
-        value="${area.value}"
-        ${area.value === selected ? "selected" : ""}
-      >
-        ${area.label}
-      </option>
-    `).join("")}
-  `;
-}
-
-
-function getAreaLabel(value) {
-
-  const area = AREAS.find(
-    item => item.value === value
-  );
-
-  return area
-    ? area.label
-    : value || "Sem área";
-}
-
-
-function getNextProductSort(area) {
-
-  const products = S.products.filter(
-    product => product.area === area
-  );
-
-  if (!products.length) {
-    return 1;
-  }
-
-  return (
-    Math.max(
-      ...products.map(
-        product => Number(product.sort) || 0
-      )
-    ) + 1
-  );
-}
-
-
-function formatMoney(value) {
-
-  return Number(value || 0).toLocaleString(
-    "pt-BR",
-    {
-      style: "currency",
-      currency: "BRL"
-    }
-  );
-}
-
-
-function escapeHtml(value) {
-
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-
-function escapeAttr(value) {
-  return escapeHtml(value);
-}
-
-
-/* =========================================================
-   START
-========================================================= */
-
-checkSession();
+})();
