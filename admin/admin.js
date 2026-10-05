@@ -2,64 +2,52 @@
   "use strict";
 
   /*
-   * MARTINS CONFEITARIA
-   * PAINEL ADMINISTRATIVO
-   *
-   * Não colocar nenhum código antes das constantes abaixo.
-   * O antigo erro "$ is not defined" acontecia porque o JS
-   * estava sendo executado antes de definir seus recursos.
-   */
+    MARTINS CONFEITARIA
+    PAINEL ADMINISTRATIVO
+  */
 
-  const C = window.MARTINS_CONFIG || {};
-  const D = window.MARTINS_DEFAULTS || {};
+  const CONFIG = window.MARTINS_CONFIG || {};
+  const DEFAULTS = window.MARTINS_DEFAULTS || {};
 
-  if (
-    !C.SUPABASE_URL ||
-    !C.SUPABASE_ANON_KEY
-  ) {
-    document.body.innerHTML = `
-      <div style="
-        min-height:100vh;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        padding:24px;
-        font-family:Arial,sans-serif;
-      ">
-        <div style="
-          max-width:500px;
-          text-align:center;
-          padding:30px;
-          border:1px solid #ddd;
-          border-radius:18px;
-        ">
-          <h2>Supabase não configurado</h2>
-          <p>
-            Verifique SUPABASE_URL e SUPABASE_ANON_KEY
-            no arquivo config.js.
-          </p>
-        </div>
-      </div>
-    `;
-
+  if (!window.supabase) {
+    console.error("Supabase JS não foi carregado.");
     return;
   }
 
-  const client = supabase.createClient(
-    C.SUPABASE_URL,
-    C.SUPABASE_ANON_KEY
+  if (!CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_ANON_KEY) {
+    console.error(
+      "SUPABASE_URL ou SUPABASE_ANON_KEY não encontrados em config.js."
+    );
+    return;
+  }
+
+  const client = window.supabase.createClient(
+    CONFIG.SUPABASE_URL,
+    CONFIG.SUPABASE_ANON_KEY,
+    {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      }
+    }
   );
 
-  const $ = selector =>
-    document.querySelector(selector);
 
-  const $$ = selector =>
-    [...document.querySelectorAll(selector)];
+  /* =========================
+     HELPERS
+  ========================= */
 
-  const esc = value =>
+  const $ = (selector, root = document) =>
+    root.querySelector(selector);
+
+  const $$ = (selector, root = document) =>
+    Array.from(root.querySelectorAll(selector));
+
+  const esc = (value) =>
     String(value ?? "").replace(
       /[&<>"']/g,
-      char =>
+      (char) =>
         ({
           "&": "&amp;",
           "<": "&lt;",
@@ -69,22 +57,85 @@
         })[char]
     );
 
-  const money = value =>
-    Number(value || 0).toLocaleString(
-      "pt-BR",
-      {
-        style: "currency",
-        currency: "BRL"
-      }
-    );
-
-  const clone = value => {
+  const clone = (value) => {
     try {
       return structuredClone(value);
     } catch {
       return JSON.parse(JSON.stringify(value));
     }
   };
+
+  const money = (value) => {
+    const number = Number(value || 0);
+
+    return number.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+  };
+
+  const normalize = (value) =>
+    String(value ?? "")
+      .trim()
+      .toLowerCase();
+
+  const slug = (value) =>
+    normalize(value)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+  const toast = (message, type = "") => {
+    const element = $("#toast");
+
+    if (!element) return;
+
+    element.textContent = message;
+    element.className = "";
+
+    if (type) {
+      element.classList.add(type);
+    }
+
+    element.classList.add("show");
+
+    clearTimeout(toast.timer);
+
+    toast.timer = setTimeout(() => {
+      element.classList.remove("show");
+    }, 3500);
+  };
+
+
+  /* =========================
+     STATE
+  ========================= */
+
+  let S = clone(DEFAULTS || {});
+
+  if (!S || typeof S !== "object") {
+    S = {};
+  }
+
+  S.products = Array.isArray(S.products) ? S.products : [];
+  S.categories = Array.isArray(S.categories) ? S.categories : [];
+  S.hours = S.hours || {};
+  S.rules = S.rules || {};
+  S.about = S.about || {};
+  S.delivery = S.delivery || {};
+  S.payments = S.payments || {};
+  S.deliveryInfo = S.deliveryInfo || {};
+
+  let currentTab = "products";
+  let currentProducts = [];
+  let editingProductId = null;
+  let selectedImageFile = null;
+
+
+  /* =========================
+     AREAS
+  ========================= */
 
   const AREAS = [
     {
@@ -101,42 +152,22 @@
     }
   ];
 
-  let S = clone(D || {});
-  let currentTab = "products";
-  let currentEditId = null;
-
-  if (!Array.isArray(S.products)) {
-    S.products = [];
-  }
-
-  if (!Array.isArray(S.categories)) {
-    S.categories = [];
-  }
-
-  /*
-   * =========================================================
-   * ÁREA
-   * =========================================================
-   */
-
-  function normalizeArea(area) {
-    const value =
-      String(area || "")
-        .trim()
-        .toLowerCase();
+  function normalizeArea(value) {
+    const v = normalize(value);
 
     if (
-      value === "pronta" ||
-      value === "ready" ||
-      value === "pronta-entrega"
+      v === "pronta" ||
+      v === "ready" ||
+      v === "pronta entrega" ||
+      v === "pronta-entrega"
     ) {
       return "pronta-entrega";
     }
 
     if (
-      value === "encomenda" ||
-      value === "bolo-personalizado" ||
-      value === "encomendas"
+      v === "encomenda" ||
+      v === "bolo-personalizado" ||
+      v === "encomendas"
     ) {
       return "encomendas";
     }
@@ -144,385 +175,254 @@
     return "cardapio";
   }
 
-  function areaLabel(area) {
-    const normalized =
-      normalizeArea(area);
+  function areaLabel(value) {
+    const normalized = normalizeArea(value);
 
     return (
-      AREAS.find(
-        item =>
-          item.value === normalized
-      )?.label || "Delivery"
+      AREAS.find((area) => area.value === normalized)?.label ||
+      "Delivery"
     );
   }
 
-  /*
-   * =========================================================
-   * CATEGORIAS
-   * =========================================================
-   */
 
-  function categoryNames() {
-    const result = [];
+  /* =========================
+     CATEGORIES
+  ========================= */
+
+  function getCategories() {
+    const values = [];
 
     if (Array.isArray(S.categories)) {
-      result.push(...S.categories);
-    }
-
-    if (Array.isArray(S.products)) {
-      result.push(
-        ...S.products.map(
-          product => product.category
-        )
-      );
-    }
-
-    return [
-      ...new Map(
-        result
-          .map(value =>
-            String(value || "").trim()
-          )
-          .filter(Boolean)
-          .map(value => [
-            value.toLowerCase(),
-            value
-          ])
-      ).values()
-    ].sort((a, b) =>
-      a.localeCompare(
-        b,
-        "pt-BR"
-      )
-    );
-  }
-
-  function addCategory(category) {
-    const clean =
-      String(category || "").trim();
-
-    if (!clean) {
-      return;
-    }
-
-    const exists =
-      categoryNames().some(
-        item =>
-          item.toLowerCase() ===
-          clean.toLowerCase()
-      );
-
-    if (!exists) {
-      S.categories.push(clean);
-    }
-  }
-
-  /*
-   * =========================================================
-   * LOGIN
-   * =========================================================
-   */
-
-  async function setupAuth() {
-
-    const loginForm =
-      $("#loginForm");
-
-    if (!loginForm) {
-      return;
-    }
-
-    loginForm.addEventListener(
-      "submit",
-      async event => {
-
-        event.preventDefault();
-
-        const button =
-          $("#loginButton");
-
-        const msg =
-          $("#loginMsg");
-
-        button.disabled = true;
-        button.textContent =
-          "Entrando...";
-
-        msg.textContent = "";
-
-        const formData =
-          new FormData(
-            loginForm
-          );
-
-        const email =
-          String(
-            formData.get("email") || ""
-          ).trim();
-
-        const password =
-          String(
-            formData.get("password") || ""
-          );
-
-        const { error } =
-          await client.auth.signInWithPassword({
-            email,
-            password
-          });
-
-        if (error) {
-
-          msg.textContent =
-            error.message;
-
-          button.disabled = false;
-          button.textContent =
-            "Entrar";
-
-          return;
-        }
-
-        button.disabled = false;
-        button.textContent =
-          "Entrar";
-
-        await showApp();
-      }
-    );
-  }
-
-  async function checkSession() {
-
-    const {
-      data,
-      error
-    } =
-      await client.auth.getSession();
-
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    if (data?.session) {
-      await showApp();
-    } else {
-      showLogin();
-    }
-  }
-
-  function showLogin() {
-
-    $("#loginScreen")
-      ?.classList.remove("hidden");
-
-    $("#app")
-      ?.classList.add("hidden");
-  }
-
-  async function showApp() {
-
-    $("#loginScreen")
-      ?.classList.add("hidden");
-
-    $("#app")
-      ?.classList.remove("hidden");
-
-    await load();
-  }
-
-  /*
-   * =========================================================
-   * LOGOUT
-   * =========================================================
-   */
-
-  function setupLogout() {
-
-    $("#logout")?.addEventListener(
-      "click",
-      async () => {
-
-        await client.auth.signOut();
-
-        showLogin();
-      }
-    );
-  }
-
-  /*
-   * =========================================================
-   * TABS
-   * =========================================================
-   */
-
-  function setupTabs() {
-
-    $$("[data-tab]").forEach(
-      button => {
-
-        button.addEventListener(
-          "click",
-          async () => {
-
-            currentTab =
-              button.dataset.tab;
-
-            $$("[data-tab]")
-              .forEach(item =>
-                item.classList.toggle(
-                  "active",
-                  item === button
-                )
-              );
-
-            await render();
-          }
-        );
-      }
-    );
-  }
-
-  /*
-   * =========================================================
-   * CARREGAR DADOS
-   * =========================================================
-   */
-
-  async function load() {
-
-    const main =
-      $("#main");
-
-    if (main) {
-      main.innerHTML = `
-        <div class="loading">
-          Carregando dados...
-        </div>
-      `;
-    }
-
-    const settingsResult =
-      await client
-        .from("settings")
-        .select("value")
-        .eq("key", "site")
-        .maybeSingle();
-
-    if (
-      settingsResult.error &&
-      settingsResult.error.code !==
-        "PGRST116"
-    ) {
-      console.error(
-        settingsResult.error
-      );
-    }
-
-    const productsResult =
-      await client
-        .from("products")
-        .select("*")
-        .order(
-          "sort",
-          {
-            ascending: true
-          }
-        );
-
-    if (productsResult.error) {
-
-      console.error(
-        productsResult.error
-      );
-
-      main.innerHTML = `
-        <div class="panel">
-          <h3>Erro ao carregar produtos</h3>
-          <p>
-            ${esc(
-              productsResult.error.message
-            )}
-          </p>
-        </div>
-      `;
-
-      return;
-    }
-
-    if (
-      settingsResult.data &&
-      settingsResult.data.value
-    ) {
-
-      const saved =
-        settingsResult.data.value;
-
-      S = {
-        ...clone(D || {}),
-        ...saved,
-        products:
-          productsResult.data || []
-      };
-
-    } else {
-
-      S = {
-        ...clone(D || {}),
-        products:
-          productsResult.data || []
-      };
-    }
-
-    if (!Array.isArray(S.categories)) {
-      S.categories = [];
+      values.push(...S.categories);
     }
 
     for (const product of S.products) {
       if (product.category) {
-        addCategory(
-          product.category
-        );
+        values.push(product.category);
       }
     }
 
-    await render();
+    return Array.from(
+      new Map(
+        values
+          .map((value) => String(value).trim())
+          .filter(Boolean)
+          .map((value) => [normalize(value), value])
+      ).values()
+    ).sort((a, b) =>
+      a.localeCompare(b, "pt-BR")
+    );
   }
 
-  /*
-   * =========================================================
-   * SALVAR SETTINGS
-   * =========================================================
-   */
+  function addCategory(category) {
+    const value = String(category || "").trim();
+
+    if (!value) return;
+
+    const exists = getCategories().some(
+      (item) => normalize(item) === normalize(value)
+    );
+
+    if (!exists) {
+      S.categories.push(value);
+    }
+  }
+
+
+  /* =========================
+     LOGO
+  ========================= */
+
+  function getLogoUrl() {
+    return (
+      S.logoUrl ||
+      S.logo ||
+      S.brand?.logoUrl ||
+      S.brand?.logo ||
+      S.about?.logoUrl ||
+      S.about?.logo ||
+      ""
+    );
+  }
+
+  function renderLogo() {
+    const url = getLogoUrl();
+
+    const loginWrap = $("#loginLogoWrap");
+    const sidebarWrap = $("#sidebarLogoWrap");
+
+    if (loginWrap) {
+      loginWrap.innerHTML = url
+        ? `<img class="login-logo" src="${esc(url)}" alt="Martins Confeitaria">`
+        : `<div class="login-logo-fallback">M</div>`;
+    }
+
+    if (sidebarWrap) {
+      sidebarWrap.innerHTML = url
+        ? `<img class="sidebar-logo" src="${esc(url)}" alt="Martins">`
+        : `<div class="sidebar-logo-fallback">M</div>`;
+    }
+  }
+
+
+  /* =========================
+     AUTH
+  ========================= */
+
+  function setupAuth() {
+    const form = $("#loginForm");
+
+    if (!form) return;
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const email = $("#loginEmail")?.value.trim();
+      const password = $("#loginPassword")?.value;
+
+      const message = $("#loginMsg");
+
+      if (!email || !password) {
+        if (message) {
+          message.textContent =
+            "Informe e-mail e senha.";
+        }
+
+        return;
+      }
+
+      if (message) {
+        message.textContent = "Entrando...";
+      }
+
+      const { error } =
+        await client.auth.signInWithPassword({
+          email,
+          password
+        });
+
+      if (error) {
+        console.error(error);
+
+        if (message) {
+          message.textContent =
+            error.message || "Não foi possível entrar.";
+        }
+
+        return;
+      }
+
+      if (message) {
+        message.textContent = "";
+      }
+
+      await startApp();
+    });
+  }
+
+
+  async function checkSession() {
+    const {
+      data,
+      error
+    } = await client.auth.getSession();
+
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    return data?.session || null;
+  }
+
+
+  async function logout() {
+    await client.auth.signOut();
+
+    $("#app")?.classList.add("hidden");
+    $("#loginScreen")?.classList.remove("hidden");
+  }
+
+
+  /* =========================
+     DATABASE
+  ========================= */
+
+  async function loadData() {
+    const settingsResult = await client
+      .from("settings")
+      .select("key,value")
+      .eq("key", "site")
+      .maybeSingle();
+
+    if (settingsResult.error) {
+      throw settingsResult.error;
+    }
+
+    if (settingsResult.data?.value) {
+      const saved = settingsResult.data.value;
+
+      if (
+        saved &&
+        typeof saved === "object"
+      ) {
+        S = {
+          ...S,
+          ...saved
+        };
+      }
+    }
+
+    const productsResult = await client
+      .from("products")
+      .select("*")
+      .order("sort", {
+        ascending: true
+      });
+
+    if (productsResult.error) {
+      throw productsResult.error;
+    }
+
+    S.products = productsResult.data || [];
+
+    S.categories = Array.isArray(S.categories)
+      ? S.categories
+      : [];
+
+    for (const product of S.products) {
+      if (product.category) {
+        addCategory(product.category);
+      }
+    }
+  }
+
 
   async function saveSite() {
-
-    const payload =
-      clone(S);
+    const payload = clone(S);
 
     delete payload.products;
 
     const {
       error
-    } =
-      await client
-        .from("settings")
-        .upsert(
-          {
-            key: "site",
-            value: payload
-          },
-          {
-            onConflict: "key"
-          }
-        );
+    } = await client
+      .from("settings")
+      .upsert(
+        {
+          key: "site",
+          value: payload
+        },
+        {
+          onConflict: "key"
+        }
+      );
 
     if (error) {
-
-      alert(
-        "Erro ao salvar configurações:\n" +
-        error.message
+      console.error(error);
+      toast(
+        "Erro ao salvar configurações: " +
+        error.message,
+        "error"
       );
 
       return false;
@@ -531,1547 +431,1356 @@
     return true;
   }
 
-  /*
-   * =========================================================
-   * RENDER
-   * =========================================================
-   */
 
-  async function render() {
+  /* =========================
+     APP
+  ========================= */
 
-    switch (currentTab) {
+  async function startApp() {
+    try {
+      $("#loginScreen")?.classList.add("hidden");
+      $("#app")?.classList.remove("hidden");
 
-      case "products":
-        renderProducts();
-        break;
+      renderLogo();
 
-      case "orders":
-        await renderOrders();
-        break;
+      await loadData();
 
-      case "cakes":
-        await renderCakes();
-        break;
+      renderStats();
+      renderTab();
 
-      case "content":
-        renderContent();
-        break;
+    } catch (error) {
+      console.error(error);
 
-      case "hours":
-        renderHours();
-        break;
-
-      case "media":
-        await renderMedia();
-        break;
-
-      default:
-        renderProducts();
+      toast(
+        "Erro ao carregar painel: " +
+        (error.message || error),
+        "error"
+      );
     }
   }
 
-  /*
-   * =========================================================
-   * PRODUTOS
-   * =========================================================
-   */
+
+  /* =========================
+     NAVIGATION
+  ========================= */
+
+  const TITLES = {
+    products: [
+      "Produtos",
+      "Gerencie o catálogo da confeitaria."
+    ],
+
+    orders: [
+      "Pedidos",
+      "Acompanhe os pedidos recebidos."
+    ],
+
+    cakes: [
+      "Bolos personalizados",
+      "Acompanhe as solicitações de bolos."
+    ],
+
+    content: [
+      "Conteúdos",
+      "Edite as informações exibidas no site."
+    ],
+
+    hours: [
+      "Horários",
+      "Configure os horários de atendimento."
+    ],
+
+    rules: [
+      "Regras",
+      "Configure regras e informações do atendimento."
+    ],
+
+    media: [
+      "Mídia",
+      "Gerencie arquivos utilizados no site."
+    ]
+  };
+
+
+  function setupNavigation() {
+    $$(".nav button").forEach((button) => {
+      button.addEventListener("click", async () => {
+        currentTab = button.dataset.tab;
+
+        $$(".nav button").forEach((item) => {
+          item.classList.toggle(
+            "active",
+            item === button
+          );
+        });
+
+        const title = TITLES[currentTab] || [
+          "Painel",
+          ""
+        ];
+
+        $("#pageTitle").textContent = title[0];
+        $("#pageSubtitle").textContent = title[1];
+
+        $("#sidebar")?.classList.remove("open");
+
+        renderTab();
+      });
+    });
+  }
+
+
+  function renderTab() {
+    if (currentTab === "products") {
+      renderProducts();
+      return;
+    }
+
+    if (currentTab === "orders") {
+      renderOrders();
+      return;
+    }
+
+    if (currentTab === "cakes") {
+      renderCakes();
+      return;
+    }
+
+    if (currentTab === "content") {
+      renderContent();
+      return;
+    }
+
+    if (currentTab === "hours") {
+      renderHours();
+      return;
+    }
+
+    if (currentTab === "rules") {
+      renderRules();
+      return;
+    }
+
+    if (currentTab === "media") {
+      renderMedia();
+      return;
+    }
+  }
+
+
+  /* =========================
+     STATS
+  ========================= */
+
+  function renderStats() {
+    const products = S.products || [];
+
+    $("#statProducts").textContent =
+      products.length;
+
+    $("#statAvailable").textContent =
+      products.filter(
+        (product) =>
+          product.available !== false
+      ).length;
+
+    loadOrderCount();
+    loadCakeCount();
+  }
+
+
+  async function loadOrderCount() {
+    const {
+      count,
+      error
+    } = await client
+      .from("orders")
+      .select("*", {
+        count: "exact",
+        head: true
+      });
+
+    if (!error) {
+      $("#statOrders").textContent =
+        count || 0;
+    }
+  }
+
+
+  async function loadCakeCount() {
+    const {
+      count,
+      error
+    } = await client
+      .from("custom_cakes")
+      .select("*", {
+        count: "exact",
+        head: true
+      });
+
+    if (!error) {
+      $("#statCakes").textContent =
+        count || 0;
+    }
+  }
+
+
+  /* =========================
+     PRODUCTS
+  ========================= */
 
   function renderProducts() {
+    currentProducts = S.products || [];
 
-    const main =
-      $("#main");
+    const groups = {};
 
-    main.innerHTML = `
-      <div class="page-header">
-        <div>
-          <h2>Produtos</h2>
-          <p>
-            Gerencie Delivery, pronta entrega e encomendas.
-          </p>
-        </div>
+    for (const area of AREAS) {
+      groups[area.value] = [];
+    }
 
-        <button
-          class="btn btn-primary"
-          id="newProduct"
-          type="button"
-        >
-          + Novo produto
-        </button>
-      </div>
+    for (const product of currentProducts) {
+      const area = normalizeArea(product.area);
 
-      ${AREAS.map(area => {
+      if (!groups[area]) {
+        groups[area] = [];
+      }
 
-        const products =
-          S.products.filter(
-            product =>
-              normalizeArea(
-                product.area
-              ) === area.value
-          );
+      groups[area].push(product);
+    }
 
-        return `
-          <section class="area">
+    let html = `
+      <div class="section">
 
-            <div class="area-title">
+        <div class="section-header">
 
-              <h3>
-                ${esc(area.label)}
-              </h3>
-
-              <button
-                class="btn btn-secondary btn-small"
-                data-add-area="${esc(area.value)}"
-                type="button"
-              >
-                + Adicionar aqui
-              </button>
-
-            </div>
-
-            ${
-              products.length
-                ? `
-                  <div class="cards">
-                    ${products
-                      .map(
-                        renderProductCard
-                      )
-                      .join("")}
-                  </div>
-                `
-                : `
-                  <div class="empty">
-                    Nenhum produto nesta área.
-                  </div>
-                `
-            }
-
-          </section>
-        `;
-      }).join("")}
-    `;
-
-    $("#newProduct")
-      ?.addEventListener(
-        "click",
-        () =>
-          editProduct(null)
-      );
-
-    $$("[data-add-area]")
-      .forEach(button => {
-
-        button.addEventListener(
-          "click",
-          () =>
-            editProduct(
-              null,
-              button.dataset.addArea
-            )
-        );
-      });
-
-    $$("[data-edit-product]")
-      .forEach(button => {
-
-        button.addEventListener(
-          "click",
-          () =>
-            editProduct(
-              button.dataset.editProduct
-            )
-        );
-      });
-
-    $$("[data-delete-product]")
-      .forEach(button => {
-
-        button.addEventListener(
-          "click",
-          () =>
-            deleteProduct(
-              button.dataset.deleteProduct
-            )
-        );
-      });
-  }
-
-  function renderProductCard(product) {
-
-    const price =
-      Number(product.price || 0);
-
-    const discount =
-      Math.max(
-        0,
-        Math.min(
-          100,
-          Number(
-            product.discount_percent || 0
-          )
-        )
-      );
-
-    const finalPrice =
-      price *
-      (1 - discount / 100);
-
-    const image =
-      product.image ||
-      "https://placehold.co/700x450?text=Sem+imagem";
-
-    return `
-      <article class="product-card">
-
-        <img
-          class="product-image"
-          src="${esc(image)}"
-          alt="${esc(product.name)}"
-          loading="lazy"
-        >
-
-        <div class="product-body">
-
-          <h4>
-            ${esc(product.name)}
-          </h4>
-
-          <div class="meta">
-
-            Área:
-            ${esc(
-              areaLabel(product.area)
-            )}
-
-            ${
-              product.category
-                ? `
-                  <br>
-                  Categoria:
-                  ${esc(product.category)}
-                `
-                : ""
-            }
-
-            ${
-              product.gramatura
-                ? `
-                  <br>
-                  ${esc(product.gramatura)}
-                `
-                : ""
-            }
-
-            ${
-              product.serve_ate
-                ? `
-                  <br>
-                  Serve:
-                  ${esc(product.serve_ate)}
-                `
-                : ""
-            }
-
+          <div>
+            <h3>Catálogo</h3>
+            <p>
+              Cadastre produtos e escolha exatamente onde eles aparecem.
+            </p>
           </div>
-
-          <div class="price">
-
-            ${
-              discount > 0
-                ? `
-                  <span style="text-decoration:line-through;color:#999;">
-                    ${money(price)}
-                  </span>
-
-                  <br>
-
-                  ${money(finalPrice)}
-
-                  <div class="discount">
-                    ${discount}% de desconto
-                  </div>
-                `
-                : money(price)
-            }
-
-          </div>
-
-          <div style="margin-top:8px;">
-
-            ${
-              product.available !== false
-                ? `
-                  <span class="status success">
-                    Disponível
-                  </span>
-                `
-                : `
-                  <span class="status danger">
-                    Indisponível
-                  </span>
-                `
-            }
-
-            ${
-              product.featured
-                ? `
-                  <span class="status">
-                    Destaque
-                  </span>
-                `
-                : ""
-            }
-
-          </div>
-
-          <div class="actions">
-
-            <button
-              class="btn btn-secondary btn-small"
-              data-edit-product="${esc(product.id)}"
-              type="button"
-            >
-              Editar
-            </button>
-
-            <button
-              class="btn btn-danger btn-small"
-              data-delete-product="${esc(product.id)}"
-              type="button"
-            >
-              Excluir
-            </button>
-
-          </div>
-
-        </div>
-
-      </article>
-    `;
-  }
-
-  /*
-   * =========================================================
-   * EDITAR PRODUTO
-   * =========================================================
-   */
-
-  function editProduct(id, defaultArea = "cardapio") {
-
-    currentEditId = id;
-
-    const product =
-      id
-        ? S.products.find(
-            item =>
-              String(item.id) ===
-              String(id)
-          )
-        : null;
-
-    const area =
-      product?.area ||
-      defaultArea;
-
-    const categories =
-      categoryNames();
-
-    const main =
-      $("#main");
-
-    main.innerHTML = `
-
-      <div class="page-header">
-
-        <div>
-          <h2>
-            ${product
-              ? "Editar produto"
-              : "Novo produto"}
-          </h2>
-
-          <p>
-            Cadastre o produto sem precisar digitar a categoria toda vez.
-          </p>
-        </div>
-
-        <button
-          id="backProducts"
-          class="btn btn-secondary"
-          type="button"
-        >
-          ← Voltar
-        </button>
-
-      </div>
-
-      <form
-        id="productForm"
-        class="panel"
-      >
-
-        <div class="grid-2">
-
-          <div class="field">
-            <label>
-              Nome do produto
-            </label>
-
-            <input
-              name="name"
-              required
-              value="${esc(product?.name || "")}"
-            >
-          </div>
-
-          <div class="field">
-            <label>
-              Área
-            </label>
-
-            <select
-              name="area"
-              id="productArea"
-            >
-              ${AREAS.map(item => `
-                <option
-                  value="${esc(item.value)}"
-                  ${
-                    normalizeArea(area) ===
-                    item.value
-                      ? "selected"
-                      : ""
-                  }
-                >
-                  ${esc(item.label)}
-                </option>
-              `).join("")}
-            </select>
-          </div>
-
-          <div class="field">
-
-            <label>
-              Categoria
-            </label>
-
-            <div class="category-row">
-
-              <select
-                name="category"
-                id="productCategory"
-                required
-              >
-
-                <option value="">
-                  Selecione uma categoria
-                </option>
-
-                ${categories.map(category => `
-                  <option
-                    value="${esc(category)}"
-                    ${
-                      product?.category ===
-                      category
-                        ? "selected"
-                        : ""
-                    }
-                  >
-                    ${esc(category)}
-                  </option>
-                `).join("")}
-
-                <option value="__new__">
-                  + Criar nova categoria
-                </option>
-
-              </select>
-
-              <button
-                type="button"
-                id="newCategoryButton"
-                class="btn btn-secondary"
-              >
-                Nova
-              </button>
-
-            </div>
-
-            <input
-              id="newCategoryInput"
-              class="hidden"
-              placeholder="Nome da nova categoria"
-              style="margin-top:8px;"
-            >
-
-          </div>
-
-          <div class="field">
-            <label>
-              Preço
-            </label>
-
-            <input
-              name="price"
-              type="number"
-              min="0"
-              step="0.01"
-              required
-              value="${esc(product?.price ?? "")}"
-            >
-          </div>
-
-          <div class="field">
-            <label>
-              Desconto (%)
-            </label>
-
-            <input
-              name="discount_percent"
-              type="number"
-              min="0"
-              max="100"
-              step="1"
-              value="${esc(
-                product?.discount_percent || 0
-              )}"
-            >
-          </div>
-
-          <div class="field">
-            <label>
-              Ordem
-            </label>
-
-            <input
-              name="sort"
-              type="number"
-              step="1"
-              value="${esc(
-                product?.sort || 0
-              )}"
-            >
-          </div>
-
-          <div class="field">
-            <label>
-              Gramatura / tamanho
-            </label>
-
-            <input
-              name="gramatura"
-              placeholder="Ex.: 500g, 1kg, 10 unidades"
-              value="${esc(
-                product?.gramatura || ""
-              )}"
-            >
-          </div>
-
-          <div class="field">
-            <label>
-              Serve
-            </label>
-
-            <input
-              name="serve_ate"
-              placeholder="Ex.: 10 pessoas"
-              value="${esc(
-                product?.serve_ate || ""
-              )}"
-            >
-          </div>
-
-          <div class="field full">
-            <label>
-              Descrição
-            </label>
-
-            <textarea
-              name="description"
-            >${esc(
-              product?.description || ""
-            )}</textarea>
-          </div>
-
-          <div class="field">
-
-            <label>
-              Foto do produto
-            </label>
-
-            <input
-              id="productImageFile"
-              type="file"
-              accept="image/*"
-            >
-
-            <img
-              id="imagePreview"
-              class="preview"
-              ${
-                product?.image
-                  ? `src="${esc(product.image)}"`
-                  : "style=\"display:none;\""
-              }
-              alt="Pré-visualização"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label>
-              URL da imagem
-            </label>
-
-            <input
-              name="image"
-              id="imageUrl"
-              placeholder="https://..."
-              value="${esc(
-                product?.image || ""
-              )}"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label>
-              Opções
-            </label>
-
-            <label style="display:block;margin-bottom:8px;">
-              <input
-                name="available"
-                type="checkbox"
-                ${
-                  product?.available !== false
-                    ? "checked"
-                    : ""
-                }
-              >
-              Produto disponível
-            </label>
-
-            <label style="display:block;margin-bottom:8px;">
-              <input
-                name="featured"
-                type="checkbox"
-                ${
-                  product?.featured
-                    ? "checked"
-                    : ""
-                }
-              >
-              Produto em destaque
-            </label>
-
-            <label style="display:block;">
-              <input
-                name="appointment_required"
-                type="checkbox"
-                ${
-                  product?.appointment_required
-                    ? "checked"
-                    : ""
-                }
-              >
-              Exige agendamento
-            </label>
-
-          </div>
-
-        </div>
-
-        <div class="form-actions">
 
           <button
             class="btn btn-primary"
-            type="submit"
-            id="saveProductButton"
+            id="newProductBtn"
+            type="button"
           >
-            Salvar produto
+            + Novo produto
+          </button>
+
+        </div>
+
+        <div class="section-body">
+    `;
+
+    for (const area of AREAS) {
+      const products = groups[area.value] || [];
+
+      html += `
+        <div class="area-group">
+
+          <div class="area-heading">
+
+            <h4>
+              ${esc(area.label)}
+            </h4>
+
+            <button
+              class="btn btn-secondary btn-small"
+              data-add-area="${esc(area.value)}"
+              type="button"
+            >
+              + Adicionar aqui
+            </button>
+
+          </div>
+
+          <div class="product-list">
+      `;
+
+      if (!products.length) {
+        html += `
+          <div class="empty">
+            <div class="empty-icon">🍰</div>
+            <p>Nenhum produto nesta área.</p>
+          </div>
+        `;
+      } else {
+        for (const product of products) {
+          html += productRow(product);
+        }
+      }
+
+      html += `
+          </div>
+        </div>
+      `;
+    }
+
+    html += `
+        </div>
+      </div>
+    `;
+
+    $("#tabContent").innerHTML = html;
+
+    $("#newProductBtn")?.addEventListener(
+      "click",
+      () => openProductModal()
+    );
+
+    $$("[data-add-area]").forEach((button) => {
+      button.addEventListener("click", () => {
+        openProductModal(
+          null,
+          button.dataset.addArea
+        );
+      });
+    });
+
+    $$("[data-edit-product]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const product = currentProducts.find(
+          (item) =>
+            String(item.id) ===
+            String(button.dataset.editProduct)
+        );
+
+        if (product) {
+          openProductModal(product);
+        }
+      });
+    });
+
+    $$("[data-delete-product]").forEach((button) => {
+      button.addEventListener("click", () => {
+        deleteProduct(button.dataset.deleteProduct);
+      });
+    });
+  }
+
+
+  function productRow(product) {
+    const available =
+      product.available !== false;
+
+    const discount =
+      Number(product.discount_percent || 0);
+
+    const originalPrice =
+      Number(product.price || 0);
+
+    const finalPrice =
+      discount > 0
+        ? originalPrice * (1 - discount / 100)
+        : originalPrice;
+
+    const photo =
+      product.image_url ||
+      product.image ||
+      "";
+
+    const meta = [];
+
+    if (product.category) {
+      meta.push(
+        `<span class="tag">${esc(product.category)}</span>`
+      );
+    }
+
+    if (product.gramatura) {
+      meta.push(
+        `<span class="tag">${esc(product.gramatura)}</span>`
+      );
+    }
+
+    if (product.serve_ate) {
+      meta.push(
+        `<span class="tag">${esc(product.serve_ate)}</span>`
+      );
+    }
+
+    if (discount > 0) {
+      meta.push(
+        `<span class="tag yellow">-${discount}%</span>`
+      );
+    }
+
+    if (product.appointment_required) {
+      meta.push(
+        `<span class="tag yellow">Agendamento</span>`
+      );
+    }
+
+    meta.push(
+      available
+        ? `<span class="tag green">Disponível</span>`
+        : `<span class="tag red">Em falta</span>`
+    );
+
+    return `
+      <div class="product-row">
+
+        <div class="product-image">
+          ${
+            photo
+              ? `<img src="${esc(photo)}" alt="${esc(product.name)}">`
+              : "🍰"
+          }
+        </div>
+
+        <div class="product-info">
+
+          <div class="product-name">
+            ${esc(product.name || "Produto sem nome")}
+          </div>
+
+          <div class="product-meta">
+            ${meta.join("")}
+          </div>
+
+        </div>
+
+        <div class="product-price">
+
+          ${
+            discount > 0
+              ? `<span class="old-price">${money(originalPrice)}</span>`
+              : ""
+          }
+
+          <strong>
+            ${money(finalPrice)}
+          </strong>
+
+        </div>
+
+        <div class="product-actions">
+
+          <button
+            class="btn btn-secondary btn-small"
+            data-edit-product="${esc(product.id)}"
+            type="button"
+          >
+            Editar
           </button>
 
           <button
-            class="btn btn-secondary"
-            id="cancelProduct"
+            class="btn btn-danger btn-small"
+            data-delete-product="${esc(product.id)}"
             type="button"
           >
-            Cancelar
+            Excluir
           </button>
 
         </div>
 
-      </form>
+      </div>
     `;
+  }
 
-    $("#backProducts")
-      ?.addEventListener(
-        "click",
-        () => {
-          currentEditId = null;
-          renderProducts();
-        }
+
+  /* =========================
+     PRODUCT MODAL
+  ========================= */
+
+  function openProductModal(product = null, forcedArea = null) {
+    editingProductId =
+      product?.id || null;
+
+    selectedImageFile = null;
+
+    $("#productModalTitle").textContent =
+      product
+        ? "Editar produto"
+        : "Novo produto";
+
+    $("#productName").value =
+      product?.name || "";
+
+    $("#productArea").value =
+      normalizeArea(
+        forcedArea ||
+        product?.area ||
+        "cardapio"
       );
 
-    $("#cancelProduct")
-      ?.addEventListener(
-        "click",
-        () => {
-          currentEditId = null;
-          renderProducts();
-        }
-      );
-
-    const category =
-      $("#productCategory");
-
-    const newCategoryInput =
-      $("#newCategoryInput");
-
-    function toggleNewCategory() {
-
-      const isNew =
-        category.value ===
-        "__new__";
-
-      newCategoryInput.classList.toggle(
-        "hidden",
-        !isNew
-      );
-
-      if (!isNew) {
-        newCategoryInput.value = "";
-      }
-    }
-
-    category?.addEventListener(
-      "change",
-      toggleNewCategory
+    populateCategories(
+      product?.category || ""
     );
 
-    $("#newCategoryButton")
-      ?.addEventListener(
-        "click",
-        () => {
+    $("#productPrice").value =
+      product?.price ?? "";
 
-          category.value =
-            "__new__";
+    $("#productDiscount").value =
+      product?.discount_percent ?? 0;
 
-          toggleNewCategory();
+    $("#productSort").value =
+      product?.sort ?? 0;
 
-          newCategoryInput.focus();
-        }
-      );
+    $("#productGramatura").value =
+      product?.gramatura || "";
 
-    $("#productImageFile")
-      ?.addEventListener(
-        "change",
-        event => {
+    $("#productServeAte").value =
+      product?.serve_ate || "";
 
-          const file =
-            event.target.files?.[0];
+    $("#productDescription").value =
+      product?.description || "";
 
-          if (!file) {
-            return;
-          }
+    $("#productAvailable").checked =
+      product?.available !== false;
 
-          const preview =
-            $("#imagePreview");
+    $("#productFeatured").checked =
+      product?.featured === true;
 
-          preview.src =
-            URL.createObjectURL(file);
+    $("#productAppointment").checked =
+      product?.appointment_required === true;
 
-          preview.style.display =
-            "block";
-        }
-      );
+    $("#newCategoryField")
+      ?.classList.add("hidden");
 
-    $("#imageUrl")
-      ?.addEventListener(
-        "input",
-        event => {
+    $("#newCategory").value = "";
 
-          const value =
-            event.target.value.trim();
+    const photo =
+      product?.image_url ||
+      product?.image ||
+      "";
 
-          if (!value) {
-            return;
-          }
+    if (photo) {
+      $("#photoPreview").innerHTML =
+        `<img src="${esc(photo)}" alt="Prévia">`;
+    } else {
+      $("#photoPreview").textContent = "📷";
+    }
 
-          const preview =
-            $("#imagePreview");
-
-          preview.src = value;
-          preview.style.display =
-            "block";
-        }
-      );
-
-    $("#productForm")
-      ?.addEventListener(
-        "submit",
-        saveProduct
-      );
+    $("#productModal")
+      ?.classList.add("open");
   }
 
-  /*
-   * =========================================================
-   * SALVAR PRODUTO
-   * =========================================================
-   */
 
-  async function saveProduct(event) {
+  function closeProductModal() {
+    $("#productModal")
+      ?.classList.remove("open");
 
-    event.preventDefault();
+    editingProductId = null;
+    selectedImageFile = null;
 
-    const form =
-      event.currentTarget;
+    $("#productForm")?.reset();
 
-    const button =
-      $("#saveProductButton");
+    $("#productAvailable").checked = true;
+    $("#productDiscount").value = 0;
+    $("#productSort").value = 0;
 
-    button.disabled = true;
-    button.textContent =
-      "Salvando...";
+    $("#photoPreview").textContent = "📷";
 
-    try {
-
-      const formData =
-        new FormData(form);
-
-      const name =
-        String(
-          formData.get("name") || ""
-        ).trim();
-
-      const price =
-        Number(
-          formData.get("price")
-        );
-
-      let area =
-        normalizeArea(
-          formData.get("area")
-        );
-
-      let category =
-        String(
-          formData.get("category") || ""
-        ).trim();
-
-      if (
-        category ===
-        "__new__"
-      ) {
-
-        category =
-          String(
-            $("#newCategoryInput")
-              ?.value || ""
-          ).trim();
-
-        if (!category) {
-          throw new Error(
-            "Informe o nome da nova categoria."
-          );
-        }
-      }
-
-      if (!name) {
-        throw new Error(
-          "Informe o nome do produto."
-        );
-      }
-
-      if (
-        !Number.isFinite(price) ||
-        price < 0
-      ) {
-        throw new Error(
-          "Informe um preço válido."
-        );
-      }
-
-      if (!category) {
-        throw new Error(
-          "Selecione uma categoria."
-        );
-      }
-
-      let discount =
-        Number(
-          formData.get(
-            "discount_percent"
-          ) || 0
-        );
-
-      discount =
-        Math.max(
-          0,
-          Math.min(
-            100,
-            discount
-          )
-        );
-
-      addCategory(category);
-
-      /*
-       * FOTO
-       */
-
-      let image =
-        String(
-          formData.get("image") || ""
-        ).trim();
-
-      const file =
-        $("#productImageFile")
-          ?.files?.[0];
-
-      if (file) {
-
-        const safeName =
-          file.name
-            .replace(
-              /[^a-zA-Z0-9._-]/g,
-              "-"
-            );
-
-        const path =
-          `products/${Date.now()}-${safeName}`;
-
-        const upload =
-          await client.storage
-            .from("media")
-            .upload(
-              path,
-              file,
-              {
-                upsert: false,
-                contentType:
-                  file.type ||
-                  "image/jpeg"
-              }
-            );
-
-        if (upload.error) {
-          throw new Error(
-            "Erro ao enviar imagem: " +
-            upload.error.message
-          );
-        }
-
-        const publicData =
-          client.storage
-            .from("media")
-            .getPublicUrl(path);
-
-        image =
-          publicData.data
-            ?.publicUrl || image;
-      }
-
-      const productData = {
-
-        name,
-
-        description:
-          String(
-            formData.get(
-              "description"
-            ) || ""
-          ).trim(),
-
-        price,
-
-        image,
-
-        category,
-
-        area,
-
-        gramatura:
-          String(
-            formData.get(
-              "gramatura"
-            ) || ""
-          ).trim(),
-
-        serve_ate:
-          String(
-            formData.get(
-              "serve_ate"
-            ) || ""
-          ).trim(),
-
-        discount_percent:
-          discount,
-
-        sort:
-          Number(
-            formData.get(
-              "sort"
-            ) || 0
-          ),
-
-        available:
-          formData.get(
-            "available"
-          ) === "on",
-
-        featured:
-          formData.get(
-            "featured"
-          ) === "on",
-
-        appointment_required:
-          formData.get(
-            "appointment_required"
-          ) === "on"
-      };
-
-      let result;
-
-      if (currentEditId) {
-
-        result =
-          await client
-            .from("products")
-            .update(productData)
-            .eq(
-              "id",
-              currentEditId
-            );
-
-      } else {
-
-        result =
-          await client
-            .from("products")
-            .insert(
-              productData
-            );
-      }
-
-      if (result.error) {
-        throw new Error(
-          result.error.message
-        );
-      }
-
-      await saveSite();
-
-      currentEditId = null;
-
-      alert(
-        "Produto salvo com sucesso."
-      );
-
-      await load();
-
-    } catch (error) {
-
-      console.error(error);
-
-      alert(
-        "Não foi possível salvar:\n\n" +
-        error.message
-      );
-
-      button.disabled = false;
-      button.textContent =
-        "Salvar produto";
-    }
+    $("#newCategoryField")
+      ?.classList.add("hidden");
   }
 
-  /*
-   * =========================================================
-   * EXCLUIR PRODUTO
-   * =========================================================
-   */
 
-  async function deleteProduct(id) {
+  function populateCategories(selected = "") {
+    const select = $("#productCategory");
 
-    const product =
-      S.products.find(
-        item =>
-          String(item.id) ===
-          String(id)
-      );
+    if (!select) return;
 
-    if (!product) {
-      return;
-    }
+    const categories = getCategories();
 
-    const confirmed =
-      confirm(
-        `Excluir "${product.name}"?`
-      );
+    select.innerHTML = `
+      <option value="">
+        Sem categoria
+      </option>
 
-    if (!confirmed) {
-      return;
-    }
+      ${categories
+        .map(
+          (category) =>
+            `<option value="${esc(category)}">
+              ${esc(category)}
+            </option>`
+        )
+        .join("")}
 
-    const {
-      error
-    } =
-      await client
-        .from("products")
-        .delete()
-        .eq("id", id);
-
-    if (error) {
-
-      alert(
-        "Erro ao excluir:\n" +
-        error.message
-      );
-
-      return;
-    }
-
-    await load();
-  }
-
-  /*
-   * =========================================================
-   * PEDIDOS
-   * =========================================================
-   */
-
-  async function renderOrders() {
-
-    const main =
-      $("#main");
-
-    main.innerHTML = `
-      <div class="page-header">
-        <div>
-          <h2>Pedidos</h2>
-          <p>
-            Pedidos recebidos pelo site.
-          </p>
-        </div>
-
-        <button
-          id="refreshOrders"
-          class="btn btn-secondary"
-          type="button"
-        >
-          Atualizar
-        </button>
-      </div>
-
-      <div id="ordersList">
-        <div class="loading">
-          Carregando pedidos...
-        </div>
-      </div>
+      <option value="__new__">
+        + Criar nova categoria
+      </option>
     `;
 
-    $("#refreshOrders")
-      ?.addEventListener(
-        "click",
-        renderOrders
+    if (
+      selected &&
+      !categories.some(
+        (category) =>
+          normalize(category) ===
+          normalize(selected)
+      )
+    ) {
+      const option =
+        document.createElement("option");
+
+      option.value = selected;
+      option.textContent = selected;
+
+      select.insertBefore(
+        option,
+        select.lastElementChild
       );
+    }
+
+    select.value = selected || "";
+  }
+
+
+  /* =========================
+     PHOTO
+  ========================= */
+
+  function setupPhotoPicker() {
+    $("#productPhoto")?.addEventListener(
+      "change",
+      (event) => {
+        const file =
+          event.target.files?.[0];
+
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+          toast(
+            "Escolha um arquivo de imagem.",
+            "error"
+          );
+
+          event.target.value = "";
+          return;
+        }
+
+        selectedImageFile = file;
+
+        const url =
+          URL.createObjectURL(file);
+
+        $("#photoPreview").innerHTML =
+          `<img src="${url}" alt="Prévia da imagem">`;
+      }
+    );
+  }
+
+
+  /* =========================
+     STORAGE
+  ========================= */
+
+  async function uploadProductImage(file) {
+    if (!file) return null;
+
+    const safeName =
+      slug(
+        file.name.replace(
+          /\.[^/.]+$/,
+          ""
+        )
+      ) || "produto";
+
+    const extension =
+      file.name.split(".").pop()?.toLowerCase() ||
+      "jpg";
+
+    const path =
+      `products/${Date.now()}-${safeName}.${extension}`;
 
     const {
       data,
       error
-    } =
-      await client
-        .from("orders")
-        .select("*")
-        .order(
-          "created_at",
-          {
-            ascending: false
-          }
-        );
+    } = await client
+      .storage
+      .from("media")
+      .upload(
+        path,
+        file,
+        {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: file.type
+        }
+      );
 
     if (error) {
-
-      $("#ordersList").innerHTML = `
-        <div class="panel">
-          <h3>Erro</h3>
-          <p>
-            ${esc(error.message)}
-          </p>
-        </div>
-      `;
-
-      return;
+      throw error;
     }
 
-    const orders =
-      data || [];
+    const publicResult =
+      client
+        .storage
+        .from("media")
+        .getPublicUrl(data.path);
 
-    if (!orders.length) {
+    return publicResult.data.publicUrl;
+  }
 
-      $("#ordersList").innerHTML = `
-        <div class="empty">
-          Nenhum pedido recebido.
-        </div>
-      `;
 
-      return;
-    }
+  /* =========================
+     SAVE PRODUCT
+  ========================= */
 
-    $("#ordersList").innerHTML =
-      orders
-        .map(renderOrder)
-        .join("");
+  async function saveProduct(event) {
+    event.preventDefault();
 
-    $$("[data-order-status]")
-      .forEach(select => {
+    const name =
+      $("#productName").value.trim();
 
-        select.addEventListener(
-          "change",
-          async () => {
+    const area =
+      normalizeArea(
+        $("#productArea").value
+      );
 
-            const id =
-              select.dataset.orderStatus;
+    const categorySelect =
+      $("#productCategory").value;
 
-            await updateOrderStatus(
-              id,
-              select.value
-            );
-          }
+    let category =
+      categorySelect;
+
+    if (categorySelect === "__new__") {
+      category =
+        $("#newCategory").value.trim();
+
+      if (!category) {
+        toast(
+          "Digite o nome da nova categoria.",
+          "error"
         );
+
+        return;
+      }
+
+      addCategory(category);
+    }
+
+    const price =
+      Number(
+        $("#productPrice").value
+      );
+
+    const discount =
+      Math.min(
+        100,
+        Math.max(
+          0,
+          Number(
+            $("#productDiscount").value || 0
+          )
+        )
+      );
+
+    const sort =
+      Number(
+        $("#productSort").value || 0
+      );
+
+    const gramatura =
+      $("#productGramatura").value.trim();
+
+    const serveAte =
+      $("#productServeAte").value.trim();
+
+    const description =
+      $("#productDescription").value.trim();
+
+    const available =
+      $("#productAvailable").checked;
+
+    const featured =
+      $("#productFeatured").checked;
+
+    const appointmentRequired =
+      $("#productAppointment").checked;
+
+    if (!name) {
+      toast(
+        "Informe o nome do produto.",
+        "error"
+      );
+
+      return;
+    }
+
+    if (
+      !Number.isFinite(price) ||
+      price < 0
+    ) {
+      toast(
+        "Informe um preço válido.",
+        "error"
+      );
+
+      return;
+    }
+
+    const submit =
+      $('#productForm button[type="submit"]');
+
+    if (submit) {
+      submit.disabled = true;
+      submit.textContent = "Salvando...";
+    }
+
+    try {
+      let imageUrl = null;
+
+      if (selectedImageFile) {
+        toast("Enviando foto...");
+
+        imageUrl =
+          await uploadProductImage(
+            selectedImageFile
+          );
+      }
+
+      const payload = {
+        name,
+        area,
+        category: category || null,
+        price,
+        discount_percent: discount,
+        gramatura: gramatura || null,
+        serve_ate: serveAte || null,
+        description: description || null,
+        available,
+        featured,
+        appointment_required:
+          appointmentRequired,
+        sort
+      };
+
+      if (imageUrl) {
+        payload.image_url =
+          imageUrl;
+      }
+
+      let result;
+
+      if (editingProductId) {
+        result = await client
+          .from("products")
+          .update(payload)
+          .eq(
+            "id",
+            editingProductId
+          );
+      } else {
+        result = await client
+          .from("products")
+          .insert(payload);
+      }
+
+      if (result.error) {
+        throw result.error;
+      }
+
+      addCategory(category);
+
+      await saveSite();
+
+      closeProductModal();
+
+      await loadData();
+
+      renderStats();
+      renderProducts();
+
+      toast(
+        editingProductId
+          ? "Produto atualizado."
+          : "Produto criado.",
+        "success"
+      );
+
+    } catch (error) {
+      console.error(error);
+
+      toast(
+        "Erro ao salvar produto: " +
+        error.message,
+        "error"
+      );
+
+    } finally {
+      if (submit) {
+        submit.disabled = false;
+        submit.textContent =
+          "Salvar produto";
+      }
+    }
+  }
+
+
+  /* =========================
+     DELETE PRODUCT
+  ========================= */
+
+  async function deleteProduct(id) {
+    const product =
+      S.products.find(
+        (item) =>
+          String(item.id) ===
+          String(id)
+      );
+
+    if (!product) return;
+
+    const confirmed =
+      window.confirm(
+        `Excluir o produto "${product.name}"?`
+      );
+
+    if (!confirmed) return;
+
+    const {
+      error
+    } = await client
+      .from("products")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error(error);
+
+      toast(
+        "Erro ao excluir: " +
+        error.message,
+        "error"
+      );
+
+      return;
+    }
+
+    await loadData();
+
+    renderStats();
+    renderProducts();
+
+    toast(
+      "Produto excluído.",
+      "success"
+    );
+  }
+
+
+  /* =========================
+     ORDERS
+  ========================= */
+
+  async function renderOrders() {
+    $("#tabContent").innerHTML = `
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <h3>Pedidos</h3>
+            <p>Pedidos recebidos pelo site.</p>
+          </div>
+
+          <button
+            class="btn btn-secondary btn-small"
+            id="reloadOrders"
+            type="button"
+          >
+            Atualizar
+          </button>
+        </div>
+
+        <div class="section-body" id="ordersBody">
+          <div class="empty">
+            Carregando pedidos...
+          </div>
+        </div>
+      </div>
+    `;
+
+    $("#reloadOrders")?.addEventListener(
+      "click",
+      renderOrders
+    );
+
+    const {
+      data,
+      error
+    } = await client
+      .from("orders")
+      .select("*")
+      .order("created_at", {
+        ascending: false
       });
 
-    $$("[data-print-order]")
-      .forEach(button => {
+    if (error) {
+      $("#ordersBody").innerHTML =
+        `<div class="empty">${esc(error.message)}</div>`;
 
+      return;
+    }
+
+    const orders = data || [];
+
+    if (!orders.length) {
+      $("#ordersBody").innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">🛍️</div>
+          <p>Nenhum pedido encontrado.</p>
+        </div>
+      `;
+
+      return;
+    }
+
+    $("#ordersBody").innerHTML = `
+      <div class="table-wrap">
+
+        <table class="data-table">
+
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Cliente</th>
+              <th>Entrega</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            ${orders
+              .map((order) => orderRow(order))
+              .join("")}
+
+          </tbody>
+
+        </table>
+
+      </div>
+    `;
+
+    $$("[data-order-status]").forEach(
+      (select) => {
+        select.addEventListener(
+          "change",
+          () =>
+            updateOrderStatus(
+              select.dataset.orderStatus,
+              select.value
+            )
+        );
+      }
+    );
+
+    $$("[data-print-order]").forEach(
+      (button) => {
         button.addEventListener(
           "click",
           () =>
             printOrder(
               orders.find(
-                order =>
+                (order) =>
                   String(order.id) ===
-                  String(
-                    button.dataset.printOrder
-                  )
+                  String(button.dataset.printOrder)
               )
             )
         );
-      });
+      }
+    );
   }
 
-  function renderOrder(order) {
 
-    const created =
-      order.created_at
-        ? new Date(
-            order.created_at
-          ).toLocaleString(
-            "pt-BR"
-          )
-        : "";
+  function orderRow(order) {
+    const date = order.created_at
+      ? new Date(order.created_at)
+          .toLocaleString("pt-BR")
+      : "-";
 
-    const items =
-      order.items || [];
+    const customer =
+      order.customer_name ||
+      order.customer ||
+      order.name ||
+      "-";
 
-    let itemsText = "";
+    const receiving =
+      order.receiving ||
+      order.delivery_method ||
+      "-";
 
-    if (Array.isArray(items)) {
+    const total =
+      Number(order.total || 0);
 
-      itemsText =
-        items
-          .map(item =>
-            `${item.quantity || 1}x ${item.name || "Produto"}`
-          )
-          .join("\n");
-
-    } else if (
-      typeof items === "object"
-    ) {
-
-      itemsText =
-        JSON.stringify(
-          items,
-          null,
-          2
-        );
-
-    } else {
-
-      itemsText =
-        String(items || "");
-    }
-
-    const statuses = [
-      "novo",
-      "em preparo",
-      "pronto",
-      "concluído",
-      "cancelado"
-    ];
+    const status =
+      order.status || "novo";
 
     return `
-      <article class="order-card">
+      <tr>
 
-        <div class="order-head">
+        <td>${esc(date)}</td>
 
-          <div>
-            <h3>
-              Pedido #${esc(order.id)}
-            </h3>
-
-            <div class="meta">
-              ${esc(created)}
-            </div>
-          </div>
-
-          <select
-            class="field"
-            data-order-status="${esc(order.id)}"
-            style="width:auto;"
-          >
-            ${statuses.map(status => `
-              <option
-                value="${esc(status)}"
-                ${
-                  String(
-                    order.status || "novo"
-                  ) === status
-                    ? "selected"
-                    : ""
-                }
-              >
-                ${esc(status)}
-              </option>
-            `).join("")}
-          </select>
-
-        </div>
-
-        <div style="margin-top:14px;">
-
+        <td>
           <strong>
-            ${esc(
-              order.customer_name ||
-              order.name ||
-              "Cliente"
-            )}
+            ${esc(customer)}
           </strong>
 
           ${
             order.phone
-              ? `<div class="meta">
-                  Telefone: ${esc(order.phone)}
-                </div>`
+              ? `<br><small>${esc(order.phone)}</small>`
               : ""
           }
+        </td>
 
-          ${
-            order.receiving
-              ? `<div class="meta">
-                  Recebimento: ${esc(order.receiving)}
-                </div>`
-              : ""
-          }
+        <td>${esc(receiving)}</td>
 
-          ${
-            order.address
-              ? `<div class="meta">
-                  Endereço: ${esc(order.address)}
-                </div>`
-              : ""
-          }
+        <td>
+          <strong>${money(total)}</strong>
+        </td>
 
-          ${
-            order.payment
-              ? `<div class="meta">
-                  Pagamento: ${esc(order.payment)}
-                </div>`
-              : ""
-          }
+        <td>
 
-        </div>
+          <select
+            class="field-input"
+            data-order-status="${esc(order.id)}"
+            style="
+              padding:8px;
+              border:1px solid #e7d8c6;
+              border-radius:9px;
+              background:#fff;
+            "
+          >
 
-        <div class="items">
-          ${esc(itemsText)}
-        </div>
+            ${[
+              "novo",
+              "em preparo",
+              "pronto",
+              "concluído",
+              "cancelado"
+            ]
+              .map(
+                (item) =>
+                  `<option
+                    value="${esc(item)}"
+                    ${
+                      normalize(status) ===
+                      normalize(item)
+                        ? "selected"
+                        : ""
+                    }
+                  >
+                    ${esc(item)}
+                  </option>`
+              )
+              .join("")}
 
-        ${
-          order.notes
-            ? `
-              <div class="meta">
-                <strong>Observações:</strong><br>
-                ${esc(order.notes)}
-              </div>
-            `
-            : ""
-        }
+          </select>
 
-        ${
-          order.total != null
-            ? `
-              <div class="price">
-                Total:
-                ${money(order.total)}
-              </div>
-            `
-            : ""
-        }
+        </td>
 
-        <div class="actions">
+        <td>
 
           <button
             class="btn btn-secondary btn-small"
             data-print-order="${esc(order.id)}"
             type="button"
           >
-            Imprimir comanda
+            Imprimir
           </button>
 
-        </div>
+        </td>
 
-      </article>
+      </tr>
     `;
   }
+
 
   async function updateOrderStatus(
     id,
     status
   ) {
-
     const {
       error
-    } =
-      await client
-        .from("orders")
-        .update({
-          status
-        })
-        .eq(
-          "id",
-          id
-        );
+    } = await client
+      .from("orders")
+      .update({ status })
+      .eq("id", id);
 
     if (error) {
-
-      alert(
-        "Erro ao atualizar pedido:\n" +
-        error.message
+      toast(
+        "Erro ao atualizar pedido: " +
+        error.message,
+        "error"
       );
+
+      return;
     }
+
+    toast(
+      "Status atualizado.",
+      "success"
+    );
   }
 
-  /*
-   * =========================================================
-   * BOLOS PERSONALIZADOS
-   * =========================================================
-   */
+
+  /* =========================
+     CUSTOM CAKES
+  ========================= */
 
   async function renderCakes() {
+    $("#tabContent").innerHTML = `
+      <div class="section">
 
-    const main =
-      $("#main");
+        <div class="section-header">
 
-    main.innerHTML = `
-      <div class="page-header">
-        <div>
-          <h2>Bolos personalizados</h2>
-          <p>
-            Solicitações de encomendas personalizadas.
-          </p>
+          <div>
+            <h3>Bolos personalizados</h3>
+            <p>
+              Solicitações de encomendas personalizadas.
+            </p>
+          </div>
+
+          <button
+            class="btn btn-secondary btn-small"
+            id="reloadCakes"
+            type="button"
+          >
+            Atualizar
+          </button>
+
         </div>
-      </div>
 
-      <div id="cakesList">
-        <div class="loading">
-          Carregando...
+        <div
+          class="section-body"
+          id="cakesBody"
+        >
+          <div class="empty">
+            Carregando...
+          </div>
         </div>
+
       </div>
     `;
+
+    $("#reloadCakes")?.addEventListener(
+      "click",
+      renderCakes
+    );
 
     const {
       data,
       error
-    } =
-      await client
-        .from("custom_cakes")
-        .select("*")
-        .order(
-          "created_at",
-          {
-            ascending: false
-          }
-        );
+    } = await client
+      .from("custom_cakes")
+      .select("*")
+      .order("created_at", {
+        ascending: false
+      });
 
     if (error) {
-
-      $("#cakesList").innerHTML = `
-        <div class="panel">
-          <h3>Erro</h3>
-          <p>${esc(error.message)}</p>
-        </div>
-      `;
+      $("#cakesBody").innerHTML =
+        `<div class="empty">${esc(error.message)}</div>`;
 
       return;
     }
 
-    const cakes =
-      data || [];
+    const cakes = data || [];
 
     if (!cakes.length) {
-
-      $("#cakesList").innerHTML = `
+      $("#cakesBody").innerHTML = `
         <div class="empty">
-          Nenhuma solicitação de bolo personalizado.
+          <div class="empty-icon">🎂</div>
+          <p>Nenhuma solicitação encontrada.</p>
         </div>
       `;
 
       return;
     }
 
-    $("#cakesList").innerHTML =
-      cakes
-        .map(renderCake)
-        .join("");
+    $("#cakesBody").innerHTML = `
+      <div class="table-wrap">
 
-    $$("[data-cake-status]")
-      .forEach(select => {
+        <table class="data-table">
 
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Cliente</th>
+              <th>Evento</th>
+              <th>Descrição</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${cakes
+              .map(
+                (cake) =>
+                  cakeRow(cake)
+              )
+              .join("")}
+          </tbody>
+
+        </table>
+
+      </div>
+    `;
+
+    $$("[data-cake-status]").forEach(
+      (select) => {
         select.addEventListener(
           "change",
-          async () => {
-
-            const id =
-              select.dataset.cakeStatus;
-
-            const {
-              error
-            } =
-              await client
-                .from("custom_cakes")
-                .update({
-                  status:
-                    select.value
-                })
-                .eq(
-                  "id",
-                  id
-                );
-
-            if (error) {
-              alert(
-                error.message
-              );
-            }
-          }
+          () =>
+            updateCakeStatus(
+              select.dataset.cakeStatus,
+              select.value
+            )
         );
-      });
+      }
+    );
+
+    $$("[data-print-cake]").forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          () =>
+            printCake(
+              cakes.find(
+                (cake) =>
+                  String(cake.id) ===
+                  String(
+                    button.dataset.printCake
+                  )
+              )
+            )
+        );
+      }
+    );
   }
 
-  function renderCake(cake) {
+
+  function cakeRow(cake) {
+    const date = cake.created_at
+      ? new Date(cake.created_at)
+          .toLocaleString("pt-BR")
+      : "-";
+
+    const customer =
+      cake.customer_name ||
+      cake.name ||
+      cake.customer ||
+      "-";
+
+    const event =
+      cake.event ||
+      cake.event_type ||
+      cake.occasion ||
+      "-";
+
+    const description =
+      cake.description ||
+      cake.details ||
+      cake.message ||
+      "-";
+
+    const status =
+      cake.status || "novo";
 
     const statuses = [
       "novo",
@@ -2081,585 +1790,614 @@
       "cancelado"
     ];
 
-    const date =
-      cake.created_at
-        ? new Date(
-            cake.created_at
-          ).toLocaleString(
-            "pt-BR"
-          )
-        : "";
-
     return `
-      <article class="cake-card">
+      <tr>
 
-        <div class="cake-head">
+        <td>${esc(date)}</td>
 
-          <div>
-            <h3>
-              Solicitação #${esc(cake.id)}
-            </h3>
+        <td>
+          <strong>${esc(customer)}</strong>
 
-            <div class="meta">
-              ${esc(date)}
-            </div>
-          </div>
+          ${
+            cake.phone
+              ? `<br><small>${esc(cake.phone)}</small>`
+              : ""
+          }
+        </td>
+
+        <td>${esc(event)}</td>
+
+        <td>
+          ${esc(description)}
+        </td>
+
+        <td>
 
           <select
             data-cake-status="${esc(cake.id)}"
+            style="
+              padding:8px;
+              border:1px solid #e7d8c6;
+              border-radius:9px;
+              background:#fff;
+            "
           >
-            ${statuses.map(status => `
-              <option
-                value="${esc(status)}"
-                ${
-                  String(
-                    cake.status || "novo"
-                  ) === status
-                    ? "selected"
-                    : ""
-                }
-              >
-                ${esc(status)}
-              </option>
-            `).join("")}
+
+            ${statuses
+              .map(
+                (item) =>
+                  `<option
+                    value="${esc(item)}"
+                    ${
+                      normalize(status) ===
+                      normalize(item)
+                        ? "selected"
+                        : ""
+                    }
+                  >
+                    ${esc(item)}
+                  </option>`
+              )
+              .join("")}
+
           </select>
 
-        </div>
+        </td>
 
-        <div style="margin-top:15px;">
-          ${
-            Object.entries(cake)
-              .filter(
-                ([key]) =>
-                  ![
-                    "id",
-                    "created_at",
-                    "updated_at",
-                    "status"
-                  ].includes(key)
-              )
-              .map(
-                ([key, value]) => `
-                  <div
-                    class="meta"
-                    style="margin-bottom:6px;"
-                  >
-                    <strong>
-                      ${esc(key)}:
-                    </strong>
-                    ${esc(
-                      typeof value ===
-                      "object"
-                        ? JSON.stringify(
-                            value
-                          )
-                        : value
-                    )}
-                  </div>
-                `
-              )
-              .join("")
-          }
-        </div>
-
-        <div class="actions">
+        <td>
 
           <button
             class="btn btn-secondary btn-small"
-            type="button"
             data-print-cake="${esc(cake.id)}"
+            type="button"
           >
-            Imprimir comanda
+            Imprimir
           </button>
 
-        </div>
+        </td>
 
-      </article>
+      </tr>
     `;
   }
 
-  /*
-   * =========================================================
-   * CONTEÚDO
-   * =========================================================
-   */
+
+  async function updateCakeStatus(
+    id,
+    status
+  ) {
+    const {
+      error
+    } = await client
+      .from("custom_cakes")
+      .update({ status })
+      .eq("id", id);
+
+    if (error) {
+      toast(
+        "Erro ao atualizar bolo: " +
+        error.message,
+        "error"
+      );
+
+      return;
+    }
+
+    toast(
+      "Status atualizado.",
+      "success"
+    );
+  }
+
+
+  /* =========================
+     CONTENT
+  ========================= */
 
   function renderContent() {
+    const about = S.about || {};
 
-    const about =
-      S.about || {};
+    $("#tabContent").innerHTML = `
+      <div class="section">
 
-    const main =
-      $("#main");
+        <div class="section-header">
 
-    main.innerHTML = `
-
-      <div class="page-header">
-
-        <div>
-          <h2>Conteúdo</h2>
-          <p>
-            Informações exibidas no site.
-          </p>
-        </div>
-
-      </div>
-
-      <form
-        id="contentForm"
-        class="panel"
-      >
-
-        <div class="grid-2">
-
-          <div class="field">
-            <label>
-              Nome
-            </label>
-
-            <input
-              name="name"
-              value="${esc(
-                about.name || ""
-              )}"
-            >
-          </div>
-
-          <div class="field">
-            <label>
-              Título
-            </label>
-
-            <input
-              name="title"
-              value="${esc(
-                about.title || ""
-              )}"
-            >
-          </div>
-
-          <div class="field">
-            <label>
-              Instagram
-            </label>
-
-            <input
-              name="instagram"
-              value="${esc(
-                S.instagram || ""
-              )}"
-            >
-          </div>
-
-          <div class="field">
-            <label>
-              WhatsApp
-            </label>
-
-            <input
-              name="whatsapp"
-              value="${esc(
-                S.whatsapp || ""
-              )}"
-            >
-          </div>
-
-          <div class="field">
-            <label>
-              Foto
-            </label>
-
-            <input
-              name="photo"
-              value="${esc(
-                about.photo || ""
-              )}"
-            >
-          </div>
-
-          <div class="field">
-            <label>
-              Frase
-            </label>
-
-            <input
-              name="quote"
-              value="${esc(
-                about.quote || ""
-              )}"
-            >
-          </div>
-
-          <div class="field full">
-            <label>
-              Texto
-            </label>
-
-            <textarea
-              name="text"
-            >${esc(
-              about.text || ""
-            )}</textarea>
+          <div>
+            <h3>Conteúdos do site</h3>
+            <p>
+              Informações institucionais e contato.
+            </p>
           </div>
 
         </div>
 
-        <div class="form-actions">
+        <div class="section-body">
+
+          <div class="setting-card">
+
+            <h4>Identidade</h4>
+
+            <div class="grid-2">
+
+              <div class="field">
+                <label>Nome</label>
+                <input
+                  id="contentName"
+                  value="${esc(
+                    about.name || ""
+                  )}"
+                >
+              </div>
+
+              <div class="field">
+                <label>Título</label>
+                <input
+                  id="contentTitle"
+                  value="${esc(
+                    about.title || ""
+                  )}"
+                >
+              </div>
+
+            </div>
+
+            <div class="field">
+              <label>Frase</label>
+              <input
+                id="contentQuote"
+                value="${esc(
+                  about.quote || ""
+                )}"
+              >
+            </div>
+
+            <div class="field">
+              <label>Texto sobre a confeitaria</label>
+              <textarea id="contentText">${esc(
+                about.text || ""
+              )}</textarea>
+            </div>
+
+          </div>
+
+
+          <div class="setting-card">
+
+            <h4>Contato</h4>
+
+            <div class="grid-2">
+
+              <div class="field">
+                <label>Instagram</label>
+                <input
+                  id="contentInstagram"
+                  value="${esc(
+                    S.instagram || ""
+                  )}"
+                  placeholder="@martinsconfeitaria"
+                >
+              </div>
+
+              <div class="field">
+                <label>WhatsApp</label>
+                <input
+                  id="contentWhatsapp"
+                  value="${esc(
+                    S.whatsapp || ""
+                  )}"
+                  placeholder="5585999999999"
+                >
+              </div>
+
+            </div>
+
+          </div>
+
 
           <button
             class="btn btn-primary"
-            type="submit"
+            id="saveContent"
+            type="button"
           >
-            Salvar conteúdo
+            Salvar conteúdos
           </button>
 
         </div>
 
-      </form>
+      </div>
     `;
 
-    $("#contentForm")
-      ?.addEventListener(
-        "submit",
-        async event => {
-
-          event.preventDefault();
-
-          const data =
-            new FormData(
-              event.currentTarget
-            );
-
-          S.about = {
-            ...about,
-
-            name:
-              String(
-                data.get("name") || ""
-              ).trim(),
-
-            title:
-              String(
-                data.get("title") || ""
-              ).trim(),
-
-            photo:
-              String(
-                data.get("photo") || ""
-              ).trim(),
-
-            quote:
-              String(
-                data.get("quote") || ""
-              ).trim(),
-
-            text:
-              String(
-                data.get("text") || ""
-              ).trim()
-          };
-
-          S.instagram =
-            String(
-              data.get("instagram") ||
-              ""
-            ).trim();
-
-          S.whatsapp =
-            String(
-              data.get("whatsapp") ||
-              ""
-            ).trim();
-
-          if (
-            await saveSite()
-          ) {
-            alert(
-              "Conteúdo salvo."
-            );
-          }
-        }
-      );
+    $("#saveContent")?.addEventListener(
+      "click",
+      saveContent
+    );
   }
 
-  /*
-   * =========================================================
-   * HORÁRIOS
-   * =========================================================
-   */
+
+  async function saveContent() {
+    S.about = {
+      ...S.about,
+      name: $("#contentName").value.trim(),
+      title: $("#contentTitle").value.trim(),
+      quote: $("#contentQuote").value.trim(),
+      text: $("#contentText").value.trim()
+    };
+
+    S.instagram =
+      $("#contentInstagram").value.trim();
+
+    S.whatsapp =
+      $("#contentWhatsapp").value.trim();
+
+    const saved =
+      await saveSite();
+
+    if (saved) {
+      toast(
+        "Conteúdos salvos.",
+        "success"
+      );
+    }
+  }
+
+
+  /* =========================
+     HOURS
+  ========================= */
 
   function renderHours() {
+    const days = [
+      ["monday", "Segunda-feira"],
+      ["tuesday", "Terça-feira"],
+      ["wednesday", "Quarta-feira"],
+      ["thursday", "Quinta-feira"],
+      ["friday", "Sexta-feira"],
+      ["saturday", "Sábado"],
+      ["sunday", "Domingo"]
+    ];
 
     const hours =
       S.hours || {};
 
-    const main =
-      $("#main");
+    $("#tabContent").innerHTML = `
+      <div class="section">
 
-    const days = [
-      ["0", "Domingo"],
-      ["1", "Segunda-feira"],
-      ["2", "Terça-feira"],
-      ["3", "Quarta-feira"],
-      ["4", "Quinta-feira"],
-      ["5", "Sexta-feira"],
-      ["6", "Sábado"]
-    ];
+        <div class="section-header">
 
-    main.innerHTML = `
+          <div>
+            <h3>Horários</h3>
+            <p>
+              Configure os horários exibidos no site.
+            </p>
+          </div>
 
-      <div class="page-header">
-
-        <div>
-          <h2>Horários</h2>
-          <p>
-            Controle os horários exibidos no site.
-          </p>
         </div>
 
-      </div>
+        <div class="section-body">
 
-      <form
-        id="hoursForm"
-        class="panel"
-      >
+          ${days
+            .map(
+              ([key, label]) => `
+                <div class="setting-card">
 
-        ${days.map(
-          ([key, label]) => {
+                  <div class="grid-3">
 
-            const item =
-              hours[key] || {};
+                    <div>
+                      <strong>${label}</strong>
+                    </div>
 
-            return `
-              <div
-                class="grid-3"
-                style="
-                  margin-bottom:12px;
-                  align-items:end;
-                "
-              >
+                    <div class="field">
+                      <label>Abertura</label>
+                      <input
+                        type="time"
+                        id="open_${key}"
+                        value="${esc(
+                          hours[key]?.open ||
+                          ""
+                        )}"
+                      >
+                    </div>
 
-                <div>
-                  <strong>
-                    ${label}
-                  </strong>
+                    <div class="field">
+                      <label>Fechamento</label>
+                      <input
+                        type="time"
+                        id="close_${key}"
+                        value="${esc(
+                          hours[key]?.close ||
+                          ""
+                        )}"
+                      >
+                    </div>
+
+                  </div>
+
                 </div>
+              `
+            )
+            .join("")}
 
-                <div class="field">
-                  <label>
-                    Abertura
-                  </label>
-
-                  <input
-                    type="time"
-                    name="o${key}"
-                    value="${esc(
-                      item.open || ""
-                    )}"
-                  >
-                </div>
-
-                <div class="field">
-                  <label>
-                    Fechamento
-                  </label>
-
-                  <input
-                    type="time"
-                    name="c${key}"
-                    value="${esc(
-                      item.close || ""
-                    )}"
-                  >
-                </div>
-
-              </div>
-            `;
-          }
-        ).join("")}
-
-        <div class="field">
-          <label>
-            Informações de delivery
-          </label>
-
-          <textarea
-            name="deliveryInfo"
-          >${esc(
-            S.deliveryInfo || ""
-          )}</textarea>
-        </div>
-
-        <div class="field">
-          <label>
-            Formas de pagamento
-          </label>
-
-          <textarea
-            name="payments"
-          >${esc(
-            Array.isArray(S.payments)
-              ? S.payments.join("\n")
-              : S.payments || ""
-          )}</textarea>
-        </div>
-
-        <div class="form-actions">
 
           <button
             class="btn btn-primary"
-            type="submit"
+            id="saveHours"
+            type="button"
           >
             Salvar horários
           </button>
 
         </div>
 
-      </form>
+      </div>
     `;
 
-    $("#hoursForm")
-      ?.addEventListener(
-        "submit",
-        async event => {
-
-          event.preventDefault();
-
-          const data =
-            new FormData(
-              event.currentTarget
-            );
-
-          S.hours = {};
-
-          days.forEach(
-            ([key]) => {
-
-              S.hours[key] = {
-                open:
-                  String(
-                    data.get(
-                      `o${key}`
-                    ) || ""
-                  ),
-
-                close:
-                  String(
-                    data.get(
-                      `c${key}`
-                    ) || ""
-                  )
-              };
-            }
-          );
-
-          S.deliveryInfo =
-            String(
-              data.get(
-                "deliveryInfo"
-              ) || ""
-            ).trim();
-
-          S.payments =
-            String(
-              data.get(
-                "payments"
-              ) || ""
-            )
-              .split("\n")
-              .map(
-                item =>
-                  item.trim()
-              )
-              .filter(Boolean);
-
-          if (
-            await saveSite()
-          ) {
-            alert(
-              "Horários salvos."
-            );
-          }
-        }
-      );
+    $("#saveHours")?.addEventListener(
+      "click",
+      saveHours
+    );
   }
 
-  /*
-   * =========================================================
-   * MÍDIA
-   * =========================================================
-   */
 
-  async function renderMedia() {
+  async function saveHours() {
+    const days = [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday"
+    ];
 
-    const main =
-      $("#main");
+    S.hours = S.hours || {};
 
-    main.innerHTML = `
+    for (const day of days) {
+      S.hours[day] = {
+        open:
+          $(`#open_${day}`)?.value || "",
+        close:
+          $(`#close_${day}`)?.value || ""
+      };
+    }
 
-      <div class="page-header">
+    const saved =
+      await saveSite();
 
-        <div>
-          <h2>Mídia</h2>
-          <p>
-            Arquivos armazenados no bucket media.
-          </p>
+    if (saved) {
+      toast(
+        "Horários salvos.",
+        "success"
+      );
+    }
+  }
+
+
+  /* =========================
+     RULES
+  ========================= */
+
+  function renderRules() {
+    const rules =
+      S.rules || {};
+
+    $("#tabContent").innerHTML = `
+      <div class="section">
+
+        <div class="section-header">
+
+          <div>
+            <h3>Regras do atendimento</h3>
+            <p>
+              Informações utilizadas para orientar os clientes.
+            </p>
+          </div>
+
         </div>
 
-      </div>
+        <div class="section-body">
 
-      <div class="panel">
+          <div class="setting-card">
 
-        <div class="field">
-          <label>
-            Enviar imagem
-          </label>
+            <h4>Delivery</h4>
 
-          <input
-            id="mediaUpload"
-            type="file"
-            accept="image/*"
+            <div class="field">
+              <label>Regra de entrega</label>
+              <textarea
+                id="ruleDelivery"
+              >${esc(
+                rules.delivery || ""
+              )}</textarea>
+            </div>
+
+          </div>
+
+
+          <div class="setting-card">
+
+            <h4>Encomendas</h4>
+
+            <div class="field">
+              <label>Regra de encomendas</label>
+              <textarea
+                id="ruleOrders"
+              >${esc(
+                rules.orders || ""
+              )}</textarea>
+            </div>
+
+          </div>
+
+
+          <div class="setting-card">
+
+            <h4>Pagamento</h4>
+
+            <div class="field">
+              <label>Formas e regras de pagamento</label>
+              <textarea
+                id="rulePayment"
+              >${esc(
+                rules.payment || ""
+              )}</textarea>
+            </div>
+
+          </div>
+
+
+          <div class="setting-card">
+
+            <h4>Observações gerais</h4>
+
+            <div class="field">
+              <label>Informações adicionais</label>
+              <textarea
+                id="ruleGeneral"
+              >${esc(
+                rules.general || ""
+              )}</textarea>
+            </div>
+
+          </div>
+
+
+          <button
+            class="btn btn-primary"
+            id="saveRules"
+            type="button"
           >
+            Salvar regras
+          </button>
+
         </div>
 
-      </div>
-
-      <div
-        id="mediaList"
-        class="media-grid"
-      >
-        <div class="loading">
-          Carregando arquivos...
-        </div>
       </div>
     `;
 
-    $("#mediaUpload")
-      ?.addEventListener(
-        "change",
-        uploadMedia
+    $("#saveRules")?.addEventListener(
+      "click",
+      saveRules
+    );
+  }
+
+
+  async function saveRules() {
+    S.rules = {
+      ...S.rules,
+
+      delivery:
+        $("#ruleDelivery").value.trim(),
+
+      orders:
+        $("#ruleOrders").value.trim(),
+
+      payment:
+        $("#rulePayment").value.trim(),
+
+      general:
+        $("#ruleGeneral").value.trim()
+    };
+
+    const saved =
+      await saveSite();
+
+    if (saved) {
+      toast(
+        "Regras salvas.",
+        "success"
       );
+    }
+  }
+
+
+  /* =========================
+     MEDIA
+  ========================= */
+
+  async function renderMedia() {
+    $("#tabContent").innerHTML = `
+      <div class="section">
+
+        <div class="section-header">
+
+          <div>
+            <h3>Mídia</h3>
+            <p>
+              Arquivos armazenados no bucket media.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="section-body">
+
+          <div class="photo-picker">
+
+            <label
+              for="mediaUpload"
+              class="btn btn-primary"
+            >
+              + Enviar arquivo
+            </label>
+
+            <input
+              id="mediaUpload"
+              class="file-input"
+              type="file"
+              accept="image/*,video/*"
+            >
+
+            <small>
+              Fotos, imagens e outros arquivos de mídia.
+            </small>
+
+          </div>
+
+          <div
+            id="mediaList"
+            style="margin-top:20px;"
+          >
+            <div class="empty">
+              Carregando mídia...
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    `;
+
+    $("#mediaUpload")?.addEventListener(
+      "change",
+      uploadMedia
+    );
+
+    await loadMedia();
+  }
+
+
+  async function loadMedia() {
+    const container =
+      $("#mediaList");
+
+    if (!container) return;
 
     const {
       data,
       error
-    } =
-      await client.storage
-        .from("media")
-        .list(
-          "",
-          {
-            limit: 100
-          }
-        );
+    } = await client
+      .storage
+      .from("media")
+      .list("", {
+        limit: 100,
+        sortBy: {
+          column: "created_at",
+          order: "desc"
+        }
+      });
 
     if (error) {
-
-      $("#mediaList").innerHTML = `
-        <div class="panel">
-          <p>
-            ${esc(error.message)}
-          </p>
+      container.innerHTML = `
+        <div class="empty">
+          ${esc(error.message)}
         </div>
       `;
 
@@ -2667,11 +2405,15 @@
     }
 
     const files =
-      data || [];
+      (data || [])
+        .filter(
+          (file) =>
+            file.name &&
+            file.name !== ".emptyFolderPlaceholder"
+        );
 
     if (!files.length) {
-
-      $("#mediaList").innerHTML = `
+      container.innerHTML = `
         <div class="empty">
           Nenhum arquivo encontrado.
         </div>
@@ -2680,394 +2422,139 @@
       return;
     }
 
-    $("#mediaList").innerHTML =
-      files
-        .filter(
-          file =>
-            file.name !==
-            ".emptyFolderPlaceholder"
-        )
-        .map(file => {
+    container.innerHTML = `
+      <div
+        style="
+          display:grid;
+          grid-template-columns:
+            repeat(auto-fill,minmax(180px,1fr));
+          gap:14px;
+        "
+      >
 
-          const url =
-            client.storage
-              .from("media")
-              .getPublicUrl(
-                file.name
-              )
-              .data
-              .publicUrl;
-
-          return `
-            <div class="media-card">
-
-              <img
-                src="${esc(url)}"
-                alt="${esc(file.name)}"
-                loading="lazy"
+        ${files
+          .map(
+            (file) => `
+              <div
+                class="setting-card"
+                style="margin:0;"
               >
 
-              <div class="media-name">
-                ${esc(file.name)}
+                <div
+                  style="
+                    height:150px;
+                    border-radius:12px;
+                    overflow:hidden;
+                    background:#f2e8da;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    margin-bottom:10px;
+                  "
+                >
+                  🖼️
+                </div>
+
+                <strong
+                  style="
+                    display:block;
+                    font-size:12px;
+                    word-break:break-word;
+                  "
+                >
+                  ${esc(file.name)}
+                </strong>
+
               </div>
+            `
+          )
+          .join("")}
 
-              <button
-                class="btn btn-secondary btn-small"
-                data-copy-media="${esc(url)}"
-                type="button"
-              >
-                Copiar URL
-              </button>
-
-            </div>
-          `;
-        })
-        .join("");
-
-    $$("[data-copy-media]")
-      .forEach(button => {
-
-        button.addEventListener(
-          "click",
-          async () => {
-
-            try {
-
-              await navigator.clipboard.writeText(
-                button.dataset.copyMedia
-              );
-
-              button.textContent =
-                "Copiado!";
-
-              setTimeout(
-                () =>
-                  button.textContent =
-                    "Copiar URL",
-                1500
-              );
-
-            } catch {
-
-              alert(
-                button.dataset.copyMedia
-              );
-            }
-          }
-        );
-      });
+      </div>
+    `;
   }
 
-  async function uploadMedia(event) {
 
+  async function uploadMedia(event) {
     const file =
       event.target.files?.[0];
 
-    if (!file) {
-      return;
-    }
+    if (!file) return;
 
-    const safeName =
-      file.name.replace(
-        /[^a-zA-Z0-9._-]/g,
-        "-"
-      );
+    try {
+      const safeName =
+        slug(
+          file.name.replace(
+            /\.[^/.]+$/,
+            ""
+          )
+        ) || "arquivo";
 
-    const path =
-      `${Date.now()}-${safeName}`;
+      const extension =
+        file.name.split(".").pop() ||
+        "bin";
 
-    const {
-      error
-    } =
-      await client.storage
+      const path =
+        `media/${Date.now()}-${safeName}.${extension}`;
+
+      const {
+        error
+      } = await client
+        .storage
         .from("media")
         .upload(
           path,
           file,
           {
+            cacheControl: "3600",
             upsert: false,
-            contentType:
-              file.type ||
-              "image/jpeg"
+            contentType: file.type
           }
         );
 
-    if (error) {
+      if (error) {
+        throw error;
+      }
 
-      alert(
-        "Erro ao enviar arquivo:\n" +
-        error.message
+      toast(
+        "Arquivo enviado.",
+        "success"
       );
 
-      return;
+      event.target.value = "";
+
+      await loadMedia();
+
+    } catch (error) {
+      console.error(error);
+
+      toast(
+        "Erro ao enviar arquivo: " +
+        error.message,
+        "error"
+      );
     }
-
-    alert(
-      "Arquivo enviado."
-    );
-
-    await renderMedia();
   }
 
-  /*
-   * =========================================================
-   * COMANDA DE PEDIDO
-   * =========================================================
-   */
 
-  function printOrder(order) {
+  /* =========================
+     PRINT
+  ========================= */
 
-    if (!order) {
-      return;
-    }
-
-    const items =
-      Array.isArray(order.items)
-        ? order.items
-        : [];
-
-    const itemHTML =
-      items
-        .map(
-          item => `
-            <tr>
-              <td>
-                ${esc(
-                  item.quantity || 1
-                )}x
-              </td>
-
-              <td>
-                ${esc(
-                  item.name || "Produto"
-                )}
-              </td>
-
-              <td>
-                ${money(
-                  item.price || 0
-                )}
-              </td>
-            </tr>
-          `
-        )
-        .join("");
-
-    const html = `
-      <!DOCTYPE html>
-
-      <html lang="pt-BR">
-
-      <head>
-
-        <meta charset="UTF-8">
-
-        <title>
-          Comanda
-        </title>
-
-        <style>
-
-          body {
-            font-family: Arial, sans-serif;
-            padding: 25px;
-            color: #000;
-          }
-
-          h1 {
-            text-align: center;
-            font-size: 20px;
-          }
-
-          .meta {
-            font-size: 13px;
-            margin: 4px 0;
-          }
-
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-          }
-
-          th,
-          td {
-            padding: 7px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-          }
-
-          .total {
-            margin-top: 20px;
-            text-align: right;
-            font-weight: bold;
-            font-size: 18px;
-          }
-
-          @media print {
-            body {
-              padding: 0;
-            }
-          }
-
-        </style>
-
-      </head>
-
-      <body>
-
-        <h1>
-          MARTINS CONFEITARIA ARTESANAL
-        </h1>
-
-        <div class="meta">
-          Pedido:
-          ${esc(order.id)}
-        </div>
-
-        <div class="meta">
-          Cliente:
-          ${esc(
-            order.customer_name ||
-            order.name ||
-            ""
-          )}
-        </div>
-
-        <div class="meta">
-          Telefone:
-          ${esc(
-            order.phone || ""
-          )}
-        </div>
-
-        <div class="meta">
-          Recebimento:
-          ${esc(
-            order.receiving || ""
-          )}
-        </div>
-
-        <table>
-
-          <thead>
-            <tr>
-              <th>Qtd.</th>
-              <th>Produto</th>
-              <th>Valor</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            ${itemHTML}
-          </tbody>
-
-        </table>
-
-        <div class="total">
-          Total:
-          ${money(order.total)}
-        </div>
-
-        ${
-          order.notes
-            ? `
-              <p>
-                <strong>
-                  Observações:
-                </strong>
-                ${esc(order.notes)}
-              </p>
-            `
-            : ""
-        }
-
-        <script>
-          window.onload = () => {
-            window.print();
-            window.close();
-          };
-        </script>
-
-      </body>
-
-      </html>
-    `;
-
+  function printWindow(title, body) {
     const popup =
       window.open(
         "",
-        "_blank"
+        "_blank",
+        "width=800,height=900"
       );
 
     if (!popup) {
-
-      alert(
-        "O navegador bloqueou a janela de impressão."
+      toast(
+        "O navegador bloqueou a janela de impressão.",
+        "error"
       );
 
-      return;
-    }
-
-    popup.document.write(
-      html
-    );
-
-    popup.document.close();
-  }
-
-  /*
-   * =========================================================
-   * COMANDA DE BOLO
-   * =========================================================
-   */
-
-  function printCake(cake) {
-
-    if (!cake) {
-      return;
-    }
-
-    const fields =
-      Object.entries(cake)
-        .filter(
-          ([key]) =>
-            ![
-              "id",
-              "created_at",
-              "updated_at",
-              "status"
-            ].includes(key)
-        )
-        .map(
-          ([key, value]) => `
-            <p>
-              <strong>
-                ${esc(key)}:
-              </strong>
-              ${esc(
-                typeof value ===
-                "object"
-                  ? JSON.stringify(
-                      value
-                    )
-                  : value
-              )}
-            </p>
-          `
-        )
-        .join("");
-
-    const popup =
-      window.open(
-        "",
-        "_blank"
-      );
-
-    if (!popup) {
-      alert(
-        "O navegador bloqueou a impressão."
-      );
       return;
     }
 
@@ -3080,24 +2567,23 @@
 
         <meta charset="UTF-8">
 
-        <title>
-          Comanda de bolo
-        </title>
+        <title>${esc(title)}</title>
 
         <style>
 
           body {
             font-family: Arial, sans-serif;
-            padding: 25px;
+            padding: 30px;
+            color: #222;
           }
 
           h1 {
-            text-align: center;
+            font-size: 22px;
           }
 
-          p {
+          .line {
             border-bottom: 1px solid #ddd;
-            padding: 7px 0;
+            padding: 8px 0;
           }
 
         </style>
@@ -3106,18 +2592,13 @@
 
       <body>
 
-        <h1>
-          COMANDA DE BOLO PERSONALIZADO
-        </h1>
-
-        ${fields}
+        ${body}
 
         <script>
-          window.onload = () => {
+          window.onload = function() {
             window.print();
-            window.close();
           };
-        </script>
+        <\/script>
 
       </body>
 
@@ -3127,80 +2608,330 @@
     popup.document.close();
   }
 
-  /*
-   * =========================================================
-   * EVENTOS DE BOLOS
-   * =========================================================
-   */
 
-  document.addEventListener(
-    "click",
-    event => {
+  function printOrder(order) {
+    if (!order) return;
 
-      const button =
-        event.target.closest(
-          "[data-print-cake]"
-        );
+    let items = [];
 
-      if (!button) {
-        return;
+    try {
+      items =
+        typeof order.items === "string"
+          ? JSON.parse(order.items)
+          : order.items || [];
+    } catch {
+      items = [];
+    }
+
+    const itemsHtml =
+      Array.isArray(items)
+        ? items
+            .map(
+              (item) => `
+                <div class="line">
+                  ${esc(
+                    item.name ||
+                    item.product ||
+                    "Produto"
+                  )}
+
+                  ${
+                    item.quantity
+                      ? ` × ${esc(item.quantity)}`
+                      : ""
+                  }
+
+                  ${
+                    item.price != null
+                      ? ` - ${money(item.price)}`
+                      : ""
+                  }
+                </div>
+              `
+            )
+            .join("")
+        : `<div class="line">${esc(items)}</div>`;
+
+    printWindow(
+      "Pedido - Martins Confeitaria",
+      `
+        <h1>Martins Confeitaria</h1>
+
+        <h2>Pedido</h2>
+
+        <div class="line">
+          <strong>Cliente:</strong>
+          ${esc(
+            order.customer_name ||
+            order.customer ||
+            "-"
+          )}
+        </div>
+
+        <div class="line">
+          <strong>Telefone:</strong>
+          ${esc(order.phone || "-")}
+        </div>
+
+        <div class="line">
+          <strong>Recebimento:</strong>
+          ${esc(
+            order.receiving ||
+            order.delivery_method ||
+            "-"
+          )}
+        </div>
+
+        <div class="line">
+          <strong>Endereço:</strong>
+          ${esc(order.address || "-")}
+        </div>
+
+        <h3>Itens</h3>
+
+        ${itemsHtml}
+
+        <div class="line">
+          <strong>Total:</strong>
+          ${money(order.total)}
+        </div>
+
+        <div class="line">
+          <strong>Pagamento:</strong>
+          ${esc(order.payment || "-")}
+        </div>
+
+        <div class="line">
+          <strong>Observações:</strong>
+          ${esc(order.notes || "-")}
+        </div>
+      `
+    );
+  }
+
+
+  function printCake(cake) {
+    if (!cake) return;
+
+    printWindow(
+      "Bolo personalizado - Martins Confeitaria",
+      `
+        <h1>Martins Confeitaria</h1>
+
+        <h2>Bolo personalizado</h2>
+
+        <div class="line">
+          <strong>Cliente:</strong>
+          ${esc(
+            cake.customer_name ||
+            cake.name ||
+            cake.customer ||
+            "-"
+          )}
+        </div>
+
+        <div class="line">
+          <strong>Telefone:</strong>
+          ${esc(cake.phone || "-")}
+        </div>
+
+        <div class="line">
+          <strong>Evento:</strong>
+          ${esc(
+            cake.event ||
+            cake.event_type ||
+            cake.occasion ||
+            "-"
+          )}
+        </div>
+
+        <div class="line">
+          <strong>Data:</strong>
+          ${esc(
+            cake.event_date ||
+            cake.date ||
+            "-"
+          )}
+        </div>
+
+        <div class="line">
+          <strong>Descrição:</strong>
+          ${esc(
+            cake.description ||
+            cake.details ||
+            cake.message ||
+            "-"
+          )}
+        </div>
+
+        <div class="line">
+          <strong>Observações:</strong>
+          ${esc(
+            cake.notes ||
+            "-"
+          )}
+        </div>
+      `
+    );
+  }
+
+
+  /* =========================
+     GLOBAL EVENTS
+  ========================= */
+
+  function setupGlobalEvents() {
+    $("#logout")?.addEventListener(
+      "click",
+      logout
+    );
+
+    $("#refreshBtn")?.addEventListener(
+      "click",
+      async () => {
+        try {
+          await loadData();
+          renderStats();
+          renderTab();
+
+          toast(
+            "Painel atualizado.",
+            "success"
+          );
+        } catch (error) {
+          toast(
+            "Erro ao atualizar: " +
+            error.message,
+            "error"
+          );
+        }
       }
+    );
 
-      const id =
-        button.dataset.printCake;
+    $("#mobileMenu")?.addEventListener(
+      "click",
+      () => {
+        $("#sidebar")
+          ?.classList.toggle("open");
+      }
+    );
 
-      client
-        .from("custom_cakes")
-        .select("*")
-        .eq("id", id)
-        .maybeSingle()
-        .then(
-          ({ data, error }) => {
+    $$("[data-close-modal]").forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          () => {
+            const id =
+              button.dataset.closeModal;
 
-            if (error) {
-              alert(
-                error.message
-              );
-              return;
+            if (id === "productModal") {
+              closeProductModal();
             }
-
-            printCake(data);
           }
         );
-    }
-  );
-
-  /*
-   * =========================================================
-   * AUTH STATE
-   * =========================================================
-   */
-
-  client.auth.onAuthStateChange(
-    async (_event, session) => {
-
-      if (session) {
-        await showApp();
-      } else {
-        showLogin();
       }
-    }
-  );
+    );
 
-  /*
-   * =========================================================
-   * INICIALIZAÇÃO
-   * =========================================================
-   */
+    $("#productModal")?.addEventListener(
+      "click",
+      (event) => {
+        if (
+          event.target.id ===
+          "productModal"
+        ) {
+          closeProductModal();
+        }
+      }
+    );
+
+    $("#productForm")?.addEventListener(
+      "submit",
+      saveProduct
+    );
+
+    $("#productCategory")?.addEventListener(
+      "change",
+      (event) => {
+        if (
+          event.target.value ===
+          "__new__"
+        ) {
+          $("#newCategoryField")
+            ?.classList.remove("hidden");
+
+          $("#newCategory")?.focus();
+
+        } else {
+          $("#newCategoryField")
+            ?.classList.add("hidden");
+        }
+      }
+    );
+
+    setupPhotoPicker();
+  }
+
+
+  /* =========================
+     INIT
+  ========================= */
 
   async function init() {
+    try {
+      renderLogo();
 
-    setupAuth();
-    setupLogout();
-    setupTabs();
+      setupAuth();
+      setupNavigation();
+      setupGlobalEvents();
 
-    await checkSession();
+      const session =
+        await checkSession();
+
+      if (session) {
+        await startApp();
+      } else {
+        $("#loginScreen")
+          ?.classList.remove("hidden");
+
+        $("#app")
+          ?.classList.add("hidden");
+      }
+
+      client.auth.onAuthStateChange(
+        async (event, session) => {
+          if (
+            event === "SIGNED_IN" &&
+            session
+          ) {
+            await startApp();
+          }
+
+          if (
+            event === "SIGNED_OUT"
+          ) {
+            $("#app")
+              ?.classList.add("hidden");
+
+            $("#loginScreen")
+              ?.classList.remove("hidden");
+          }
+        }
+      );
+
+    } catch (error) {
+      console.error(
+        "Erro ao iniciar painel:",
+        error
+      );
+
+      toast(
+        "Erro ao iniciar painel: " +
+        error.message,
+        "error"
+      );
+    }
   }
+
 
   init();
 
