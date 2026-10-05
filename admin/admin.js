@@ -1,4527 +1,1431 @@
-(() => {
-  "use strict";
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  /*
-    MARTINS CONFEITARIA
-    PAINEL ADMINISTRATIVO
-  */
+  <title>Martins Confeitaria | Administração</title>
 
-  const CONFIG = window.MARTINS_CONFIG || {};
-  const DEFAULTS = window.MARTINS_DEFAULTS || {};
+  <style>
+    :root {
+      --brown-950: #24140d;
+      --brown-900: #321b11;
+      --brown-800: #452719;
+      --brown-700: #603823;
+      --brown-600: #765039;
+      --cream-50: #fffdf9;
+      --cream-100: #faf5ed;
+      --cream-200: #f2e8da;
+      --cream-300: #e7d8c6;
+      --text: #2b211b;
+      --muted: #7e7065;
+      --white: #ffffff;
+      --green: #2f7d4a;
+      --red: #b44343;
+      --yellow: #a8791e;
+      --shadow: 0 18px 50px rgba(50, 27, 17, .10);
+      --radius: 18px;
+      --sidebar: 270px;
+    }
 
-  if (!window.supabase) {
-    console.error("Supabase JS não foi carregado.");
-    return;
-  }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  if (!CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_ANON_KEY) {
-    console.error(
-      "SUPABASE_URL ou SUPABASE_ANON_KEY não encontrados em config.js."
-    );
-    return;
-  }
+    html,
+    body {
+      min-height: 100%;
+    }
 
-  const client = window.supabase.createClient(
-    CONFIG.SUPABASE_URL,
-    CONFIG.SUPABASE_ANON_KEY,
-    {
-      auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: true
+    body {
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      background: var(--cream-100);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    #loginScreen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+
+      background:
+        radial-gradient(circle at 20% 20%, rgba(118, 80, 57, .18), transparent 32%),
+        radial-gradient(circle at 80% 80%, rgba(96, 56, 35, .14), transparent 35%),
+        var(--brown-950);
+    }
+
+    .login-card {
+      width: min(440px, 100%);
+      background: var(--white);
+      border-radius: 26px;
+      padding: 42px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, .30);
+    }
+
+    .login-brand {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .login-logo {
+      width: 86px;
+      height: 86px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--cream-200);
+      border: 4px solid var(--cream-100);
+    }
+
+    .login-logo-fallback {
+      width: 86px;
+      height: 86px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--brown-900);
+      color: var(--white);
+      font-size: 30px;
+      font-weight: 800;
+    }
+
+    .login-brand h1 {
+      font-family: Georgia, serif;
+      font-size: 28px;
+      color: var(--brown-900);
+      margin-bottom: 5px;
+    }
+
+    .login-brand p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .field {
+      margin-bottom: 17px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--brown-900);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      border: 1px solid var(--cream-300);
+      background: var(--white);
+      color: var(--text);
+      border-radius: 11px;
+      padding: 12px 13px;
+      outline: none;
+      transition: .18s ease;
+    }
+
+    .field textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--brown-600);
+      box-shadow: 0 0 0 3px rgba(118, 80, 57, .12);
+    }
+
+    .field small {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 11px;
+      padding: 11px 16px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: .18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--brown-900);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background: var(--brown-800);
+    }
+
+    .btn-secondary {
+      background: var(--cream-200);
+      color: var(--brown-900);
+    }
+
+    .btn-danger {
+      background: #f9e6e6;
+      color: var(--red);
+    }
+
+    .btn-success {
+      background: #e5f3e9;
+      color: var(--green);
+    }
+
+    .btn-small {
+      padding: 8px 11px;
+      font-size: 12px;
+    }
+
+    .btn-full {
+      width: 100%;
+    }
+
+    #app {
+      min-height: 100vh;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+    }
+
+    .sidebar {
+      position: fixed;
+      z-index: 30;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: var(--sidebar);
+      background: var(--brown-950);
+      color: var(--white);
+      padding: 24px 16px;
+      overflow-y: auto;
+    }
+
+    .sidebar-brand {
+      padding: 8px 10px 24px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      margin-bottom: 20px;
+    }
+
+    .sidebar-brand-inner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sidebar-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: rgba(255,255,255,.08);
+      border: 2px solid rgba(255,255,255,.12);
+    }
+
+    .sidebar-logo-fallback {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--brown-700);
+      font-weight: 800;
+    }
+
+    .sidebar-brand strong {
+      display: block;
+      font-family: Georgia, serif;
+      font-size: 17px;
+    }
+
+    .sidebar-brand span {
+      display: block;
+      color: rgba(255,255,255,.55);
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    .nav-title {
+      color: rgba(255,255,255,.35);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      padding: 0 12px;
+      margin-bottom: 8px;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav button {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: rgba(255,255,255,.68);
+      border-radius: 11px;
+      padding: 12px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-weight: 600;
+      transition: .18s ease;
+    }
+
+    .nav button:hover {
+      background: rgba(255,255,255,.07);
+      color: var(--white);
+    }
+
+    .nav button.active {
+      background: var(--white);
+      color: var(--brown-900);
+    }
+
+    .nav-icon {
+      width: 24px;
+      text-align: center;
+      font-size: 17px;
+    }
+
+    .sidebar-bottom {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,.10);
+    }
+
+    .main {
+      width: calc(100% - var(--sidebar));
+      margin-left: var(--sidebar);
+      min-height: 100vh;
+    }
+
+    .topbar {
+      height: 76px;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      background: rgba(255,255,255,.92);
+      border-bottom: 1px solid var(--cream-300);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar-title h2 {
+      font-family: Georgia, serif;
+      color: var(--brown-900);
+      font-size: 23px;
+    }
+
+    .topbar-title p {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+    }
+
+    .content {
+      padding: 32px;
+      max-width: 1500px;
+      margin: 0 auto;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--cream-300);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 5px 20px rgba(50,27,17,.04);
+    }
+
+    .stat-card .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .stat-card .stat-value {
+      font-size: 29px;
+      color: var(--brown-900);
+      font-weight: 800;
+      margin-top: 6px;
+    }
+
+    .section {
+      background: var(--white);
+      border: 1px solid var(--cream-300);
+      border-radius: var(--radius);
+      box-shadow: 0 5px 20px rgba(50,27,17,.04);
+      overflow: hidden;
+      margin-bottom: 22px;
+    }
+
+    .section-header {
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--cream-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .section-header h3 {
+      color: var(--brown-900);
+      font-family: Georgia, serif;
+      font-size: 19px;
+    }
+
+    .section-header p {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .section-body {
+      padding: 22px;
+    }
+
+    .area-group {
+      margin-bottom: 28px;
+    }
+
+    .area-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .area-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .area-heading h4 {
+      color: var(--brown-900);
+      font-size: 16px;
+    }
+
+    .product-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .product-row {
+      display: grid;
+      grid-template-columns: 70px minmax(0, 1fr) auto auto auto;
+      align-items: center;
+      gap: 14px;
+      padding: 12px;
+      border: 1px solid var(--cream-200);
+      border-radius: 14px;
+      background: var(--cream-50);
+    }
+
+    .product-image {
+      width: 70px;
+      height: 70px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--cream-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--brown-600);
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .product-info {
+      min-width: 0;
+    }
+
+    .product-name {
+      font-weight: 800;
+      color: var(--brown-900);
+      margin-bottom: 3px;
+    }
+
+    .product-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 700;
+      background: var(--cream-200);
+      color: var(--brown-700);
+    }
+
+    .tag.green {
+      background: #e5f3e9;
+      color: var(--green);
+    }
+
+    .tag.red {
+      background: #f9e6e6;
+      color: var(--red);
+    }
+
+    .tag.yellow {
+      background: #f7efd9;
+      color: var(--yellow);
+    }
+
+    .product-price {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .product-price strong {
+      color: var(--brown-900);
+      display: block;
+    }
+
+    .old-price {
+      color: var(--muted);
+      text-decoration: line-through;
+      font-size: 11px;
+    }
+
+    .product-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    .data-table th {
+      background: var(--cream-100);
+      color: var(--brown-700);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--cream-300);
+    }
+
+    .data-table td {
+      padding: 14px;
+      border-bottom: 1px solid var(--cream-200);
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .status {
+      display: inline-flex;
+      padding: 5px 9px;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 800;
+      background: var(--cream-200);
+      color: var(--brown-700);
+    }
+
+    .status.green {
+      background: #e5f3e9;
+      color: var(--green);
+    }
+
+    .status.red {
+      background: #f9e6e6;
+      color: var(--red);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      z-index: 100;
+      inset: 0;
+      background: rgba(20, 11, 7, .60);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(850px, 100%);
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      background: var(--white);
+      border-radius: 22px;
+      box-shadow: 0 30px 100px rgba(0,0,0,.35);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--cream-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(10px);
+      z-index: 2;
+    }
+
+    .modal-header h3 {
+      font-family: Georgia, serif;
+      color: var(--brown-900);
+    }
+
+    .close-btn {
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--cream-100);
+      color: var(--brown-900);
+      font-size: 20px;
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .modal-footer {
+      padding: 18px 24px;
+      border-top: 1px solid var(--cream-200);
+      display: flex;
+      justify-content: flex-end;
+      gap: 9px;
+      position: sticky;
+      bottom: 0;
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(10px);
+    }
+
+    .photo-picker {
+      border: 2px dashed var(--cream-300);
+      border-radius: 16px;
+      padding: 20px;
+      background: var(--cream-50);
+      text-align: center;
+    }
+
+    .photo-preview {
+      width: 150px;
+      height: 150px;
+      margin: 0 auto 14px;
+      border-radius: 15px;
+      overflow: hidden;
+      background: var(--cream-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--brown-600);
+      font-size: 35px;
+    }
+
+    .photo-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .check-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 12px;
+      border: 1px solid var(--cream-300);
+      border-radius: 11px;
+      background: var(--cream-50);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--brown-800);
+    }
+
+    .check input {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--brown-900);
+    }
+
+    .empty {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .empty-icon {
+      font-size: 36px;
+      margin-bottom: 8px;
+    }
+
+    #toast {
+      position: fixed;
+      z-index: 200;
+      right: 22px;
+      bottom: 22px;
+      max-width: 380px;
+      padding: 14px 17px;
+      border-radius: 12px;
+      background: var(--brown-950);
+      color: var(--white);
+      box-shadow: 0 15px 40px rgba(0,0,0,.25);
+      opacity: 0;
+      transform: translateY(15px);
+      pointer-events: none;
+      transition: .25s ease;
+      font-size: 13px;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #toast.error {
+      background: var(--red);
+    }
+
+    #toast.success {
+      background: var(--green);
+    }
+
+    .setting-card {
+      border: 1px solid var(--cream-300);
+      border-radius: 15px;
+      padding: 18px;
+      background: var(--cream-50);
+      margin-bottom: 14px;
+    }
+
+    .setting-card h4 {
+      color: var(--brown-900);
+      margin-bottom: 15px;
+    }
+
+    @media (max-width: 1100px) {
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .product-row {
+        grid-template-columns: 60px minmax(0, 1fr) auto;
+      }
+
+      .product-price {
+        grid-column: 2;
+        text-align: left;
+      }
+
+      .product-actions {
+        grid-column: 3;
+        grid-row: 1 / span 2;
       }
     }
-  );
 
-  /* =========================
-     HELPERS
-  ========================= */
+    @media (max-width: 850px) {
+      :root {
+        --sidebar: 0px;
+      }
 
-  const $ = (selector, root = document) =>
-    root.querySelector(selector);
+      .sidebar {
+        position: fixed;
+        width: 250px;
+        transform: translateX(-100%);
+        transition: transform .25s ease;
+      }
 
-  const $$ = (selector, root = document) =>
-    Array.from(root.querySelectorAll(selector));
+      .sidebar.open {
+        transform: translateX(0);
+      }
 
-  const esc = (value) =>
-    String(value ?? "").replace(
-      /[&<>"']/g,
-      (char) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;"
-        })[char]
-    );
+      .main {
+        width: 100%;
+        margin-left: 0;
+      }
 
-  const clone = (value) => {
-    try {
-      return structuredClone(value);
-    } catch {
-      return JSON.parse(JSON.stringify(value));
-    }
-  };
+      .topbar {
+        padding: 0 18px;
+      }
 
-  const money = (value) => {
-    const number = Number(value || 0);
+      .content {
+        padding: 18px;
+      }
 
-    return number.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL"
-    });
-  };
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
 
-  const normalize = (value) =>
-    String(value ?? "")
-      .trim()
-      .toLowerCase();
+      .check-grid {
+        grid-template-columns: 1fr;
+      }
 
-  const slug = (value) =>
-    normalize(value)
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-
-  const firstValue = (...values) => {
-    for (const value of values) {
-      if (
-        value !== undefined &&
-        value !== null &&
-        typeof value !== "object" &&
-        String(value).trim() !== ""
-      ) {
-        return value;
+      .mobile-menu {
+        display: inline-flex !important;
       }
     }
 
-    return "";
-  };
+    .mobile-menu {
+      display: none;
+      border: 0;
+      background: var(--cream-100);
+      color: var(--brown-900);
+      border-radius: 10px;
+      width: 40px;
+      height: 40px;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
 
-  const formatDate = (value) => {
-    if (!value) return "-";
-
-    try {
-      const date = new Date(value);
-
-      if (Number.isNaN(date.getTime())) {
-        return String(value);
+    @media (max-width: 600px) {
+      .login-card {
+        padding: 28px 20px;
       }
 
-      return date.toLocaleString("pt-BR");
-    } catch {
-      return String(value);
-    }
-  };
-
-  const toast = (message, type = "") => {
-    const element = $("#toast");
-
-    if (!element) return;
-
-    element.textContent = message;
-    element.className = "";
-
-    if (type) {
-      element.classList.add(type);
-    }
-
-    element.classList.add("show");
-
-    clearTimeout(toast.timer);
-
-    toast.timer = setTimeout(() => {
-      element.classList.remove("show");
-    }, 3500);
-  };
-
-  /* =========================
-     STATE
-  ========================= */
-
-  let S = clone(DEFAULTS || {});
-
-  if (!S || typeof S !== "object") {
-    S = {};
-  }
-
-  S.products = Array.isArray(S.products) ? S.products : [];
-  S.categories = Array.isArray(S.categories) ? S.categories : [];
-  S.hours = S.hours || {};
-  S.rules = S.rules || {};
-  S.about = S.about || {};
-  S.delivery = S.delivery || {};
-  S.payments = S.payments || {};
-  S.deliveryInfo = S.deliveryInfo || {};
-
-  let currentTab = "products";
-  let currentProducts = [];
-  let editingProductId = null;
-  let selectedImageFile = null;
-
-  /* =========================
-     AREAS
-  ========================= */
-
-  /*
-    EXISTEM SOMENTE DUAS ÁREAS:
-
-    cardapio / encomendas
-      -> Encomendas
-
-    pronta-entrega / pronta / delivery
-      -> Delivery
-
-    Valores antigos continuam sendo
-    reconhecidos para não quebrar
-    produtos já cadastrados.
-  */
-
-  const AREAS = [
-    {
-      value: "cardapio",
-      label: "Encomendas"
-    },
-    {
-      value: "pronta-entrega",
-      label: "Delivery"
-    }
-  ];
-
-  function normalizeArea(value) {
-    const v = normalize(value);
-
-    if (
-      v === "pronta" ||
-      v === "ready" ||
-      v === "delivery" ||
-      v === "pronta entrega" ||
-      v === "pronta-entrega" ||
-      v === "pronta_entrega"
-    ) {
-      return "pronta-entrega";
-    }
-
-    if (
-      v === "encomenda" ||
-      v === "encomendas" ||
-      v === "bolo-personalizado" ||
-      v === "bolo personalizado" ||
-      v === "cardapio" ||
-      v === "cardápio"
-    ) {
-      return "cardapio";
-    }
-
-    return "cardapio";
-  }
-
-  function areaLabel(value) {
-    const normalized = normalizeArea(value);
-
-    return (
-      AREAS.find(
-        (area) => area.value === normalized
-      )?.label || "Encomendas"
-    );
-  }
-
-  function populateAreas(selected = "") {
-    const select = $("#productArea");
-
-    if (!select) return;
-
-    select.innerHTML = AREAS.map(
-      (area) =>
-        `
-          <option value="${esc(area.value)}">
-            ${esc(area.label)}
-          </option>
-        `
-    ).join("");
-
-    select.value = normalizeArea(
-      selected || "cardapio"
-    );
-  }
-
-  /* =========================
-     CATEGORIES
-  ========================= */
-
-  /*
-    CATEGORIAS PADRÃO:
-
-    - Bolos
-    - Brownies
-    - Bolos no pote
-    - Copos de felicidade
-
-    O administrador também pode criar
-    novas categorias manualmente.
-
-    "Brigadeiros clássicos" e
-    "Brigadeiros premium" foram removidos
-    das categorias padrão e também não
-    serão adicionados novamente.
-  */
-
-  const PRODUCT_CLASSIFICATIONS = [
-    "Bolos",
-    "Brownies",
-    "Bolos no pote",
-    "Copos de felicidade"
-  ];
-
-  const BLOCKED_CATEGORIES = [
-    "brigadeiros clássicos",
-    "brigadeiros classicos",
-    "brigadeiros premium"
-  ];
-
-  function isBlockedCategory(category) {
-    return BLOCKED_CATEGORIES.includes(
-      normalize(category)
-    );
-  }
-
-  function getCategories() {
-    const categories = [];
-
-    /*
-      Primeiro entram as quatro categorias
-      padrão.
-    */
-    PRODUCT_CLASSIFICATIONS.forEach(
-      (category) => {
-        if (
-          !isBlockedCategory(category) &&
-          !categories.some(
-            (item) =>
-              normalize(item) ===
-              normalize(category)
-          )
-        ) {
-          categories.push(category);
-        }
+      .stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
       }
-    );
 
-    /*
-      Depois entram categorias personalizadas
-      já salvas em S.categories.
-    */
-    if (Array.isArray(S.categories)) {
-      S.categories.forEach(
-        (category) => {
-          const value =
-            String(category || "").trim();
+      .stat-card {
+        padding: 15px;
+      }
 
-          if (!value) return;
+      .stat-card .stat-value {
+        font-size: 22px;
+      }
 
-          if (isBlockedCategory(value)) {
-            return;
-          }
+      .topbar-title h2 {
+        font-size: 18px;
+      }
 
-          if (
-            !categories.some(
-              (item) =>
-                normalize(item) ===
-                normalize(value)
-            )
-          ) {
-            categories.push(value);
-          }
-        }
-      );
+      .topbar-title p {
+        display: none;
+      }
+
+      .product-row {
+        grid-template-columns: 58px minmax(0, 1fr);
+      }
+
+      .product-price,
+      .product-actions {
+        grid-column: 2;
+        grid-row: auto;
+      }
+
+      .product-actions {
+        display: flex;
+      }
+
+      .modal-body {
+        padding: 18px;
+      }
     }
+  </style>
+</head>
 
-    /*
-      Também verifica categorias que estejam
-      diretamente nos produtos.
-    */
-    if (Array.isArray(S.products)) {
-      S.products.forEach(
-        (product) => {
-          const value =
-            String(
-              product?.category || ""
-            ).trim();
+<body>
 
-          if (!value) return;
+  <section id="loginScreen">
+    <div class="login-card">
 
-          if (isBlockedCategory(value)) {
-            return;
-          }
+      <div class="login-brand">
+        <div id="loginLogoWrap">
+          <div class="login-logo-fallback">M</div>
+        </div>
 
-          if (
-            !categories.some(
-              (item) =>
-                normalize(item) ===
-                normalize(value)
-            )
-          ) {
-            categories.push(value);
-          }
-        }
-      );
-    }
+        <h1>Martins Confeitaria</h1>
+        <p>Painel administrativo</p>
+      </div>
 
-    return categories;
-  }
+      <form id="loginForm">
 
-  function addCategory(category) {
-    const value =
-      String(category || "").trim();
-
-    if (!value) {
-      return false;
-    }
-
-    /*
-      As duas categorias removidas não podem
-      voltar para a lista.
-    */
-    if (isBlockedCategory(value)) {
-      return false;
-    }
-
-    if (!Array.isArray(S.categories)) {
-      S.categories = [];
-    }
-
-    const exists =
-      S.categories.some(
-        (item) =>
-          normalize(item) ===
-          normalize(value)
-      );
-
-    if (!exists) {
-      S.categories.push(value);
-    }
-
-    return true;
-  }
-
-  /* =========================
-     LOGO
-  ========================= */
-
-  function getLogoUrl() {
-    return firstValue(
-      CONFIG.LOGO_URL,
-      CONFIG.logoUrl,
-      CONFIG.LOGO,
-      CONFIG.logo,
-
-      DEFAULTS.logoUrl,
-      DEFAULTS.logo,
-
-      S.logoUrl,
-      S.logo_url,
-      S.logoURL,
-      S.logo,
-      S.siteLogo,
-      S.site_logo,
-
-      S.brand?.logoUrl,
-      S.brand?.logo_url,
-      S.brand?.logo,
-
-      S.about?.logoUrl,
-      S.about?.logo_url,
-      S.about?.logo,
-
-      S.company?.logoUrl,
-      S.company?.logo_url,
-      S.company?.logo
-    );
-  }
-
-  function renderLogo() {
-    const url = getLogoUrl();
-
-    const loginWrap = $("#loginLogoWrap");
-    const sidebarWrap = $("#sidebarLogoWrap");
-
-    const loginImage = $("#loginLogo");
-    const sidebarImage = $("#sidebarLogo");
-
-    if (loginWrap) {
-      loginWrap.innerHTML = url
-        ? `
-          <img
-            class="login-logo"
-            src="${esc(url)}"
-            alt="Martins Confeitaria"
+        <div class="field">
+          <label for="loginEmail">E-mail</label>
+          <input
+            id="loginEmail"
+            name="email"
+            type="email"
+            autocomplete="username"
+            required
           >
-        `
-        : `
-          <div class="login-logo-fallback">
-            M
-          </div>
-        `;
-    } else if (loginImage) {
-      loginImage.src = url || "";
-      loginImage.alt = "Martins Confeitaria";
-      loginImage.style.display =
-        url ? "" : "none";
-    }
+        </div>
 
-    if (sidebarWrap) {
-      sidebarWrap.innerHTML = url
-        ? `
-          <img
-            class="sidebar-logo"
-            src="${esc(url)}"
-            alt="Martins Confeitaria"
+        <div class="field">
+          <label for="loginPassword">Senha</label>
+          <input
+            id="loginPassword"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
           >
-        `
-        : `
-          <div class="sidebar-logo-fallback">
-            M
+        </div>
+
+        <button class="btn btn-primary btn-full" type="submit">
+          Entrar
+        </button>
+
+        <p
+          id="loginMsg"
+          style="margin-top:12px;text-align:center;color:#b44343;font-size:12px;"
+        ></p>
+
+      </form>
+    </div>
+  </section>
+
+
+  <section id="app" class="hidden">
+
+    <div class="app-shell">
+
+      <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-brand">
+          <div class="sidebar-brand-inner">
+
+            <div id="sidebarLogoWrap">
+              <div class="sidebar-logo-fallback">M</div>
+            </div>
+
+            <div>
+              <strong>Martins</strong>
+              <span>Confeitaria Artesanal</span>
+            </div>
+
           </div>
-        `;
-    } else if (sidebarImage) {
-      sidebarImage.src = url || "";
-      sidebarImage.alt = "Martins Confeitaria";
-      sidebarImage.style.display =
-        url ? "" : "none";
-    }
-  }
+        </div>
 
-  /* =========================
-     AUTH
-  ========================= */
+        <div class="nav-title">Painel</div>
 
-  function setupAuth() {
-    const form = $("#loginForm");
+        <nav class="nav">
 
-    if (!form) return;
+          <button data-tab="products" class="active">
+            <span class="nav-icon">🍰</span>
+            Produtos
+          </button>
 
-    form.addEventListener(
-      "submit",
-      async (event) => {
-        event.preventDefault();
+          <button data-tab="orders">
+            <span class="nav-icon">🛍️</span>
+            Pedidos
+          </button>
 
-        const email =
-          $("#loginEmail")?.value.trim();
+          <button data-tab="cakes">
+            <span class="nav-icon">🎂</span>
+            Bolos personalizados
+          </button>
 
-        const password =
-          $("#loginPassword")?.value;
+          <button data-tab="content">
+            <span class="nav-icon">✏️</span>
+            Conteúdos
+          </button>
 
-        const message =
-          $("#loginMsg");
+          <button data-tab="hours">
+            <span class="nav-icon">🕒</span>
+            Horários
+          </button>
 
-        if (!email || !password) {
-          if (message) {
-            message.textContent =
-              "Informe e-mail e senha.";
-          }
+          <button data-tab="rules">
+            <span class="nav-icon">📋</span>
+            Regras
+          </button>
 
-          return;
-        }
+          <button data-tab="media">
+            <span class="nav-icon">🖼️</span>
+            Mídia
+          </button>
 
-        if (message) {
-          message.textContent =
-            "Entrando...";
-        }
+        </nav>
 
-        const { error } =
-          await client.auth.signInWithPassword({
-            email,
-            password
-          });
-
-        if (error) {
-          console.error(error);
-
-          if (message) {
-            message.textContent =
-              error.message ||
-              "Não foi possível entrar.";
-          }
-
-          return;
-        }
-
-        if (message) {
-          message.textContent = "";
-        }
-
-        await startApp();
-      }
-    );
-  }
-
-  async function checkSession() {
-    const {
-      data,
-      error
-    } = await client.auth.getSession();
-
-    if (error) {
-      console.error(error);
-      return null;
-    }
-
-    return data?.session || null;
-  }
-
-  async function logout() {
-    await client.auth.signOut();
-
-    $("#app")?.classList.add("hidden");
-    $("#loginScreen")?.classList.remove("hidden");
-  }
-
-  /* =========================
-     DATABASE
-  ========================= */
-
-  async function loadData() {
-    const settingsResult =
-      await client
-        .from("settings")
-        .select("key,value")
-        .eq("key", "site")
-        .maybeSingle();
-
-    if (settingsResult.error) {
-      throw settingsResult.error;
-    }
-
-    if (settingsResult.data?.value) {
-      const saved =
-        settingsResult.data.value;
-
-      if (
-        saved &&
-        typeof saved === "object"
-      ) {
-        S = {
-          ...S,
-          ...saved
-        };
-      }
-    }
-
-    const productsResult =
-      await client
-        .from("products")
-        .select("*")
-        .order("sort", {
-          ascending: true
-        });
-
-    if (productsResult.error) {
-      throw productsResult.error;
-    }
-
-    S.products =
-      productsResult.data || [];
-
-    S.categories =
-      Array.isArray(S.categories)
-        ? S.categories
-        : [];
-
-    /*
-      Recupera categorias personalizadas
-      que já estejam nos produtos.
-
-      As duas categorias removidas são
-      ignoradas.
-    */
-    for (const product of S.products) {
-      if (
-        product.category &&
-        !isBlockedCategory(
-          product.category
-        )
-      ) {
-        addCategory(
-          product.category
-        );
-      }
-    }
-
-    /*
-      Remove da lista salva as categorias
-      antigas que foram descontinuadas.
-    */
-    S.categories =
-      S.categories.filter(
-        (category) =>
-          !isBlockedCategory(category)
-      );
-
-    renderLogo();
-  }
-
-  async function saveSite() {
-    const payload = clone(S);
-
-    delete payload.products;
-
-    const {
-      error
-    } = await client
-      .from("settings")
-      .upsert(
-        {
-          key: "site",
-          value: payload
-        },
-        {
-          onConflict: "key"
-        }
-      );
-
-    if (error) {
-      console.error(error);
-
-      toast(
-        "Erro ao salvar configurações: " +
-        error.message,
-        "error"
-      );
-
-      return false;
-    }
-
-    return true;
-  }
-
-  /* =========================
-     APP
-  ========================= */
-
-  async function startApp() {
-    try {
-      $("#loginScreen")
-        ?.classList.add("hidden");
-
-      $("#app")
-        ?.classList.remove("hidden");
-
-      renderLogo();
-
-      await loadData();
-
-      renderStats();
-      renderTab();
-
-    } catch (error) {
-      console.error(error);
-
-      toast(
-        "Erro ao carregar painel: " +
-        (error.message || error),
-        "error"
-      );
-    }
-  }
-
-  /* =========================
-     NAVIGATION
-  ========================= */
-
-  const TITLES = {
-    products: [
-      "Produtos",
-      "Gerencie o catálogo da confeitaria."
-    ],
-
-    orders: [
-      "Pedidos",
-      "Acompanhe os pedidos recebidos."
-    ],
-
-    cakes: [
-      "Bolos personalizados",
-      "Acompanhe as solicitações de bolos."
-    ],
-
-    content: [
-      "Conteúdos",
-      "Edite as informações exibidas no site."
-    ],
-
-    hours: [
-      "Horários",
-      "Configure os horários de atendimento."
-    ],
-
-    rules: [
-      "Regras",
-      "Configure regras e informações do atendimento."
-    ],
-
-    media: [
-      "Mídia",
-      "Gerencie arquivos utilizados no site."
-    ]
-  };
-
-  function setupNavigation() {
-    $$(".nav button").forEach((button) => {
-      button.addEventListener(
-        "click",
-        () => {
-          currentTab =
-            button.dataset.tab;
-
-          $$(".nav button").forEach(
-            (item) => {
-              item.classList.toggle(
-                "active",
-                item === button
-              );
-            }
-          );
-
-          const title =
-            TITLES[currentTab] ||
-            ["Painel", ""];
-
-          $("#pageTitle").textContent =
-            title[0];
-
-          $("#pageSubtitle").textContent =
-            title[1];
-
-          $("#sidebar")
-            ?.classList.remove("open");
-
-          renderTab();
-        }
-      );
-    });
-  }
-
-  function renderTab() {
-    if (currentTab === "products") {
-      renderProducts();
-      return;
-    }
-
-    if (currentTab === "orders") {
-      renderOrders();
-      return;
-    }
-
-    if (currentTab === "cakes") {
-      renderCakes();
-      return;
-    }
-
-    if (currentTab === "content") {
-      renderContent();
-      return;
-    }
-
-    if (currentTab === "hours") {
-      renderHours();
-      return;
-    }
-
-    if (currentTab === "rules") {
-      renderRules();
-      return;
-    }
-
-    if (currentTab === "media") {
-      renderMedia();
-      return;
-    }
-  }
-
-  /* =========================
-     STATS
-  ========================= */
-
-  function renderStats() {
-    const products =
-      S.products || [];
-
-    $("#statProducts").textContent =
-      products.length;
-
-    $("#statAvailable").textContent =
-      products.filter(
-        (product) =>
-          product.available !== false
-      ).length;
-
-    loadOrderCount();
-    loadCakeCount();
-  }
-
-  async function loadOrderCount() {
-    const {
-      count,
-      error
-    } = await client
-      .from("orders")
-      .select("*", {
-        count: "exact",
-        head: true
-      });
-
-    if (!error) {
-      $("#statOrders").textContent =
-        count || 0;
-    }
-  }
-
-  async function loadCakeCount() {
-    const {
-      count,
-      error
-    } = await client
-      .from("custom_cakes")
-      .select("*", {
-        count: "exact",
-        head: true
-      });
-
-    if (!error) {
-      $("#statCakes").textContent =
-        count || 0;
-    }
-  }
-
-  /* =========================
-     PRODUCTS
-  ========================= */
-
-  function renderProducts() {
-    currentProducts =
-      S.products || [];
-
-    const groups = {};
-
-    for (const area of AREAS) {
-      groups[area.value] = [];
-    }
-
-    for (const product of currentProducts) {
-      const area =
-        normalizeArea(product.area);
-
-      if (!groups[area]) {
-        groups[area] = [];
-      }
-
-      groups[area].push(product);
-    }
-
-    let html = `
-      <div class="section">
-
-        <div class="section-header">
-
-          <div>
-            <h3>Catálogo</h3>
-
-            <p>
-              Cadastre produtos e escolha onde eles aparecem.
-            </p>
-          </div>
+        <div class="sidebar-bottom">
 
           <button
-            class="btn btn-primary"
-            id="newProductBtn"
-            type="button"
+            id="logout"
+            class="btn btn-secondary btn-full"
           >
-            + Novo produto
+            Sair
           </button>
 
         </div>
 
-        <div class="section-body">
-    `;
+      </aside>
 
-    for (const area of AREAS) {
-      const products =
-        groups[area.value] || [];
 
-      html += `
-        <div class="area-group">
+      <main class="main">
 
-          <div class="area-heading">
+        <header class="topbar">
 
-            <h4>
-              ${esc(area.label)}
-            </h4>
+          <div style="display:flex;align-items:center;gap:12px;">
 
             <button
+              class="mobile-menu"
+              id="mobileMenu"
+              type="button"
+            >
+              ☰
+            </button>
+
+            <div class="topbar-title">
+              <h2 id="pageTitle">Produtos</h2>
+              <p id="pageSubtitle">
+                Gerencie o catálogo da confeitaria.
+              </p>
+            </div>
+
+          </div>
+
+          <div class="topbar-actions">
+            <button
+              id="refreshBtn"
               class="btn btn-secondary btn-small"
-              data-add-area="${esc(area.value)}"
               type="button"
             >
-              + Adicionar aqui
+              ↻ Atualizar
             </button>
+          </div>
+
+        </header>
+
+
+        <div class="content">
+
+          <div class="stats">
+
+            <div class="stat-card">
+              <div class="stat-label">Produtos</div>
+              <div class="stat-value" id="statProducts">0</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">Disponíveis</div>
+              <div class="stat-value" id="statAvailable">0</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">Pedidos</div>
+              <div class="stat-value" id="statOrders">0</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">Bolos personalizados</div>
+              <div class="stat-value" id="statCakes">0</div>
+            </div>
 
           </div>
 
-          <div class="product-list">
-      `;
-
-      if (!products.length) {
-        html += `
-          <div class="empty">
-            <div class="empty-icon">🍰</div>
-            <p>Nenhum produto nesta área.</p>
-          </div>
-        `;
-      } else {
-        for (const product of products) {
-          html += productRow(product);
-        }
-      }
-
-      html += `
-          </div>
-        </div>
-      `;
-    }
-
-    html += `
-        </div>
-      </div>
-    `;
-
-    $("#tabContent").innerHTML =
-      html;
-
-    $("#newProductBtn")
-      ?.addEventListener(
-        "click",
-        () => openProductModal()
-      );
-
-    $$("[data-add-area]")
-      .forEach((button) => {
-        button.addEventListener(
-          "click",
-          () => {
-            openProductModal(
-              null,
-              button.dataset.addArea
-            );
-          }
-        );
-      });
-
-    $$("[data-edit-product]")
-      .forEach((button) => {
-        button.addEventListener(
-          "click",
-          () => {
-            const product =
-              currentProducts.find(
-                (item) =>
-                  String(item.id) ===
-                  String(
-                    button.dataset.editProduct
-                  )
-              );
-
-            if (product) {
-              openProductModal(product);
-            }
-          }
-        );
-      });
-
-    $$("[data-delete-product]")
-      .forEach((button) => {
-        button.addEventListener(
-          "click",
-          () => {
-            deleteProduct(
-              button.dataset.deleteProduct
-            );
-          }
-        );
-      });
-  }
-
-  function productRow(product) {
-    const available =
-      product.available !== false;
-
-    const discount =
-      Number(
-        product.discount_percent || 0
-      );
-
-    const originalPrice =
-      Number(product.price || 0);
-
-    const finalPrice =
-      discount > 0
-        ? originalPrice *
-          (1 - discount / 100)
-        : originalPrice;
-
-    const photo =
-      product.image_url ||
-      product.image ||
-      "";
-
-    const meta = [];
-
-    if (product.category) {
-      meta.push(
-        `<span class="tag">${esc(
-          product.category
-        )}</span>`
-      );
-    }
-
-    if (product.gramatura) {
-      meta.push(
-        `<span class="tag">${esc(
-          product.gramatura
-        )}</span>`
-      );
-    }
-
-    if (product.serve_ate) {
-      meta.push(
-        `<span class="tag">${esc(
-          product.serve_ate
-        )}</span>`
-      );
-    }
-
-    if (discount > 0) {
-      meta.push(
-        `<span class="tag yellow">-${discount}%</span>`
-      );
-    }
-
-    if (product.appointment_required) {
-      meta.push(
-        `<span class="tag yellow">Agendamento</span>`
-      );
-    }
-
-    meta.push(
-      available
-        ? `<span class="tag green">Disponível</span>`
-        : `<span class="tag red">Em falta</span>`
-    );
-
-    return `
-      <div class="product-row">
-
-        <div class="product-image">
-          ${
-            photo
-              ? `
-                <img
-                  src="${esc(photo)}"
-                  alt="${esc(
-                    product.name
-                  )}"
-                >
-              `
-              : "🍰"
-          }
-        </div>
-
-        <div class="product-info">
-
-          <div class="product-name">
-            ${esc(
-              product.name ||
-              "Produto sem nome"
-            )}
-          </div>
-
-          <div class="product-meta">
-            ${meta.join("")}
-          </div>
+          <div id="tabContent"></div>
 
         </div>
 
-        <div class="product-price">
+      </main>
 
-          ${
-            discount > 0
-              ? `
-                <span class="old-price">
-                  ${money(originalPrice)}
-                </span>
-              `
-              : ""
-          }
+    </div>
 
-          <strong>
-            ${money(finalPrice)}
-          </strong>
+  </section>
 
+
+  <div class="modal-backdrop" id="productModal">
+
+    <div class="modal">
+
+      <div class="modal-header">
+
+        <div>
+          <h3 id="productModalTitle">Novo produto</h3>
         </div>
 
-        <div class="product-actions">
-
-          <button
-            class="btn btn-secondary btn-small"
-            data-edit-product="${esc(
-              product.id
-            )}"
-            type="button"
-          >
-            Editar
-          </button>
-
-          <button
-            class="btn btn-danger btn-small"
-            data-delete-product="${esc(
-              product.id
-            )}"
-            type="button"
-          >
-            Excluir
-          </button>
-
-        </div>
-
-      </div>
-    `;
-  }
-
-  /* =========================
-     PRODUCT MODAL
-  ========================= */
-
-  function openProductModal(
-    product = null,
-    forcedArea = null
-  ) {
-    editingProductId =
-      product?.id || null;
-
-    selectedImageFile = null;
-
-    $("#productModalTitle").textContent =
-      product
-        ? "Editar produto"
-        : "Novo produto";
-
-    $("#productName").value =
-      product?.name || "";
-
-    populateAreas(
-      forcedArea ||
-      product?.area ||
-      "cardapio"
-    );
-
-    populateCategories(
-      product?.category || ""
-    );
-
-    $("#productPrice").value =
-      product?.price ?? "";
-
-    $("#productDiscount").value =
-      product?.discount_percent ?? 0;
-
-    $("#productSort").value =
-      product?.sort ?? 0;
-
-    $("#productGramatura").value =
-      product?.gramatura || "";
-
-    $("#productServeAte").value =
-      product?.serve_ate || "";
-
-    $("#productDescription").value =
-      product?.description || "";
-
-    $("#productAvailable").checked =
-      product?.available !== false;
-
-    $("#productFeatured").checked =
-      product?.featured === true;
-
-    $("#productAppointment").checked =
-      product?.appointment_required === true;
-
-    $("#newCategoryField")
-      ?.classList.add("hidden");
-
-    if ($("#newCategory")) {
-      $("#newCategory").value = "";
-    }
-
-    const photo =
-      product?.image_url ||
-      product?.image ||
-      "";
-
-    if (photo) {
-      $("#photoPreview").innerHTML =
-        `
-          <img
-            src="${esc(photo)}"
-            alt="Prévia"
-          >
-        `;
-    } else {
-      $("#photoPreview").textContent =
-        "📷";
-    }
-
-    $("#productModal")
-      ?.classList.add("open");
-  }
-
-  function closeProductModal() {
-    $("#productModal")
-      ?.classList.remove("open");
-
-    editingProductId = null;
-    selectedImageFile = null;
-
-    $("#productForm")?.reset();
-
-    if ($("#productAvailable")) {
-      $("#productAvailable").checked =
-        true;
-    }
-
-    if ($("#productDiscount")) {
-      $("#productDiscount").value = 0;
-    }
-
-    if ($("#productSort")) {
-      $("#productSort").value = 0;
-    }
-
-    if ($("#photoPreview")) {
-      $("#photoPreview").textContent =
-        "📷";
-    }
-
-    $("#newCategoryField")
-      ?.classList.add("hidden");
-  }
-
-  function populateCategories(selected = "") {
-    const select =
-      $("#productCategory");
-
-    if (!select) return;
-
-    const categories =
-      getCategories();
-
-    select.innerHTML = `
-      <option value="">
-        Sem categoria
-      </option>
-
-      ${categories
-        .map(
-          (category) =>
-            `
-              <option
-                value="${esc(category)}"
-              >
-                ${esc(category)}
-              </option>
-            `
-        )
-        .join("")}
-
-      <option value="__new__">
-        + Nova categoria
-      </option>
-    `;
-
-    /*
-      Se o produto já possuir uma categoria
-      personalizada que não esteja na lista,
-      adiciona temporariamente essa categoria
-      ao seletor.
-
-      As categorias bloqueadas nunca voltam.
-    */
-    if (
-      selected &&
-      !isBlockedCategory(selected) &&
-      !categories.some(
-        (category) =>
-          normalize(category) ===
-          normalize(selected)
-      )
-    ) {
-      addCategory(selected);
-
-      const option =
-        document.createElement("option");
-
-      option.value = selected;
-      option.textContent = selected;
-
-      const newOption =
-        select.querySelector(
-          'option[value="__new__"]'
-        );
-
-      if (newOption) {
-        select.insertBefore(
-          option,
-          newOption
-        );
-      } else {
-        select.appendChild(option);
-      }
-    }
-
-    /*
-      Se o produto antigo estiver usando
-      uma das categorias removidas,
-      não deixa ela aparecer novamente.
-    */
-    if (
-      selected &&
-      isBlockedCategory(selected)
-    ) {
-      select.value = "";
-      return;
-    }
-
-    select.value = selected || "";
-  }
-
-  /* =========================
-     PHOTO
-  ========================= */
-
-  function setupPhotoPicker() {
-    $("#productPhoto")
-      ?.addEventListener(
-        "change",
-        (event) => {
-          const file =
-            event.target.files?.[0];
-
-          if (!file) return;
-
-          if (
-            !file.type.startsWith(
-              "image/"
-            )
-          ) {
-            toast(
-              "Escolha um arquivo de imagem.",
-              "error"
-            );
-
-            event.target.value =
-              "";
-
-            return;
-          }
-
-          selectedImageFile =
-            file;
-
-          const url =
-            URL.createObjectURL(file);
-
-          $("#photoPreview").innerHTML =
-            `
-              <img
-                src="${url}"
-                alt="Prévia da imagem"
-              >
-            `;
-        }
-      );
-  }
-
-  /* =========================
-     STORAGE
-  ========================= */
-
-  async function uploadProductImage(file) {
-    if (!file) return null;
-
-    const safeName =
-      slug(
-        file.name.replace(
-          /\.[^/.]+$/,
-          ""
-        )
-      ) || "produto";
-
-    const extension =
-      file.name
-        .split(".")
-        .pop()
-        ?.toLowerCase() ||
-      "jpg";
-
-    const path =
-      `products/${Date.now()}-${safeName}.${extension}`;
-
-    const {
-      data,
-      error
-    } = await client
-      .storage
-      .from("media")
-      .upload(
-        path,
-        file,
-        {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: file.type
-        }
-      );
-
-    if (error) {
-      throw error;
-    }
-
-    const publicResult =
-      client
-        .storage
-        .from("media")
-        .getPublicUrl(
-          data.path
-        );
-
-    return publicResult.data
-      .publicUrl;
-  }
-
-  /* =========================
-     SAVE PRODUCT
-  ========================= */
-
-  async function saveProduct(event) {
-    event.preventDefault();
-
-    /*
-      Guardamos isso ANTES de fechar o modal.
-      closeProductModal() limpa editingProductId.
-    */
-    const wasEditing =
-      Boolean(editingProductId);
-
-    const productId =
-      editingProductId;
-
-    const name =
-      $("#productName")
-        .value
-        .trim();
-
-    const area =
-      normalizeArea(
-        $("#productArea").value
-      );
-
-    let category =
-      $("#productCategory").value;
-
-    /*
-      Se o administrador escolher
-      "+ Nova categoria", usa o campo
-      de nova categoria.
-    */
-    if (category === "__new__") {
-      category =
-        $("#newCategory")
-          ?.value
-          ?.trim() || "";
-
-      if (!category) {
-        toast(
-          "Digite o nome da nova categoria.",
-          "error"
-        );
-
-        return;
-      }
-
-      if (isBlockedCategory(category)) {
-        toast(
-          "Essa categoria não está disponível.",
-          "error"
-        );
-
-        return;
-      }
-
-      addCategory(category);
-    }
-
-    const price =
-      Number(
-        $("#productPrice").value
-      );
-
-    const discount =
-      Math.min(
-        100,
-        Math.max(
-          0,
-          Number(
-            $("#productDiscount")
-              .value || 0
-          )
-        )
-      );
-
-    const sort =
-      Number(
-        $("#productSort")
-          .value || 0
-      );
-
-    const gramatura =
-      $("#productGramatura")
-        .value
-        .trim();
-
-    const serveAte =
-      $("#productServeAte")
-        .value
-        .trim();
-
-    const description =
-      $("#productDescription")
-        .value
-        .trim();
-
-    const available =
-      $("#productAvailable")
-        .checked;
-
-    const featured =
-      $("#productFeatured")
-        .checked;
-
-    const appointmentRequired =
-      $("#productAppointment")
-        .checked;
-
-    if (!name) {
-      toast(
-        "Informe o nome do produto.",
-        "error"
-      );
-
-      return;
-    }
-
-    if (
-      !Number.isFinite(price) ||
-      price < 0
-    ) {
-      toast(
-        "Informe um preço válido.",
-        "error"
-      );
-
-      return;
-    }
-
-    if (
-      category &&
-      isBlockedCategory(category)
-    ) {
-      toast(
-        "Essa categoria não está disponível.",
-        "error"
-      );
-
-      return;
-    }
-
-    const submit =
-      $('#productForm button[type="submit"]');
-
-    if (submit) {
-      submit.disabled =
-        true;
-
-      submit.textContent =
-        "Salvando...";
-    }
-
-    try {
-      let imageUrl = null;
-
-      if (selectedImageFile) {
-        toast(
-          "Enviando foto..."
-        );
-
-        imageUrl =
-          await uploadProductImage(
-            selectedImageFile
-          );
-      }
-
-      const payload = {
-        name,
-        area,
-        category:
-          category || null,
-        price,
-        discount_percent:
-          discount,
-        gramatura:
-          gramatura || null,
-        serve_ate:
-          serveAte || null,
-        description:
-          description || null,
-        available,
-        featured,
-        appointment_required:
-          appointmentRequired,
-        sort
-      };
-
-      if (imageUrl) {
-        payload.image_url =
-          imageUrl;
-      }
-
-      let result;
-
-      if (wasEditing) {
-        result =
-          await client
-            .from("products")
-            .update(payload)
-            .eq(
-              "id",
-              productId
-            );
-      } else {
-        result =
-          await client
-            .from("products")
-            .insert(payload);
-      }
-
-      if (result.error) {
-        throw result.error;
-      }
-
-      if (category) {
-        addCategory(category);
-      }
-
-      await saveSite();
-
-      closeProductModal();
-
-      await loadData();
-
-      renderStats();
-      renderProducts();
-
-      toast(
-        wasEditing
-          ? "Produto atualizado."
-          : "Produto criado.",
-        "success"
-      );
-
-    } catch (error) {
-      console.error(error);
-
-      toast(
-        "Erro ao salvar produto: " +
-        error.message,
-        "error"
-      );
-
-    } finally {
-      if (submit) {
-        submit.disabled =
-          false;
-
-        submit.textContent =
-          "Salvar produto";
-      }
-    }
-  }
-
-  /* =========================
-     DELETE PRODUCT
-  ========================= */
-
-  async function deleteProduct(id) {
-    const product =
-      S.products.find(
-        (item) =>
-          String(item.id) ===
-          String(id)
-      );
-
-    if (!product) return;
-
-    const confirmed =
-      window.confirm(
-        `Excluir o produto "${product.name}"?`
-      );
-
-    if (!confirmed) return;
-
-    const {
-      error
-    } = await client
-      .from("products")
-      .delete()
-      .eq("id", id);
-
-    if (error) {
-      console.error(error);
-
-      toast(
-        "Erro ao excluir: " +
-        error.message,
-        "error"
-      );
-
-      return;
-    }
-
-    await loadData();
-
-    renderStats();
-    renderProducts();
-
-    toast(
-      "Produto excluído.",
-      "success"
-    );
-  }
-
-  /* =========================
-     ORDERS
-  ========================= */
-
-  async function renderOrders() {
-    $("#tabContent").innerHTML = `
-      <div class="section">
-
-        <div class="section-header">
-
-          <div>
-            <h3>Pedidos</h3>
-
-            <p>
-              Pedidos recebidos pelo site.
-            </p>
-          </div>
-
-          <button
-            class="btn btn-secondary btn-small"
-            id="reloadOrders"
-            type="button"
-          >
-            Atualizar
-          </button>
-
-        </div>
-
-        <div
-          class="section-body"
-          id="ordersBody"
+        <button
+          class="close-btn"
+          type="button"
+          data-close-modal="productModal"
         >
-          <div class="empty">
-            Carregando pedidos...
-          </div>
-        </div>
+          ×
+        </button>
 
       </div>
-    `;
 
-    $("#reloadOrders")
-      ?.addEventListener(
-        "click",
-        renderOrders
-      );
+      <form id="productForm">
 
-    const {
-      data,
-      error
-    } = await client
-      .from("orders")
-      .select("*")
-      .order("created_at", {
-        ascending: false
-      });
+        <div class="modal-body">
 
-    if (error) {
-      $("#ordersBody").innerHTML =
-        `
-          <div class="empty">
-            ${esc(error.message)}
-          </div>
-        `;
+          <div class="field">
 
-      return;
-    }
-
-    const orders =
-      data || [];
-
-    if (!orders.length) {
-      $("#ordersBody").innerHTML =
-        `
-          <div class="empty">
-
-            <div class="empty-icon">
-              🛍️
-            </div>
-
-            <p>
-              Nenhum pedido encontrado.
-            </p>
-
-          </div>
-        `;
-
-      return;
-    }
-
-    $("#ordersBody").innerHTML =
-      `
-        <div class="table-wrap">
-
-          <table class="data-table">
-
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Cliente</th>
-                <th>Entrega</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-
-            <tbody>
-
-              ${orders
-                .map(
-                  (order) =>
-                    orderRow(order)
-                )
-                .join("")}
-
-            </tbody>
-
-          </table>
-
-        </div>
-      `;
-
-    $$("[data-order-status]")
-      .forEach((select) => {
-        select.addEventListener(
-          "change",
-          () =>
-            updateOrderStatus(
-              select.dataset
-                .orderStatus,
-              select.value
-            )
-        );
-      });
-
-    $$("[data-print-order]")
-      .forEach((button) => {
-        button.addEventListener(
-          "click",
-          () =>
-            printOrder(
-              orders.find(
-                (order) =>
-                  String(
-                    order.id
-                  ) ===
-                  String(
-                    button.dataset
-                      .printOrder
-                  )
-              )
-            )
-        );
-      });
-  }
-
-  function orderRow(order) {
-    const date =
-      order.created_at
-        ? new Date(
-            order.created_at
-          ).toLocaleString(
-            "pt-BR"
-          )
-        : "-";
-
-    const customer =
-      firstValue(
-        order.customer_name,
-        order.customer,
-        order.name,
-        order.client_name
-      ) || "-";
-
-    const phone =
-      firstValue(
-        order.phone,
-        order.telephone,
-        order.whatsapp,
-        order.customer_phone
-      );
-
-    const receiving =
-      firstValue(
-        order.receiving,
-        order.delivery_method,
-        order.method
-      ) || "-";
-
-    const total =
-      Number(
-        order.total || 0
-      );
-
-    const status =
-      order.status || "novo";
-
-    return `
-      <tr>
-
-        <td>
-          ${esc(date)}
-        </td>
-
-        <td>
-
-          <strong>
-            ${esc(customer)}
-          </strong>
-
-          ${
-            phone
-              ? `
-                <br>
-                <small>
-                  ${esc(phone)}
-                </small>
-              `
-              : ""
-          }
-
-        </td>
-
-        <td>
-          ${esc(receiving)}
-        </td>
-
-        <td>
-          <strong>
-            ${money(total)}
-          </strong>
-        </td>
-
-        <td>
-
-          <select
-            class="field-input"
-            data-order-status="${esc(
-              order.id
-            )}"
-            style="
-              padding:8px;
-              border:1px solid #e7d8c6;
-              border-radius:9px;
-              background:#fff;
-            "
-          >
-
-            ${[
-              "novo",
-              "em preparo",
-              "pronto",
-              "concluído",
-              "cancelado"
-            ]
-              .map(
-                (item) =>
-                  `
-                    <option
-                      value="${esc(item)}"
-                      ${
-                        normalize(
-                          status
-                        ) ===
-                        normalize(
-                          item
-                        )
-                          ? "selected"
-                          : ""
-                      }
-                    >
-                      ${esc(item)}
-                    </option>
-                  `
-              )
-              .join("")}
-
-          </select>
-
-        </td>
-
-        <td>
-
-          <button
-            class="btn btn-secondary btn-small"
-            data-print-order="${esc(
-              order.id
-            )}"
-            type="button"
-          >
-            Imprimir
-          </button>
-
-        </td>
-
-      </tr>
-    `;
-  }
-
-  async function updateOrderStatus(
-    id,
-    status
-  ) {
-    const {
-      error
-    } = await client
-      .from("orders")
-      .update({
-        status
-      })
-      .eq(
-        "id",
-        id
-      );
-
-    if (error) {
-      toast(
-        "Erro ao atualizar pedido: " +
-        error.message,
-        "error"
-      );
-
-      return;
-    }
-
-    toast(
-      "Status atualizado.",
-      "success"
-    );
-  }
-
-  /* =========================
-     CUSTOM CAKES
-  ========================= */
-
-  function cakeSources(cake) {
-    const sources = [
-      cake,
-      cake?.data,
-      cake?.form,
-      cake?.form_data,
-      cake?.customer_data,
-      cake?.customer,
-      cake?.details,
-      cake?.payload,
-      cake?.request
-    ];
-
-    return sources.filter(
-      (source) =>
-        source &&
-        typeof source === "object" &&
-        !Array.isArray(source)
-    );
-  }
-
-  function cakeValue(cake, keys) {
-    const sources =
-      cakeSources(cake);
-
-    for (const source of sources) {
-      for (const key of keys) {
-        const value =
-          source?.[key];
-
-        if (
-          value !== undefined &&
-          value !== null &&
-          typeof value !== "object" &&
-          String(value).trim() !== ""
-        ) {
-          return value;
-        }
-      }
-    }
-
-    return "";
-  }
-
-  function cakeText(value) {
-    if (
-      value === undefined ||
-      value === null
-    ) {
-      return "";
-    }
-
-    if (
-      typeof value === "string" ||
-      typeof value === "number" ||
-      typeof value === "boolean"
-    ) {
-      return String(value);
-    }
-
-    try {
-      return JSON.stringify(
-        value,
-        null,
-        2
-      );
-    } catch {
-      return String(value);
-    }
-  }
-
-  async function renderCakes() {
-    $("#tabContent").innerHTML = `
-      <div class="section">
-
-        <div class="section-header">
-
-          <div>
-            <h3>
-              Bolos personalizados
-            </h3>
-
-            <p>
-              Solicitações de encomendas personalizadas.
-            </p>
-          </div>
-
-          <button
-            class="btn btn-secondary btn-small"
-            id="reloadCakes"
-            type="button"
-          >
-            Atualizar
-          </button>
-
-        </div>
-
-        <div
-          class="section-body"
-          id="cakesBody"
-        >
-          <div class="empty">
-            Carregando...
-          </div>
-        </div>
-
-      </div>
-    `;
-
-    $("#reloadCakes")
-      ?.addEventListener(
-        "click",
-        renderCakes
-      );
-
-    const {
-      data,
-      error
-    } = await client
-      .from("custom_cakes")
-      .select("*")
-      .order("created_at", {
-        ascending: false
-      });
-
-    if (error) {
-      $("#cakesBody").innerHTML =
-        `
-          <div class="empty">
-            ${esc(error.message)}
-          </div>
-        `;
-
-      return;
-    }
-
-    const cakes =
-      data || [];
-
-    if (!cakes.length) {
-      $("#cakesBody").innerHTML =
-        `
-          <div class="empty">
-
-            <div class="empty-icon">
-              🎂
-            </div>
-
-            <p>
-              Nenhuma solicitação encontrada.
-            </p>
-
-          </div>
-        `;
-
-      return;
-    }
-
-    $("#cakesBody").innerHTML =
-      `
-        <div class="cake-list">
-
-          ${cakes
-            .map(
-              (cake) =>
-                cakeCard(cake)
-            )
-            .join("")}
-
-        </div>
-      `;
-
-    $$("[data-cake-status]")
-      .forEach((select) => {
-        select.addEventListener(
-          "change",
-          () =>
-            updateCakeStatus(
-              select.dataset
-                .cakeStatus,
-              select.value
-            )
-        );
-      });
-
-    $$("[data-print-cake]")
-      .forEach((button) => {
-        button.addEventListener(
-          "click",
-          () =>
-            printCake(
-              cakes.find(
-                (cake) =>
-                  String(
-                    cake.id
-                  ) ===
-                  String(
-                    button.dataset
-                      .printCake
-                  )
-              )
-            )
-        );
-      });
-  }
-
-  function cakeCard(cake) {
-    const customer =
-      cakeText(
-        cakeValue(cake, [
-          "customer_name",
-          "client_name",
-          "full_name",
-          "nome_completo",
-          "customer",
-          "client",
-          "name",
-          "nome"
-        ])
-      ) || "-";
-
-    const phone =
-      cakeText(
-        cakeValue(cake, [
-          "phone",
-          "telephone",
-          "whatsapp",
-          "customer_phone",
-          "client_phone",
-          "phone_number",
-          "telefone"
-        ])
-      ) || "-";
-
-    const email =
-      cakeText(
-        cakeValue(cake, [
-          "email",
-          "customer_email",
-          "client_email",
-          "e_mail"
-        ])
-      );
-
-    const event =
-      cakeText(
-        cakeValue(cake, [
-          "event",
-          "event_type",
-          "occasion",
-          "event_name",
-          "evento",
-          "tipo_evento"
-        ])
-      ) || "-";
-
-    const eventDate =
-      cakeText(
-        cakeValue(cake, [
-          "event_date",
-          "delivery_date",
-          "date",
-          "data_evento",
-          "data",
-          "date_event"
-        ])
-      ) || "-";
-
-    const eventTime =
-      cakeText(
-        cakeValue(cake, [
-          "event_time",
-          "delivery_time",
-          "time",
-          "horario",
-          "hora"
-        ])
-      );
-
-    const guests =
-      cakeText(
-        cakeValue(cake, [
-          "guests",
-          "people",
-          "people_count",
-          "quantity_people",
-          "number_of_people",
-          "servings",
-          "serves",
-          "serve_ate",
-          "pessoas"
-        ])
-      );
-
-    const flavor =
-      cakeText(
-        cakeValue(cake, [
-          "flavor",
-          "sabor",
-          "cake_flavor",
-          "filling",
-          "cake_filling",
-          "recheio",
-          "recheios"
-        ])
-      );
-
-    const dough =
-      cakeText(
-        cakeValue(cake, [
-          "dough",
-          "cake_dough",
-          "massa",
-          "mass"
-        ])
-      );
-
-    const size =
-      cakeText(
-        cakeValue(cake, [
-          "size",
-          "tamanho",
-          "weight",
-          "peso",
-          "gramatura",
-          "cake_size"
-        ])
-      );
-
-    const theme =
-      cakeText(
-        cakeValue(cake, [
-          "theme",
-          "tema",
-          "decoration",
-          "decoracao",
-          "decoração",
-          "design"
-        ])
-      );
-
-    const description =
-      cakeText(
-        cakeValue(cake, [
-          "description",
-          "details",
-          "request",
-          "pedido",
-          "message",
-          "mensagem",
-          "personalization",
-          "personalizacao"
-        ])
-      );
-
-    const notes =
-      cakeText(
-        cakeValue(cake, [
-          "notes",
-          "observations",
-          "observation",
-          "observacao",
-          "observações",
-          "obs"
-        ])
-      );
-
-    const address =
-      cakeText(
-        cakeValue(cake, [
-          "address",
-          "delivery_address",
-          "endereco",
-          "endereço"
-        ])
-      );
-
-    const payment =
-      cakeText(
-        cakeValue(cake, [
-          "payment",
-          "payment_method",
-          "pagamento",
-          "forma_pagamento"
-        ])
-      );
-
-    const total =
-      cakeValue(cake, [
-        "total",
-        "price",
-        "valor",
-        "budget",
-        "orcamento",
-        "orçamento"
-      ]);
-
-    const createdAt =
-      cake.created_at
-        ? formatDate(
-            cake.created_at
-          )
-        : "-";
-
-    const status =
-      cake.status || "novo";
-
-    const statuses = [
-      "novo",
-      "em contato",
-      "orçamento enviado",
-      "concluído",
-      "cancelado"
-    ];
-
-    const detail = (
-      label,
-      value
-    ) => {
-      if (
-        value === undefined ||
-        value === null ||
-        String(value).trim() === ""
-      ) {
-        return "";
-      }
-
-      return `
-        <div class="cake-detail">
-
-          <span class="cake-detail-label">
-            ${esc(label)}
-          </span>
-
-          <strong class="cake-detail-value">
-            ${esc(value)}
-          </strong>
-
-        </div>
-      `;
-    };
-
-    return `
-      <div class="cake-card">
-
-        <div class="cake-card-header">
-
-          <div>
-
-            <h4>
-              ${esc(customer)}
-            </h4>
-
-            <span>
-              Solicitação em
-              ${esc(createdAt)}
-            </span>
-
-          </div>
-
-          <select
-            class="field-input"
-            data-cake-status="${esc(
-              cake.id
-            )}"
-            style="
-              min-width:180px;
-              padding:9px;
-              border:1px solid #e7d8c6;
-              border-radius:9px;
-              background:#fff;
-            "
-          >
-
-            ${statuses
-              .map(
-                (item) =>
-                  `
-                    <option
-                      value="${esc(item)}"
-                      ${
-                        normalize(
-                          status
-                        ) ===
-                        normalize(
-                          item
-                        )
-                          ? "selected"
-                          : ""
-                      }
-                    >
-                      ${esc(item)}
-                    </option>
-                  `
-              )
-              .join("")}
-
-          </select>
-
-        </div>
-
-        <div class="cake-client-grid">
-
-          ${detail(
-            "Cliente",
-            customer
-          )}
-
-          ${detail(
-            "Telefone / WhatsApp",
-            phone
-          )}
-
-          ${
-            email
-              ? detail(
-                  "E-mail",
-                  email
-                )
-              : ""
-          }
-
-          ${detail(
-            "Evento",
-            event
-          )}
-
-          ${detail(
-            "Data desejada",
-            eventDate
-          )}
-
-          ${
-            eventTime
-              ? detail(
-                  "Horário",
-                  eventTime
-                )
-              : ""
-          }
-
-          ${
-            guests
-              ? detail(
-                  "Quantidade de pessoas",
-                  guests
-                )
-              : ""
-          }
-
-          ${
-            size
-              ? detail(
-                  "Tamanho / peso",
-                  size
-                )
-              : ""
-          }
-
-          ${
-            dough
-              ? detail(
-                  "Massa",
-                  dough
-                )
-              : ""
-          }
-
-          ${
-            flavor
-              ? detail(
-                  "Recheio / sabor",
-                  flavor
-                )
-              : ""
-          }
-
-          ${
-            theme
-              ? detail(
-                  "Tema / decoração",
-                  theme
-                )
-              : ""
-          }
-
-          ${
-            address
-              ? detail(
-                  "Endereço",
-                  address
-                )
-              : ""
-          }
-
-          ${
-            payment
-              ? detail(
-                  "Pagamento",
-                  payment
-                )
-              : ""
-          }
-
-          ${
-            total !== ""
-              ? detail(
-                  "Valor / orçamento",
-                  money(total)
-                )
-              : ""
-          }
-
-        </div>
-
-        ${
-          description
-            ? `
-              <div class="cake-description">
-
-                <span class="cake-detail-label">
-                  Detalhes da encomenda
-                </span>
-
-                <div>
-                  ${esc(description)}
-                </div>
-
-              </div>
-            `
-            : ""
-        }
-
-        ${
-          notes
-            ? `
-              <div class="cake-description">
-
-                <span class="cake-detail-label">
-                  Observações
-                </span>
-
-                <div>
-                  ${esc(notes)}
-                </div>
-
-              </div>
-            `
-            : ""
-        }
-
-        <div class="cake-card-footer">
-
-          <button
-            class="btn btn-secondary btn-small"
-            data-print-cake="${esc(
-              cake.id
-            )}"
-            type="button"
-          >
-            Imprimir comanda
-          </button>
-
-        </div>
-
-      </div>
-    `;
-  }
-
-  async function updateCakeStatus(
-    id,
-    status
-  ) {
-    const {
-      error
-    } = await client
-      .from("custom_cakes")
-      .update({
-        status
-      })
-      .eq(
-        "id",
-        id
-      );
-
-    if (error) {
-      toast(
-        "Erro ao atualizar bolo: " +
-        error.message,
-        "error"
-      );
-
-      return;
-    }
-
-    toast(
-      "Status atualizado.",
-      "success"
-    );
-  }
-
-  /* =========================
-     CONTENT
-  ========================= */
-
-  function renderContent() {
-    const about =
-      S.about || {};
-
-    $("#tabContent").innerHTML =
-      `
-        <div class="section">
-
-          <div class="section-header">
-
-            <div>
-              <h3>
-                Conteúdos do site
-              </h3>
-
-              <p>
-                Informações institucionais e contato.
-              </p>
-            </div>
-
-          </div>
-
-          <div class="section-body">
-
-            <div class="setting-card">
-
-              <h4>Identidade</h4>
-
-              <div class="grid-2">
-
-                <div class="field">
-
-                  <label>
-                    Nome
-                  </label>
-
-                  <input
-                    id="contentName"
-                    value="${esc(
-                      about.name ||
-                      ""
-                    )}"
-                  >
-
-                </div>
-
-                <div class="field">
-
-                  <label>
-                    Título
-                  </label>
-
-                  <input
-                    id="contentTitle"
-                    value="${esc(
-                      about.title ||
-                      ""
-                    )}"
-                  >
-
-                </div>
-
-              </div>
-
-              <div class="field">
-
-                <label>
-                  Frase
-                </label>
-
-                <input
-                  id="contentQuote"
-                  value="${esc(
-                    about.quote ||
-                    ""
-                  )}"
-                >
-
-              </div>
-
-              <div class="field">
-
-                <label>
-                  Texto sobre a confeitaria
-                </label>
-
-                <textarea id="contentText">${esc(
-                  about.text ||
-                  ""
-                )}</textarea>
-
-              </div>
-
-            </div>
-
-            <div class="setting-card">
-
-              <h4>Contato</h4>
-
-              <div class="grid-2">
-
-                <div class="field">
-
-                  <label>
-                    Instagram
-                  </label>
-
-                  <input
-                    id="contentInstagram"
-                    value="${esc(
-                      S.instagram ||
-                      ""
-                    )}"
-                    placeholder="@martinsconfeitaria"
-                  >
-
-                </div>
-
-                <div class="field">
-
-                  <label>
-                    WhatsApp
-                  </label>
-
-                  <input
-                    id="contentWhatsapp"
-                    value="${esc(
-                      S.whatsapp ||
-                      ""
-                    )}"
-                    placeholder="5585999999999"
-                  >
-
-                </div>
-
-              </div>
-
-            </div>
-
-            <button
-              class="btn btn-primary"
-              id="saveContent"
-              type="button"
-            >
-              Salvar conteúdos
-            </button>
-
-          </div>
-
-        </div>
-      `;
-
-    $("#saveContent")
-      ?.addEventListener(
-        "click",
-        saveContent
-      );
-  }
-
-  async function saveContent() {
-    S.about = {
-      ...S.about,
-
-      name:
-        $("#contentName")
-          .value
-          .trim(),
-
-      title:
-        $("#contentTitle")
-          .value
-          .trim(),
-
-      quote:
-        $("#contentQuote")
-          .value
-          .trim(),
-
-      text:
-        $("#contentText")
-          .value
-          .trim()
-    };
-
-    S.instagram =
-      $("#contentInstagram")
-        .value
-        .trim();
-
-    S.whatsapp =
-      $("#contentWhatsapp")
-        .value
-        .trim();
-
-    const saved =
-      await saveSite();
-
-    if (saved) {
-      toast(
-        "Conteúdos salvos.",
-        "success"
-      );
-    }
-  }
-
-  /* =========================
-     HOURS
-  ========================= */
-
-  function renderHours() {
-    const days = [
-      ["monday", "Segunda-feira"],
-      ["tuesday", "Terça-feira"],
-      ["wednesday", "Quarta-feira"],
-      ["thursday", "Quinta-feira"],
-      ["friday", "Sexta-feira"],
-      ["saturday", "Sábado"],
-      ["sunday", "Domingo"]
-    ];
-
-    const hours =
-      S.hours || {};
-
-    $("#tabContent").innerHTML =
-      `
-        <div class="section">
-
-          <div class="section-header">
-
-            <div>
-
-              <h3>
-                Horários
-              </h3>
-
-              <p>
-                Configure os horários exibidos no site.
-              </p>
-
-            </div>
-
-          </div>
-
-          <div class="section-body">
-
-            ${days
-              .map(
-                ([key, label]) =>
-                  `
-                    <div class="setting-card">
-
-                      <div class="grid-3">
-
-                        <div>
-                          <strong>
-                            ${label}
-                          </strong>
-                        </div>
-
-                        <div class="field">
-
-                          <label>
-                            Abertura
-                          </label>
-
-                          <input
-                            type="time"
-                            id="open_${key}"
-                            value="${esc(
-                              hours[key]
-                                ?.open ||
-                              ""
-                            )}"
-                          >
-
-                        </div>
-
-                        <div class="field">
-
-                          <label>
-                            Fechamento
-                          </label>
-
-                          <input
-                            type="time"
-                            id="close_${key}"
-                            value="${esc(
-                              hours[key]
-                                ?.close ||
-                              ""
-                            )}"
-                          >
-
-                        </div>
-
-                      </div>
-
-                    </div>
-                  `
-              )
-              .join("")}
-
-            <button
-              class="btn btn-primary"
-              id="saveHours"
-              type="button"
-            >
-              Salvar horários
-            </button>
-
-          </div>
-
-        </div>
-      `;
-
-    $("#saveHours")
-      ?.addEventListener(
-        "click",
-        saveHours
-      );
-  }
-
-  async function saveHours() {
-    const days = [
-      "monday",
-      "tuesday",
-      "wednesday",
-      "thursday",
-      "friday",
-      "saturday",
-      "sunday"
-    ];
-
-    S.hours =
-      S.hours || {};
-
-    for (const day of days) {
-      S.hours[day] = {
-        open:
-          $(`#open_${day}`)
-            ?.value || "",
-
-        close:
-          $(`#close_${day}`)
-            ?.value || ""
-      };
-    }
-
-    const saved =
-      await saveSite();
-
-    if (saved) {
-      toast(
-        "Horários salvos.",
-        "success"
-      );
-    }
-  }
-
-  /* =========================
-     RULES
-  ========================= */
-
-  function renderRules() {
-    const rules =
-      S.rules || {};
-
-    $("#tabContent").innerHTML =
-      `
-        <div class="section">
-
-          <div class="section-header">
-
-            <div>
-
-              <h3>
-                Regras do atendimento
-              </h3>
-
-              <p>
-                Informações utilizadas para orientar os clientes.
-              </p>
-
-            </div>
-
-          </div>
-
-          <div class="section-body">
-
-            <div class="setting-card">
-
-              <h4>
-                Delivery
-              </h4>
-
-              <div class="field">
-
-                <label>
-                  Regra de entrega
-                </label>
-
-                <textarea
-                  id="ruleDelivery"
-                >${esc(
-                  rules.delivery ||
-                  ""
-                )}</textarea>
-
-              </div>
-
-            </div>
-
-            <div class="setting-card">
-
-              <h4>
-                Encomendas
-              </h4>
-
-              <div class="field">
-
-                <label>
-                  Regra de encomendas
-                </label>
-
-                <textarea
-                  id="ruleOrders"
-                >${esc(
-                  rules.orders ||
-                  ""
-                )}</textarea>
-
-              </div>
-
-            </div>
-
-            <div class="setting-card">
-
-              <h4>
-                Pagamento
-              </h4>
-
-              <div class="field">
-
-                <label>
-                  Formas e regras de pagamento
-                </label>
-
-                <textarea
-                  id="rulePayment"
-                >${esc(
-                  rules.payment ||
-                  ""
-                )}</textarea>
-
-              </div>
-
-            </div>
-
-            <div class="setting-card">
-
-              <h4>
-                Observações gerais
-              </h4>
-
-              <div class="field">
-
-                <label>
-                  Informações adicionais
-                </label>
-
-                <textarea
-                  id="ruleGeneral"
-                >${esc(
-                  rules.general ||
-                  ""
-                )}</textarea>
-
-              </div>
-
-            </div>
-
-            <button
-              class="btn btn-primary"
-              id="saveRules"
-              type="button"
-            >
-              Salvar regras
-            </button>
-
-          </div>
-
-        </div>
-      `;
-
-    $("#saveRules")
-      ?.addEventListener(
-        "click",
-        saveRules
-      );
-  }
-
-  async function saveRules() {
-    S.rules = {
-      ...S.rules,
-
-      delivery:
-        $("#ruleDelivery")
-          .value
-          .trim(),
-
-      orders:
-        $("#ruleOrders")
-          .value
-          .trim(),
-
-      payment:
-        $("#rulePayment")
-          .value
-          .trim(),
-
-      general:
-        $("#ruleGeneral")
-          .value
-          .trim()
-    };
-
-    const saved =
-      await saveSite();
-
-    if (saved) {
-      toast(
-        "Regras salvas.",
-        "success"
-      );
-    }
-  }
-
-  /* =========================
-     MEDIA
-  ========================= */
-
-  async function renderMedia() {
-    $("#tabContent").innerHTML =
-      `
-        <div class="section">
-
-          <div class="section-header">
-
-            <div>
-
-              <h3>
-                Mídia
-              </h3>
-
-              <p>
-                Arquivos armazenados no bucket media.
-              </p>
-
-            </div>
-
-          </div>
-
-          <div class="section-body">
+            <label>Foto do produto</label>
 
             <div class="photo-picker">
 
+              <div class="photo-preview" id="photoPreview">
+                📷
+              </div>
+
               <label
-                for="mediaUpload"
-                class="btn btn-primary"
+                for="productPhoto"
+                class="btn btn-secondary"
               >
-                + Enviar arquivo
+                Escolher foto
               </label>
 
               <input
-                id="mediaUpload"
                 class="file-input"
+                id="productPhoto"
                 type="file"
-                accept="image/*,video/*"
+                accept="image/*"
               >
 
               <small>
-                Fotos, imagens e outros arquivos de mídia.
+                Você pode escolher uma foto diretamente do celular,
+                computador ou galeria.
               </small>
 
             </div>
 
-            <div
-              id="mediaList"
-              style="margin-top:20px;"
+          </div>
+
+
+          <div class="field">
+
+            <label for="productName">
+              Nome do produto *
+            </label>
+
+            <input
+              id="productName"
+              name="name"
+              type="text"
+              placeholder="Ex.: Bolo de chocolate"
+              required
             >
-              <div class="empty">
-                Carregando mídia...
-              </div>
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="productArea">
+              Classificação / área *
+            </label>
+
+            <select
+              id="productArea"
+              name="area"
+              required
+            >
+              <option value="cardapio">Delivery</option>
+              <option value="pronta-entrega">
+                Pronta entrega
+              </option>
+              <option value="encomendas">
+                Encomendas
+              </option>
+            </select>
+
+          </div>
+
+
+          <div class="grid-3">
+
+            <div class="field">
+
+              <label for="productPrice">
+                Preço *
+              </label>
+
+              <input
+                id="productPrice"
+                name="price"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0,00"
+                required
+              >
+
+            </div>
+
+
+            <div class="field">
+
+              <label for="productDiscount">
+                Desconto (%)
+              </label>
+
+              <input
+                id="productDiscount"
+                name="discount_percent"
+                type="number"
+                min="0"
+                max="100"
+                step="1"
+                value="0"
+              >
+
+            </div>
+
+
+            <div class="field">
+
+              <label for="productSort">
+                Ordem
+              </label>
+
+              <input
+                id="productSort"
+                name="sort"
+                type="number"
+                step="1"
+                value="0"
+              >
+
+            </div>
+
+          </div>
+
+
+          <div class="grid-2">
+
+            <div class="field">
+
+              <label for="productGramatura">
+                Gramatura
+              </label>
+
+              <input
+                id="productGramatura"
+                name="gramatura"
+                type="text"
+                placeholder="Ex.: 1 kg"
+              >
+
+            </div>
+
+
+            <div class="field">
+
+              <label for="productServeAte">
+                Serve até quantas pessoas
+              </label>
+
+              <input
+                id="productServeAte"
+                name="serve_ate"
+                type="text"
+                placeholder="Ex.: 10 pessoas"
+              >
+
+            </div>
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="productDescription">
+              Descrição
+            </label>
+
+            <textarea
+              id="productDescription"
+              name="description"
+              placeholder="Descreva o produto..."
+            ></textarea>
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Configurações
+            </label>
+
+            <div class="check-grid">
+
+              <label class="check">
+                <input
+                  id="productAvailable"
+                  type="checkbox"
+                  checked
+                >
+                Produto disponível
+              </label>
+
+              <label class="check">
+                <input
+                  id="productFeatured"
+                  type="checkbox"
+                >
+                Produto em destaque
+              </label>
+
+              <label class="check">
+                <input
+                  id="productAppointment"
+                  type="checkbox"
+                >
+                Agendamento obrigatório
+              </label>
+
             </div>
 
           </div>
 
         </div>
-      `;
 
-    $("#mediaUpload")
-      ?.addEventListener(
-        "change",
-        uploadMedia
-      );
 
-    await loadMedia();
-  }
+        <div class="modal-footer">
 
-  async function loadMedia() {
-    const container =
-      $("#mediaList");
+          <button
+            class="btn btn-secondary"
+            type="button"
+            data-close-modal="productModal"
+          >
+            Cancelar
+          </button>
 
-    if (!container) return;
-
-    const {
-      data,
-      error
-    } = await client
-      .storage
-      .from("media")
-      .list(
-        "",
-        {
-          limit: 100,
-          sortBy: {
-            column:
-              "created_at",
-            order:
-              "desc"
-          }
-        }
-      );
-
-    if (error) {
-      container.innerHTML =
-        `
-          <div class="empty">
-            ${esc(
-              error.message
-            )}
-          </div>
-        `;
-
-      return;
-    }
-
-    const files =
-      (data || [])
-        .filter(
-          (file) =>
-            file.name &&
-            file.name !==
-              ".emptyFolderPlaceholder"
-        );
-
-    if (!files.length) {
-      container.innerHTML =
-        `
-          <div class="empty">
-            Nenhum arquivo encontrado.
-          </div>
-        `;
-
-      return;
-    }
-
-    container.innerHTML =
-      `
-        <div
-          style="
-            display:grid;
-            grid-template-columns:
-              repeat(
-                auto-fill,
-                minmax(180px,1fr)
-              );
-            gap:14px;
-          "
-        >
-
-          ${files
-            .map(
-              (file) =>
-                `
-                  <div
-                    class="setting-card"
-                    style="margin:0;"
-                  >
-
-                    <div
-                      style="
-                        height:150px;
-                        border-radius:12px;
-                        overflow:hidden;
-                        background:#f2e8da;
-                        display:flex;
-                        align-items:center;
-                        justify-content:center;
-                        margin-bottom:10px;
-                      "
-                    >
-                      🖼️
-                    </div>
-
-                    <strong
-                      style="
-                        display:block;
-                        font-size:12px;
-                        word-break:break-word;
-                      "
-                    >
-                      ${esc(
-                        file.name
-                      )}
-                    </strong>
-
-                  </div>
-                `
-            )
-            .join("")}
+          <button
+            class="btn btn-primary"
+            type="submit"
+          >
+            Salvar produto
+          </button>
 
         </div>
-      `;
-  }
 
-  async function uploadMedia(event) {
-    const file =
-      event.target.files?.[0];
+      </form>
 
-    if (!file) return;
+    </div>
 
-    try {
-      const safeName =
-        slug(
-          file.name.replace(
-            /\.[^/.]+$/,
-            ""
-          )
-        ) || "arquivo";
+  </div>
 
-      const extension =
-        file.name
-          .split(".")
-          .pop() ||
-        "bin";
 
-      const path =
-        `media/${Date.now()}-${safeName}.${extension}`;
+  <div id="toast"></div>
 
-      const {
-        error
-      } = await client
-        .storage
-        .from("media")
-        .upload(
-          path,
-          file,
-          {
-            cacheControl:
-              "3600",
-            upsert:
-              false,
-            contentType:
-              file.type
-          }
-        );
 
-      if (error) {
-        throw error;
-      }
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../config.js"></script>
+  <script src="./admin.js?v=20261005"></script>
 
-      toast(
-        "Arquivo enviado.",
-        "success"
-      );
-
-      event.target.value =
-        "";
-
-      await loadMedia();
-
-    } catch (error) {
-      console.error(error);
-
-      toast(
-        "Erro ao enviar arquivo: " +
-        error.message,
-        "error"
-      );
-    }
-  }
-
-  /* =========================
-     PRINT
-  ========================= */
-
-  function printWindow(
-    title,
-    body
-  ) {
-    const popup =
-      window.open(
-        "",
-        "_blank",
-        "width=800,height=900"
-      );
-
-    if (!popup) {
-      toast(
-        "O navegador bloqueou a janela de impressão.",
-        "error"
-      );
-
-      return;
-    }
-
-    popup.document.write(`
-      <!DOCTYPE html>
-
-      <html lang="pt-BR">
-
-      <head>
-
-        <meta charset="UTF-8">
-
-        <title>
-          ${esc(title)}
-        </title>
-
-        <style>
-
-          body {
-            font-family:
-              Arial,
-              sans-serif;
-
-            padding:30px;
-            color:#222;
-          }
-
-          h1 {
-            font-size:22px;
-          }
-
-          h2 {
-            margin-top:24px;
-          }
-
-          .line {
-            border-bottom:
-              1px solid #ddd;
-
-            padding:8px 0;
-          }
-
-          .block {
-            margin-top:18px;
-            padding:12px;
-            border:1px solid #ddd;
-            border-radius:8px;
-          }
-
-        </style>
-
-      </head>
-
-      <body>
-
-        ${body}
-
-        <script>
-          window.onload = function() {
-            window.print();
-          };
-        <\/script>
-
-      </body>
-
-      </html>
-    `);
-
-    popup.document.close();
-  }
-
-  function printOrder(order) {
-    if (!order) return;
-
-    let items = [];
-
-    try {
-      items =
-        typeof order.items ===
-        "string"
-          ? JSON.parse(
-              order.items
-            )
-          : order.items || [];
-    } catch {
-      items = [];
-    }
-
-    const itemsHtml =
-      Array.isArray(items)
-        ? items
-            .map(
-              (item) =>
-                `
-                  <div class="line">
-
-                    ${esc(
-                      item.name ||
-                      item.product ||
-                      "Produto"
-                    )}
-
-                    ${
-                      item.quantity
-                        ? ` × ${esc(
-                            item.quantity
-                          )}`
-                        : ""
-                    }
-
-                    ${
-                      item.price != null
-                        ? ` - ${money(
-                            item.price
-                          )}`
-                        : ""
-                    }
-
-                  </div>
-                `
-            )
-            .join("")
-        : `
-            <div class="line">
-              ${esc(items)}
-            </div>
-          `;
-
-    printWindow(
-      "Pedido - Martins Confeitaria",
-      `
-        <h1>
-          Martins Confeitaria
-        </h1>
-
-        <h2>
-          Pedido
-        </h2>
-
-        <div class="line">
-          <strong>
-            Cliente:
-          </strong>
-
-          ${esc(
-            firstValue(
-              order.customer_name,
-              order.customer,
-              order.name
-            ) || "-"
-          )}
-        </div>
-
-        <div class="line">
-          <strong>
-            Telefone:
-          </strong>
-
-          ${esc(
-            firstValue(
-              order.phone,
-              order.telephone,
-              order.whatsapp
-            ) || "-"
-          )}
-        </div>
-
-        <div class="line">
-          <strong>
-            Recebimento:
-          </strong>
-
-          ${esc(
-            firstValue(
-              order.receiving,
-              order.delivery_method
-            ) || "-"
-          )}
-        </div>
-
-        <div class="line">
-          <strong>
-            Endereço:
-          </strong>
-
-          ${esc(
-            order.address || "-"
-          )}
-        </div>
-
-        <h3>
-          Itens
-        </h3>
-
-        ${itemsHtml}
-
-        <div class="line">
-          <strong>
-            Total:
-          </strong>
-
-          ${money(order.total)}
-        </div>
-
-        <div class="line">
-          <strong>
-            Pagamento:
-          </strong>
-
-          ${esc(
-            order.payment || "-"
-          )}
-        </div>
-
-        <div class="line">
-          <strong>
-            Observações:
-          </strong>
-
-          ${esc(
-            order.notes || "-"
-          )}
-        </div>
-      `
-    );
-  }
-
-  function printCake(cake) {
-    if (!cake) return;
-
-    const customer =
-      cakeText(
-        cakeValue(cake, [
-          "customer_name",
-          "client_name",
-          "full_name",
-          "nome_completo",
-          "customer",
-          "client",
-          "name",
-          "nome"
-        ])
-      ) || "-";
-
-    const phone =
-      cakeText(
-        cakeValue(cake, [
-          "phone",
-          "telephone",
-          "whatsapp",
-          "customer_phone",
-          "client_phone",
-          "phone_number",
-          "telefone"
-        ])
-      ) || "-";
-
-    const email =
-      cakeText(
-        cakeValue(cake, [
-          "email",
-          "customer_email",
-          "client_email",
-          "e_mail"
-        ])
-      );
-
-    const event =
-      cakeText(
-        cakeValue(cake, [
-          "event",
-          "event_type",
-          "occasion",
-          "event_name",
-          "evento",
-          "tipo_evento"
-        ])
-      ) || "-";
-
-    const eventDate =
-      cakeText(
-        cakeValue(cake, [
-          "event_date",
-          "delivery_date",
-          "date",
-          "data_evento",
-          "data",
-          "date_event"
-        ])
-      ) || "-";
-
-    const eventTime =
-      cakeText(
-        cakeValue(cake, [
-          "event_time",
-          "delivery_time",
-          "time",
-          "horario",
-          "hora"
-        ])
-      );
-
-    const guests =
-      cakeText(
-        cakeValue(cake, [
-          "guests",
-          "people",
-          "people_count",
-          "quantity_people",
-          "number_of_people",
-          "servings",
-          "serves",
-          "serve_ate",
-          "pessoas"
-        ])
-      );
-
-    const flavor =
-      cakeText(
-        cakeValue(cake, [
-          "flavor",
-          "sabor",
-          "cake_flavor",
-          "filling",
-          "cake_filling",
-          "recheio",
-          "recheios"
-        ])
-      );
-
-    const dough =
-      cakeText(
-        cakeValue(cake, [
-          "dough",
-          "cake_dough",
-          "massa",
-          "mass"
-        ])
-      );
-
-    const size =
-      cakeText(
-        cakeValue(cake, [
-          "size",
-          "tamanho",
-          "weight",
-          "peso",
-          "gramatura",
-          "cake_size"
-        ])
-      );
-
-    const theme =
-      cakeText(
-        cakeValue(cake, [
-          "theme",
-          "tema",
-          "decoration",
-          "decoracao",
-          "decoração",
-          "design"
-        ])
-      );
-
-    const description =
-      cakeText(
-        cakeValue(cake, [
-          "description",
-          "details",
-          "request",
-          "pedido",
-          "message",
-          "mensagem",
-          "personalization",
-          "personalizacao"
-        ])
-      ) || "-";
-
-    const notes =
-      cakeText(
-        cakeValue(cake, [
-          "notes",
-          "observations",
-          "observation",
-          "observacao",
-          "observações",
-          "obs"
-        ])
-      );
-
-    const address =
-      cakeText(
-        cakeValue(cake, [
-          "address",
-          "delivery_address",
-          "endereco",
-          "endereço"
-        ])
-      );
-
-    const payment =
-      cakeText(
-        cakeValue(cake, [
-          "payment",
-          "payment_method",
-          "pagamento",
-          "forma_pagamento"
-        ])
-      );
-
-    const total =
-      cakeValue(cake, [
-        "total",
-        "price",
-        "valor",
-        "budget",
-        "orcamento",
-        "orçamento"
-      ]);
-
-    printWindow(
-      "Bolo personalizado - Martins Confeitaria",
-      `
-        <h1>
-          Martins Confeitaria
-        </h1>
-
-        <h2>
-          Bolo personalizado
-        </h2>
-
-        <div class="block">
-
-          <div class="line">
-            <strong>
-              Cliente:
-            </strong>
-
-            ${esc(customer)}
-          </div>
-
-          <div class="line">
-            <strong>
-              Telefone / WhatsApp:
-            </strong>
-
-            ${esc(phone)}
-          </div>
-
-          ${
-            email
-              ? `
-                <div class="line">
-                  <strong>
-                    E-mail:
-                  </strong>
-
-                  ${esc(email)}
-                </div>
-              `
-              : ""
-          }
-
-          <div class="line">
-            <strong>
-              Evento:
-            </strong>
-
-            ${esc(event)}
-          </div>
-
-          <div class="line">
-            <strong>
-              Data desejada:
-            </strong>
-
-            ${esc(eventDate)}
-          </div>
-
-          ${
-            eventTime
-              ? `
-                <div class="line">
-                  <strong>
-                    Horário:
-                  </strong>
-
-                  ${esc(eventTime)}
-                </div>
-              `
-              : ""
-          }
-
-          ${
-            guests
-              ? `
-                <div class="line">
-                  <strong>
-                    Quantidade de pessoas:
-                  </strong>
-
-                  ${esc(guests)}
-                </div>
-              `
-              : ""
-          }
-
-          ${
-            size
-              ? `
-                <div class="line">
-                  <strong>
-                    Tamanho / peso:
-                  </strong>
-
-                  ${esc(size)}
-                </div>
-              `
-              : ""
-          }
-
-          ${
-            dough
-              ? `
-                <div class="line">
-                  <strong>
-                    Massa:
-                  </strong>
-
-                  ${esc(dough)}
-                </div>
-              `
-              : ""
-          }
-
-          ${
-            flavor
-              ? `
-                <div class="line">
-                  <strong>
-                    Recheio / sabor:
-                  </strong>
-
-                  ${esc(flavor)}
-                </div>
-              `
-              : ""
-          }
-
-          ${
-            theme
-              ? `
-                <div class="line">
-                  <strong>
-                    Tema / decoração:
-                  </strong>
-
-                  ${esc(theme)}
-                </div>
-              `
-              : ""
-          }
-
-          ${
-            address
-              ? `
-                <div class="line">
-                  <strong>
-                    Endereço:
-                  </strong>
-
-                  ${esc(address)}
-                </div>
-              `
-              : ""
-          }
-
-          ${
-            payment
-              ? `
-                <div class="line">
-                  <strong>
-                    Pagamento:
-                  </strong>
-
-                  ${esc(payment)}
-                </div>
-              `
-              : ""
-          }
-
-          ${
-            total !== ""
-              ? `
-                <div class="line">
-                  <strong>
-                    Valor / orçamento:
-                  </strong>
-
-                  ${money(total)}
-                </div>
-              `
-              : ""
-          }
-
-        </div>
-
-        ${
-          description
-            ? `
-              <div class="block">
-
-                <strong>
-                  Detalhes da encomenda:
-                </strong>
-
-                <p>
-                  ${esc(description)}
-                </p>
-
-              </div>
-            `
-            : ""
-        }
-
-        ${
-          notes
-            ? `
-              <div class="block">
-
-                <strong>
-                  Observações:
-                </strong>
-
-                <p>
-                  ${esc(notes)}
-                </p>
-
-              </div>
-            `
-            : ""
-        }
-      `
-    );
-  }
-
-  /* =========================
-     GLOBAL EVENTS
-  ========================= */
-
-  function setupGlobalEvents() {
-    $("#logout")
-      ?.addEventListener(
-        "click",
-        logout
-      );
-
-    $("#refreshBtn")
-      ?.addEventListener(
-        "click",
-        async () => {
-          try {
-            await loadData();
-
-            renderStats();
-            renderTab();
-
-            toast(
-              "Painel atualizado.",
-              "success"
-            );
-
-          } catch (error) {
-            toast(
-              "Erro ao atualizar: " +
-              error.message,
-              "error"
-            );
-          }
-        }
-      );
-
-    $("#mobileMenu")
-      ?.addEventListener(
-        "click",
-        () => {
-          $("#sidebar")
-            ?.classList.toggle(
-              "open"
-            );
-        }
-      );
-
-    $$("[data-close-modal]")
-      .forEach((button) => {
-        button.addEventListener(
-          "click",
-          () => {
-            const id =
-              button.dataset
-                .closeModal;
-
-            if (
-              id ===
-              "productModal"
-            ) {
-              closeProductModal();
-            }
-          }
-        );
-      });
-
-    $("#productModal")
-      ?.addEventListener(
-        "click",
-        (event) => {
-          if (
-            event.target.id ===
-            "productModal"
-          ) {
-            closeProductModal();
-          }
-        }
-      );
-
-    $("#productForm")
-      ?.addEventListener(
-        "submit",
-        saveProduct
-      );
-
-    /*
-      Criação de categorias continua
-      disponível através da opção
-      "+ Nova categoria".
-    */
-
-    $("#productCategory")
-      ?.addEventListener(
-        "change",
-        (event) => {
-          const value =
-            event.target.value;
-
-          const newCategoryField =
-            $("#newCategoryField");
-
-          const newCategoryInput =
-            $("#newCategory");
-
-          if (value === "__new__") {
-            newCategoryField
-              ?.classList.remove(
-                "hidden"
-              );
-
-            if (newCategoryInput) {
-              newCategoryInput.focus();
-            }
-
-            return;
-          }
-
-          newCategoryField
-            ?.classList.add(
-              "hidden"
-            );
-
-          if (newCategoryInput) {
-            newCategoryInput.value =
-              "";
-          }
-        }
-      );
-
-    setupPhotoPicker();
-  }
-
-  /* =========================
-     INIT
-  ========================= */
-
-  async function init() {
-    try {
-      renderLogo();
-
-      setupAuth();
-      setupNavigation();
-      setupGlobalEvents();
-
-      const session =
-        await checkSession();
-
-      if (session) {
-        await startApp();
-      } else {
-        $("#loginScreen")
-          ?.classList.remove(
-            "hidden"
-          );
-
-        $("#app")
-          ?.classList.add(
-            "hidden"
-          );
-      }
-
-      client.auth.onAuthStateChange(
-        async (
-          event,
-          session
-        ) => {
-          if (
-            event ===
-              "SIGNED_IN" &&
-            session
-          ) {
-            await startApp();
-          }
-
-          if (
-            event ===
-            "SIGNED_OUT"
-          ) {
-            $("#app")
-              ?.classList.add(
-                "hidden"
-              );
-
-            $("#loginScreen")
-              ?.classList.remove(
-                "hidden"
-              );
-          }
-        }
-      );
-
-    } catch (error) {
-      console.error(
-        "Erro ao iniciar painel:",
-        error
-      );
-
-      toast(
-        "Erro ao iniciar painel: " +
-        error.message,
-        "error"
-      );
-    }
-  }
-
-  init();
-
-})();
+</body>
+</html>
