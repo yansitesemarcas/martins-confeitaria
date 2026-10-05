@@ -33,7 +33,6 @@
     }
   );
 
-
   /* =========================
      HELPERS
   ========================= */
@@ -91,6 +90,7 @@
       if (
         value !== undefined &&
         value !== null &&
+        typeof value !== "object" &&
         String(value).trim() !== ""
       ) {
         return value;
@@ -137,7 +137,6 @@
     }, 3500);
   };
 
-
   /* =========================
      STATE
   ========================= */
@@ -162,21 +161,22 @@
   let editingProductId = null;
   let selectedImageFile = null;
 
-
   /* =========================
      AREAS
   ========================= */
 
   /*
-    IMPORTANTE:
-    Mantemos os valores do banco para não quebrar
-    os produtos existentes.
+    EXISTEM SOMENTE DUAS ÁREAS:
 
-    Apenas corrigimos o significado visual das áreas:
+    cardapio / encomendas
+      -> Encomendas
 
-    cardapio        -> Encomendas
-    pronta-entrega  -> Delivery
-    encomendas      -> Pronta entrega
+    pronta-entrega / pronta / delivery
+      -> Delivery
+
+    Valores antigos continuam sendo
+    reconhecidos para não quebrar
+    produtos já cadastrados.
   */
 
   const AREAS = [
@@ -187,10 +187,6 @@
     {
       value: "pronta-entrega",
       label: "Delivery"
-    },
-    {
-      value: "encomendas",
-      label: "Pronta entrega"
     }
   ];
 
@@ -200,18 +196,23 @@
     if (
       v === "pronta" ||
       v === "ready" ||
+      v === "delivery" ||
       v === "pronta entrega" ||
-      v === "pronta-entrega"
+      v === "pronta-entrega" ||
+      v === "pronta_entrega"
     ) {
       return "pronta-entrega";
     }
 
     if (
       v === "encomenda" ||
+      v === "encomendas" ||
       v === "bolo-personalizado" ||
-      v === "encomendas"
+      v === "bolo personalizado" ||
+      v === "cardapio" ||
+      v === "cardápio"
     ) {
-      return "encomendas";
+      return "cardapio";
     }
 
     return "cardapio";
@@ -227,97 +228,111 @@
     );
   }
 
+  function populateAreas(selected = "") {
+    const select = $("#productArea");
+
+    if (!select) return;
+
+    select.innerHTML = AREAS.map(
+      (area) =>
+        `
+          <option value="${esc(area.value)}">
+            ${esc(area.label)}
+          </option>
+        `
+    ).join("");
+
+    select.value = normalizeArea(
+      selected || "cardapio"
+    );
+  }
 
   /* =========================
      CATEGORIES
   ========================= */
 
   /*
-    Somente categorias de produtos.
-    Categorias antigas relacionadas a serviços
-    de encomenda não aparecem mais no seletor.
+    SOMENTE ESTAS CLASSIFICAÇÕES:
+
+    - Bolos
+    - Brownies
+    - Bolos no pote
+    - Copos de felicidade
+    - Brigadeiros clássicos
+    - Brigadeiros premium
   */
 
-  const BLOCKED_CATEGORIES = [
-    "kit massas",
-    "para sua festa",
-    "personalização",
-    "personalizacao",
-    "recheios",
-    "sobremesas"
+  const PRODUCT_CLASSIFICATIONS = [
+    "Bolos",
+    "Brownies",
+    "Bolos no pote",
+    "Copos de felicidade",
+    "Brigadeiros clássicos",
+    "Brigadeiros premium"
   ];
 
-  function isBlockedCategory(category) {
-    return BLOCKED_CATEGORIES.includes(
-      normalize(category)
+  function isAllowedCategory(category) {
+    return PRODUCT_CLASSIFICATIONS.some(
+      (item) =>
+        normalize(item) ===
+        normalize(category)
     );
   }
 
   function getCategories() {
-    const values = [];
-
-    if (Array.isArray(S.categories)) {
-      values.push(...S.categories);
-    }
-
-    for (const product of S.products) {
-      if (product.category) {
-        values.push(product.category);
-      }
-    }
-
-    return Array.from(
-      new Map(
-        values
-          .map((value) => String(value).trim())
-          .filter(Boolean)
-          .filter(
-            (value) => !isBlockedCategory(value)
-          )
-          .map((value) => [
-            normalize(value),
-            value
-          ])
-      ).values()
-    ).sort((a, b) =>
-      a.localeCompare(b, "pt-BR")
-    );
+    return [...PRODUCT_CLASSIFICATIONS];
   }
 
   function addCategory(category) {
-    const value = String(category || "").trim();
+    /*
+      Mantido para compatibilidade com o restante
+      do painel, mas nenhuma categoria fora das
+      seis permitidas será adicionada.
+    */
 
-    if (!value) return;
+    if (!category) return;
 
-    if (isBlockedCategory(value)) {
+    if (!isAllowedCategory(category)) {
       return;
     }
 
-    const exists = getCategories().some(
-      (item) =>
-        normalize(item) ===
-        normalize(value)
-    );
-
-    if (!exists) {
-      S.categories.push(value);
+    if (!S.categories.includes(category)) {
+      S.categories.push(category);
     }
   }
-
 
   /* =========================
      LOGO
   ========================= */
 
   function getLogoUrl() {
-    return (
-      S.logoUrl ||
-      S.logo ||
-      S.brand?.logoUrl ||
-      S.brand?.logo ||
-      S.about?.logoUrl ||
-      S.about?.logo ||
-      ""
+    return firstValue(
+      CONFIG.LOGO_URL,
+      CONFIG.logoUrl,
+      CONFIG.LOGO,
+      CONFIG.logo,
+
+      DEFAULTS.logoUrl,
+      DEFAULTS.logo,
+
+      S.logoUrl,
+      S.logo_url,
+      S.logoURL,
+      S.logo,
+      S.siteLogo,
+      S.site_logo,
+
+      S.brand?.logoUrl,
+      S.brand?.logo_url,
+      S.brand?.logo,
+
+      S.about?.logoUrl,
+      S.about?.logo_url,
+      S.about?.logo,
+
+      S.company?.logoUrl,
+      S.company?.logo_url,
+      S.company?.logo
     );
   }
 
@@ -326,6 +341,9 @@
 
     const loginWrap = $("#loginLogoWrap");
     const sidebarWrap = $("#sidebarLogoWrap");
+
+    const loginImage = $("#loginLogo");
+    const sidebarImage = $("#sidebarLogo");
 
     if (loginWrap) {
       loginWrap.innerHTML = url
@@ -341,6 +359,11 @@
             M
           </div>
         `;
+    } else if (loginImage) {
+      loginImage.src = url || "";
+      loginImage.alt = "Martins Confeitaria";
+      loginImage.style.display =
+        url ? "" : "none";
     }
 
     if (sidebarWrap) {
@@ -349,7 +372,7 @@
           <img
             class="sidebar-logo"
             src="${esc(url)}"
-            alt="Martins"
+            alt="Martins Confeitaria"
           >
         `
         : `
@@ -357,9 +380,13 @@
             M
           </div>
         `;
+    } else if (sidebarImage) {
+      sidebarImage.src = url || "";
+      sidebarImage.alt = "Martins Confeitaria";
+      sidebarImage.style.display =
+        url ? "" : "none";
     }
   }
-
 
   /* =========================
      AUTH
@@ -370,58 +397,60 @@
 
     if (!form) return;
 
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
+    form.addEventListener(
+      "submit",
+      async (event) => {
+        event.preventDefault();
 
-      const email =
-        $("#loginEmail")?.value.trim();
+        const email =
+          $("#loginEmail")?.value.trim();
 
-      const password =
-        $("#loginPassword")?.value;
+        const password =
+          $("#loginPassword")?.value;
 
-      const message =
-        $("#loginMsg");
+        const message =
+          $("#loginMsg");
 
-      if (!email || !password) {
-        if (message) {
-          message.textContent =
-            "Informe e-mail e senha.";
+        if (!email || !password) {
+          if (message) {
+            message.textContent =
+              "Informe e-mail e senha.";
+          }
+
+          return;
         }
-
-        return;
-      }
-
-      if (message) {
-        message.textContent =
-          "Entrando...";
-      }
-
-      const { error } =
-        await client.auth.signInWithPassword({
-          email,
-          password
-        });
-
-      if (error) {
-        console.error(error);
 
         if (message) {
           message.textContent =
-            error.message ||
-            "Não foi possível entrar.";
+            "Entrando...";
         }
 
-        return;
-      }
+        const { error } =
+          await client.auth.signInWithPassword({
+            email,
+            password
+          });
 
-      if (message) {
-        message.textContent = "";
-      }
+        if (error) {
+          console.error(error);
 
-      await startApp();
-    });
+          if (message) {
+            message.textContent =
+              error.message ||
+              "Não foi possível entrar.";
+          }
+
+          return;
+        }
+
+        if (message) {
+          message.textContent = "";
+        }
+
+        await startApp();
+      }
+    );
   }
-
 
   async function checkSession() {
     const {
@@ -437,14 +466,12 @@
     return data?.session || null;
   }
 
-
   async function logout() {
     await client.auth.signOut();
 
     $("#app")?.classList.add("hidden");
     $("#loginScreen")?.classList.remove("hidden");
   }
-
 
   /* =========================
      DATABASE
@@ -500,15 +527,16 @@
     for (const product of S.products) {
       if (
         product.category &&
-        !isBlockedCategory(product.category)
+        isAllowedCategory(product.category)
       ) {
         addCategory(
           product.category
         );
       }
     }
-  }
 
+    renderLogo();
+  }
 
   async function saveSite() {
     const payload = clone(S);
@@ -544,7 +572,6 @@
     return true;
   }
 
-
   /* =========================
      APP
   ========================= */
@@ -574,7 +601,6 @@
       );
     }
   }
-
 
   /* =========================
      NAVIGATION
@@ -617,12 +643,11 @@
     ]
   };
 
-
   function setupNavigation() {
     $$(".nav button").forEach((button) => {
       button.addEventListener(
         "click",
-        async () => {
+        () => {
           currentTab =
             button.dataset.tab;
 
@@ -637,10 +662,7 @@
 
           const title =
             TITLES[currentTab] ||
-            [
-              "Painel",
-              ""
-            ];
+            ["Painel", ""];
 
           $("#pageTitle").textContent =
             title[0];
@@ -656,7 +678,6 @@
       );
     });
   }
-
 
   function renderTab() {
     if (currentTab === "products") {
@@ -695,7 +716,6 @@
     }
   }
 
-
   /* =========================
      STATS
   ========================= */
@@ -717,7 +737,6 @@
     loadCakeCount();
   }
 
-
   async function loadOrderCount() {
     const {
       count,
@@ -735,7 +754,6 @@
     }
   }
 
-
   async function loadCakeCount() {
     const {
       count,
@@ -752,7 +770,6 @@
         count || 0;
     }
   }
-
 
   /* =========================
      PRODUCTS
@@ -788,7 +805,7 @@
             <h3>Catálogo</h3>
 
             <p>
-              Cadastre produtos e escolha exatamente onde eles aparecem.
+              Cadastre produtos e escolha onde eles aparecem.
             </p>
           </div>
 
@@ -840,8 +857,7 @@
         `;
       } else {
         for (const product of products) {
-          html +=
-            productRow(product);
+          html += productRow(product);
         }
       }
 
@@ -911,7 +927,6 @@
         );
       });
   }
-
 
   function productRow(product) {
     const available =
@@ -1059,7 +1074,6 @@
     `;
   }
 
-
   /* =========================
      PRODUCT MODAL
   ========================= */
@@ -1081,12 +1095,11 @@
     $("#productName").value =
       product?.name || "";
 
-    $("#productArea").value =
-      normalizeArea(
-        forcedArea ||
-        product?.area ||
-        "cardapio"
-      );
+    populateAreas(
+      forcedArea ||
+      product?.area ||
+      "cardapio"
+    );
 
     populateCategories(
       product?.category || ""
@@ -1122,7 +1135,9 @@
     $("#newCategoryField")
       ?.classList.add("hidden");
 
-    $("#newCategory").value = "";
+    if ($("#newCategory")) {
+      $("#newCategory").value = "";
+    }
 
     const photo =
       product?.image_url ||
@@ -1146,7 +1161,6 @@
       ?.classList.add("open");
   }
 
-
   function closeProductModal() {
     $("#productModal")
       ?.classList.remove("open");
@@ -1156,26 +1170,29 @@
 
     $("#productForm")?.reset();
 
-    $("#productAvailable").checked =
-      true;
+    if ($("#productAvailable")) {
+      $("#productAvailable").checked =
+        true;
+    }
 
-    $("#productDiscount").value =
-      0;
+    if ($("#productDiscount")) {
+      $("#productDiscount").value = 0;
+    }
 
-    $("#productSort").value =
-      0;
+    if ($("#productSort")) {
+      $("#productSort").value = 0;
+    }
 
-    $("#photoPreview").textContent =
-      "📷";
+    if ($("#photoPreview")) {
+      $("#photoPreview").textContent =
+        "📷";
+    }
 
     $("#newCategoryField")
       ?.classList.add("hidden");
   }
 
-
-  function populateCategories(
-    selected = ""
-  ) {
+  function populateCategories(selected = "") {
     const select =
       $("#productCategory");
 
@@ -1201,10 +1218,6 @@
             `
         )
         .join("")}
-
-      <option value="__new__">
-        + Criar nova categoria
-      </option>
     `;
 
     if (
@@ -1215,25 +1228,20 @@
           normalize(selected)
       )
     ) {
-      const option =
-        document.createElement(
-          "option"
-        );
+      /*
+        Produto antigo com classificação
+        que não faz mais parte das permitidas.
 
-      option.value = selected;
-      option.textContent =
-        selected;
+        Não adicionamos essa classificação
+        novamente ao seletor.
+      */
 
-      select.insertBefore(
-        option,
-        select.lastElementChild
-      );
+      select.value = "";
+    } else {
+      select.value =
+        selected || "";
     }
-
-    select.value =
-      selected || "";
   }
-
 
   /* =========================
      PHOTO
@@ -1269,9 +1277,7 @@
             file;
 
           const url =
-            URL.createObjectURL(
-              file
-            );
+            URL.createObjectURL(file);
 
           $("#photoPreview").innerHTML =
             `
@@ -1284,14 +1290,11 @@
       );
   }
 
-
   /* =========================
      STORAGE
   ========================= */
 
-  async function uploadProductImage(
-    file
-  ) {
+  async function uploadProductImage(file) {
     if (!file) return null;
 
     const safeName =
@@ -1344,13 +1347,22 @@
       .publicUrl;
   }
 
-
   /* =========================
      SAVE PRODUCT
   ========================= */
 
   async function saveProduct(event) {
     event.preventDefault();
+
+    /*
+      Guardamos isso ANTES de fechar o modal.
+      closeProductModal() limpa editingProductId.
+    */
+    const wasEditing =
+      Boolean(editingProductId);
+
+    const productId =
+      editingProductId;
 
     const name =
       $("#productName")
@@ -1362,45 +1374,8 @@
         $("#productArea").value
       );
 
-    const categorySelect =
+    const category =
       $("#productCategory").value;
-
-    let category =
-      categorySelect;
-
-    if (
-      categorySelect ===
-      "__new__"
-    ) {
-      category =
-        $("#newCategory")
-          .value
-          .trim();
-
-      if (!category) {
-        toast(
-          "Digite o nome da nova categoria.",
-          "error"
-        );
-
-        return;
-      }
-
-      if (
-        isBlockedCategory(
-          category
-        )
-      ) {
-        toast(
-          "Essa categoria é reservada e não pode ser usada.",
-          "error"
-        );
-
-        return;
-      }
-
-      addCategory(category);
-    }
 
     const price =
       Number(
@@ -1473,6 +1448,18 @@
       return;
     }
 
+    if (
+      category &&
+      !isAllowedCategory(category)
+    ) {
+      toast(
+        "Escolha uma classificação válida.",
+        "error"
+      );
+
+      return;
+    }
+
     const submit =
       $('#productForm button[type="submit"]');
 
@@ -1526,14 +1513,14 @@
 
       let result;
 
-      if (editingProductId) {
+      if (wasEditing) {
         result =
           await client
             .from("products")
             .update(payload)
             .eq(
               "id",
-              editingProductId
+              productId
             );
       } else {
         result =
@@ -1546,7 +1533,9 @@
         throw result.error;
       }
 
-      addCategory(category);
+      if (category) {
+        addCategory(category);
+      }
 
       await saveSite();
 
@@ -1558,7 +1547,7 @@
       renderProducts();
 
       toast(
-        editingProductId
+        wasEditing
           ? "Produto atualizado."
           : "Produto criado.",
         "success"
@@ -1583,7 +1572,6 @@
       }
     }
   }
-
 
   /* =========================
      DELETE PRODUCT
@@ -1636,7 +1624,6 @@
     );
   }
 
-
   /* =========================
      ORDERS
   ========================= */
@@ -1649,6 +1636,7 @@
 
           <div>
             <h3>Pedidos</h3>
+
             <p>
               Pedidos recebidos pelo site.
             </p>
@@ -1710,6 +1698,7 @@
       $("#ordersBody").innerHTML =
         `
           <div class="empty">
+
             <div class="empty-icon">
               🛍️
             </div>
@@ -1717,6 +1706,7 @@
             <p>
               Nenhum pedido encontrado.
             </p>
+
           </div>
         `;
 
@@ -1789,7 +1779,6 @@
         );
       });
   }
-
 
   function orderRow(order) {
     const date =
@@ -1934,7 +1923,6 @@
     `;
   }
 
-
   async function updateOrderStatus(
     id,
     status
@@ -1967,10 +1955,80 @@
     );
   }
 
-
   /* =========================
      CUSTOM CAKES
   ========================= */
+
+  function cakeSources(cake) {
+    const sources = [
+      cake,
+      cake?.data,
+      cake?.form,
+      cake?.form_data,
+      cake?.customer_data,
+      cake?.customer,
+      cake?.details,
+      cake?.payload,
+      cake?.request
+    ];
+
+    return sources.filter(
+      (source) =>
+        source &&
+        typeof source === "object" &&
+        !Array.isArray(source)
+    );
+  }
+
+  function cakeValue(cake, keys) {
+    const sources =
+      cakeSources(cake);
+
+    for (const source of sources) {
+      for (const key of keys) {
+        const value =
+          source?.[key];
+
+        if (
+          value !== undefined &&
+          value !== null &&
+          typeof value !== "object" &&
+          String(value).trim() !== ""
+        ) {
+          return value;
+        }
+      }
+    }
+
+    return "";
+  }
+
+  function cakeText(value) {
+    if (
+      value === undefined ||
+      value === null
+    ) {
+      return "";
+    }
+
+    if (
+      typeof value === "string" ||
+      typeof value === "number" ||
+      typeof value === "boolean"
+    ) {
+      return String(value);
+    }
+
+    try {
+      return JSON.stringify(
+        value,
+        null,
+        2
+      );
+    } catch {
+      return String(value);
+    }
+  }
 
   async function renderCakes() {
     $("#tabContent").innerHTML = `
@@ -2107,137 +2165,196 @@
       });
   }
 
-
   function cakeCard(cake) {
     const customer =
-      firstValue(
-        cake.customer_name,
-        cake.client_name,
-        cake.client,
-        cake.customer,
-        cake.name
+      cakeText(
+        cakeValue(cake, [
+          "customer_name",
+          "client_name",
+          "full_name",
+          "nome_completo",
+          "customer",
+          "client",
+          "name",
+          "nome"
+        ])
       ) || "-";
 
     const phone =
-      firstValue(
-        cake.phone,
-        cake.telephone,
-        cake.whatsapp,
-        cake.customer_phone,
-        cake.client_phone
+      cakeText(
+        cakeValue(cake, [
+          "phone",
+          "telephone",
+          "whatsapp",
+          "customer_phone",
+          "client_phone",
+          "phone_number",
+          "telefone"
+        ])
       ) || "-";
 
     const email =
-      firstValue(
-        cake.email,
-        cake.customer_email,
-        cake.client_email
+      cakeText(
+        cakeValue(cake, [
+          "email",
+          "customer_email",
+          "client_email",
+          "e_mail"
+        ])
       );
 
     const event =
-      firstValue(
-        cake.event,
-        cake.event_type,
-        cake.occasion,
-        cake.event_name
+      cakeText(
+        cakeValue(cake, [
+          "event",
+          "event_type",
+          "occasion",
+          "event_name",
+          "evento",
+          "tipo_evento"
+        ])
       ) || "-";
 
     const eventDate =
-      firstValue(
-        cake.event_date,
-        cake.delivery_date,
-        cake.date,
-        cake.data,
-        cake.data_evento
+      cakeText(
+        cakeValue(cake, [
+          "event_date",
+          "delivery_date",
+          "date",
+          "data_evento",
+          "data",
+          "date_event"
+        ])
       ) || "-";
 
     const eventTime =
-      firstValue(
-        cake.event_time,
-        cake.delivery_time,
-        cake.time,
-        cake.horario,
-        cake.hora
-      ) || "-";
+      cakeText(
+        cakeValue(cake, [
+          "event_time",
+          "delivery_time",
+          "time",
+          "horario",
+          "hora"
+        ])
+      );
 
     const guests =
-      firstValue(
-        cake.guests,
-        cake.people,
-        cake.people_count,
-        cake.quantity_people,
-        cake.serves,
-        cake.serve_ate,
-        cake.pessoas
+      cakeText(
+        cakeValue(cake, [
+          "guests",
+          "people",
+          "people_count",
+          "quantity_people",
+          "number_of_people",
+          "servings",
+          "serves",
+          "serve_ate",
+          "pessoas"
+        ])
       );
 
     const flavor =
-      firstValue(
-        cake.flavor,
-        cake.sabor,
-        cake.recheio,
-        cake.filling,
-        cake.recheios
+      cakeText(
+        cakeValue(cake, [
+          "flavor",
+          "sabor",
+          "cake_flavor",
+          "filling",
+          "cake_filling",
+          "recheio",
+          "recheios"
+        ])
       );
 
     const dough =
-      firstValue(
-        cake.dough,
-        cake.massa,
-        cake.mass
+      cakeText(
+        cakeValue(cake, [
+          "dough",
+          "cake_dough",
+          "massa",
+          "mass"
+        ])
       );
 
     const size =
-      firstValue(
-        cake.size,
-        cake.tamanho,
-        cake.weight,
-        cake.peso,
-        cake.gramatura
+      cakeText(
+        cakeValue(cake, [
+          "size",
+          "tamanho",
+          "weight",
+          "peso",
+          "gramatura",
+          "cake_size"
+        ])
+      );
+
+    const theme =
+      cakeText(
+        cakeValue(cake, [
+          "theme",
+          "tema",
+          "decoration",
+          "decoracao",
+          "decoração",
+          "design"
+        ])
       );
 
     const description =
-      firstValue(
-        cake.description,
-        cake.details,
-        cake.message,
-        cake.design,
-        cake.theme,
-        cake.tema,
-        cake.personalization,
-        cake.personalizacao
-      ) || "-";
+      cakeText(
+        cakeValue(cake, [
+          "description",
+          "details",
+          "request",
+          "pedido",
+          "message",
+          "mensagem",
+          "personalization",
+          "personalizacao"
+        ])
+      );
 
     const notes =
-      firstValue(
-        cake.notes,
-        cake.observations,
-        cake.observacao,
-        cake.obs
+      cakeText(
+        cakeValue(cake, [
+          "notes",
+          "observations",
+          "observation",
+          "observacao",
+          "observações",
+          "obs"
+        ])
       );
 
     const address =
-      firstValue(
-        cake.address,
-        cake.delivery_address,
-        cake.endereco
+      cakeText(
+        cakeValue(cake, [
+          "address",
+          "delivery_address",
+          "endereco",
+          "endereço"
+        ])
       );
 
     const payment =
-      firstValue(
-        cake.payment,
-        cake.payment_method,
-        cake.pagamento
+      cakeText(
+        cakeValue(cake, [
+          "payment",
+          "payment_method",
+          "pagamento",
+          "forma_pagamento"
+        ])
       );
 
     const total =
-      firstValue(
-        cake.total,
-        cake.price,
-        cake.valor,
-        cake.budget,
-        cake.orcamento
-      );
+      cakeValue(cake, [
+        "total",
+        "price",
+        "valor",
+        "budget",
+        "orcamento",
+        "orçamento"
+      ]);
 
     const createdAt =
       cake.created_at
@@ -2257,7 +2374,10 @@
       "cancelado"
     ];
 
-    const detail = (label, value) => {
+    const detail = (
+      label,
+      value
+    ) => {
       if (
         value === undefined ||
         value === null ||
@@ -2340,7 +2460,6 @@
 
         </div>
 
-
         <div class="cake-client-grid">
 
           ${detail(
@@ -2349,7 +2468,7 @@
           )}
 
           ${detail(
-            "Telefone",
+            "Telefone / WhatsApp",
             phone
           )}
 
@@ -2418,6 +2537,15 @@
           }
 
           ${
+            theme
+              ? detail(
+                  "Tema / decoração",
+                  theme
+                )
+              : ""
+          }
+
+          ${
             address
               ? detail(
                   "Endereço",
@@ -2446,19 +2574,23 @@
 
         </div>
 
+        ${
+          description
+            ? `
+              <div class="cake-description">
 
-        <div class="cake-description">
+                <span class="cake-detail-label">
+                  Detalhes da encomenda
+                </span>
 
-          <span class="cake-detail-label">
-            Detalhes da encomenda
-          </span>
+                <div>
+                  ${esc(description)}
+                </div>
 
-          <div>
-            ${esc(description)}
-          </div>
-
-        </div>
-
+              </div>
+            `
+            : ""
+        }
 
         ${
           notes
@@ -2478,7 +2610,6 @@
             : ""
         }
 
-
         <div class="cake-card-footer">
 
           <button
@@ -2496,7 +2627,6 @@
       </div>
     `;
   }
-
 
   async function updateCakeStatus(
     id,
@@ -2529,7 +2659,6 @@
       "success"
     );
   }
-
 
   /* =========================
      CONTENT
@@ -2630,7 +2759,6 @@
 
             </div>
 
-
             <div class="setting-card">
 
               <h4>Contato</h4>
@@ -2675,7 +2803,6 @@
 
             </div>
 
-
             <button
               class="btn btn-primary"
               id="saveContent"
@@ -2695,7 +2822,6 @@
         saveContent
       );
   }
-
 
   async function saveContent() {
     S.about = {
@@ -2742,7 +2868,6 @@
       );
     }
   }
-
 
   /* =========================
      HOURS
@@ -2841,7 +2966,6 @@
               )
               .join("")}
 
-
             <button
               class="btn btn-primary"
               id="saveHours"
@@ -2861,7 +2985,6 @@
         saveHours
       );
   }
-
 
   async function saveHours() {
     const days = [
@@ -2899,7 +3022,6 @@
       );
     }
   }
-
 
   /* =========================
      RULES
@@ -2954,7 +3076,6 @@
 
             </div>
 
-
             <div class="setting-card">
 
               <h4>
@@ -2977,7 +3098,6 @@
               </div>
 
             </div>
-
 
             <div class="setting-card">
 
@@ -3002,7 +3122,6 @@
 
             </div>
 
-
             <div class="setting-card">
 
               <h4>
@@ -3026,7 +3145,6 @@
 
             </div>
 
-
             <button
               class="btn btn-primary"
               id="saveRules"
@@ -3046,7 +3164,6 @@
         saveRules
       );
   }
-
 
   async function saveRules() {
     S.rules = {
@@ -3083,7 +3200,6 @@
       );
     }
   }
-
 
   /* =========================
      MEDIA
@@ -3156,7 +3272,6 @@
 
     await loadMedia();
   }
-
 
   async function loadMedia() {
     const container =
@@ -3275,7 +3390,6 @@
       `;
   }
 
-
   async function uploadMedia(event) {
     const file =
       event.target.files?.[0];
@@ -3342,7 +3456,6 @@
       );
     }
   }
-
 
   /* =========================
      PRINT
@@ -3435,7 +3548,6 @@
 
     popup.document.close();
   }
-
 
   function printOrder(order) {
     if (!order) return;
@@ -3593,139 +3705,198 @@
     );
   }
 
-
   function printCake(cake) {
     if (!cake) return;
 
     const customer =
-      firstValue(
-        cake.customer_name,
-        cake.client_name,
-        cake.client,
-        cake.customer,
-        cake.name
+      cakeText(
+        cakeValue(cake, [
+          "customer_name",
+          "client_name",
+          "full_name",
+          "nome_completo",
+          "customer",
+          "client",
+          "name",
+          "nome"
+        ])
       ) || "-";
 
     const phone =
-      firstValue(
-        cake.phone,
-        cake.telephone,
-        cake.whatsapp,
-        cake.customer_phone,
-        cake.client_phone
+      cakeText(
+        cakeValue(cake, [
+          "phone",
+          "telephone",
+          "whatsapp",
+          "customer_phone",
+          "client_phone",
+          "phone_number",
+          "telefone"
+        ])
       ) || "-";
 
     const email =
-      firstValue(
-        cake.email,
-        cake.customer_email,
-        cake.client_email
+      cakeText(
+        cakeValue(cake, [
+          "email",
+          "customer_email",
+          "client_email",
+          "e_mail"
+        ])
       );
 
     const event =
-      firstValue(
-        cake.event,
-        cake.event_type,
-        cake.occasion,
-        cake.event_name
+      cakeText(
+        cakeValue(cake, [
+          "event",
+          "event_type",
+          "occasion",
+          "event_name",
+          "evento",
+          "tipo_evento"
+        ])
       ) || "-";
 
     const eventDate =
-      firstValue(
-        cake.event_date,
-        cake.delivery_date,
-        cake.date,
-        cake.data,
-        cake.data_evento
+      cakeText(
+        cakeValue(cake, [
+          "event_date",
+          "delivery_date",
+          "date",
+          "data_evento",
+          "data",
+          "date_event"
+        ])
       ) || "-";
 
     const eventTime =
-      firstValue(
-        cake.event_time,
-        cake.delivery_time,
-        cake.time,
-        cake.horario,
-        cake.hora
+      cakeText(
+        cakeValue(cake, [
+          "event_time",
+          "delivery_time",
+          "time",
+          "horario",
+          "hora"
+        ])
       );
 
     const guests =
-      firstValue(
-        cake.guests,
-        cake.people,
-        cake.people_count,
-        cake.quantity_people,
-        cake.serves,
-        cake.serve_ate,
-        cake.pessoas
+      cakeText(
+        cakeValue(cake, [
+          "guests",
+          "people",
+          "people_count",
+          "quantity_people",
+          "number_of_people",
+          "servings",
+          "serves",
+          "serve_ate",
+          "pessoas"
+        ])
       );
 
     const flavor =
-      firstValue(
-        cake.flavor,
-        cake.sabor,
-        cake.recheio,
-        cake.filling,
-        cake.recheios
+      cakeText(
+        cakeValue(cake, [
+          "flavor",
+          "sabor",
+          "cake_flavor",
+          "filling",
+          "cake_filling",
+          "recheio",
+          "recheios"
+        ])
       );
 
     const dough =
-      firstValue(
-        cake.dough,
-        cake.massa,
-        cake.mass
+      cakeText(
+        cakeValue(cake, [
+          "dough",
+          "cake_dough",
+          "massa",
+          "mass"
+        ])
       );
 
     const size =
-      firstValue(
-        cake.size,
-        cake.tamanho,
-        cake.weight,
-        cake.peso,
-        cake.gramatura
+      cakeText(
+        cakeValue(cake, [
+          "size",
+          "tamanho",
+          "weight",
+          "peso",
+          "gramatura",
+          "cake_size"
+        ])
+      );
+
+    const theme =
+      cakeText(
+        cakeValue(cake, [
+          "theme",
+          "tema",
+          "decoration",
+          "decoracao",
+          "decoração",
+          "design"
+        ])
       );
 
     const description =
-      firstValue(
-        cake.description,
-        cake.details,
-        cake.message,
-        cake.design,
-        cake.theme,
-        cake.tema,
-        cake.personalization,
-        cake.personalizacao
+      cakeText(
+        cakeValue(cake, [
+          "description",
+          "details",
+          "request",
+          "pedido",
+          "message",
+          "mensagem",
+          "personalization",
+          "personalizacao"
+        ])
       ) || "-";
 
     const notes =
-      firstValue(
-        cake.notes,
-        cake.observations,
-        cake.observacao,
-        cake.obs
+      cakeText(
+        cakeValue(cake, [
+          "notes",
+          "observations",
+          "observation",
+          "observacao",
+          "observações",
+          "obs"
+        ])
       );
 
     const address =
-      firstValue(
-        cake.address,
-        cake.delivery_address,
-        cake.endereco
+      cakeText(
+        cakeValue(cake, [
+          "address",
+          "delivery_address",
+          "endereco",
+          "endereço"
+        ])
       );
 
     const payment =
-      firstValue(
-        cake.payment,
-        cake.payment_method,
-        cake.pagamento
+      cakeText(
+        cakeValue(cake, [
+          "payment",
+          "payment_method",
+          "pagamento",
+          "forma_pagamento"
+        ])
       );
 
     const total =
-      firstValue(
-        cake.total,
-        cake.price,
-        cake.valor,
-        cake.budget,
-        cake.orcamento
-      );
+      cakeValue(cake, [
+        "total",
+        "price",
+        "valor",
+        "budget",
+        "orcamento",
+        "orçamento"
+      ]);
 
     printWindow(
       "Bolo personalizado - Martins Confeitaria",
@@ -3750,7 +3921,7 @@
 
           <div class="line">
             <strong>
-              Telefone:
+              Telefone / WhatsApp:
             </strong>
 
             ${esc(phone)}
@@ -3857,6 +4028,20 @@
           }
 
           ${
+            theme
+              ? `
+                <div class="line">
+                  <strong>
+                    Tema / decoração:
+                  </strong>
+
+                  ${esc(theme)}
+                </div>
+              `
+              : ""
+          }
+
+          ${
             address
               ? `
                 <div class="line">
@@ -3900,19 +4085,23 @@
 
         </div>
 
+        ${
+          description
+            ? `
+              <div class="block">
 
-        <div class="block">
+                <strong>
+                  Detalhes da encomenda:
+                </strong>
 
-          <strong>
-            Detalhes da encomenda:
-          </strong>
+                <p>
+                  ${esc(description)}
+                </p>
 
-          <p>
-            ${esc(description)}
-          </p>
-
-        </div>
-
+              </div>
+            `
+            : ""
+        }
 
         ${
           notes
@@ -3934,7 +4123,6 @@
       `
     );
   }
-
 
   /* =========================
      GLOBAL EVENTS
@@ -4021,6 +4209,11 @@
         saveProduct
       );
 
+    /*
+      Como as classificações agora são fixas,
+      não existe mais criação de categoria.
+    */
+
     $("#productCategory")
       ?.addEventListener(
         "change",
@@ -4029,26 +4222,18 @@
             event.target.value ===
             "__new__"
           ) {
-            $("#newCategoryField")
-              ?.classList.remove(
-                "hidden"
-              );
-
-            $("#newCategory")
-              ?.focus();
-
-          } else {
-            $("#newCategoryField")
-              ?.classList.add(
-                "hidden"
-              );
+            event.target.value = "";
           }
+
+          $("#newCategoryField")
+            ?.classList.add(
+              "hidden"
+            );
         }
       );
 
     setupPhotoPicker();
   }
-
 
   /* =========================
      INIT
@@ -4123,7 +4308,6 @@
     }
   }
 
-
   init();
 
-})();
+})();v
