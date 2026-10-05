@@ -11,126 +11,156 @@
         )
       : null;
 
-  const $ = s =>
-    document.querySelector(s);
+  const $ = s => document.querySelector(s);
 
   const esc = s =>
     String(s ?? '').replace(
       /[&<>"']/g,
       m => ({
-        '&':'&amp;',
-        '<':'&lt;',
-        '>':'&gt;',
-        '"':'&quot;',
-        "'":'&#39;'
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
       }[m])
     );
 
   let S = structuredClone(D);
   let tab = 'products';
 
-
   /* =========================================================
-     ÁREAS DOS PRODUTOS
+     ÁREAS
   ========================================================= */
 
   const AREAS = [
     {
-      value:'cardapio',
-      label:'Delivery'
+      value: 'cardapio',
+      label: 'Delivery'
     },
     {
-      value:'pronta-entrega',
-      label:'Pronta entrega'
+      value: 'pronta-entrega',
+      label: 'Pronta entrega'
     },
     {
-      value:'encomendas',
-      label:'Encomendas'
+      value: 'encomendas',
+      label: 'Encomendas'
     }
   ];
 
-
-  function normalizeArea(area){
+  function normalizeArea(area) {
 
     const value =
       String(area || 'cardapio')
         .trim()
         .toLowerCase()
-        .replace(/_/g,'-')
-        .replace(/\s+/g,'-');
+        .replace(/_/g, '-')
+        .replace(/\s+/g, '-');
 
-    if(
+    if (
       value === 'pronta' ||
-      value === 'ready'
-    ){
+      value === 'ready' ||
+      value === 'delivery'
+    ) {
       return 'pronta-entrega';
     }
 
-    if(
+    if (
       value === 'encomenda' ||
       value === 'bolo-personalizado'
-    ){
+    ) {
+      return 'encomendas';
+    }
+
+    if (value === 'encomendas') {
       return 'encomendas';
     }
 
     return 'cardapio';
   }
 
+  function areaLabel(area) {
 
-  function areaLabel(area){
-
-    const normalized =
-      normalizeArea(area);
+    const normalized = normalizeArea(area);
 
     const found =
-      AREAS.find(
-        x => x.value === normalized
-      );
+      AREAS.find(x => x.value === normalized);
 
     return found
       ? found.label
       : 'Delivery';
   }
 
+  /* =========================================================
+     CATEGORIAS
+     ========================================================= */
 
-  function categoryNames(current = ''){
+  function categoryNames(current = '') {
 
-    const list =
-      Array.isArray(S.categories)
-        ? [...S.categories]
-        : [];
+    const list = [];
 
-    if(
-      current &&
-      !list.some(
-        x =>
-          String(x).toLowerCase() ===
-          String(current).toLowerCase()
-      )
-    ){
+    if (Array.isArray(S.categories)) {
+      list.push(...S.categories);
+    }
+
+    /*
+      Também pega categorias que já existem nos produtos.
+      Assim um produto antigo com categoria "Bolos"
+      não desaparece do seletor.
+    */
+
+    if (Array.isArray(S.products)) {
+      S.products.forEach(p => {
+        if (p.category) {
+          list.push(p.category);
+        }
+      });
+    }
+
+    if (current) {
       list.push(current);
     }
 
     return [
       ...new Set(
         list
-          .map(
-            x =>
-              String(x || '').trim()
-          )
+          .map(x => String(x || '').trim())
           .filter(Boolean)
       )
     ];
   }
 
+  function addCategory(category) {
+
+    category =
+      String(category || '').trim();
+
+    if (!category) {
+      return;
+    }
+
+    if (!Array.isArray(S.categories)) {
+      S.categories = [];
+    }
+
+    const exists =
+      S.categories.some(
+        x =>
+          String(x).toLowerCase() ===
+          category.toLowerCase()
+      );
+
+    if (!exists) {
+      S.categories.push(category);
+    }
+  }
 
   /* =========================================================
      INICIALIZAÇÃO
   ========================================================= */
 
-  async function init(){
+  async function init() {
 
-    if(!client){
+    if (!client) {
 
       $('#loginMsg').textContent =
         'Configure SUPABASE_URL e SUPABASE_ANON_KEY em config.js.';
@@ -138,45 +168,43 @@
       return;
     }
 
-    const {data} =
+    const { data } =
       await client.auth.getSession();
 
-    if(data.session){
+    if (data.session) {
       show();
     }
 
     client.auth.onAuthStateChange(
-      (_, s) => {
+      (_, session) => {
 
-        if(s){
+        if (session) {
           show();
-        }else{
+        } else {
           hide();
         }
 
       }
     );
-
   }
 
-
   /* =========================================================
-     LOGIN / PAINEL
+     LOGIN
   ========================================================= */
 
-  function show(){
+  function show() {
 
     $('#login')
-      .classList
+      ?.classList
       .add('hidden');
 
     $('#app')
-      .classList
+      ?.classList
       .remove('hidden');
 
     load();
 
-    if(!window.__martinsRealtime){
+    if (!window.__martinsRealtime) {
 
       window.__martinsRealtime = true;
 
@@ -186,103 +214,95 @@
         .on(
           'postgres_changes',
           {
-            event:'INSERT',
-            schema:'public',
-            table:'orders'
+            event: 'INSERT',
+            schema: 'public',
+            table: 'orders'
           },
           () => {
 
-            if(tab === 'orders'){
+            if (tab === 'orders') {
               orders();
             }
 
-            try{
+            try {
 
               new Audio(
                 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA='
               ).play();
 
-            }catch(e){}
+            } catch (e) {}
 
-            alert(
-              'Novo pedido recebido!'
-            );
-
+            alert('Novo pedido recebido!');
           }
         )
 
         .on(
           'postgres_changes',
           {
-            event:'INSERT',
-            schema:'public',
-            table:'custom_cakes'
+            event: 'INSERT',
+            schema: 'public',
+            table: 'custom_cakes'
           },
           () => {
 
-            if(tab === 'cakes'){
+            if (tab === 'cakes') {
               cakes();
             }
 
             alert(
               'Novo pedido de bolo personalizado!'
             );
-
           }
         )
 
         .subscribe();
-
     }
-
   }
 
-
-  function hide(){
+  function hide() {
 
     $('#app')
-      .classList
+      ?.classList
       .add('hidden');
 
     $('#login')
-      .classList
+      ?.classList
       .remove('hidden');
-
   }
 
+  /* =========================================================
+     LOGIN FORM
+  ========================================================= */
 
-  $('#loginForm').onsubmit =
-    async e => {
+  if ($('#loginForm')) {
 
-      e.preventDefault();
+    $('#loginForm').onsubmit =
+      async e => {
 
-      const f =
-        new FormData(e.target);
+        e.preventDefault();
 
-      const {error} =
-        await client.auth.signInWithPassword({
+        const f =
+          new FormData(e.target);
 
-          email:
-            f.get('email'),
+        const { error } =
+          await client.auth.signInWithPassword({
+            email: f.get('email'),
+            password: f.get('password')
+          });
 
-          password:
-            f.get('password')
+        if (error) {
 
-        });
+          $('#loginMsg').textContent =
+            error.message;
+        }
+      };
+  }
 
-      if(error){
+  if ($('#logout')) {
 
-        $('#loginMsg').textContent =
-          error.message;
-
-      }
-
-    };
-
-
-  $('#logout').onclick =
-    () => client.auth.signOut();
-
+    $('#logout').onclick =
+      () => client.auth.signOut();
+  }
 
   document
     .querySelectorAll('[data-tab]')
@@ -290,8 +310,7 @@
 
       button.onclick = () => {
 
-        tab =
-          button.dataset.tab;
+        tab = button.dataset.tab;
 
         document
           .querySelectorAll('[data-tab]')
@@ -303,155 +322,144 @@
           );
 
         render();
-
       };
-
     });
-
 
   /* =========================================================
      CARREGAR DADOS
   ========================================================= */
 
-  async function load(){
+  async function load() {
 
     const [
-      st,
-      pr
+      settingsResult,
+      productsResult
     ] = await Promise.all([
 
       client
         .from('settings')
         .select('value')
-        .eq('key','site')
+        .eq('key', 'site')
         .maybeSingle(),
 
       client
         .from('products')
         .select('*')
-        .order('sort')
+        .order('sort', {
+          ascending: true
+        })
 
     ]);
 
-
-    if(st.error){
+    if (settingsResult.error) {
 
       console.error(
         'Erro ao carregar configurações:',
-        st.error
+        settingsResult.error
       );
-
     }
 
-
-    if(pr.error){
+    if (productsResult.error) {
 
       console.error(
         'Erro ao carregar produtos:',
-        pr.error
+        productsResult.error
       );
 
       alert(
         'Erro ao carregar produtos: ' +
-        pr.error.message
+        productsResult.error.message
       );
 
       return;
     }
 
-
-    if(st.data?.value){
+    if (settingsResult.data?.value) {
 
       S = {
         ...S,
-        ...st.data.value
+        ...settingsResult.data.value
       };
-
     }
 
-
-    /*
-      O banco é a fonte oficial dos produtos.
-    */
-
     S.products =
-      Array.isArray(pr.data)
-        ? pr.data
+      Array.isArray(productsResult.data)
+        ? productsResult.data
         : [];
 
+    /*
+      Mantém categorias antigas e também
+      descobre categorias existentes nos produtos.
+    */
+
+    categoryNames().forEach(category => {
+      addCategory(category);
+    });
 
     render();
-
   }
 
-
   /* =========================================================
-     RENDER PRINCIPAL
+     RENDER
   ========================================================= */
 
-  function render(){
+  function render() {
 
     const names = {
 
-      products:'Produtos',
-
-      orders:'Pedidos',
-
-      cakes:'Bolos personalizados',
-
-      content:'Conteúdo',
-
-      hours:'Horários e regras',
-
-      media:'Mídia'
+      products: 'Produtos',
+      orders: 'Pedidos',
+      cakes: 'Bolos personalizados',
+      content: 'Conteúdo',
+      hours: 'Horários e regras',
+      media: 'Mídia'
 
     };
 
-
     $('#title').textContent =
-      names[tab];
+      names[tab] || 'Administração';
 
-
-    ({
+    const pages = {
       products,
       orders,
       cakes,
       content,
       hours,
       media
-    })[tab]();
+    };
 
+    if (pages[tab]) {
+      pages[tab]();
+    }
   }
-
 
   /* =========================================================
      PRODUTOS
   ========================================================= */
 
-  function products(){
+  function products() {
 
     const groups = [
 
       {
-        key:'cardapio',
-        title:'Delivery',
-        className:'delivery'
+        key: 'cardapio',
+        title: 'Delivery',
+        className: 'delivery'
       },
 
       {
-        key:'pronta-entrega',
-        title:'Pronta entrega',
-        className:'ready'
+        key: 'pronta-entrega',
+        title: 'Pronta entrega',
+        className: 'ready'
       },
 
       {
-        key:'encomendas',
-        title:'Encomendas',
-        className:'orders'
+        key: 'encomendas',
+        title: 'Encomendas',
+        className: 'orders'
       }
 
     ];
-
 
     $('#view').innerHTML = `
 
@@ -461,14 +469,11 @@
 
           <div>
 
-            <h2>
-              Produtos
-            </h2>
+            <h2>Produtos</h2>
 
             <p>
-              Organize os produtos
-              entre Delivery,
-              Pronta entrega e
+              Organize os produtos entre
+              Delivery, Pronta entrega e
               Encomendas.
             </p>
 
@@ -485,7 +490,6 @@
 
       </div>
 
-
       <div class="product-groups">
 
         ${groups.map(group => {
@@ -497,21 +501,11 @@
                 group.key
             );
 
-
           return `
 
-            <section
-              class="
-                card
-                area-section
-              "
-            >
+            <section class="card area-section">
 
-              <div
-                class="
-                  area-section-head
-                "
-              >
+              <div class="area-section-head">
 
                 <div>
 
@@ -535,7 +529,6 @@
 
                 </div>
 
-
                 <button
                   class="btn alt"
                   data-new-area="${group.key}"
@@ -545,7 +538,6 @@
 
               </div>
 
-
               <div class="table-wrap">
 
                 <table class="table">
@@ -554,38 +546,17 @@
 
                     <tr>
 
-                      <th>
-                        Foto
-                      </th>
-
-                      <th>
-                        Produto
-                      </th>
-
-                      <th>
-                        Categoria
-                      </th>
-
-                      <th>
-                        Preço
-                      </th>
-
-                      <th>
-                        Desconto
-                      </th>
-
-                      <th>
-                        Disponível
-                      </th>
-
-                      <th>
-                        Ações
-                      </th>
+                      <th>Foto</th>
+                      <th>Produto</th>
+                      <th>Categoria</th>
+                      <th>Preço</th>
+                      <th>Desconto</th>
+                      <th>Disponível</th>
+                      <th>Ações</th>
 
                     </tr>
 
                   </thead>
-
 
                   <tbody>
 
@@ -596,10 +567,8 @@
 
                             const discount =
                               Number(
-                                p.discount_percent ||
-                                0
+                                p.discount_percent || 0
                               );
-
 
                             const finalPrice =
                               Number(
@@ -609,7 +578,6 @@
                                 1 -
                                 discount / 100
                               );
-
 
                             return `
 
@@ -628,16 +596,13 @@
                                       `
 
                                       : `
-                                        <span
-                                          class="status"
-                                        >
+                                        <span class="status">
                                           Sem foto
                                         </span>
                                       `
                                   }
 
                                 </td>
-
 
                                 <td>
 
@@ -649,13 +614,11 @@
 
                                   <small>
                                     ${esc(
-                                      p.description ||
-                                      ''
+                                      p.description || ''
                                     )}
                                   </small>
 
                                 </td>
-
 
                                 <td>
                                   ${esc(
@@ -664,24 +627,19 @@
                                   )}
                                 </td>
 
-
                                 <td>
 
                                   ${
                                     discount > 0
 
                                       ? `
-
                                         <del>
                                           R$
                                           ${Number(
                                             p.price || 0
                                           )
                                             .toFixed(2)
-                                            .replace(
-                                              '.',
-                                              ','
-                                            )}
+                                            .replace('.', ',')}
                                         </del>
 
                                         <br>
@@ -690,53 +648,37 @@
                                           R$
                                           ${finalPrice
                                             .toFixed(2)
-                                            .replace(
-                                              '.',
-                                              ','
-                                            )}
+                                            .replace('.', ',')}
                                         </b>
-
                                       `
 
                                       : `
-
                                         R$
                                         ${Number(
                                           p.price || 0
                                         )
                                           .toFixed(2)
-                                          .replace(
-                                            '.',
-                                            ','
-                                          )}
-
+                                          .replace('.', ',')}
                                       `
                                   }
 
                                 </td>
 
-
                                 <td>
-
                                   ${
                                     discount > 0
                                       ? discount + '%'
                                       : 'Sem desconto'
                                   }
-
                                 </td>
 
-
                                 <td>
-
                                   ${
                                     p.available !== false
                                       ? 'Sim'
                                       : 'Não'
                                   }
-
                                 </td>
-
 
                                 <td>
 
@@ -764,24 +706,19 @@
 
                         : `
 
-                            <tr>
+                          <tr>
 
-                              <td
-                                colspan="7"
-                              >
+                            <td colspan="7">
 
-                                <div
-                                  class="empty"
-                                >
-                                  Nenhum produto
-                                  nesta área.
-                                </div>
+                              <div class="empty">
+                                Nenhum produto nesta área.
+                              </div>
 
-                              </td>
+                            </td>
 
-                            </tr>
+                          </tr>
 
-                          `
+                        `
                     }
 
                   </tbody>
@@ -800,47 +737,41 @@
 
     `;
 
-
     $('#new').onclick =
       () => editProduct();
 
-
     document
-      .querySelectorAll(
-        '[data-new-area]'
-      )
+      .querySelectorAll('[data-new-area]')
       .forEach(button => {
 
         button.onclick = () => {
 
           editProduct({
 
-            name:'',
-            description:'',
-            price:'',
-            category:'',
-            image:'',
+            name: '',
+            description: '',
+            price: '',
+            category: '',
+            image: '',
 
-            available:true,
-            featured:false,
-            sort:0,
+            available: true,
+            featured: false,
+            sort: 0,
 
             area:
               button.dataset.newArea,
 
-            gramatura:'',
-            serve_ate:'',
+            gramatura: '',
+            serve_ate: '',
 
-            discount_percent:0,
+            discount_percent: 0,
 
-            appointment_required:false
+            appointment_required: false
 
           });
 
         };
-
       });
-
 
     document
       .querySelectorAll('.edit')
@@ -848,18 +779,18 @@
 
         button.onclick = () => {
 
-          editProduct(
+          const product =
             S.products.find(
               p =>
                 String(p.id) ===
                 String(button.dataset.id)
-            )
-          );
+            );
 
+          if (product) {
+            editProduct(product);
+          }
         };
-
       });
-
 
     document
       .querySelectorAll('.del')
@@ -868,16 +799,15 @@
         button.onclick =
           async () => {
 
-            if(
+            if (
               !confirm(
                 'Excluir este produto?'
               )
-            ){
+            ) {
               return;
             }
 
-
-            const {error} =
+            const { error } =
               await client
                 .from('products')
                 .delete()
@@ -886,8 +816,7 @@
                   button.dataset.id
                 );
 
-
-            if(error){
+            if (error) {
 
               alert(
                 'Erro ao excluir produto: ' +
@@ -897,15 +826,10 @@
               return;
             }
 
-
             await load();
-
           };
-
       });
-
   }
-
 
   /* =========================================================
      EDITAR / CRIAR PRODUTO
@@ -915,35 +839,37 @@
 
     p = {
 
-      name:'',
-      description:'',
-      price:'',
+      name: '',
+      description: '',
+      price: '',
 
       category:
-        S.categories?.[0] || '',
+        categoryNames()[0] || '',
 
-      image:'',
+      image: '',
 
-      available:true,
-      featured:false,
-      sort:0,
+      available: true,
+      featured: false,
+      sort: 0,
 
-      area:'cardapio',
+      area: 'cardapio',
 
-      gramatura:'',
-      serve_ate:'',
+      gramatura: '',
+      serve_ate: '',
 
-      discount_percent:0,
+      discount_percent: 0,
 
-      appointment_required:false
+      appointment_required: false
 
     }
 
-  ){
+  ) {
 
     const currentArea =
       normalizeArea(p.area);
 
+    const categories =
+      categoryNames(p.category);
 
     $('#view').innerHTML = `
 
@@ -957,12 +883,10 @@
               class="
                 area-badge
                 ${
-                  currentArea ===
-                  'pronta-entrega'
+                  currentArea === 'pronta-entrega'
                     ? 'ready'
                     :
-                  currentArea ===
-                  'encomendas'
+                  currentArea === 'encomendas'
                     ? 'orders'
                     : 'delivery'
                 }
@@ -980,20 +904,17 @@
             </h2>
 
             <p>
-              Escolha a área,
-              categoria e foto.
+              Escolha a área, categoria e foto.
             </p>
 
           </div>
 
         </div>
 
-
         <form
           id="pf"
           class="formgrid"
         >
-
 
           <label class="field">
 
@@ -1007,7 +928,6 @@
             >
 
           </label>
-
 
           <label class="field">
 
@@ -1024,22 +944,18 @@
 
           </label>
 
-
           <label class="field">
 
             Área
 
-            <select
-              name="area"
-            >
+            <select name="area">
 
               ${AREAS.map(area => `
 
                 <option
                   value="${area.value}"
                   ${
-                    currentArea ===
-                    area.value
+                    currentArea === area.value
                       ? 'selected'
                       : ''
                   }
@@ -1053,7 +969,6 @@
 
           </label>
 
-
           <label class="field">
 
             Categoria
@@ -1065,39 +980,36 @@
             >
 
               ${
-                categoryNames(
-                  p.category
-                )
-                .map(category => `
+                categories.length
+                  ? categories.map(category => `
 
-                  <option
-                    value="${esc(category)}"
-                    ${
-                      String(category) ===
-                      String(
-                        p.category || ''
-                      )
-                        ? 'selected'
-                        : ''
-                    }
-                  >
-                    ${esc(category)}
-                  </option>
+                      <option
+                        value="${esc(category)}"
+                        ${
+                          String(category) ===
+                          String(p.category || '')
+                            ? 'selected'
+                            : ''
+                        }
+                      >
+                        ${esc(category)}
+                      </option>
 
-                `)
-                .join('')
+                    `).join('')
+                  : `
+                      <option value="">
+                        Selecione uma categoria
+                      </option>
+                    `
               }
 
-              <option
-                value="__new__"
-              >
+              <option value="__new__">
                 + Criar nova categoria
               </option>
 
             </select>
 
           </label>
-
 
           <label
             class="
@@ -1119,17 +1031,14 @@
             >
 
             <small>
-              A nova categoria será
-              adicionada às categorias
-              do site.
+              A categoria ficará disponível
+              nos próximos produtos.
             </small>
 
           </label>
 
-
           <label class="field">
 
-            Tamanho da porção /
             Gramatura (g)
 
             <input
@@ -1142,7 +1051,6 @@
             >
 
           </label>
-
 
           <label class="field">
 
@@ -1159,7 +1067,6 @@
 
           </label>
 
-
           <label class="field">
 
             Desconto (%)
@@ -1171,11 +1078,9 @@
               max="100"
               step="0.01"
               value="${p.discount_percent ?? 0}"
-              placeholder="Ex.: 15"
             >
 
           </label>
-
 
           <label class="field">
 
@@ -1190,22 +1095,15 @@
 
           </label>
 
-
           <label class="field full">
 
             Foto do produto
 
-            <div
-              class="
-                product-image-box
-              "
-            >
+            <div class="product-image-box">
 
               <img
                 id="productImagePreview"
-                class="
-                  product-image-preview
-                "
+                class="product-image-preview"
                 src="${esc(p.image || '')}"
                 alt="Prévia da foto"
                 ${
@@ -1215,21 +1113,16 @@
                 }
               >
 
-
               <input
                 id="productImageFile"
                 type="file"
                 accept="image/*"
               >
 
-
               <small>
-                Escolha uma foto do
-                celular ou computador.
-                Ela será enviada
-                automaticamente.
+                Escolha uma foto do celular
+                ou computador.
               </small>
-
 
               <input
                 name="image"
@@ -1241,7 +1134,6 @@
             </div>
 
           </label>
-
 
           <label class="field full">
 
@@ -1255,7 +1147,6 @@
             )}</textarea>
 
           </label>
-
 
           <label>
 
@@ -1273,7 +1164,6 @@
 
           </label>
 
-
           <label>
 
             <input
@@ -1289,7 +1179,6 @@
             Destaque
 
           </label>
-
 
           <label>
 
@@ -1307,7 +1196,6 @@
 
           </label>
 
-
           <div class="row">
 
             <button class="btn">
@@ -1324,19 +1212,16 @@
 
           </div>
 
-
           <small
             id="productMsg"
             class="field full"
           ></small>
-
 
         </form>
 
       </div>
 
     `;
-
 
     const categorySelect =
       $('#productCategory');
@@ -1347,12 +1232,10 @@
     const newCategoryInput =
       $('#newCategory');
 
-
-    function syncCategoryField(){
+    function syncCategoryField() {
 
       const isNew =
-        categorySelect.value ===
-        '__new__';
+        categorySelect.value === '__new__';
 
       newCategoryWrap
         .classList
@@ -1363,15 +1246,12 @@
 
       newCategoryInput.required =
         isNew;
-
     }
-
 
     categorySelect.onchange =
       syncCategoryField;
 
     syncCategoryField();
-
 
     const imageFile =
       $('#productImageFile');
@@ -1382,27 +1262,21 @@
     const imageUrl =
       $('#productImageUrl');
 
-
     imageFile.onchange =
       () => {
 
         const file =
           imageFile.files?.[0];
 
-        if(!file){
+        if (!file) {
           return;
         }
 
         imagePreview.src =
-          URL.createObjectURL(
-            file
-          );
+          URL.createObjectURL(file);
 
-        imagePreview.hidden =
-          false;
-
+        imagePreview.hidden = false;
       };
-
 
     imageUrl.oninput =
       () => {
@@ -1410,129 +1284,92 @@
         const value =
           imageUrl.value.trim();
 
-        if(value){
+        if (value) {
 
-          imagePreview.src =
-            value;
-
-          imagePreview.hidden =
-            false;
+          imagePreview.src = value;
+          imagePreview.hidden = false;
 
         }
-
       };
-
 
     $('#back').onclick =
       products;
-
 
     $('#pf').onsubmit =
       async e => {
 
         e.preventDefault();
 
-
         const msg =
           $('#productMsg');
 
         const f =
-          new FormData(
-            e.target
-          );
-
+          new FormData(e.target);
 
         msg.textContent =
           'Salvando...';
-
 
         const area =
           normalizeArea(
             f.get('area')
           );
 
-
         let category =
           String(
             f.get('category') || ''
           ).trim();
 
+        /* NOVA CATEGORIA */
 
-        if(
-          category ===
-          '__new__'
-        ){
+        if (category === '__new__') {
 
           category =
             String(
-              f.get(
-                'new_category'
-              ) || ''
+              f.get('new_category') || ''
             ).trim();
 
-
-          if(!category){
+          if (!category) {
 
             msg.textContent =
               'Informe o nome da nova categoria.';
 
             return;
-
           }
 
+          addCategory(category);
 
-          if(
-            !Array.isArray(
-              S.categories
-            )
-          ){
+          const saved =
+            await saveSite();
 
-            S.categories = [];
+          if (!saved) {
 
+            msg.textContent =
+              'Não foi possível salvar a categoria.';
+
+            return;
           }
-
-
-          if(
-            !S.categories.some(
-              x =>
-                String(x)
-                  .toLowerCase() ===
-                category.toLowerCase()
-            )
-          ){
-
-            S.categories.push(
-              category
-            );
-
-
-            const saved =
-              await saveSite();
-
-
-            if(!saved){
-
-              msg.textContent =
-                'Não foi possível salvar a nova categoria.';
-
-              return;
-
-            }
-
-          }
-
         }
 
-
-        if(!category){
+        if (!category) {
 
           msg.textContent =
             'Selecione uma categoria.';
 
           return;
-
         }
 
+        const price =
+          Number(
+            f.get('price')
+          );
+
+        if (!Number.isFinite(price)) {
+
+          msg.textContent =
+            'Informe um preço válido.';
+
+          return;
+        }
 
         const discount =
           Math.max(
@@ -1547,18 +1384,17 @@
             )
           );
 
-
         let image =
           String(
             f.get('image') || ''
           ).trim();
 
+        /* UPLOAD DA FOTO */
 
         const file =
           imageFile.files?.[0];
 
-
-        if(file){
+        if (file) {
 
           const safeName =
             file.name
@@ -1572,13 +1408,11 @@
                 '-'
               );
 
-
           const path =
             `products/${Date.now()}-${safeName}`;
 
-
           const {
-            error:uploadError
+            error: uploadError
           } =
             await client
               .storage
@@ -1587,43 +1421,44 @@
                 path,
                 file,
                 {
-                  cacheControl:'3600',
-                  upsert:false,
+                  cacheControl: '3600',
+                  upsert: false,
                   contentType:
-                    file.type ||
-                    undefined
+                    file.type || undefined
                 }
               );
 
-
-          if(uploadError){
+          if (uploadError) {
 
             msg.textContent =
               'Erro ao enviar a foto: ' +
               uploadError.message;
 
             return;
-
           }
 
-
           const {
-            data:publicData
+            data: publicData
           } =
             client
               .storage
               .from('media')
-              .getPublicUrl(
-                path
-              );
-
+              .getPublicUrl(path);
 
           image =
             publicData?.publicUrl ||
             image;
-
         }
 
+        const gramaturaValue =
+          String(
+            f.get('gramatura') || ''
+          ).trim();
+
+        const serveValue =
+          String(
+            f.get('serve_ate') || ''
+          ).trim();
 
         const obj = {
 
@@ -1634,15 +1469,10 @@
 
           description:
             String(
-              f.get(
-                'description'
-              ) || ''
+              f.get('description') || ''
             ).trim(),
 
-          price:
-            Number(
-              f.get('price')
-            ) || 0,
+          price,
 
           category,
 
@@ -1662,25 +1492,17 @@
           area,
 
           gramatura:
-            f.get(
-              'gramatura'
-            ) === ''
+            gramaturaValue === ''
               ? null
               : Number(
-                  f.get(
-                    'gramatura'
-                  )
+                  gramaturaValue
                 ),
 
           serve_ate:
-            f.get(
-              'serve_ate'
-            ) === ''
+            serveValue === ''
               ? null
               : Number(
-                  f.get(
-                    'serve_ate'
-                  )
+                  serveValue
                 ),
 
           discount_percent:
@@ -1693,11 +1515,9 @@
 
         };
 
-
         let result;
 
-
-        if(p.id){
+        if (p.id) {
 
           result =
             await client
@@ -1708,7 +1528,7 @@
                 p.id
               );
 
-        }else{
+        } else {
 
           result =
             await client
@@ -1717,50 +1537,52 @@
 
         }
 
-
-        if(result.error){
+        if (result.error) {
 
           msg.textContent =
             'Erro ao salvar produto: ' +
             result.error.message;
 
           return;
-
         }
 
+        /*
+          Salva categorias no settings.
+        */
+
+        addCategory(category);
+
+        await saveSite();
 
         await load();
-
       };
-
   }
-
 
   /* =========================================================
      SALVAR CONFIGURAÇÕES
   ========================================================= */
 
-  async function saveSite(){
+  async function saveSite() {
 
     const payload =
       structuredClone(S);
 
     delete payload.products;
 
-
-    const {error} =
+    const { error } =
       await client
         .from('settings')
-        .upsert({
+        .upsert(
+          {
+            key: 'site',
+            value: payload
+          },
+          {
+            onConflict: 'key'
+          }
+        );
 
-          key:'site',
-
-          value:payload
-
-        });
-
-
-    if(error){
+    if (error) {
 
       alert(
         'Erro ao salvar configurações: ' +
@@ -1768,24 +1590,19 @@
       );
 
       return false;
-
     }
 
-
     return true;
-
   }
-
 
   /* =========================================================
      CONTEÚDO
   ========================================================= */
 
-  async function content(){
+  function content() {
 
     const a =
       S.about || {};
-
 
     $('#view').innerHTML = `
 
@@ -1795,12 +1612,10 @@
           Conteúdo do site
         </h2>
 
-
         <form
           id="cf"
           class="formgrid"
         >
-
 
           <label class="field">
 
@@ -1813,7 +1628,6 @@
 
           </label>
 
-
           <label class="field">
 
             Foto (URL)
@@ -1824,7 +1638,6 @@
             >
 
           </label>
-
 
           <label class="field full">
 
@@ -1837,7 +1650,6 @@
 
           </label>
 
-
           <label class="field full">
 
             Frase
@@ -1849,7 +1661,6 @@
 
           </label>
 
-
           <label class="field full">
 
             História
@@ -1860,7 +1671,6 @@
 
           </label>
 
-
           <label class="field">
 
             Instagram
@@ -1868,12 +1678,11 @@
             <input
               name="instagram"
               value="${esc(
-                S.instagram
+                S.instagram || ''
               )}"
             >
 
           </label>
-
 
           <label class="field">
 
@@ -1882,12 +1691,11 @@
             <input
               name="whatsapp"
               value="${esc(
-                S.whatsapp
+                S.whatsapp || ''
               )}"
             >
 
           </label>
-
 
           <label class="field">
 
@@ -1896,12 +1704,11 @@
             <input
               name="maps"
               value="${esc(
-                S.maps
+                S.maps || ''
               )}"
             >
 
           </label>
-
 
           <label class="field">
 
@@ -1910,12 +1717,11 @@
             <input
               name="review"
               value="${esc(
-                S.review
+                S.review || ''
               )}"
             >
 
           </label>
-
 
           <div class="row">
 
@@ -1925,27 +1731,22 @@
 
           </div>
 
-
         </form>
 
       </div>
 
     `;
 
-
     $('#cf').onsubmit =
       saveSettings;
-
   }
 
-
-  async function saveSettings(e){
+  async function saveSettings(e) {
 
     e.preventDefault();
 
     const f =
       new FormData(e.target);
-
 
     S.instagram =
       f.get('instagram');
@@ -1959,58 +1760,42 @@
     S.review =
       f.get('review');
 
-
     S.about = {
 
       ...S.about,
 
       name:
-        f.get(
-          'about.name'
-        ),
+        f.get('about.name'),
 
       photo:
-        f.get(
-          'about.photo'
-        ),
+        f.get('about.photo'),
 
       title:
-        f.get(
-          'about.title'
-        ),
+        f.get('about.title'),
 
       quote:
-        f.get(
-          'about.quote'
-        ),
+        f.get('about.quote'),
 
       text:
-        f.get(
-          'about.text'
-        )
+        f.get('about.text')
 
     };
-
 
     const saved =
       await saveSite();
 
-
-    if(saved){
+    if (saved) {
       alert('Salvo!');
     }
-
   }
-
 
   /* =========================================================
      HORÁRIOS
   ========================================================= */
 
-  function hours(){
+  function hours() {
 
     const days = [
-
       'Domingo',
       'Segunda-feira',
       'Terça-feira',
@@ -2018,9 +1803,16 @@
       'Quinta-feira',
       'Sexta-feira',
       'Sábado'
-
     ];
 
+    const hoursData =
+      Array.isArray(S.hours)
+        ? S.hours
+        : days.map(() => ({
+            s: 'closed',
+            o: '',
+            c: ''
+          }));
 
     $('#view').innerHTML = `
 
@@ -2030,95 +1822,98 @@
           Horários
         </h2>
 
-
         <form id="hf">
 
-          ${(
-            S.hours || []
-          ).map(
-            (h,i) => `
+          ${days.map(
+            (day, i) => {
 
-              <div class="formgrid">
+              const h =
+                hoursData[i] || {
+                  s: 'closed',
+                  o: '',
+                  c: ''
+                };
 
-                <label class="field">
+              return `
 
-                  ${days[i]}
+                <div class="formgrid">
 
-                  <select
-                    name="s${i}"
-                  >
+                  <label class="field">
 
-                    <option
-                      value="open"
-                      ${
-                        h.s === 'open'
-                          ? 'selected'
-                          : ''
-                      }
+                    ${day}
+
+                    <select
+                      name="s${i}"
                     >
-                      Aberto
-                    </option>
 
-                    <option
-                      value="closed"
-                      ${
-                        h.s === 'closed'
-                          ? 'selected'
-                          : ''
-                      }
+                      <option
+                        value="open"
+                        ${
+                          h.s === 'open'
+                            ? 'selected'
+                            : ''
+                        }
+                      >
+                        Aberto
+                      </option>
+
+                      <option
+                        value="closed"
+                        ${
+                          h.s === 'closed'
+                            ? 'selected'
+                            : ''
+                        }
+                      >
+                        Fechado
+                      </option>
+
+                      <option
+                        value="tbd"
+                        ${
+                          h.s === 'tbd'
+                            ? 'selected'
+                            : ''
+                        }
+                      >
+                        A confirmar
+                      </option>
+
+                    </select>
+
+                  </label>
+
+                  <label class="field">
+
+                    Abertura
+
+                    <input
+                      name="o${i}"
+                      type="time"
+                      value="${h.o || ''}"
                     >
-                      Fechado
-                    </option>
 
-                    <option
-                      value="tbd"
-                      ${
-                        h.s === 'tbd'
-                          ? 'selected'
-                          : ''
-                      }
+                  </label>
+
+                  <label class="field">
+
+                    Fechamento
+
+                    <input
+                      name="c${i}"
+                      type="time"
+                      value="${h.c || ''}"
                     >
-                      A confirmar
-                    </option>
 
-                  </select>
+                  </label>
 
-                </label>
+                </div>
 
-
-                <label class="field">
-
-                  Abertura
-
-                  <input
-                    name="o${i}"
-                    type="time"
-                    value="${h.o || ''}"
-                  >
-
-                </label>
-
-
-                <label class="field">
-
-                  Fechamento
-
-                  <input
-                    name="c${i}"
-                    type="time"
-                    value="${h.c || ''}"
-                  >
-
-                </label>
-
-              </div>
-
-            `
+              `;
+            }
           ).join('')}
 
-
           <hr>
-
 
           <label class="field">
 
@@ -2133,7 +1928,6 @@
 
           </label>
 
-
           <label class="field">
 
             Informação de entrega
@@ -2145,7 +1939,6 @@
             )}</textarea>
 
           </label>
-
 
           <label class="field">
 
@@ -2160,7 +1953,6 @@
 
           </label>
 
-
           <label class="field">
 
             Categorias
@@ -2174,11 +1966,9 @@
 
           </label>
 
-
           <button class="btn">
             Salvar
           </button>
-
 
         </form>
 
@@ -2186,129 +1976,107 @@
 
     `;
 
-
     $('#hf').onsubmit =
       saveHours;
-
   }
 
-
-  async function saveHours(e){
+  async function saveHours(e) {
 
     e.preventDefault();
 
     const f =
       new FormData(e.target);
 
+    const currentHours =
+      Array.isArray(S.hours)
+        ? S.hours
+        : [];
 
     S.hours =
-      S.hours.map(
-        (_,i) => ({
+      Array.from(
+        { length: 7 },
+        (_, i) => ({
 
-          s:f.get(
-            's' + i
-          ),
+          s:
+            f.get('s' + i) ||
+            'closed',
 
-          o:f.get(
-            'o' + i
-          ),
+          o:
+            f.get('o' + i) ||
+            '',
 
-          c:f.get(
-            'c' + i
-          )
+          c:
+            f.get('c' + i) ||
+            ''
 
         })
       );
 
-
     S.delivery =
       String(
-        f.get(
-          'delivery'
-        ) || ''
+        f.get('delivery') || ''
       )
         .split('\n')
-        .map(
-          x => x.trim()
-        )
+        .map(x => x.trim())
         .filter(Boolean);
 
-
     S.deliveryInfo =
-      f.get(
-        'deliveryInfo'
-      );
-
+      String(
+        f.get('deliveryInfo') || ''
+      ).trim();
 
     S.payments =
       String(
-        f.get(
-          'payments'
-        ) || ''
+        f.get('payments') || ''
       )
         .split('\n')
-        .map(
-          x => x.trim()
-        )
+        .map(x => x.trim())
         .filter(Boolean);
-
 
     S.categories =
       String(
-        f.get(
-          'categories'
-        ) || ''
+        f.get('categories') || ''
       )
         .split('\n')
-        .map(
-          x => x.trim()
-        )
+        .map(x => x.trim())
         .filter(Boolean);
-
 
     const saved =
       await saveSite();
 
-
-    if(saved){
+    if (saved) {
       alert('Salvo!');
     }
-
   }
 
-
   /* =========================================================
-     IMPRESSÃO DE COMANDA
+     IMPRESSÃO
   ========================================================= */
 
   function printComanda(
     title,
     data,
-    total=''
-  ){
+    total = ''
+  ) {
 
     const escPrint =
       v =>
-        String(v ?? '')
-          .replace(
-            /[&<>"']/g,
-            m => ({
-              '&':'&amp;',
-              '<':'&lt;',
-              '>':'&gt;',
-              '"':'&quot;',
-              "'":'&#039;'
-            }[m])
-          );
-
+        String(v ?? '').replace(
+          /[&<>"']/g,
+          m => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+          }[m])
+        );
 
     const rows =
       Object
-        .entries(
-          data || {}
-        )
+        .entries(data || {})
         .map(
-          ([k,v]) => `
+          ([k, v]) => `
 
             <div class="pr">
 
@@ -2330,7 +2098,6 @@
         )
         .join('');
 
-
     const w =
       window.open(
         '',
@@ -2338,17 +2105,14 @@
         'width=850,height=900'
       );
 
-
-    if(!w){
+    if (!w) {
 
       alert(
         'Permita pop-ups no navegador para imprimir a comanda.'
       );
 
       return;
-
     }
-
 
     w.document.write(`
 
@@ -2363,7 +2127,6 @@
         <title>
           ${escPrint(title)}
         </title>
-
 
         <style>
 
@@ -2425,7 +2188,6 @@
 
       </head>
 
-
       <body>
 
         <div class="head">
@@ -2439,31 +2201,23 @@
           </p>
 
           <p>
-            ${new Date()
-              .toLocaleString(
-                'pt-BR'
-              )}
+            ${new Date().toLocaleString('pt-BR')}
           </p>
 
         </div>
 
-
         ${rows}
-
 
         ${
           total
             ? `
               <div class="total">
-
                 TOTAL:
                 ${escPrint(total)}
-
               </div>
             `
             : ''
         }
-
 
         <script>
 
@@ -2478,24 +2232,20 @@
 
         <\/script>
 
-
       </body>
 
       </html>
 
     `);
 
-
     w.document.close();
-
   }
-
 
   /* =========================================================
      PEDIDOS
   ========================================================= */
 
-  async function orders(){
+  async function orders() {
 
     const {
       data,
@@ -2507,12 +2257,11 @@
         .order(
           'created_at',
           {
-            ascending:false
+            ascending: false
           }
         );
 
-
-    if(error){
+    if (error) {
 
       $('#view').innerHTML = `
 
@@ -2528,9 +2277,7 @@
       `;
 
       return;
-
     }
-
 
     $('#view').innerHTML = `
 
@@ -2540,7 +2287,6 @@
           Pedidos
         </h2>
 
-
         <div class="table-wrap">
 
           <table class="table">
@@ -2549,34 +2295,16 @@
 
               <tr>
 
-                <th>
-                  Data
-                </th>
-
-                <th>
-                  Cliente
-                </th>
-
-                <th>
-                  Itens
-                </th>
-
-                <th>
-                  Total
-                </th>
-
-                <th>
-                  Status
-                </th>
-
-                <th>
-                  Ação
-                </th>
+                <th>Data</th>
+                <th>Cliente</th>
+                <th>Itens</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Ação</th>
 
               </tr>
 
             </thead>
-
 
             <tbody>
 
@@ -2589,43 +2317,31 @@
                       <td>
                         ${new Date(
                           o.created_at
-                        )
-                          .toLocaleString(
-                            'pt-BR'
-                          )}
+                        ).toLocaleString('pt-BR')}
                       </td>
-
 
                       <td>
 
                         <b>
-                          ${esc(
-                            o.customer
-                          )}
+                          ${esc(o.customer)}
                         </b>
 
                         <br>
 
                         📱
-                        ${esc(
-                          o.phone
-                        )}
+                        ${esc(o.phone)}
 
                         <br>
 
                         📦
-                        ${esc(
-                          o.receiving || ''
-                        )}
+                        ${esc(o.receiving || '')}
 
                         <br>
 
                         ${
                           o.address
                             ? '📍 ' +
-                              esc(
-                                o.address
-                              ) +
+                              esc(o.address) +
                               '<br>'
                             : ''
                         }
@@ -2633,9 +2349,7 @@
                         ${
                           o.payment
                             ? '💳 ' +
-                              esc(
-                                o.payment
-                              ) +
+                              esc(o.payment) +
                               '<br>'
                             : ''
                         }
@@ -2643,46 +2357,34 @@
                         ${
                           o.notes
                             ? '📝 ' +
-                              esc(
-                                o.notes
-                              )
+                              esc(o.notes)
                             : ''
                         }
 
                       </td>
-
 
                       <td>
 
                         ${(o.items || [])
                           .map(
                             i =>
-                              `${i.qty}x ${esc(
-                                i.name
-                              )}`
+                              `${i.qty}x ${esc(i.name)}`
                           )
-                          .join(
-                            '<br>'
-                          )}
+                          .join('<br>')}
 
                       </td>
-
 
                       <td>
 
                         R$
 
                         ${Number(
-                          o.total
+                          o.total || 0
                         )
                           .toFixed(2)
-                          .replace(
-                            '.',
-                            ','
-                          )}
+                          .replace('.', ',')}
 
                       </td>
-
 
                       <td>
 
@@ -2707,8 +2409,9 @@
                                         ? 'selected'
                                         : ''
                                     }
+                                    value="${esc(s)}"
                                   >
-                                    ${s}
+                                    ${esc(s)}
                                   </option>`
                               )
                               .join('')
@@ -2717,7 +2420,6 @@
                         </select>
 
                       </td>
-
 
                       <td>
 
@@ -2750,17 +2452,14 @@
 
     `;
 
-
     document
-      .querySelectorAll(
-        '.order-status'
-      )
+      .querySelectorAll('.order-status')
       .forEach(select => {
 
         select.onchange =
           async () => {
 
-            const {error} =
+            const { error } =
               await client
                 .from('orders')
                 .update({
@@ -2772,44 +2471,34 @@
                   select.dataset.id
                 );
 
-
-            if(error){
+            if (error) {
 
               alert(
                 'Erro ao atualizar pedido: ' +
                 error.message
               );
-
             }
-
           };
-
       });
 
-
     document
-      .querySelectorAll(
-        '.print-order'
-      )
+      .querySelectorAll('.print-order')
       .forEach(button => {
 
         button.onclick = () => {
 
           const o =
-            (data || [])
-              .find(
-                x =>
-                  String(x.id) ===
-                  String(
-                    button.dataset.id
-                  )
-              );
+            (data || []).find(
+              x =>
+                String(x.id) ===
+                String(
+                  button.dataset.id
+                )
+            );
 
-
-          if(!o){
+          if (!o) {
             return;
           }
-
 
           const items =
             (o.items || [])
@@ -2817,19 +2506,14 @@
                 i =>
                   `${i.qty}x ${i.name} — R$ ${
                     Number(
-                      i.price *
-                      i.qty || 0
+                      i.price * i.qty || 0
                     )
                       .toFixed(2)
-                      .replace(
-                        '.',
-                        ','
-                      )
+                      .replace('.', ',')
                   }`
               )
               .join('\n') ||
             'Nenhum';
-
 
           printComanda(
 
@@ -2867,30 +2551,21 @@
             },
 
             `R$ ${
-              Number(
-                o.total || 0
-              )
+              Number(o.total || 0)
                 .toFixed(2)
-                .replace(
-                  '.',
-                  ','
-                )
+                .replace('.', ',')
             }`
 
           );
-
         };
-
       });
-
   }
-
 
   /* =========================================================
      BOLOS PERSONALIZADOS
   ========================================================= */
 
-  async function cakes(){
+  async function cakes() {
 
     const {
       data,
@@ -2902,12 +2577,11 @@
         .order(
           'created_at',
           {
-            ascending:false
+            ascending: false
           }
         );
 
-
-    if(error){
+    if (error) {
 
       $('#view').innerHTML = `
 
@@ -2923,9 +2597,7 @@
       `;
 
       return;
-
     }
-
 
     $('#view').innerHTML = `
 
@@ -2935,7 +2607,6 @@
           Solicitações de bolo personalizado
         </h2>
 
-
         ${
           (data || [])
             .map(
@@ -2944,37 +2615,27 @@
                 <article class="card">
 
                   <b>
-
                     ${new Date(
                       o.created_at
-                    )
-                      .toLocaleString(
-                        'pt-BR'
-                      )}
-
+                    ).toLocaleString('pt-BR')}
                   </b>
-
 
                   <p>
 
                     ${Object
-                      .entries(
-                        o.data || {}
-                      )
+                      .entries(o.data || {})
                       .map(
-                        ([k,v]) =>
-                          `
-                            <b>
-                              ${esc(k)}:
-                            </b>
+                        ([k, v]) => `
+                          <b>
+                            ${esc(k)}:
+                          </b>
 
-                            ${esc(v)}
-                          `
+                          ${esc(v)}
+                        `
                       )
                       .join('<br>')}
 
                   </p>
-
 
                   <div class="row">
 
@@ -2995,13 +2656,14 @@
                             s =>
                               `
                                 <option
+                                  value="${esc(s)}"
                                   ${
                                     o.status === s
                                       ? 'selected'
                                       : ''
                                   }
                                 >
-                                  ${s}
+                                  ${esc(s)}
                                 </option>
                               `
                           )
@@ -3009,7 +2671,6 @@
                       }
 
                     </select>
-
 
                     <button
                       class="
@@ -3041,17 +2702,14 @@
 
     `;
 
-
     document
-      .querySelectorAll(
-        '.cake-status'
-      )
+      .querySelectorAll('.cake-status')
       .forEach(select => {
 
         select.onchange =
           async () => {
 
-            const {error} =
+            const { error } =
               await client
                 .from('custom_cakes')
                 .update({
@@ -3063,73 +2721,52 @@
                   select.dataset.id
                 );
 
-
-            if(error){
+            if (error) {
 
               alert(
                 'Erro ao atualizar bolo: ' +
                 error.message
               );
-
             }
-
           };
-
       });
 
-
     document
-      .querySelectorAll(
-        '.print-cake'
-      )
+      .querySelectorAll('.print-cake')
       .forEach(button => {
 
         button.onclick = () => {
 
           const o =
-            (data || [])
-              .find(
-                x =>
-                  String(x.id) ===
-                  String(
-                    button.dataset.id
-                  )
-              );
+            (data || []).find(
+              x =>
+                String(x.id) ===
+                String(
+                  button.dataset.id
+                )
+            );
 
-
-          if(!o){
+          if (!o) {
             return;
           }
-
 
           const d =
             o.data || {};
 
-
           printComanda(
-
             'COMANDA DE BOLO PERSONALIZADO',
-
             d,
-
-            d[
-              'Total estimado'
-            ] || ''
-
+            d['Total estimado'] || ''
           );
-
         };
-
       });
-
   }
-
 
   /* =========================================================
      MÍDIA
   ========================================================= */
 
-  async function media(){
+  async function media() {
 
     const {
       data,
@@ -3141,12 +2778,11 @@
         .list(
           '',
           {
-            limit:100
+            limit: 100
           }
         );
 
-
-    if(error){
+    if (error) {
 
       $('#view').innerHTML = `
 
@@ -3162,9 +2798,7 @@
       `;
 
       return;
-
     }
-
 
     $('#view').innerHTML = `
 
@@ -3174,21 +2808,15 @@
           Enviar mídia
         </h2>
 
-
         <p>
-
-          Envie fotos e vídeos
-          para usar no site.
-
+          Envie fotos e vídeos para usar no site.
         </p>
-
 
         <input
           id="file"
           type="file"
           accept="image/*,video/*"
         >
-
 
         <button
           class="btn"
@@ -3198,7 +2826,6 @@
         </button>
 
       </div>
-
 
       <div class="media-list">
 
@@ -3222,34 +2849,37 @@
 
     `;
 
-
     $('#up').onclick =
       async () => {
 
         const file =
-          $('#file').files[0];
+          $('#file').files?.[0];
 
-
-        if(!file){
+        if (!file) {
 
           alert(
             'Selecione um arquivo.'
           );
 
           return;
-
         }
 
-
-        const path =
-          `${Date.now()}-${file.name
+        const safeName =
+          file.name
+            .normalize('NFD')
+            .replace(
+              /[\u0300-\u036f]/g,
+              ''
+            )
             .replace(
               /[^a-zA-Z0-9._-]/g,
               '-'
-            )}`;
+            );
 
+        const path =
+          `${Date.now()}-${safeName}`;
 
-        const {error} =
+        const { error } =
           await client
             .storage
             .from('media')
@@ -3257,48 +2887,44 @@
               path,
               file,
               {
-                upsert:false
+                upsert: false,
+                contentType:
+                  file.type || undefined
               }
             );
 
+        if (error) {
 
-        if(error){
-
-          alert(
-            error.message
-          );
+          alert(error.message);
 
           return;
-
         }
 
-
         const {
-          data:u
+          data: u
         } =
           client
             .storage
             .from('media')
-            .getPublicUrl(
-              path
+            .getPublicUrl(path);
+
+        try {
+
+          await navigator
+            .clipboard
+            ?.writeText(
+              u.publicUrl
             );
 
-
-        await navigator
-          .clipboard
-          ?.writeText(
-            u.publicUrl
-          );
-
+        } catch (e) {}
 
         alert(
           'Enviado. URL copiada quando o navegador permitiu.'
         );
 
+        media();
       };
-
   }
-
 
   /* =========================================================
      INICIAR
