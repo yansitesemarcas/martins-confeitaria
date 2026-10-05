@@ -1,108 +1,53 @@
+/* =========================================================
+   MARTINS CONFEITARIA — PAINEL ADMINISTRATIVO
+   admin/admin.js
+   ========================================================= */
+
 (() => {
   "use strict";
 
   /* =========================================================
-     MARTINS CONFEITARIA
-     PAINEL ADMINISTRATIVO
-     admin.js — versão refeita do zero
-  ========================================================= */
+     CONFIGURAÇÃO
+     ========================================================= */
 
   const CONFIG = window.MARTINS_CONFIG || {};
+
+  if (!window.supabase) {
+    console.error("Supabase JS não foi carregado.");
+    return;
+  }
+
+  if (!CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_ANON_KEY) {
+    console.error("Configuração do Supabase não encontrada.");
+    return;
+  }
+
+  const db = window.supabase.createClient(
+    CONFIG.SUPABASE_URL,
+    CONFIG.SUPABASE_ANON_KEY
+  );
+
   const DEFAULTS = window.MARTINS_DEFAULTS || {};
 
-  let client = null;
-  let state = JSON.parse(JSON.stringify(DEFAULTS || {}));
-
-  let currentTab = "products";
-  let editingProductId = null;
-  let selectedPhotoData = "";
-  let toastTimer = null;
-
-  const TAB_INFO = {
-    products: {
-      title: "Produtos",
-      subtitle: "Gerencie o catálogo da confeitaria."
-    },
-
-    orders: {
-      title: "Pedidos",
-      subtitle: "Visualize os pedidos recebidos."
-    },
-
-    cakes: {
-      title: "Bolos personalizados",
-      subtitle: "Consulte as encomendas de bolos personalizados."
-    },
-
-    content: {
-      title: "Conteúdos",
-      subtitle: "Edite os conteúdos principais do site."
-    },
-
-    hours: {
-      title: "Horários",
-      subtitle: "Configure os horários de funcionamento."
-    },
-
-    rules: {
-      title: "Regras",
-      subtitle: "Configure informações e regras das encomendas."
-    },
-
-    media: {
-      title: "Mídia",
-      subtitle: "Gerencie imagens e informações visuais."
-    }
+  const PRODUCT_AREAS = {
+    delivery: "Delivery",
+    encomendas: "Encomendas"
   };
 
-  const DAYS = [
-    "Domingo",
-    "Segunda-feira",
-    "Terça-feira",
-    "Quarta-feira",
-    "Quinta-feira",
-    "Sexta-feira",
-    "Sábado"
-  ];
+  let state = clone(DEFAULTS);
+
+  let products = [];
+  let orders = [];
+  let cakeOrders = [];
+
+  let editingProductId = null;
+  let currentTab = "products";
+
+  let classifications = [];
 
   /* =========================================================
-     HELPERS
-  ========================================================= */
-
-  const $ = (selector, parent = document) =>
-    parent.querySelector(selector);
-
-  const $$ = (selector, parent = document) =>
-    [...parent.querySelectorAll(selector)];
-
-  const escapeHTML = (value) =>
-    String(value ?? "").replace(
-      /[&<>"']/g,
-      (char) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;"
-        })[char]
-    );
-
-  const money = (value) => {
-    const number = Number(value || 0);
-
-    return number.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL"
-    });
-  };
-
-  const normalizeArea = (area) =>
-    String(area || "")
-      .trim()
-      .toLowerCase()
-      .replace(/_/g, "-")
-      .replace(/\s+/g, "-");
+     UTILITÁRIOS
+     ========================================================= */
 
   function clone(value) {
     try {
@@ -112,442 +57,483 @@
     }
   }
 
-  function getProductImage(product) {
-    return (
-      product?.image ||
-      product?.image_url ||
-      product?.photo ||
-      product?.photo_url ||
-      product?.imagem ||
-      product?.foto ||
-      ""
+  function $(selector, root = document) {
+    return root.querySelector(selector);
+  }
+
+  function $$(selector, root = document) {
+    return Array.from(root.querySelectorAll(selector));
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function money(value) {
+    const number = Number(value || 0);
+
+    return number.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+  }
+
+  function showMessage(element, message, type = "error") {
+    if (!element) return;
+
+    element.textContent = message;
+    element.dataset.type = type;
+    element.style.display = message ? "block" : "none";
+  }
+
+  function generateId(prefix = "id") {
+    if (window.crypto && crypto.randomUUID) {
+      return `${prefix}_${crypto.randomUUID()}`;
+    }
+
+    return `${prefix}_${Date.now()}_${Math.random()
+      .toString(36)
+      .substring(2, 9)}`;
+  }
+
+  function normalizeClassification(value) {
+    return String(value || "")
+      .trim()
+      .replace(/\s+/g, " ");
+  }
+
+  /* =========================================================
+     CLASSIFICAÇÕES
+     
+     Delivery e Pronta entrega NÃO são classificações.
+     A classificação é algo como:
+     - Bolos
+     - Brownies
+     - Sobremesas
+     - Bolos no pote
+     - etc.
+     ========================================================= */
+
+  function getDefaultClassifications() {
+    const defaults = Array.isArray(DEFAULTS.categories)
+      ? DEFAULTS.categories
+      : [];
+
+    return defaults
+      .map(normalizeClassification)
+      .filter(Boolean);
+  }
+
+  function loadClassificationsFromState() {
+    const saved =
+      state &&
+      state.admin &&
+      Array.isArray(state.admin.classifications)
+        ? state.admin.classifications
+        : null;
+
+    if (saved && saved.length) {
+      classifications = saved
+        .map(normalizeClassification)
+        .filter(Boolean);
+    } else {
+      classifications = getDefaultClassifications();
+    }
+
+    classifications = [...new Set(classifications)];
+  }
+
+  function saveClassificationsToState() {
+    if (!state.admin || typeof state.admin !== "object") {
+      state.admin = {};
+    }
+
+    state.admin.classifications = [...classifications];
+  }
+
+  function renderClassificationOptions(selected = "") {
+    const select = $("#productClassification");
+
+    if (!select) return;
+
+    const current = normalizeClassification(selected);
+
+    select.innerHTML = `
+      <option value="">Selecione uma classificação</option>
+      ${classifications
+        .map((item) => {
+          const selectedAttr =
+            item === current ? " selected" : "";
+
+          return `
+            <option value="${escapeHTML(item)}"${selectedAttr}>
+              ${escapeHTML(item)}
+            </option>
+          `;
+        })
+        .join("")}
+    `;
+  }
+
+  function createClassification() {
+    const value = window.prompt(
+      "Digite o nome da nova classificação:"
     );
-  }
 
-  function setValue(selector, value) {
-    const element = $(selector);
+    if (value === null) return;
 
-    if (element) {
-      element.value = value ?? "";
-    }
-  }
+    const name = normalizeClassification(value);
 
-  function setChecked(selector, value) {
-    const element = $(selector);
-
-    if (element) {
-      element.checked = Boolean(value);
-    }
-  }
-
-  function getValue(selector) {
-    return $(selector)?.value ?? "";
-  }
-
-  function getChecked(selector) {
-    return Boolean($(selector)?.checked);
-  }
-
-  /* =========================================================
-     SUPABASE
-  ========================================================= */
-
-  function initSupabase() {
-    if (
-      !window.supabase ||
-      !CONFIG.SUPABASE_URL ||
-      !CONFIG.SUPABASE_ANON_KEY
-    ) {
-      console.error(
-        "Configuração do Supabase não encontrada."
-      );
-
-      return null;
-    }
-
-    try {
-      return window.supabase.createClient(
-        CONFIG.SUPABASE_URL,
-        CONFIG.SUPABASE_ANON_KEY
-      );
-    } catch (error) {
-      console.error(
-        "Erro ao criar cliente Supabase:",
-        error
-      );
-
-      return null;
-    }
-  }
-
-  /* =========================================================
-     TOAST
-  ========================================================= */
-
-  function showToast(message, type = "") {
-    const toast = $("#toast");
-
-    if (!toast) {
-      alert(message);
+    if (!name) {
+      alert("Digite um nome válido.");
       return;
     }
 
-    clearTimeout(toastTimer);
+    const exists = classifications.some(
+      (item) => item.toLowerCase() === name.toLowerCase()
+    );
 
-    toast.textContent = message;
-
-    toast.className = "";
-
-    if (type) {
-      toast.classList.add(type);
+    if (exists) {
+      alert("Essa classificação já existe.");
+      return;
     }
 
-    requestAnimationFrame(() => {
-      toast.classList.add("show");
-    });
+    classifications.push(name);
+    classifications.sort((a, b) =>
+      a.localeCompare(b, "pt-BR")
+    );
 
-    toastTimer = setTimeout(() => {
-      toast.classList.remove("show");
-    }, 3200);
+    saveClassificationsToState();
+    renderClassificationOptions(name);
+
+    saveSettings().catch((error) => {
+      console.error(error);
+      alert(
+        "A classificação foi criada localmente, mas não foi possível salvar no Supabase."
+      );
+    });
+  }
+
+  function removeClassification() {
+    const select = $("#productClassification");
+
+    if (!select || !select.value) {
+      alert("Selecione uma classificação primeiro.");
+      return;
+    }
+
+    const selected = select.value;
+
+    const confirmed = window.confirm(
+      `Excluir a classificação "${selected}"?\n\nOs produtos existentes não serão apagados.`
+    );
+
+    if (!confirmed) return;
+
+    classifications = classifications.filter(
+      (item) => item !== selected
+    );
+
+    saveClassificationsToState();
+    renderClassificationOptions("");
+
+    saveSettings().catch((error) => {
+      console.error(error);
+      alert(
+        "A classificação foi removida localmente, mas houve um erro ao salvar."
+      );
+    });
   }
 
   /* =========================================================
-     AUTH
-  ========================================================= */
+     LOGO / IDENTIDADE
+     ========================================================= */
+
+  function findLogoUrl() {
+    const candidates = [
+      state?.media?.logo,
+      state?.media?.logo_url,
+      state?.logo,
+      state?.logo_url,
+      "../assets/logo.png",
+      "../logo.png",
+      "../assets/logo.webp"
+    ];
+
+    return candidates.find(Boolean) || "";
+  }
+
+  function applyMartinsBrand() {
+    const logoUrl = findLogoUrl();
+
+    const loginLogoWrap = $("#loginLogoWrap");
+
+    if (loginLogoWrap && logoUrl) {
+      loginLogoWrap.innerHTML = `
+        <img
+          src="${escapeHTML(logoUrl)}"
+          alt="Martins Confeitaria"
+          style="
+            max-width:140px;
+            max-height:90px;
+            width:auto;
+            height:auto;
+            object-fit:contain;
+            display:block;
+            margin:auto;
+          "
+          onerror="this.style.display='none'"
+        >
+      `;
+    }
+
+    document.documentElement.style.setProperty(
+      "--blue",
+      "#67b0cb"
+    );
+
+    document.documentElement.style.setProperty(
+      "--blue-dark",
+      "#2b7896"
+    );
+
+    document.documentElement.style.setProperty(
+      "--pink",
+      "#f3b7bb"
+    );
+
+    document.documentElement.style.setProperty(
+      "--white",
+      "#ffffff"
+    );
+
+    document.documentElement.style.setProperty(
+      "--primary",
+      "#67b0cb"
+    );
+
+    document.documentElement.style.setProperty(
+      "--primary-dark",
+      "#2b7896"
+    );
+
+    const brandElements = $$(
+      ".login-brand h1, .brand-name, .sidebar-brand h1"
+    );
+
+    brandElements.forEach((element) => {
+      element.style.color = "#2b7896";
+    });
+  }
+
+  /* =========================================================
+     LOGIN
+     ========================================================= */
+
+  async function checkSession() {
+    try {
+      const {
+        data,
+        error
+      } = await db.auth.getSession();
+
+      if (error) {
+        throw error;
+      }
+
+      if (data?.session) {
+        showApp();
+      } else {
+        showLogin();
+      }
+    } catch (error) {
+      console.error("Erro ao verificar sessão:", error);
+      showLogin();
+    }
+  }
 
   function showLogin() {
-    $("#loginScreen")?.classList.remove("hidden");
-    $("#app")?.classList.add("hidden");
+    const login = $("#loginScreen");
+    const app = $("#app");
+
+    if (login) {
+      login.classList.remove("hidden");
+      login.style.display = "";
+    }
+
+    if (app) {
+      app.classList.add("hidden");
+    }
   }
 
   async function showApp() {
-    $("#loginScreen")?.classList.add("hidden");
-    $("#app")?.classList.remove("hidden");
+    const login = $("#loginScreen");
+    const app = $("#app");
 
-    await loadEverything();
+    if (login) {
+      login.classList.add("hidden");
+    }
 
-    renderTab(currentTab);
+    if (app) {
+      app.classList.remove("hidden");
+      app.style.display = "";
+    }
+
+    await loadAll();
   }
 
-  function setupAuth() {
-    const loginForm = $("#loginForm");
+  async function handleLogin(event) {
+    event.preventDefault();
 
-    if (!loginForm) {
+    const form = event.currentTarget;
+
+    const emailInput =
+      $("#loginEmail", form) || $("#loginEmail");
+
+    const passwordInput =
+      $("#loginPassword", form) || $("#loginPassword");
+
+    const message =
+      $("#loginMsg") ||
+      form.querySelector(".login-msg");
+
+    const submitButton =
+      form.querySelector('button[type="submit"]');
+
+    const email = emailInput?.value?.trim() || "";
+    const password = passwordInput?.value || "";
+
+    if (!email || !password) {
+      showMessage(
+        message,
+        "Informe o e-mail e a senha."
+      );
       return;
     }
 
-    /*
-      Não dependemos de id="loginButton".
-      O próprio botão submit do formulário é localizado aqui.
-    */
-
-    loginForm.addEventListener(
-      "submit",
-      async (event) => {
-        event.preventDefault();
-
-        if (!client) {
-          showToast(
-            "Não foi possível conectar ao Supabase.",
-            "error"
-          );
-
-          return;
-        }
-
-        const button =
-          loginForm.querySelector(
-            'button[type="submit"]'
-          );
-
-        const message = $("#loginMsg");
-
-        const formData =
-          new FormData(loginForm);
-
-        const email = String(
-          formData.get("email") || ""
-        ).trim();
-
-        const password = String(
-          formData.get("password") || ""
-        );
-
-        if (!email || !password) {
-          if (message) {
-            message.textContent =
-              "Informe seu e-mail e sua senha.";
-          }
-
-          return;
-        }
-
-        if (button) {
-          button.disabled = true;
-          button.textContent = "Entrando...";
-        }
-
-        if (message) {
-          message.textContent = "";
-        }
-
-        try {
-          const { error } =
-            await client.auth.signInWithPassword({
-              email,
-              password
-            });
-
-          if (error) {
-            console.error(
-              "Erro de login:",
-              error
-            );
-
-            if (message) {
-              message.textContent =
-                error.message ||
-                "Não foi possível entrar.";
-            }
-
-            showToast(
-              error.message ||
-                "E-mail ou senha incorretos.",
-              "error"
-            );
-
-            return;
-          }
-
-          if (message) {
-            message.textContent = "";
-          }
-
-          await showApp();
-        } catch (error) {
-          console.error(
-            "Erro inesperado no login:",
-            error
-          );
-
-          showToast(
-            "Ocorreu um erro ao tentar entrar.",
-            "error"
-          );
-        } finally {
-          if (button) {
-            button.disabled = false;
-            button.textContent = "Entrar";
-          }
-        }
-      }
-    );
-  }
-
-  async function checkSession() {
-    if (!client) {
-      showLogin();
-      return;
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.dataset.originalText =
+        submitButton.textContent;
+      submitButton.textContent = "Entrando...";
     }
+
+    showMessage(message, "");
 
     try {
       const {
         data,
         error
-      } = await client.auth.getSession();
+      } = await db.auth.signInWithPassword({
+        email,
+        password
+      });
 
       if (error) {
-        console.error(
-          "Erro ao verificar sessão:",
-          error
+        throw error;
+      }
+
+      if (!data?.session) {
+        throw new Error(
+          "Login realizado, mas nenhuma sessão foi criada."
         );
-
-        showLogin();
-        return;
       }
 
-      if (data?.session) {
-        await showApp();
-      } else {
-        showLogin();
-      }
-    } catch (error) {
-      console.error(
-        "Erro ao verificar sessão:",
-        error
+      showMessage(
+        message,
+        "Login realizado com sucesso.",
+        "success"
       );
 
-      showLogin();
+      await showApp();
+    } catch (error) {
+      console.error(error);
+
+      showMessage(
+        message,
+        error?.message ||
+          "Não foi possível entrar. Verifique o e-mail e a senha."
+      );
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent =
+          submitButton.dataset.originalText ||
+          "Entrar";
+      }
     }
   }
 
-  function setupAuthListener() {
-    if (!client) {
-      return;
+  async function logout() {
+    try {
+      await db.auth.signOut();
+    } catch (error) {
+      console.error(error);
     }
 
-    client.auth.onAuthStateChange(
-      (event, session) => {
-        if (
-          event === "SIGNED_OUT" ||
-          !session
-        ) {
-          showLogin();
-        }
-      }
-    );
-  }
-
-  function setupLogout() {
-    $("#logout")?.addEventListener(
-      "click",
-      async () => {
-        if (!client) {
-          showLogin();
-          return;
-        }
-
-        try {
-          await client.auth.signOut();
-        } catch (error) {
-          console.error(
-            "Erro ao sair:",
-            error
-          );
-        }
-
-        showLogin();
-      }
-    );
+    showLogin();
   }
 
   /* =========================================================
-     CARREGAMENTO
-  ========================================================= */
-
-  async function loadEverything() {
-    state = clone(DEFAULTS || {});
-
-    if (!Array.isArray(state.products)) {
-      state.products = [];
-    }
-
-    try {
-      await loadSettings();
-    } catch (error) {
-      console.warn(
-        "Não foi possível carregar settings:",
-        error
-      );
-    }
-
-    try {
-      await loadProducts();
-    } catch (error) {
-      console.warn(
-        "Não foi possível carregar produtos:",
-        error
-      );
-    }
-
-    updateStats();
-  }
+     SUPABASE — SETTINGS
+     ========================================================= */
 
   async function loadSettings() {
-    if (!client) {
-      return;
-    }
-
     const {
       data,
       error
-    } = await client
+    } = await db
       .from("settings")
-      .select("value")
+      .select("*")
       .eq("key", "site")
       .maybeSingle();
 
     if (error) {
       console.warn(
-        "Erro ao carregar settings:",
+        "Não foi possível carregar settings:",
         error
       );
-
       return;
     }
 
     if (data?.value) {
-      const remote = data.value;
+      const saved =
+        typeof data.value === "string"
+          ? JSON.parse(data.value)
+          : data.value;
 
-      state = {
-        ...state,
-        ...remote,
-
-        about: {
-          ...(state.about || {}),
-          ...(remote.about || {})
-        },
-
-        cake: {
-          ...(state.cake || {}),
-          ...(remote.cake || {})
-        }
-      };
+      if (saved && typeof saved === "object") {
+        state = {
+          ...clone(DEFAULTS),
+          ...saved
+        };
+      }
     }
+
+    loadClassificationsFromState();
   }
-
-  async function loadProducts() {
-    if (!client) {
-      return;
-    }
-
-    const {
-      data,
-      error
-    } = await client
-      .from("products")
-      .select("*")
-      .order("sort", {
-        ascending: true
-      });
-
-    if (error) {
-      console.warn(
-        "Erro ao carregar products:",
-        error
-      );
-
-      return;
-    }
-
-    if (Array.isArray(data)) {
-      state.products = data;
-    }
-  }
-
-  /* =========================================================
-     SALVAR SETTINGS
-  ========================================================= */
 
   async function saveSettings() {
-    if (!client) {
-      throw new Error(
-        "Supabase não configurado."
-      );
-    }
-
-    const payload = {
-      key: "site",
-      value: state
-    };
+    saveClassificationsToState();
 
     const {
       error
-    } = await client
+    } = await db
       .from("settings")
-      .upsert(payload, {
-        onConflict: "key"
-      });
+      .upsert(
+        {
+          key: "site",
+          value: state
+        },
+        {
+          onConflict: "key"
+        }
+      );
 
     if (error) {
       throw error;
@@ -555,953 +541,655 @@
   }
 
   /* =========================================================
-     STATS
-  ========================================================= */
+     SUPABASE — PRODUCTS
+     ========================================================= */
 
-  function updateStats() {
-    const products =
-      Array.isArray(state.products)
-        ? state.products
-        : [];
+  async function loadProducts() {
+    const {
+      data,
+      error
+    } = await db
+      .from("products")
+      .select("*")
+      .order("sort", {
+        ascending: true
+      });
 
-    const available =
-      products.filter(
-        (product) =>
-          product.available !== false
+    if (error) {
+      console.error(
+        "Erro carregando produtos:",
+        error
       );
 
-    const statProducts =
-      $("#statProducts");
-
-    const statAvailable =
-      $("#statAvailable");
-
-    if (statProducts) {
-      statProducts.textContent =
-        products.length;
-    }
-
-    if (statAvailable) {
-      statAvailable.textContent =
-        available.length;
-    }
-
-    /*
-      Pedidos e bolos são atualizados
-      quando as respectivas tabelas
-      estiverem disponíveis.
-    */
-
-    loadOptionalStats();
-  }
-
-  async function loadOptionalStats() {
-    if (!client) {
+      products = [];
       return;
     }
 
+    products = Array.isArray(data)
+      ? data
+      : [];
+  }
+
+  /* =========================================================
+     PEDIDOS — MÓDULO OPCIONAL
+     ========================================================= */
+
+  async function loadOrders() {
     try {
-      const result =
-        await client
-          .from("orders")
-          .select("id", {
-            count: "exact",
-            head: true
-          });
-
-      if (!result.error) {
-        $("#statOrders").textContent =
-          result.count || 0;
-      }
-    } catch {
-      $("#statOrders").textContent = "—";
-    }
-
-    try {
-      const result =
-        await client
-          .from("custom_cakes")
-          .select("id", {
-            count: "exact",
-            head: true
-          });
-
-      if (!result.error) {
-        $("#statCakes").textContent =
-          result.count || 0;
-      }
-    } catch {
-      $("#statCakes").textContent = "—";
-    }
-  }
-
-  /* =========================================================
-     TABS
-  ========================================================= */
-
-  function setupTabs() {
-    $$(".nav button[data-tab]").forEach(
-      (button) => {
-        button.addEventListener(
-          "click",
-          () => {
-            const tab =
-              button.dataset.tab;
-
-            if (!tab) {
-              return;
-            }
-
-            currentTab = tab;
-
-            $$(".nav button").forEach(
-              (item) => {
-                item.classList.toggle(
-                  "active",
-                  item === button
-                );
-              }
-            );
-
-            renderTab(tab);
-
-            $("#sidebar")?.classList.remove(
-              "open"
-            );
-          }
-        );
-      }
-    );
-  }
-
-  function renderTab(tab) {
-    const info =
-      TAB_INFO[tab] ||
-      TAB_INFO.products;
-
-    $("#pageTitle").textContent =
-      info.title;
-
-    $("#pageSubtitle").textContent =
-      info.subtitle;
-
-    if (tab === "products") {
-      renderProductsTab();
-      return;
-    }
-
-    if (tab === "orders") {
-      renderOrdersTab();
-      return;
-    }
-
-    if (tab === "cakes") {
-      renderCakesTab();
-      return;
-    }
-
-    if (tab === "content") {
-      renderContentTab();
-      return;
-    }
-
-    if (tab === "hours") {
-      renderHoursTab();
-      return;
-    }
-
-    if (tab === "rules") {
-      renderRulesTab();
-      return;
-    }
-
-    if (tab === "media") {
-      renderMediaTab();
-      return;
-    }
-
-    renderProductsTab();
-  }
-
-  /* =========================================================
-     MOBILE
-  ========================================================= */
-
-  function setupMobileMenu() {
-    $("#mobileMenu")?.addEventListener(
-      "click",
-      () => {
-        $("#sidebar")?.classList.toggle(
-          "open"
-        );
-      }
-    );
-  }
-
-  /* =========================================================
-     PRODUCTS
-  ========================================================= */
-
-  function renderProductsTab() {
-    const container =
-      $("#tabContent");
-
-    if (!container) {
-      return;
-    }
-
-    const products =
-      Array.isArray(state.products)
-        ? [...state.products]
-        : [];
-
-    products.sort(
-      (a, b) =>
-        Number(a.sort || 0) -
-        Number(b.sort || 0)
-    );
-
-    const areas = [
-      {
-        value: "cardapio",
-        label: "Delivery"
-      },
-      {
-        value: "pronta-entrega",
-        label: "Pronta entrega"
-      },
-      {
-        value: "encomendas",
-        label: "Encomendas"
-      }
-    ];
-
-    container.innerHTML = `
-      <div class="section">
-
-        <div class="section-header">
-
-          <div>
-            <h3>Produtos</h3>
-            <p>
-              Cadastre e edite os produtos exibidos no site.
-            </p>
-          </div>
-
-          <button
-            class="btn btn-primary"
-            type="button"
-            id="newProductBtn"
-          >
-            + Novo produto
-          </button>
-
-        </div>
-
-        <div class="section-body">
-
-          ${
-            products.length
-              ? areas
-                  .map((area) => {
-                    const list =
-                      products.filter(
-                        (product) =>
-                          normalizeArea(
-                            product.area
-                          ) ===
-                          area.value
-                      );
-
-                    return `
-                      <div class="area-group">
-
-                        <div class="area-heading">
-                          <h4>
-                            ${area.label}
-                          </h4>
-
-                          <span class="tag">
-                            ${list.length}
-                            ${
-                              list.length === 1
-                                ? "produto"
-                                : "produtos"
-                            }
-                          </span>
-                        </div>
-
-                        ${
-                          list.length
-                            ? `
-                              <div class="product-list">
-                                ${list
-                                  .map(
-                                    renderProductRow
-                                  )
-                                  .join("")}
-                              </div>
-                            `
-                            : `
-                              <div class="empty">
-                                Nenhum produto nesta área.
-                              </div>
-                            `
-                        }
-
-                      </div>
-                    `;
-                  })
-                  .join("")
-              : `
-                <div class="empty">
-
-                  <div class="empty-icon">
-                    🍰
-                  </div>
-
-                  <p>
-                    Nenhum produto cadastrado.
-                  </p>
-
-                </div>
-              `
-          }
-
-        </div>
-      </div>
-    `;
-
-    $("#newProductBtn")?.addEventListener(
-      "click",
-      () => openProductModal()
-    );
-
-    $$(".edit-product").forEach(
-      (button) => {
-        button.addEventListener(
-          "click",
-          () => {
-            openProductModal(
-              button.dataset.id
-            );
-          }
-        );
-      }
-    );
-
-    $$(".delete-product").forEach(
-      (button) => {
-        button.addEventListener(
-          "click",
-          () => {
-            deleteProduct(
-              button.dataset.id
-            );
-          }
-        );
-      }
-    );
-  }
-
-  function renderProductRow(product) {
-    const image =
-      getProductImage(product);
-
-    const available =
-      product.available !== false;
-
-    const discount =
-      Number(
-        product.discount_percent || 0
-      );
-
-    const finalPrice =
-      Number(product.price || 0) *
-      (1 - discount / 100);
-
-    return `
-      <div class="product-row">
-
-        <div class="product-image">
-
-          ${
-            image
-              ? `
-                <img
-                  src="${escapeHTML(
-                    image
-                  )}"
-                  alt="${escapeHTML(
-                    product.name
-                  )}"
-                >
-              `
-              : "🧁"
-          }
-
-        </div>
-
-        <div class="product-info">
-
-          <div class="product-name">
-            ${escapeHTML(
-              product.name ||
-                "Produto sem nome"
-            )}
-          </div>
-
-          <div class="product-meta">
-
-            ${
-              available
-                ? `
-                  <span class="tag green">
-                    Disponível
-                  </span>
-                `
-                : `
-                  <span class="tag red">
-                    Indisponível
-                  </span>
-                `
-            }
-
-            ${
-              product.featured
-                ? `
-                  <span class="tag yellow">
-                    Destaque
-                  </span>
-                `
-                : ""
-            }
-
-            ${
-              product.appointment_required
-                ? `
-                  <span class="tag">
-                    Agendamento
-                  </span>
-                `
-                : ""
-            }
-
-          </div>
-
-        </div>
-
-        <div class="product-price">
-
-          ${
-            discount > 0
-              ? `
-                <span class="old-price">
-                  ${money(
-                    product.price
-                  )}
-                </span>
-              `
-              : ""
-          }
-
-          <strong>
-            ${money(finalPrice)}
-          </strong>
-
-        </div>
-
-        <div class="product-actions">
-
-          <button
-            class="btn btn-secondary btn-small edit-product"
-            type="button"
-            data-id="${escapeHTML(
-              product.id
-            )}"
-          >
-            Editar
-          </button>
-
-          <button
-            class="btn btn-danger btn-small delete-product"
-            type="button"
-            data-id="${escapeHTML(
-              product.id
-            )}"
-          >
-            Excluir
-          </button>
-
-        </div>
-
-      </div>
-    `;
-  }
-
-  /* =========================================================
-     MODAL PRODUTO
-  ========================================================= */
-
-  function openProductModal(id = null) {
-    const modal =
-      $("#productModal");
-
-    const form =
-      $("#productForm");
-
-    if (!modal || !form) {
-      return;
-    }
-
-    editingProductId =
-      id ? String(id) : null;
-
-    selectedPhotoData = "";
-
-    form.reset();
-
-    $("#productModalTitle").textContent =
-      editingProductId
-        ? "Editar produto"
-        : "Novo produto";
-
-    setChecked(
-      "#productAvailable",
-      true
-    );
-
-    setValue(
-      "#productArea",
-      "cardapio"
-    );
-
-    setValue(
-      "#productDiscount",
-      "0"
-    );
-
-    setValue(
-      "#productSort",
-      "0"
-    );
-
-    $("#photoPreview").innerHTML =
-      "📷";
-
-    if (editingProductId) {
-      const product =
-        state.products.find(
-          (item) =>
-            String(item.id) ===
-            editingProductId
-        );
-
-      if (!product) {
+      const {
+        data,
+        error
+      } = await db
+        .from("orders")
+        .select("*")
+        .order("created_at", {
+          ascending: false
+        });
+
+      if (error) {
+        orders = [];
         return;
       }
 
-      setValue(
-        "#productName",
-        product.name
-      );
+      orders = Array.isArray(data)
+        ? data
+        : [];
+    } catch {
+      orders = [];
+    }
+  }
 
-      setValue(
-        "#productArea",
-        normalizeArea(
-          product.area
-        ) || "cardapio"
-      );
+  /* =========================================================
+     ENCOMENDAS — MÓDULO OPCIONAL
+     ========================================================= */
 
-      setValue(
-        "#productPrice",
-        product.price
-      );
+  async function loadCakeOrders() {
+    const possibleTables = [
+      "custom_cakes",
+      "cake_orders",
+      "encomendas"
+    ];
 
-      setValue(
-        "#productDiscount",
-        product.discount_percent ||
-          0
-      );
+    for (const table of possibleTables) {
+      try {
+        const {
+          data,
+          error
+        } = await db
+          .from(table)
+          .select("*")
+          .order("created_at", {
+            ascending: false
+          });
 
-      setValue(
-        "#productSort",
-        product.sort || 0
-      );
-
-      setValue(
-        "#productGramatura",
-        product.gramatura ?? ""
-      );
-
-      setValue(
-        "#productServeAte",
-        product.serve_ate ?? ""
-      );
-
-      setValue(
-        "#productDescription",
-        product.description || ""
-      );
-
-      setChecked(
-        "#productAvailable",
-        product.available !== false
-      );
-
-      setChecked(
-        "#productFeatured",
-        product.featured
-      );
-
-      setChecked(
-        "#productAppointment",
-        product.appointment_required
-      );
-
-      const image =
-        getProductImage(product);
-
-      if (image) {
-        $("#photoPreview").innerHTML = `
-          <img
-            src="${escapeHTML(image)}"
-            alt="Foto do produto"
-          >
-        `;
+        if (!error && Array.isArray(data)) {
+          cakeOrders = data;
+          return;
+        }
+      } catch {
+        // tenta a próxima tabela
       }
     }
 
-    modal.classList.add("open");
+    cakeOrders = [];
+  }
+
+  /* =========================================================
+     CARREGAMENTO GERAL
+     ========================================================= */
+
+  async function loadAll() {
+    setLoading(true);
+
+    try {
+      await Promise.all([
+        loadSettings(),
+        loadProducts(),
+        loadOrders(),
+        loadCakeOrders()
+      ]);
+
+      applyMartinsBrand();
+      updateStats();
+      renderCurrentTab();
+    } catch (error) {
+      console.error(
+        "Erro carregando painel:",
+        error
+      );
+
+      alert(
+        "Algumas informações não puderam ser carregadas. Verifique o console."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function setLoading(isLoading) {
+    document.body.dataset.loading = isLoading
+      ? "true"
+      : "false";
+  }
+
+  /* =========================================================
+     ESTATÍSTICAS
+     ========================================================= */
+
+  function updateStats() {
+    const total = products.length;
+
+    const available = products.filter(
+      (product) =>
+        product.available !== false
+    ).length;
+
+    const statProducts = $("#statProducts");
+    const statAvailable = $("#statAvailable");
+    const statOrders = $("#statOrders");
+    const statCakes = $("#statCakes");
+
+    if (statProducts) {
+      statProducts.textContent = total;
+    }
+
+    if (statAvailable) {
+      statAvailable.textContent = available;
+    }
+
+    if (statOrders) {
+      statOrders.textContent = orders.length;
+    }
+
+    if (statCakes) {
+      statCakes.textContent = cakeOrders.length;
+    }
+  }
+
+  /* =========================================================
+     PRODUTOS — IMAGEM
+     ========================================================= */
+
+  function compressImage(file) {
+    return new Promise((resolve, reject) => {
+      if (!file) {
+        resolve("");
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const image = new Image();
+
+        image.onload = () => {
+          const maxSize = 1000;
+
+          let width = image.width;
+          let height = image.height;
+
+          if (width > maxSize || height > maxSize) {
+            const ratio = Math.min(
+              maxSize / width,
+              maxSize / height
+            );
+
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
+          }
+
+          const canvas =
+            document.createElement("canvas");
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const context =
+            canvas.getContext("2d");
+
+          context.drawImage(
+            image,
+            0,
+            0,
+            width,
+            height
+          );
+
+          const dataUrl =
+            canvas.toDataURL(
+              "image/jpeg",
+              0.78
+            );
+
+          resolve(dataUrl);
+        };
+
+        image.onerror = () => {
+          reject(
+            new Error(
+              "Não foi possível processar a imagem."
+            )
+          );
+        };
+
+        image.src = reader.result;
+      };
+
+      reader.onerror = () => {
+        reject(
+          new Error(
+            "Não foi possível ler a imagem."
+          )
+        );
+      };
+
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /* =========================================================
+     PRODUTOS — MODAL
+     ========================================================= */
+
+  function getProductModal() {
+    return $("#productModal");
+  }
+
+  function openProductModal(product = null) {
+    const modal = getProductModal();
+    const form = $("#productForm");
+
+    if (!modal || !form) return;
+
+    editingProductId = product?.id || null;
+
+    form.reset();
+
+    const title =
+      modal.querySelector(
+        ".modal-title, h2, h3"
+      );
+
+    if (title) {
+      title.textContent = product
+        ? "Editar produto"
+        : "Novo produto";
+    }
+
+    const name = $("#productName");
+    const price = $("#productPrice");
+    const discount = $("#productDiscount");
+    const sort = $("#productSort");
+    const gramatura = $("#productGramatura");
+    const serveAte = $("#productServeAte");
+    const description = $("#productDescription");
+    const available = $("#productAvailable");
+    const featured = $("#productFeatured");
+    const appointment = $("#productAppointment");
+    const photo = $("#productPhoto");
+
+    /* Área não é mais usada como classificação.
+       Naked Cake / Chantininho ficam em Encomendas. */
+
+    const area =
+      $("#productArea");
+
+    if (product) {
+      if (name) {
+        name.value = product.name || "";
+      }
+
+      if (price) {
+        price.value =
+          product.price ?? "";
+      }
+
+      if (discount) {
+        discount.value =
+          product.discount_percent ?? "";
+      }
+
+      if (sort) {
+        sort.value =
+          product.sort ?? 0;
+      }
+
+      if (gramatura) {
+        gramatura.value =
+          product.gramatura || "";
+      }
+
+      if (serveAte) {
+        serveAte.value =
+          product.serve_ate || "";
+      }
+
+      if (description) {
+        description.value =
+          product.description || "";
+      }
+
+      if (available) {
+        available.checked =
+          product.available !== false;
+      }
+
+      if (featured) {
+        featured.checked =
+          product.featured === true;
+      }
+
+      if (appointment) {
+        appointment.checked =
+          product.appointment_required === true;
+      }
+
+      if (photo) {
+        photo.value = "";
+      }
+
+      renderClassificationOptions(
+        product.category || ""
+      );
+
+      if (area) {
+        /*
+          Delivery e Pronta Entrega são a mesma coisa.
+          Para produtos comuns usamos Delivery.
+          Produtos de encomenda ficam em Encomendas.
+        */
+        const currentArea =
+          String(product.area || "")
+            .toLowerCase();
+
+        if (
+          currentArea.includes("encom") ||
+          currentArea.includes("bolo")
+        ) {
+          area.value = "encomendas";
+        } else {
+          area.value = "delivery";
+        }
+      }
+    } else {
+      if (available) {
+        available.checked = true;
+      }
+
+      if (featured) {
+        featured.checked = false;
+      }
+
+      if (appointment) {
+        appointment.checked = false;
+      }
+
+      if (sort) {
+        sort.value = products.length + 1;
+      }
+
+      renderClassificationOptions("");
+
+      if (area) {
+        area.value = "delivery";
+      }
+    }
+
+    modal.classList.remove("hidden");
+    modal.style.display = "flex";
+
+    document.body.classList.add(
+      "modal-open"
+    );
   }
 
   function closeProductModal() {
-    $("#productModal")?.classList.remove(
-      "open"
+    const modal = getProductModal();
+
+    if (!modal) return;
+
+    modal.classList.add("hidden");
+    modal.style.display = "none";
+
+    document.body.classList.remove(
+      "modal-open"
     );
 
     editingProductId = null;
-    selectedPhotoData = "";
-  }
-
-  function setupProductModal() {
-    $$(
-      "[data-close-modal='productModal']"
-    ).forEach((button) => {
-      button.addEventListener(
-        "click",
-        closeProductModal
-      );
-    });
-
-    $("#productModal")?.addEventListener(
-      "click",
-      (event) => {
-        if (
-          event.target ===
-          $("#productModal")
-        ) {
-          closeProductModal();
-        }
-      }
-    );
-
-    $("#productPhoto")?.addEventListener(
-      "change",
-      handlePhotoSelection
-    );
-
-    $("#productForm")?.addEventListener(
-      "submit",
-      saveProduct
-    );
   }
 
   /* =========================================================
-     FOTO
-  ========================================================= */
-
-  function handlePhotoSelection(event) {
-    const file =
-      event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    if (!file.type.startsWith("image/")) {
-      showToast(
-        "Escolha uma imagem válida.",
-        "error"
-      );
-
-      return;
-    }
-
-    const reader =
-      new FileReader();
-
-    reader.onload = () => {
-      selectedPhotoData =
-        String(reader.result || "");
-
-      $("#photoPreview").innerHTML = `
-        <img
-          src="${escapeHTML(
-            selectedPhotoData
-          )}"
-          alt="Prévia da foto"
-        >
-      `;
-    };
-
-    reader.onerror = () => {
-      showToast(
-        "Não foi possível ler a imagem.",
-        "error"
-      );
-    };
-
-    reader.readAsDataURL(file);
-  }
-
-  /* =========================================================
-     SALVAR PRODUTO
-  ========================================================= */
+     PRODUTOS — SALVAR
+     ========================================================= */
 
   async function saveProduct(event) {
     event.preventDefault();
 
-    if (!client) {
-      showToast(
-        "Supabase não configurado.",
-        "error"
+    const form = event.currentTarget;
+
+    const name =
+      $("#productName")?.value?.trim() || "";
+
+    const price =
+      Number($("#productPrice")?.value || 0);
+
+    const discount =
+      Number(
+        $("#productDiscount")?.value || 0
       );
 
+    const sort =
+      Number($("#productSort")?.value || 0);
+
+    const gramatura =
+      $("#productGramatura")?.value?.trim() ||
+      "";
+
+    const serveAte =
+      $("#productServeAte")?.value?.trim() ||
+      "";
+
+    const description =
+      $("#productDescription")?.value?.trim() ||
+      "";
+
+    const available =
+      $("#productAvailable")?.checked !== false;
+
+    const featured =
+      $("#productFeatured")?.checked === true;
+
+    const appointment =
+      $("#productAppointment")?.checked === true;
+
+    const classification =
+      normalizeClassification(
+        $("#productClassification")?.value || ""
+      );
+
+    const areaValue =
+      $("#productArea")?.value || "delivery";
+
+    const photoFile =
+      $("#productPhoto")?.files?.[0] || null;
+
+    if (!name) {
+      alert("Informe o nome do produto.");
       return;
     }
 
-    const button =
-      $("#productForm button[type='submit']");
+    if (!price || price < 0) {
+      alert("Informe um preço válido.");
+      return;
+    }
 
-    if (button) {
-      button.disabled = true;
-      button.textContent =
+    if (!classification) {
+      alert(
+        "Selecione uma classificação para o produto."
+      );
+      return;
+    }
+
+    const existing =
+      editingProductId
+        ? products.find(
+            (item) =>
+              String(item.id) ===
+              String(editingProductId)
+          )
+        : null;
+
+    const saveButton =
+      form.querySelector(
+        'button[type="submit"]'
+      );
+
+    if (saveButton) {
+      saveButton.disabled = true;
+      saveButton.dataset.originalText =
+        saveButton.textContent;
+      saveButton.textContent =
         "Salvando...";
     }
 
     try {
-      const existing =
-        editingProductId
-          ? state.products.find(
-              (item) =>
-                String(item.id) ===
-                String(editingProductId)
-            )
-          : null;
+      let imageUrl =
+        existing?.image_url ||
+        existing?.image ||
+        existing?.photo_url ||
+        existing?.photo ||
+        existing?.imagem ||
+        existing?.foto ||
+        "";
 
-      const product = {
-        ...(existing || {}),
-
-        name:
-          getValue("#productName")
-            .trim(),
-
-        area:
-          normalizeArea(
-            getValue("#productArea")
-          ) || "cardapio",
-
-        price:
-          Number(
-            getValue("#productPrice") ||
-              0
-          ),
-
-        discount_percent:
-          Number(
-            getValue(
-              "#productDiscount"
-            ) || 0
-          ),
-
-        sort:
-          Number(
-            getValue("#productSort") ||
-              0
-          ),
-
-        gramatura:
-          getValue(
-            "#productGramatura"
-          ).trim(),
-
-        serve_ate:
-          getValue(
-            "#productServeAte"
-          ).trim(),
-
-        description:
-          getValue(
-            "#productDescription"
-          ).trim(),
-
-        available:
-          getChecked(
-            "#productAvailable"
-          ),
-
-        featured:
-          getChecked(
-            "#productFeatured"
-          ),
-
-        appointment_required:
-          getChecked(
-            "#productAppointment"
-          )
-      };
+      if (photoFile) {
+        imageUrl =
+          await compressImage(photoFile);
+      }
 
       /*
-        Mantemos a categoria existente
-        quando editamos um produto.
+        IMPORTANTE:
+        A classificação é salva no campo "category"
+        da tabela products.
 
-        O painel não exibe mais o campo
-        de categoria.
+        A interface não mostra mais "Categoria".
+        O usuário vê "Classificação".
       */
 
-      if (
-        existing &&
-        Object.prototype.hasOwnProperty.call(
-          existing,
-          "category"
-        )
-      ) {
-        product.category =
-          existing.category;
-      }
+      const productData = {
+        id:
+          existing?.id ||
+          generateId("product"),
 
-      if (
-        selectedPhotoData
-      ) {
+        name,
+
+        price,
+
+        category: classification,
+
         /*
-          A imagem selecionada fica
-          disponível imediatamente.
-          Se o banco aceitar image_url,
-          ela será gravada nesse campo.
+          Delivery e Pronta Entrega são tratados
+          como uma única área.
+
+          Encomendas continua separado para
+          Naked Cake, Chantininho etc.
         */
+        area:
+          areaValue === "encomendas"
+            ? "encomendas"
+            : "delivery",
 
-        product.image_url =
-          selectedPhotoData;
+        discount_percent:
+          discount >= 0
+            ? discount
+            : 0,
+
+        sort,
+
+        gramatura,
+
+        serve_ate: serveAte,
+
+        description,
+
+        available,
+
+        featured,
+
+        appointment_required:
+          appointment,
+
+        ...(imageUrl
+          ? {
+              image_url: imageUrl
+            }
+          : {})
+      };
+
+      const {
+        error
+      } = await db
+        .from("products")
+        .upsert(productData);
+
+      if (error) {
+        throw error;
       }
-
-      let result;
-
-      if (editingProductId) {
-        result =
-          await client
-            .from("products")
-            .update(product)
-            .eq(
-              "id",
-              editingProductId
-            );
-      } else {
-        /*
-          ID é deixado para o banco gerar
-          quando houver UUID/default.
-
-          Se a tabela usar texto sem default,
-          usamos um ID local.
-        */
-
-        if (!product.id) {
-          product.id =
-            "p_" +
-            Date.now() +
-            "_" +
-            Math.random()
-              .toString(36)
-              .slice(2, 8);
-        }
-
-        result =
-          await client
-            .from("products")
-            .insert(product);
-      }
-
-      if (result.error) {
-        throw result.error;
-      }
-
-      showToast(
-        editingProductId
-          ? "Produto atualizado com sucesso."
-          : "Produto cadastrado com sucesso.",
-        "success"
-      );
-
-      closeProductModal();
 
       await loadProducts();
 
       updateStats();
+      renderProducts();
 
-      renderProductsTab();
+      closeProductModal();
+
+      alert(
+        existing
+          ? "Produto atualizado com sucesso."
+          : "Produto criado com sucesso."
+      );
     } catch (error) {
       console.error(
-        "Erro ao salvar produto:",
+        "Erro salvando produto:",
         error
       );
 
-      showToast(
+      alert(
         error?.message ||
-          "Não foi possível salvar o produto.",
-        "error"
+          "Não foi possível salvar o produto."
       );
     } finally {
-      if (button) {
-        button.disabled = false;
-        button.textContent =
-          "Salvar produto";
+      if (saveButton) {
+        saveButton.disabled = false;
+        saveButton.textContent =
+          saveButton.dataset.originalText ||
+          "Salvar";
       }
     }
   }
 
   /* =========================================================
-     EXCLUIR PRODUTO
-  ========================================================= */
+     PRODUTOS — EXCLUIR
+     ========================================================= */
 
   async function deleteProduct(id) {
-    if (!id || !client) {
-      return;
-    }
+    const product = products.find(
+      (item) =>
+        String(item.id) === String(id)
+    );
 
-    const product =
-      state.products.find(
-        (item) =>
-          String(item.id) ===
-          String(id)
-      );
+    if (!product) return;
 
-    const name =
-      product?.name ||
-      "este produto";
+    const confirmed = window.confirm(
+      `Excluir "${product.name}"?\n\nEssa ação não pode ser desfeita.`
+    );
 
-    const confirmed =
-      window.confirm(
-        `Deseja realmente excluir "${name}"?`
-      );
-
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     try {
       const {
         error
-      } = await client
+      } = await db
         .from("products")
         .delete()
         .eq("id", id);
@@ -1510,1054 +1198,1660 @@
         throw error;
       }
 
-      state.products =
-        state.products.filter(
-          (item) =>
-            String(item.id) !==
-            String(id)
-        );
+      await loadProducts();
 
       updateStats();
-
-      renderProductsTab();
-
-      showToast(
-        "Produto excluído com sucesso.",
-        "success"
-      );
+      renderProducts();
     } catch (error) {
-      console.error(
-        "Erro ao excluir produto:",
-        error
-      );
+      console.error(error);
 
-      showToast(
+      alert(
         error?.message ||
-          "Não foi possível excluir o produto.",
-        "error"
+          "Não foi possível excluir o produto."
       );
     }
   }
 
   /* =========================================================
-     ORDERS
-  ========================================================= */
+     PRODUTOS — DISPONIBILIDADE
+     ========================================================= */
 
-  async function renderOrdersTab() {
-    const container =
-      $("#tabContent");
-
-    if (!container) {
-      return;
-    }
-
-    container.innerHTML = `
-      <div class="section">
-
-        <div class="section-header">
-
-          <div>
-            <h3>Pedidos</h3>
-            <p>
-              Pedidos armazenados no sistema.
-            </p>
-          </div>
-
-          <button
-            class="btn btn-secondary"
-            type="button"
-            id="reloadOrders"
-          >
-            ↻ Atualizar
-          </button>
-
-        </div>
-
-        <div class="section-body" id="ordersBody">
-
-          <div class="empty">
-            Carregando pedidos...
-          </div>
-
-        </div>
-
-      </div>
-    `;
-
-    $("#reloadOrders")?.addEventListener(
-      "click",
-      renderOrdersTab
+  async function toggleProduct(id) {
+    const product = products.find(
+      (item) =>
+        String(item.id) === String(id)
     );
 
-    if (!client) {
-      $("#ordersBody").innerHTML = `
-        <div class="empty">
-          Supabase não configurado.
-        </div>
-      `;
+    if (!product) return;
 
-      return;
-    }
+    const newValue =
+      product.available === false;
 
     try {
       const {
-        data,
         error
-      } = await client
-        .from("orders")
-        .select("*")
-        .order("created_at", {
-          ascending: false
-        });
+      } = await db
+        .from("products")
+        .update({
+          available: newValue
+        })
+        .eq("id", id);
 
       if (error) {
         throw error;
       }
 
-      renderOrders(data || []);
+      product.available = newValue;
+
+      updateStats();
+      renderProducts();
     } catch (error) {
-      console.warn(
-        "Pedidos não disponíveis:",
-        error
+      console.error(error);
+
+      alert(
+        error?.message ||
+          "Não foi possível alterar a disponibilidade."
       );
-
-      $("#ordersBody").innerHTML = `
-        <div class="empty">
-          <div class="empty-icon">🛍️</div>
-          <p>
-            Nenhuma tabela de pedidos disponível
-            ou nenhum pedido cadastrado.
-          </p>
-        </div>
-      `;
     }
-  }
-
-  function renderOrders(orders) {
-    const body =
-      $("#ordersBody");
-
-    if (!body) {
-      return;
-    }
-
-    if (!orders.length) {
-      body.innerHTML = `
-        <div class="empty">
-          <div class="empty-icon">🛍️</div>
-          <p>
-            Nenhum pedido encontrado.
-          </p>
-        </div>
-      `;
-
-      $("#statOrders").textContent = "0";
-
-      return;
-    }
-
-    $("#statOrders").textContent =
-      orders.length;
-
-    const keys =
-      Object.keys(orders[0] || {});
-
-    body.innerHTML = `
-      <div class="table-wrap">
-
-        <table class="data-table">
-
-          <thead>
-            <tr>
-              ${keys
-                .slice(0, 6)
-                .map(
-                  (key) => `
-                    <th>
-                      ${escapeHTML(key)}
-                    </th>
-                  `
-                )
-                .join("")}
-            </tr>
-          </thead>
-
-          <tbody>
-            ${orders
-              .map(
-                (order) => `
-                  <tr>
-                    ${keys
-                      .slice(0, 6)
-                      .map(
-                        (key) => `
-                          <td>
-                            ${escapeHTML(
-                              formatTableValue(
-                                order[key]
-                              )
-                            )}
-                          </td>
-                        `
-                      )
-                      .join("")}
-                  </tr>
-                `
-              )
-              .join("")}
-          </tbody>
-
-        </table>
-
-      </div>
-    `;
   }
 
   /* =========================================================
-     BOLOS PERSONALIZADOS
-  ========================================================= */
+     PRODUTOS — LISTAGEM
+     ========================================================= */
 
-  async function renderCakesTab() {
+  function renderProducts() {
     const container =
       $("#tabContent");
 
-    if (!container) {
+    if (!container) return;
+
+    const search =
+      (
+        $("#productSearch")?.value ||
+        ""
+      )
+        .trim()
+        .toLowerCase();
+
+    let filtered = [...products];
+
+    if (search) {
+      filtered = filtered.filter(
+        (product) => {
+          const text = [
+            product.name,
+            product.category,
+            product.description,
+            product.area
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase();
+
+          return text.includes(search);
+        }
+      );
+    }
+
+    if (!filtered.length) {
+      container.innerHTML = `
+        <div class="admin-empty">
+          <h3>Nenhum produto encontrado</h3>
+          <p>
+            ${
+              products.length
+                ? "Tente outra busca."
+                : "Cadastre o primeiro produto."
+            }
+          </p>
+        </div>
+      `;
+
       return;
     }
 
     container.innerHTML = `
-      <div class="section">
-
-        <div class="section-header">
-
-          <div>
-            <h3>Bolos personalizados</h3>
-            <p>
-              Encomendas de bolos personalizados.
-            </p>
-          </div>
-
-          <button
-            class="btn btn-secondary"
-            type="button"
-            id="reloadCakes"
-          >
-            ↻ Atualizar
-          </button>
-
+      <div class="admin-section-head">
+        <div>
+          <h2>Produtos</h2>
+          <p>
+            Gerencie os produtos do cardápio e das encomendas.
+          </p>
         </div>
 
-        <div
-          class="section-body"
-          id="cakesBody"
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-action="new-product"
         >
-          <div class="empty">
-            Carregando...
-          </div>
-        </div>
+          + Novo produto
+        </button>
+      </div>
 
+      <div class="product-toolbar">
+        <input
+          id="productSearch"
+          type="search"
+          placeholder="Buscar produto..."
+          value="${escapeHTML(search)}"
+        >
+
+        <button
+          type="button"
+          class="btn"
+          data-action="new-classification"
+        >
+          + Classificação
+        </button>
+      </div>
+
+      <div class="classification-list">
+        ${classifications
+          .map(
+            (item) => `
+              <span class="classification-chip">
+                ${escapeHTML(item)}
+              </span>
+            `
+          )
+          .join("")}
+      </div>
+
+      <div class="admin-products-list">
+        ${filtered
+          .map(renderProductCard)
+          .join("")}
       </div>
     `;
 
-    $("#reloadCakes")?.addEventListener(
-      "click",
-      renderCakesTab
-    );
+    const searchInput =
+      $("#productSearch");
 
-    if (!client) {
-      return;
-    }
-
-    try {
-      const {
-        data,
-        error
-      } = await client
-        .from("custom_cakes")
-        .select("*")
-        .order("created_at", {
-          ascending: false
-        });
-
-      if (error) {
-        throw error;
-      }
-
-      renderCakes(data || []);
-    } catch (error) {
-      console.warn(
-        "Bolos personalizados não disponíveis:",
-        error
+    if (searchInput) {
+      searchInput.addEventListener(
+        "input",
+        renderProducts
       );
-
-      $("#cakesBody").innerHTML = `
-        <div class="empty">
-
-          <div class="empty-icon">
-            🎂
-          </div>
-
-          <p>
-            Nenhuma encomenda de bolo personalizado
-            encontrada.
-          </p>
-
-        </div>
-      `;
-
-      $("#statCakes").textContent = "0";
     }
   }
 
-  function renderCakes(cakes) {
-    const body =
-      $("#cakesBody");
+  function renderProductCard(product) {
+    const image =
+      product.image_url ||
+      product.image ||
+      product.photo_url ||
+      product.photo ||
+      product.imagem ||
+      product.foto ||
+      "";
 
-    if (!body) {
-      return;
-    }
+    const isAvailable =
+      product.available !== false;
 
-    if (!cakes.length) {
-      body.innerHTML = `
-        <div class="empty">
-          <div class="empty-icon">🎂</div>
-          <p>
-            Nenhum bolo personalizado encontrado.
-          </p>
+    const area =
+      String(product.area || "")
+        .toLowerCase()
+        .includes("encom")
+        ? "Encomendas"
+        : "Delivery";
+
+    return `
+      <article
+        class="admin-product-card"
+        data-product-id="${escapeHTML(
+          product.id
+        )}"
+      >
+
+        <div class="admin-product-image">
+          ${
+            image
+              ? `
+                <img
+                  src="${escapeHTML(image)}"
+                  alt="${escapeHTML(
+                    product.name
+                  )}"
+                >
+              `
+              : `
+                <div class="product-image-placeholder">
+                  🍰
+                </div>
+              `
+          }
         </div>
-      `;
 
-      $("#statCakes").textContent = "0";
+        <div class="admin-product-info">
 
-      return;
-    }
+          <div class="admin-product-top">
+            <div>
+              <h3>
+                ${escapeHTML(
+                  product.name
+                )}
+              </h3>
 
-    $("#statCakes").textContent =
-      cakes.length;
+              <span class="product-classification">
+                ${escapeHTML(
+                  product.category ||
+                    "Sem classificação"
+                )}
+              </span>
+            </div>
 
-    const keys =
-      Object.keys(cakes[0] || {});
+            <strong>
+              ${money(product.price)}
+            </strong>
+          </div>
 
-    body.innerHTML = `
-      <div class="table-wrap">
+          <div class="product-meta">
+            <span>
+              ${escapeHTML(area)}
+            </span>
 
-        <table class="data-table">
-
-          <thead>
-            <tr>
-              ${keys
-                .slice(0, 7)
-                .map(
-                  (key) => `
-                    <th>
-                      ${escapeHTML(key)}
-                    </th>
-                  `
-                )
-                .join("")}
-            </tr>
-          </thead>
-
-          <tbody>
-            ${cakes
-              .map(
-                (cake) => `
-                  <tr>
-                    ${keys
-                      .slice(0, 7)
-                      .map(
-                        (key) => `
-                          <td>
-                            ${escapeHTML(
-                              formatTableValue(
-                                cake[key]
-                              )
-                            )}
-                          </td>
-                        `
-                      )
-                      .join("")}
-                  </tr>
+            ${
+              product.gramatura
+                ? `
+                  <span>
+                    ${escapeHTML(
+                      product.gramatura
+                    )}
+                  </span>
                 `
-              )
-              .join("")}
-          </tbody>
+                : ""
+            }
 
-        </table>
+            ${
+              product.serve_ate
+                ? `
+                  <span>
+                    Serve até ${escapeHTML(
+                      product.serve_ate
+                    )}
+                  </span>
+                `
+                : ""
+            }
+          </div>
 
-      </div>
+          ${
+            product.description
+              ? `
+                <p>
+                  ${escapeHTML(
+                    product.description
+                  )}
+                </p>
+              `
+              : ""
+          }
+
+          <div class="product-status">
+            <span class="${
+              isAvailable
+                ? "status-on"
+                : "status-off"
+            }">
+              ${
+                isAvailable
+                  ? "Disponível"
+                  : "Indisponível"
+              }
+            </span>
+          </div>
+
+          <div class="product-actions">
+
+            <button
+              type="button"
+              class="btn"
+              data-action="edit-product"
+              data-id="${escapeHTML(
+                product.id
+              )}"
+            >
+              Editar
+            </button>
+
+            <button
+              type="button"
+              class="btn"
+              data-action="toggle-product"
+              data-id="${escapeHTML(
+                product.id
+              )}"
+            >
+              ${
+                isAvailable
+                  ? "Desativar"
+                  : "Ativar"
+              }
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-danger"
+              data-action="delete-product"
+              data-id="${escapeHTML(
+                product.id
+              )}"
+            >
+              Excluir
+            </button>
+
+          </div>
+
+        </div>
+
+      </article>
     `;
   }
 
   /* =========================================================
      CONTEÚDO
-  ========================================================= */
+     ========================================================= */
 
-  function renderContentTab() {
-    const about =
-      state.about || {};
+  function renderContent() {
+    const container = $("#tabContent");
 
-    const container =
-      $("#tabContent");
+    if (!container) return;
 
-    if (!container) {
-      return;
-    }
+    const about = state.about || {};
+    const address = Array.isArray(
+      state.address
+    )
+      ? state.address.join("\n")
+      : state.address || "";
 
     container.innerHTML = `
-      <div class="section">
-
-        <div class="section-header">
-
-          <div>
-            <h3>História da confeitaria</h3>
-            <p>
-              Edite o conteúdo da seção "Um pouco da nossa história".
-            </p>
-          </div>
-
-          <button
-            class="btn btn-primary"
-            type="button"
-            id="saveContentBtn"
-          >
-            Salvar conteúdo
-          </button>
-
+      <div class="admin-section-head">
+        <div>
+          <h2>Conteúdo</h2>
+          <p>
+            Edite as informações principais da Martins Confeitaria.
+          </p>
         </div>
-
-        <div class="section-body">
-
-          <div class="field">
-
-            <label for="adminAboutTitle">
-              Título
-            </label>
-
-            <input
-              id="adminAboutTitle"
-              type="text"
-              value="${escapeHTML(
-                about.title || ""
-              )}"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label for="adminAboutQuote">
-              Frase
-            </label>
-
-            <input
-              id="adminAboutQuote"
-              type="text"
-              value="${escapeHTML(
-                about.quote || ""
-              )}"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label for="adminAboutText">
-              História
-            </label>
-
-            <textarea
-              id="adminAboutText"
-              style="min-height:380px;"
-            >${escapeHTML(
-              about.text || ""
-            )}</textarea>
-
-          </div>
-
-        </div>
-
       </div>
+
+      <form id="contentForm" class="admin-form">
+
+        <div class="field">
+          <label>Nome</label>
+          <input
+            id="contentName"
+            value="${escapeHTML(
+              state.name || ""
+            )}"
+          >
+        </div>
+
+        <div class="field">
+          <label>WhatsApp</label>
+          <input
+            id="contentWhatsapp"
+            value="${escapeHTML(
+              state.whatsapp || ""
+            )}"
+          >
+        </div>
+
+        <div class="field">
+          <label>Instagram</label>
+          <input
+            id="contentInstagram"
+            value="${escapeHTML(
+              state.instagram || ""
+            )}"
+          >
+        </div>
+
+        <div class="field">
+          <label>Endereço</label>
+          <textarea id="contentAddress">${escapeHTML(
+            address
+          )}</textarea>
+        </div>
+
+        <div class="field">
+          <label>Google Maps</label>
+          <input
+            id="contentMaps"
+            value="${escapeHTML(
+              state.maps || ""
+            )}"
+          >
+        </div>
+
+        <div class="field">
+          <label>Link de avaliação</label>
+          <input
+            id="contentReview"
+            value="${escapeHTML(
+              state.review || ""
+            )}"
+          >
+        </div>
+
+        <div class="field">
+          <label>Título da história</label>
+          <input
+            id="contentAboutTitle"
+            value="${escapeHTML(
+              about.title || ""
+            )}"
+          >
+        </div>
+
+        <div class="field">
+          <label>Frase</label>
+          <input
+            id="contentAboutQuote"
+            value="${escapeHTML(
+              about.quote || ""
+            )}"
+          >
+        </div>
+
+        <div class="field">
+          <label>História</label>
+          <textarea
+            id="contentAboutText"
+            rows="12"
+          >${escapeHTML(
+            about.text || ""
+          )}</textarea>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+        >
+          Salvar conteúdo
+        </button>
+
+      </form>
     `;
 
-    $("#saveContentBtn")?.addEventListener(
-      "click",
+    $("#contentForm")?.addEventListener(
+      "submit",
       saveContent
     );
   }
 
-  async function saveContent() {
-    state.about = {
-      ...(state.about || {}),
+  async function saveContent(event) {
+    event.preventDefault();
 
-      title:
-        getValue(
-          "#adminAboutTitle"
-        ).trim(),
+    state.name =
+      $("#contentName")?.value?.trim() ||
+      state.name;
 
-      quote:
-        getValue(
-          "#adminAboutQuote"
-        ).trim(),
+    state.whatsapp =
+      $("#contentWhatsapp")?.value?.trim() ||
+      state.whatsapp;
 
-      text:
-        getValue(
-          "#adminAboutText"
-        ).trim()
-    };
+    state.instagram =
+      $("#contentInstagram")?.value?.trim() ||
+      state.instagram;
 
-    await saveSettingsWithMessage(
-      "Conteúdo salvo com sucesso."
-    );
+    state.address =
+      ($("#contentAddress")?.value || "")
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+    state.maps =
+      $("#contentMaps")?.value?.trim() ||
+      "";
+
+    state.review =
+      $("#contentReview")?.value?.trim() ||
+      "";
+
+    if (!state.about) {
+      state.about = {};
+    }
+
+    state.about.title =
+      $("#contentAboutTitle")
+        ?.value?.trim() || "";
+
+    state.about.quote =
+      $("#contentAboutQuote")
+        ?.value?.trim() || "";
+
+    state.about.text =
+      $("#contentAboutText")
+        ?.value || "";
+
+    try {
+      await saveSettings();
+
+      applyMartinsBrand();
+
+      alert(
+        "Conteúdo salvo com sucesso."
+      );
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        error?.message ||
+          "Não foi possível salvar o conteúdo."
+      );
+    }
   }
 
   /* =========================================================
      HORÁRIOS
-  ========================================================= */
+     ========================================================= */
 
-  function renderHoursTab() {
-    const container =
-      $("#tabContent");
+  function renderHours() {
+    const container = $("#tabContent");
 
-    if (!container) {
-      return;
-    }
+    if (!container) return;
 
-    const hours =
-      Array.isArray(state.hours)
-        ? state.hours
-        : [];
+    const days = [
+      "Domingo",
+      "Segunda-feira",
+      "Terça-feira",
+      "Quarta-feira",
+      "Quinta-feira",
+      "Sexta-feira",
+      "Sábado"
+    ];
 
-    const normalized =
-      DAYS.map(
-        (_, index) =>
-          hours[index] || {
-            s: "closed",
-            o: "",
-            c: ""
-          }
-      );
+    const hours = Array.isArray(
+      state.hours
+    )
+      ? state.hours
+      : [];
 
     container.innerHTML = `
-      <div class="section">
-
-        <div class="section-header">
-
-          <div>
-            <h3>Horários de funcionamento</h3>
-            <p>
-              Configure os horários exibidos no site.
-            </p>
-          </div>
-
-          <button
-            class="btn btn-primary"
-            type="button"
-            id="saveHoursBtn"
-          >
-            Salvar horários
-          </button>
-
+      <div class="admin-section-head">
+        <div>
+          <h2>Horários</h2>
+          <p>
+            Configure os horários de funcionamento.
+          </p>
         </div>
+      </div>
 
-        <div class="section-body">
+      <form id="hoursForm">
 
-          ${DAYS.map(
-            (day, index) => {
+        <div class="hours-list">
+
+          ${days
+            .map((day, index) => {
               const item =
-                normalized[index];
+                hours[index] || {
+                  s: "closed",
+                  o: "",
+                  c: ""
+                };
 
               return `
                 <div
-                  class="setting-card"
-                  data-day-index="${index}"
+                  class="hour-row"
+                  data-day="${index}"
                 >
-
-                  <h4>
+                  <strong>
                     ${day}
-                  </h4>
+                  </strong>
 
-                  <div class="grid-3">
+                  <select
+                    class="hour-status"
+                    data-index="${index}"
+                  >
+                    <option
+                      value="open"
+                      ${
+                        item.s === "open"
+                          ? "selected"
+                          : ""
+                      }
+                    >
+                      Aberto
+                    </option>
 
-                    <div class="field">
+                    <option
+                      value="closed"
+                      ${
+                        item.s === "closed"
+                          ? "selected"
+                          : ""
+                      }
+                    >
+                      Fechado
+                    </option>
 
-                      <label>
-                        Situação
-                      </label>
+                    <option
+                      value="tbd"
+                      ${
+                        item.s === "tbd"
+                          ? "selected"
+                          : ""
+                      }
+                    >
+                      A confirmar
+                    </option>
+                  </select>
 
-                      <select
-                        class="hour-status"
-                      >
+                  <input
+                    type="time"
+                    class="hour-open"
+                    data-index="${index}"
+                    value="${escapeHTML(
+                      item.o || ""
+                    )}"
+                  >
 
-                        <option
-                          value="open"
-                          ${
-                            item.s ===
-                            "open"
-                              ? "selected"
-                              : ""
-                          }
-                        >
-                          Aberto
-                        </option>
-
-                        <option
-                          value="closed"
-                          ${
-                            item.s ===
-                            "closed"
-                              ? "selected"
-                              : ""
-                          }
-                        >
-                          Fechado
-                        </option>
-
-                        <option
-                          value="tbd"
-                          ${
-                            item.s ===
-                            "tbd"
-                              ? "selected"
-                              : ""
-                          }
-                        >
-                          A confirmar
-                        </option>
-
-                      </select>
-
-                    </div>
-
-                    <div class="field">
-
-                      <label>
-                        Abertura
-                      </label>
-
-                      <input
-                        class="hour-open"
-                        type="time"
-                        value="${escapeHTML(
-                          item.o || ""
-                        )}"
-                      >
-
-                    </div>
-
-                    <div class="field">
-
-                      <label>
-                        Fechamento
-                      </label>
-
-                      <input
-                        class="hour-close"
-                        type="time"
-                        value="${escapeHTML(
-                          item.c || ""
-                        )}"
-                      >
-
-                    </div>
-
-                  </div>
-
+                  <input
+                    type="time"
+                    class="hour-close"
+                    data-index="${index}"
+                    value="${escapeHTML(
+                      item.c || ""
+                    )}"
+                  >
                 </div>
               `;
-            }
-          ).join("")}
+            })
+            .join("")}
 
         </div>
 
-      </div>
+        <button
+          type="submit"
+          class="btn btn-primary"
+        >
+          Salvar horários
+        </button>
+
+      </form>
     `;
 
-    $("#saveHoursBtn")?.addEventListener(
-      "click",
+    $("#hoursForm")?.addEventListener(
+      "submit",
       saveHours
     );
   }
 
-  async function saveHours() {
-    const hours = [];
+  async function saveHours(event) {
+    event.preventDefault();
 
-    $$(".setting-card[data-day-index]").forEach(
-      (card) => {
-        hours.push({
-          s:
-            $(".hour-status", card)
-              ?.value || "closed",
+    const days = $$(".hour-status");
 
+    state.hours = days.map(
+      (select, index) => {
+        const open =
+          $(
+            `.hour-open[data-index="${index}"]`
+          )?.value || "";
+
+        const close =
+          $(
+            `.hour-close[data-index="${index}"]`
+          )?.value || "";
+
+        return {
+          s: select.value,
           o:
-            $(".hour-open", card)
-              ?.value || "",
-
+            select.value === "open"
+              ? open
+              : "",
           c:
-            $(".hour-close", card)
-              ?.value || ""
-        });
+            select.value === "open"
+              ? close
+              : ""
+        };
       }
     );
 
-    state.hours = hours;
+    try {
+      await saveSettings();
 
-    await saveSettingsWithMessage(
-      "Horários salvos com sucesso."
-    );
+      alert(
+        "Horários salvos com sucesso."
+      );
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        error?.message ||
+          "Não foi possível salvar os horários."
+      );
+    }
   }
 
   /* =========================================================
-     REGRAS
-  ========================================================= */
+     REGRAS DE ENCOMENDAS
+     ========================================================= */
 
-  function renderRulesTab() {
-    const container =
-      $("#tabContent");
+  function renderRules() {
+    const container = $("#tabContent");
 
-    if (!container) {
-      return;
-    }
+    if (!container) return;
 
     const cake =
       state.cake || {};
 
+    const types =
+      Array.isArray(cake.types)
+        ? cake.types
+        : [];
+
     const masses =
       Array.isArray(cake.masses)
-        ? cake.masses.join("\n")
-        : "";
+        ? cake.masses
+        : [];
 
     const fillings =
       Array.isArray(cake.fillings)
-        ? cake.fillings.join("\n")
-        : "";
+        ? cake.fillings
+        : [];
+
+    const extras =
+      Array.isArray(cake.extras)
+        ? cake.extras
+        : [];
 
     container.innerHTML = `
-      <div class="section">
-
-        <div class="section-header">
-
-          <div>
-            <h3>Regras e opções</h3>
-            <p>
-              Configure as opções utilizadas nas encomendas.
-            </p>
-          </div>
-
-          <button
-            class="btn btn-primary"
-            type="button"
-            id="saveRulesBtn"
-          >
-            Salvar regras
-          </button>
-
+      <div class="admin-section-head">
+        <div>
+          <h2>Regras de encomendas</h2>
+          <p>
+            Gerencie as opções usadas na página de encomendas.
+          </p>
         </div>
-
-        <div class="section-body">
-
-          <div class="setting-card">
-
-            <h4>
-              Massas
-            </h4>
-
-            <div class="field">
-
-              <label for="adminMasses">
-                Uma opção por linha
-              </label>
-
-              <textarea
-                id="adminMasses"
-              >${escapeHTML(
-                masses
-              )}</textarea>
-
-            </div>
-
-          </div>
-
-          <div class="setting-card">
-
-            <h4>
-              Recheios
-            </h4>
-
-            <div class="field">
-
-              <label for="adminFillings">
-                Uma opção por linha
-              </label>
-
-              <textarea
-                id="adminFillings"
-              >${escapeHTML(
-                fillings
-              )}</textarea>
-
-            </div>
-
-          </div>
-
-        </div>
-
       </div>
+
+      <form id="rulesForm">
+
+        <div class="field">
+          <label>
+            Bolos — tipo e tamanho
+          </label>
+
+          <textarea
+            id="ruleTypes"
+            rows="10"
+            placeholder="Naked Cake — 06/08 pessoas | 55"
+          >${escapeHTML(
+            types
+              .map((item) => {
+                if (
+                  Array.isArray(item)
+                ) {
+                  return `${item[0]} | ${item[1]}`;
+                }
+
+                return String(item);
+              })
+              .join("\n")
+          )}</textarea>
+
+          <small>
+            Use: Nome | Preço
+          </small>
+        </div>
+
+        <div class="field">
+          <label>
+            Massas
+          </label>
+
+          <textarea
+            id="ruleMasses"
+            rows="7"
+          >${escapeHTML(
+            masses.join("\n")
+          )}</textarea>
+        </div>
+
+        <div class="field">
+          <label>
+            Recheios
+          </label>
+
+          <textarea
+            id="ruleFillings"
+            rows="7"
+          >${escapeHTML(
+            fillings.join("\n")
+          )}</textarea>
+        </div>
+
+        <div class="field">
+          <label>
+            Adicionais
+          </label>
+
+          <textarea
+            id="ruleExtras"
+            rows="10"
+            placeholder="Morango | 16"
+          >${escapeHTML(
+            extras
+              .map((item) => {
+                if (
+                  Array.isArray(item)
+                ) {
+                  return `${item[0]} | ${item[1]}`;
+                }
+
+                return String(item);
+              })
+              .join("\n")
+          )}</textarea>
+
+          <small>
+            Use: Nome | Preço
+          </small>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+        >
+          Salvar regras
+        </button>
+
+      </form>
     `;
 
-    $("#saveRulesBtn")?.addEventListener(
-      "click",
+    $("#rulesForm")?.addEventListener(
+      "submit",
       saveRules
     );
   }
 
-  async function saveRules() {
-    state.cake = {
-      ...(state.cake || {}),
+  async function saveRules(event) {
+    event.preventDefault();
 
-      masses:
-        getValue(
-          "#adminMasses"
-        )
-          .split("\n")
-          .map(
-            (item) =>
-              item.trim()
-          )
-          .filter(Boolean),
+    if (!state.cake) {
+      state.cake = {};
+    }
 
-      fillings:
-        getValue(
-          "#adminFillings"
-        )
-          .split("\n")
-          .map(
-            (item) =>
-              item.trim()
-          )
-          .filter(Boolean)
-    };
+    const typesText =
+      $("#ruleTypes")?.value || "";
 
-    await saveSettingsWithMessage(
-      "Regras salvas com sucesso."
-    );
+    const massesText =
+      $("#ruleMasses")?.value || "";
+
+    const fillingsText =
+      $("#ruleFillings")?.value || "";
+
+    const extrasText =
+      $("#ruleExtras")?.value || "";
+
+    state.cake.types =
+      typesText
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => {
+          const parts =
+            line.split("|");
+
+          return [
+            parts[0]?.trim() || "",
+            Number(
+              String(
+                parts[1] || "0"
+              ).replace(",", ".")
+            ) || 0
+          ];
+        });
+
+    state.cake.masses =
+      massesText
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+    state.cake.fillings =
+      fillingsText
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+    state.cake.extras =
+      extrasText
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => {
+          const parts =
+            line.split("|");
+
+          return [
+            parts[0]?.trim() || "",
+            Number(
+              String(
+                parts[1] || "0"
+              ).replace(",", ".")
+            ) || 0
+          ];
+        });
+
+    try {
+      await saveSettings();
+
+      alert(
+        "Regras salvas com sucesso."
+      );
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        error?.message ||
+          "Não foi possível salvar as regras."
+      );
+    }
   }
 
   /* =========================================================
      MÍDIA
-  ========================================================= */
+     ========================================================= */
 
-  function renderMediaTab() {
-    const container =
-      $("#tabContent");
+  function renderMedia() {
+    const container = $("#tabContent");
 
-    if (!container) {
-      return;
+    if (!container) return;
+
+    if (!state.media) {
+      state.media = {};
     }
 
     container.innerHTML = `
-      <div class="section">
-
-        <div class="section-header">
-
-          <div>
-            <h3>Mídia</h3>
-            <p>
-              Informações de mídia utilizadas pelo site.
-            </p>
-          </div>
-
+      <div class="admin-section-head">
+        <div>
+          <h2>Mídia</h2>
+          <p>
+            Configure os endereços das imagens principais.
+          </p>
         </div>
-
-        <div class="section-body">
-
-          <div class="setting-card">
-
-            <h4>
-              Imagens dos produtos
-            </h4>
-
-            <p style="color:var(--muted);font-size:13px;">
-              As fotos dos produtos podem ser escolhidas
-              diretamente no cadastro ou edição de cada produto.
-            </p>
-
-          </div>
-
-          <div class="setting-card">
-
-            <h4>
-              Logo
-            </h4>
-
-            <p style="color:var(--muted);font-size:13px;">
-              O site utiliza a identidade visual configurada
-              nos arquivos principais do projeto.
-            </p>
-
-          </div>
-
-        </div>
-
       </div>
+
+      <form id="mediaForm">
+
+        <div class="field">
+          <label>
+            Logo
+          </label>
+
+          <input
+            id="mediaLogo"
+            type="text"
+            placeholder="URL da logo"
+            value="${escapeHTML(
+              state.media.logo ||
+                state.media.logo_url ||
+                ""
+            )}"
+          >
+        </div>
+
+        <div class="field">
+          <label>
+            Imagem principal
+          </label>
+
+          <input
+            id="mediaHero"
+            type="text"
+            placeholder="URL da imagem principal"
+            value="${escapeHTML(
+              state.media.hero ||
+                state.media.hero_url ||
+                ""
+            )}"
+          >
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+        >
+          Salvar mídia
+        </button>
+
+      </form>
+    `;
+
+    $("#mediaForm")?.addEventListener(
+      "submit",
+      saveMedia
+    );
+  }
+
+  async function saveMedia(event) {
+    event.preventDefault();
+
+    if (!state.media) {
+      state.media = {};
+    }
+
+    state.media.logo =
+      $("#mediaLogo")
+        ?.value?.trim() || "";
+
+    state.media.hero =
+      $("#mediaHero")
+        ?.value?.trim() || "";
+
+    try {
+      await saveSettings();
+
+      applyMartinsBrand();
+
+      alert(
+        "Mídia salva com sucesso."
+      );
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        error?.message ||
+          "Não foi possível salvar a mídia."
+      );
+    }
+  }
+
+  /* =========================================================
+     PEDIDOS
+     ========================================================= */
+
+  function renderOrders() {
+    const container = $("#tabContent");
+
+    if (!container) return;
+
+    container.innerHTML = `
+      <div class="admin-section-head">
+        <div>
+          <h2>Pedidos</h2>
+          <p>
+            Pedidos registrados no sistema.
+          </p>
+        </div>
+      </div>
+
+      ${
+        orders.length
+          ? `
+            <div class="admin-orders-list">
+              ${orders
+                .map(
+                  (order) => `
+                    <article class="admin-order-card">
+                      <strong>
+                        Pedido
+                      </strong>
+
+                      <pre>${escapeHTML(
+                        JSON.stringify(
+                          order,
+                          null,
+                          2
+                        )
+                      )}</pre>
+                    </article>
+                  `
+                )
+                .join("")}
+            </div>
+          `
+          : `
+            <div class="admin-empty">
+              <h3>Nenhum pedido encontrado</h3>
+              <p>
+                Não há pedidos registrados na tabela configurada.
+              </p>
+            </div>
+          `
+      }
     `;
   }
 
   /* =========================================================
-     SALVAR SETTINGS COM MENSAGEM
-  ========================================================= */
+     ENCOMENDAS
+     ========================================================= */
 
-  async function saveSettingsWithMessage(
-    successMessage
-  ) {
-    try {
-      await saveSettings();
+  function renderCakeOrders() {
+    const container = $("#tabContent");
 
-      showToast(
-        successMessage,
-        "success"
-      );
-    } catch (error) {
-      console.error(
-        "Erro ao salvar configurações:",
-        error
-      );
+    if (!container) return;
 
-      showToast(
-        error?.message ||
-          "Não foi possível salvar as configurações.",
-        "error"
-      );
+    container.innerHTML = `
+      <div class="admin-section-head">
+        <div>
+          <h2>Encomendas</h2>
+          <p>
+            Naked Cake, Chantininho e demais encomendas.
+          </p>
+        </div>
+      </div>
+
+      ${
+        cakeOrders.length
+          ? `
+            <div class="admin-orders-list">
+              ${cakeOrders
+                .map(
+                  (order) => `
+                    <article class="admin-order-card">
+                      <strong>
+                        Encomenda
+                      </strong>
+
+                      <pre>${escapeHTML(
+                        JSON.stringify(
+                          order,
+                          null,
+                          2
+                        )
+                      )}</pre>
+                    </article>
+                  `
+                )
+                .join("")}
+            </div>
+          `
+          : `
+            <div class="admin-empty">
+              <h3>Nenhuma encomenda encontrada</h3>
+              <p>
+                As opções de Naked Cake e Chantininho continuam configuradas em Encomendas.
+              </p>
+            </div>
+          `
+      }
+    `;
+  }
+
+  /* =========================================================
+     RENDERIZAÇÃO DAS ABAS
+     ========================================================= */
+
+  function renderCurrentTab() {
+    switch (currentTab) {
+      case "products":
+        renderProducts();
+        break;
+
+      case "orders":
+        renderOrders();
+        break;
+
+      case "cakes":
+        renderCakeOrders();
+        break;
+
+      case "content":
+        renderContent();
+        break;
+
+      case "hours":
+        renderHours();
+        break;
+
+      case "rules":
+        renderRules();
+        break;
+
+      case "media":
+        renderMedia();
+        break;
+
+      default:
+        currentTab = "products";
+        renderProducts();
     }
   }
 
   /* =========================================================
-     FORMATAÇÃO DE TABELAS
-  ========================================================= */
+     NAVEGAÇÃO
+     ========================================================= */
 
-  function formatTableValue(value) {
-    if (
-      value === null ||
-      value === undefined
-    ) {
-      return "";
+  function setTab(tab) {
+    if (!tab) return;
+
+    currentTab = tab;
+
+    $$(
+      "[data-tab]"
+    ).forEach((element) => {
+      element.classList.toggle(
+        "active",
+        element.dataset.tab === tab
+      );
+    });
+
+    renderCurrentTab();
+  }
+
+  function detectTabFromElement(element) {
+    if (!element) return "";
+
+    if (element.dataset.tab) {
+      return element.dataset.tab;
     }
 
-    if (
-      typeof value === "object"
-    ) {
-      try {
-        return JSON.stringify(value);
-      } catch {
-        return "";
+    const id =
+      element.id || "";
+
+    const text =
+      element.textContent
+        ?.trim()
+        .toLowerCase() || "";
+
+    const map = {
+      products: "products",
+      product: "products",
+      pedidos: "orders",
+      orders: "orders",
+      encomendas: "cakes",
+      cakes: "cakes",
+      conteúdo: "content",
+      conteudo: "content",
+      content: "content",
+      horários: "hours",
+      horarios: "hours",
+      hours: "hours",
+      regras: "rules",
+      rules: "rules",
+      mídia: "media",
+      midia: "media",
+      media: "media"
+    };
+
+    if (map[id]) {
+      return map[id];
+    }
+
+    if (map[text]) {
+      return map[text];
+    }
+
+    for (const key of Object.keys(map)) {
+      if (
+        id.toLowerCase().includes(key) ||
+        text.includes(key)
+      ) {
+        return map[key];
       }
     }
 
-    return String(value);
+    return "";
   }
 
   /* =========================================================
-     REFRESH
-  ========================================================= */
+     EVENTOS GERAIS
+     ========================================================= */
 
-  function setupRefresh() {
-    $("#refreshBtn")?.addEventListener(
+  function setupEvents() {
+    const loginForm =
+      $("#loginForm");
+
+    if (loginForm) {
+      loginForm.addEventListener(
+        "submit",
+        handleLogin
+      );
+    }
+
+    const logoutButton =
+      $("#logout");
+
+    if (logoutButton) {
+      logoutButton.addEventListener(
+        "click",
+        logout
+      );
+    }
+
+    const refreshButton =
+      $("#refreshBtn");
+
+    if (refreshButton) {
+      refreshButton.addEventListener(
+        "click",
+        async () => {
+          await loadAll();
+        }
+      );
+    }
+
+    const productForm =
+      $("#productForm");
+
+    if (productForm) {
+      productForm.addEventListener(
+        "submit",
+        saveProduct
+      );
+    }
+
+    document.addEventListener(
       "click",
-      async () => {
-        const button =
-          $("#refreshBtn");
+      handleDocumentClick
+    );
 
-        if (button) {
-          button.disabled = true;
-          button.textContent =
-            "↻ Carregando...";
+    db.auth.onAuthStateChange(
+      async (event, session) => {
+        if (
+          event === "SIGNED_IN" &&
+          session
+        ) {
+          await showApp();
         }
 
-        try {
-          await loadEverything();
-
-          renderTab(
-            currentTab
-          );
-
-          showToast(
-            "Painel atualizado.",
-            "success"
-          );
-        } catch (error) {
-          console.error(error);
-
-          showToast(
-            "Não foi possível atualizar.",
-            "error"
-          );
-        } finally {
-          if (button) {
-            button.disabled = false;
-            button.textContent =
-              "↻ Atualizar";
-          }
+        if (
+          event === "SIGNED_OUT"
+        ) {
+          showLogin();
         }
       }
     );
   }
 
-  /* =========================================================
-     FECHAR MODAIS COM ESC
-  ========================================================= */
+  function handleDocumentClick(event) {
+    const tabElement =
+      event.target.closest(
+        "[data-tab]"
+      );
 
-  function setupEscape() {
-    document.addEventListener(
-      "keydown",
+    if (tabElement) {
+      event.preventDefault();
+
+      const tab =
+        detectTabFromElement(
+          tabElement
+        );
+
+      if (tab) {
+        setTab(tab);
+      }
+
+      return;
+    }
+
+    const actionElement =
+      event.target.closest(
+        "[data-action]"
+      );
+
+    if (!actionElement) return;
+
+    const action =
+      actionElement.dataset.action;
+
+    switch (action) {
+      case "new-product":
+        openProductModal();
+        break;
+
+      case "edit-product": {
+        const product =
+          products.find(
+            (item) =>
+              String(item.id) ===
+              String(
+                actionElement.dataset.id
+              )
+          );
+
+        if (product) {
+          openProductModal(product);
+        }
+
+        break;
+      }
+
+      case "delete-product":
+        deleteProduct(
+          actionElement.dataset.id
+        );
+        break;
+
+      case "toggle-product":
+        toggleProduct(
+          actionElement.dataset.id
+        );
+        break;
+
+      case "new-classification":
+        createClassification();
+        break;
+
+      case "remove-classification":
+        removeClassification();
+        break;
+
+      case "close-product":
+      case "cancel-product":
+      case "close-modal":
+        closeProductModal();
+        break;
+    }
+  }
+
+  /* =========================================================
+     BOTÕES DO MODAL EXISTENTE
+     ========================================================= */
+
+  function setupModalButtons() {
+    const modal =
+      $("#productModal");
+
+    if (!modal) return;
+
+    $$(
+      "button",
+      modal
+    ).forEach((button) => {
+      const text =
+        button.textContent
+          ?.trim()
+          .toLowerCase() || "";
+
+      if (
+        text === "cancelar" ||
+        text === "fechar"
+      ) {
+        button.addEventListener(
+          "click",
+          (event) => {
+            event.preventDefault();
+            closeProductModal();
+          }
+        );
+      }
+    });
+
+    modal.addEventListener(
+      "click",
       (event) => {
         if (
-          event.key ===
-          "Escape"
+          event.target === modal
         ) {
           closeProductModal();
-
-          $("#sidebar")?.classList.remove(
-            "open"
-          );
         }
       }
     );
+  }
+
+  /* =========================================================
+     CLASSIFICAÇÃO — BOTÕES DO HTML
+     ========================================================= */
+
+  function ensureClassificationControls() {
+    const form =
+      $("#productForm");
+
+    if (!form) return;
+
+    /*
+      Se o HTML antigo ainda tiver "Área",
+      escondemos somente o campo de área.
+      Não mexemos no restante do visual.
+    */
+
+    const area =
+      $("#productArea");
+
+    if (area) {
+      const wrapper =
+        area.closest(
+          ".field, .form-group, .input-group"
+        );
+
+      if (wrapper) {
+        wrapper.style.display = "none";
+      } else {
+        area.style.display = "none";
+      }
+    }
+
+    /*
+      Cria a classificação dentro do formulário
+      caso ela ainda não exista no HTML.
+    */
+
+    let classification =
+      $("#productClassification");
+
+    if (!classification) {
+      const areaWrapper =
+        area?.closest(
+          ".field, .form-group, .input-group"
+        );
+
+      const wrapper =
+        document.createElement("div");
+
+      wrapper.className =
+        areaWrapper?.className ||
+        "field";
+
+      wrapper.innerHTML = `
+        <label for="productClassification">
+          Classificação
+        </label>
+
+        <div
+          style="
+            display:flex;
+            gap:8px;
+            align-items:center;
+            flex-wrap:wrap;
+          "
+        >
+          <select
+            id="productClassification"
+            name="classification"
+            style="flex:1;min-width:180px;"
+          ></select>
+
+          <button
+            type="button"
+            class="btn"
+            data-action="new-classification"
+          >
+            +
+          </button>
+        </div>
+      `;
+
+      if (areaWrapper) {
+        areaWrapper.parentNode.insertBefore(
+          wrapper,
+          areaWrapper
+        );
+      } else {
+        form.prepend(wrapper);
+      }
+
+      classification =
+        $("#productClassification");
+    }
+
+    renderClassificationOptions(
+      classification?.value || ""
+    );
+  }
+
+  /* =========================================================
+     CORREÇÕES DE TEXTO NO HTML EXISTENTE
+     ========================================================= */
+
+  function normalizeExistingAreaLabels() {
+    /*
+      No painel:
+      "Delivery" continua significando pronta entrega.
+
+      Naked Cake e Chantininho são mostrados
+      como "Encomendas".
+
+      Não alteramos o layout.
+    */
+
+    $$(
+      "*"
+    ).forEach((element) => {
+      if (
+        element.children.length > 0
+      ) {
+        return;
+      }
+
+      const text =
+        element.textContent
+          ?.trim();
+
+      if (
+        text === "Pronta entrega"
+      ) {
+        element.textContent =
+          "Delivery";
+      }
+
+      if (
+        text === "Pronta Entrega"
+      ) {
+        element.textContent =
+          "Delivery";
+      }
+    });
   }
 
   /* =========================================================
      INICIALIZAÇÃO
-  ========================================================= */
+     ========================================================= */
 
   async function init() {
-    client =
-      initSupabase();
+    console.log(
+      "Martins Admin — iniciando..."
+    );
 
-    setupAuth();
-    setupAuthListener();
-    setupLogout();
-    setupTabs();
-    setupMobileMenu();
-    setupProductModal();
-    setupRefresh();
-    setupEscape();
+    applyMartinsBrand();
+
+    setupEvents();
+
+    setupModalButtons();
+
+    ensureClassificationControls();
+
+    normalizeExistingAreaLabels();
 
     await checkSession();
+
+    console.log(
+      "Martins Admin — pronto."
+    );
   }
-
-  /* =========================================================
-     PROTEÇÃO
-  ========================================================= */
-
-  window.addEventListener(
-    "error",
-    (event) => {
-      console.error(
-        "Erro no painel administrativo:",
-        event.error ||
-          event.message
-      );
-    }
-  );
 
   if (
     document.readyState ===
@@ -2570,4 +2864,5 @@
   } else {
     init();
   }
+
 })();
