@@ -5,6 +5,11 @@
      MARTINS CONFEITARIA
      SCRIPT PRINCIPAL
      Compatível com o index.html + style.css atuais
+
+     ATUALIZAÇÃO:
+     - Pedidos de PRONTA ENTREGA são gravados em "orders"
+     - Encomendas continuam sendo gravadas em "custom_cakes"
+       pelo encomendas.html
   ========================================================= */
 
   const DEFAULTS = window.MARTINS_DEFAULTS || {};
@@ -108,8 +113,6 @@
   function getProductMeta(product) {
     const parts = [];
 
-    /* Gramatura */
-
     if (
       product?.gramatura !== null &&
       product?.gramatura !== undefined &&
@@ -127,8 +130,6 @@
         );
       }
     }
-
-    /* Serve até */
 
     if (
       product?.serve_ate !== null &&
@@ -264,12 +265,6 @@
 
   async function loadData() {
 
-    /*
-      Renderiza primeiro os dados locais.
-      Assim o site não começa vazio enquanto
-      o Supabase responde.
-    */
-
     render();
 
     const client =
@@ -341,20 +336,6 @@
           productsResult.data
         )
       ) {
-
-        /*
-          IMPORTANTE:
-
-          O Supabase é a fonte oficial
-          dos produtos.
-
-          Mesmo que o banco esteja vazio,
-          usamos [].
-
-          Isso impede que produtos antigos
-          de defaults.js voltem depois
-          de apagar tudo no painel.
-        */
 
         state.products =
           productsResult.data.map(
@@ -652,10 +633,6 @@
 
     }
 
-    /* =====================================================
-       CATEGORIAS
-    ===================================================== */
-
     if (!categoryList.length) {
 
       categories.innerHTML =
@@ -718,10 +695,6 @@
         );
 
       });
-
-    /* =====================================================
-       PRODUTOS
-    ===================================================== */
 
     const menuProducts =
       getMenuProducts();
@@ -1047,12 +1020,6 @@
       return ready;
     }
 
-    /*
-      Se nenhum produto foi marcado
-      como pronta-entrega, usamos até
-      3 produtos disponíveis do cardápio.
-    */
-
     return products
       .filter((product) => {
 
@@ -1169,12 +1136,6 @@
     if (existing) {
 
       existing.quantity += 1;
-
-      /*
-        Atualiza o preço caso o
-        estabelecimento tenha alterado
-        o desconto no painel.
-      */
 
       existing.price =
         finalPrice;
@@ -1694,14 +1655,10 @@
   }
 
   /* =========================================================
-     WHATSAPP
+     MONTAR DADOS DO PEDIDO
   ========================================================= */
 
-  function sendOrder(form) {
-
-    if (!cart.length) {
-      return;
-    }
+  function buildReadyOrderData(form) {
 
     const formData =
       new FormData(form);
@@ -1748,36 +1705,189 @@
         ) || ""
       ).trim();
 
+    const items =
+      cart.map((item) => ({
+        id: item.id,
+        name: item.name,
+        quantity: Number(
+          item.quantity || 0
+        ),
+        unit_price: Number(
+          item.price || 0
+        ),
+        total: Number(
+          item.price || 0
+        ) *
+          Number(
+            item.quantity || 0
+          ),
+        appointment_required:
+          Boolean(
+            item.appointment_required
+          )
+      }));
+
+    return {
+      tipo: "pronta_entrega",
+
+      cliente: customer,
+
+      whatsapp: phone,
+
+      recebimento: receiving,
+
+      endereco:
+        receiving === "Entrega"
+          ? address
+          : "",
+
+      pagamento: payment,
+
+      observacoes: notes,
+
+      itens: items,
+
+      total: Number(
+        getCartTotal()
+          .toFixed(2)
+      ),
+
+      criado_em:
+        new Date().toISOString()
+    };
+
+  }
+
+  /* =========================================================
+     SALVAR PEDIDO DE PRONTA ENTREGA
+  ========================================================= */
+
+  async function saveReadyOrder(
+    orderData
+  ) {
+
+    const client =
+      getSupabase();
+
+    if (!client) {
+
+      console.warn(
+        "Supabase não disponível. Pedido não foi salvo no banco."
+      );
+
+      return {
+        success: false,
+        reason: "no-client"
+      };
+
+    }
+
+    try {
+
+      const payload = {
+        data: orderData,
+        status: "novo"
+      };
+
+      const result =
+        await client
+          .from("orders")
+          .insert(payload)
+          .select()
+          .maybeSingle();
+
+      if (result.error) {
+
+        console.warn(
+          "Não foi possível salvar o pedido de pronta entrega:",
+          result.error
+        );
+
+        return {
+          success: false,
+          reason: "supabase-error",
+          error: result.error
+        };
+
+      }
+
+      return {
+        success: true,
+        data: result.data
+      };
+
+    } catch (error) {
+
+      console.warn(
+        "Erro ao registrar pedido:",
+        error
+      );
+
+      return {
+        success: false,
+        reason: "exception",
+        error
+      };
+
+    }
+
+  }
+
+  /* =========================================================
+     WHATSAPP
+  ========================================================= */
+
+  async function sendOrder(form) {
+
+    if (!cart.length) {
+      return;
+    }
+
+    const orderData =
+      buildReadyOrderData(
+        form
+      );
+
+    const {
+      cliente,
+      whatsapp: customerPhone,
+      recebimento,
+      endereco,
+      pagamento,
+      observacoes
+    } = orderData;
+
     let message =
       "Olá! Gostaria de fazer um pedido na Martins Confeitaria.\n\n";
 
     message +=
       "*PEDIDO*\n";
 
-    cart.forEach((item) => {
-
-      message +=
-        `${item.quantity}x ${item.name} — ${money(
-          Number(item.price) *
-            Number(item.quantity)
-        )}`;
-
-      if (
-        item.appointment_required
-      ) {
+    orderData.itens.forEach(
+      (item) => {
 
         message +=
-          " — *AGENDAMENTO OBRIGATÓRIO*";
+          `${item.quantity}x ${item.name} — ${money(
+            item.total
+          )}`;
+
+        if (
+          item.appointment_required
+        ) {
+
+          message +=
+            " — *AGENDAMENTO OBRIGATÓRIO*";
+
+        }
+
+        message += "\n";
 
       }
-
-      message += "\n";
-
-    });
+    );
 
     message +=
       `\n*TOTAL:* ${money(
-        getCartTotal()
+        orderData.total
       )}\n`;
 
     if (
@@ -1790,33 +1900,37 @@
     }
 
     message +=
-      `\n*Nome:* ${customer}`;
+      `\n*Nome:* ${cliente}`;
 
     message +=
-      `\n*WhatsApp:* ${phone}`;
+      `\n*WhatsApp:* ${customerPhone}`;
 
     message +=
-      `\n*Recebimento:* ${receiving}`;
+      `\n*Recebimento:* ${recebimento}`;
 
     if (
-      receiving === "Entrega" &&
-      address
+      recebimento === "Entrega" &&
+      endereco
     ) {
 
       message +=
-        `\n*Endereço:* ${address}`;
+        `\n*Endereço:* ${endereco}`;
 
     }
 
     message +=
-      `\n*Pagamento:* ${payment}`;
+      `\n*Pagamento:* ${pagamento}`;
 
-    if (notes) {
+    if (observacoes) {
 
       message +=
-        `\n*Observações:* ${notes}`;
+        `\n*Observações:* ${observacoes}`;
 
     }
+
+    /* =====================================================
+       WHATSAPP DA MARTINS
+    ===================================================== */
 
     const whatsapp =
       String(
@@ -1837,6 +1951,25 @@
       return;
     }
 
+    /* =====================================================
+       SALVAR NO SUPABASE
+
+       O pedido é salvo antes de abrir
+       o WhatsApp.
+
+       Mesmo que o banco apresente erro,
+       o pedido continua sendo enviado
+       pelo WhatsApp.
+    ===================================================== */
+
+    await saveReadyOrder(
+      orderData
+    );
+
+    /* =====================================================
+       ABRIR WHATSAPP
+    ===================================================== */
+
     const url =
       `https://wa.me/${whatsapp}?text=${encodeURIComponent(
         message
@@ -1847,6 +1980,10 @@
       "_blank",
       "noopener"
     );
+
+    /* =====================================================
+       LIMPAR PEDIDO
+    ===================================================== */
 
     clearCart();
 
@@ -1888,10 +2025,6 @@
     const review =
       $("#review");
 
-    /* =====================================================
-       ENDEREÇO
-    ===================================================== */
-
     if (
       address &&
       Array.isArray(
@@ -1908,10 +2041,6 @@
           .join("<br>");
 
     }
-
-    /* =====================================================
-       WHATSAPP
-    ===================================================== */
 
     const whatsapp =
       String(
@@ -1933,10 +2062,6 @@
 
     }
 
-    /* =====================================================
-       INSTAGRAM
-    ===================================================== */
-
     if (
       instagram &&
       state.instagram
@@ -1947,10 +2072,6 @@
 
     }
 
-    /* =====================================================
-       MAPS
-    ===================================================== */
-
     if (
       maps &&
       state.maps
@@ -1960,10 +2081,6 @@
         state.maps;
 
     }
-
-    /* =====================================================
-       AVALIAÇÃO
-    ===================================================== */
 
     if (
       review &&
@@ -2250,7 +2367,7 @@
 
         },
         {
-          threshold:0.12
+          threshold: 0.12
         }
       );
 
@@ -2280,10 +2397,6 @@
 
   function setupEvents() {
 
-    /* =====================================================
-       ABRIR CARRINHO
-    ===================================================== */
-
     const openCartButton =
       $("#openCart");
 
@@ -2295,10 +2408,6 @@
       );
 
     }
-
-    /* =====================================================
-       FECHAR CARRINHO
-    ===================================================== */
 
     const closeCartButton =
       $("#closeCart");
@@ -2312,10 +2421,6 @@
 
     }
 
-    /* =====================================================
-       FUNDO
-    ===================================================== */
-
     const shade =
       $("#shade");
 
@@ -2327,10 +2432,6 @@
       );
 
     }
-
-    /* =====================================================
-       LIMPAR
-    ===================================================== */
 
     const clearCartButton =
       $("#clearCart");
@@ -2344,10 +2445,6 @@
 
     }
 
-    /* =====================================================
-       FINALIZAR
-    ===================================================== */
-
     const checkoutButton =
       $("#checkoutBtn");
 
@@ -2359,10 +2456,6 @@
       );
 
     }
-
-    /* =====================================================
-       ESC
-    ===================================================== */
 
     document.addEventListener(
       "keydown",
