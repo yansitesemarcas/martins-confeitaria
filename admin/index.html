@@ -13,39 +13,12 @@
     content="#67b0cb"
   >
 
-  <meta
-    http-equiv="Cache-Control"
-    content="no-cache, no-store, must-revalidate"
-  >
-
-  <meta
-    http-equiv="Pragma"
-    content="no-cache"
-  >
-
-  <meta
-    http-equiv="Expires"
-    content="0"
-  >
-
   <title>Martins Confeitaria — Painel Administrativo</title>
 
   <link
     rel="stylesheet"
-    href="./admin.css?cb=20261006"
+    href="./admin.css?v=20261005"
   >
-
-  <style>
-    /* Evita que o painel apareça rapidamente com conteúdo antigo
-       enquanto os arquivos principais carregam. */
-    html {
-      visibility: hidden;
-    }
-
-    html.loaded {
-      visibility: visible;
-    }
-  </style>
 </head>
 
 <body>
@@ -119,7 +92,7 @@
 
 
   <!-- =========================================================
-       PAINEL
+       PAINEL ADMINISTRATIVO
        ========================================================= -->
 
   <div
@@ -155,9 +128,7 @@
       </div>
 
 
-      <!-- =====================================================
-           MENU
-           ===================================================== -->
+      <!-- MENU -->
 
       <nav class="sidebar-nav">
 
@@ -227,9 +198,7 @@
       </nav>
 
 
-      <!-- =====================================================
-           RODAPÉ SIDEBAR
-           ===================================================== -->
+      <!-- RODAPÉ -->
 
       <div class="sidebar-footer">
 
@@ -253,9 +222,7 @@
 
     <main class="main-content">
 
-      <!-- =====================================================
-           HEADER
-           ===================================================== -->
+      <!-- HEADER -->
 
       <header class="topbar">
 
@@ -271,6 +238,7 @@
           </button>
 
           <div>
+
             <h1 id="pageTitle">
               Produtos
             </h1>
@@ -278,9 +246,11 @@
             <p id="pageSubtitle">
               Gerencie os produtos da Martins Confeitaria.
             </p>
+
           </div>
 
         </div>
+
 
         <div class="topbar-right">
 
@@ -298,7 +268,7 @@
 
 
       <!-- =====================================================
-           DASHBOARD / ESTATÍSTICAS
+           ESTATÍSTICAS
            ===================================================== -->
 
       <section
@@ -313,6 +283,7 @@
           </div>
 
           <div>
+
             <span class="stat-label">
               Produtos
             </span>
@@ -323,6 +294,7 @@
             >
               0
             </strong>
+
           </div>
 
         </div>
@@ -335,6 +307,7 @@
           </div>
 
           <div>
+
             <span class="stat-label">
               Disponíveis
             </span>
@@ -345,6 +318,7 @@
             >
               0
             </strong>
+
           </div>
 
         </div>
@@ -357,6 +331,7 @@
           </div>
 
           <div>
+
             <span class="stat-label">
               Pedidos
             </span>
@@ -367,6 +342,7 @@
             >
               0
             </strong>
+
           </div>
 
         </div>
@@ -379,6 +355,7 @@
           </div>
 
           <div>
+
             <span class="stat-label">
               Encomendas
             </span>
@@ -389,6 +366,7 @@
             >
               0
             </strong>
+
           </div>
 
         </div>
@@ -397,7 +375,7 @@
 
 
       <!-- =====================================================
-           ÁREA DAS ABAS
+           ABAS
            ===================================================== -->
 
       <section class="content-area">
@@ -515,77 +493,13 @@
        SCRIPTS
        ========================================================= -->
 
-  <script>
-    /*
-     * Cache-busting automático.
-     *
-     * O navegador recebe uma URL diferente para os arquivos JS
-     * sempre que esta página é carregada.
-     *
-     * O timestamp impede que uma versão antiga do GitHub Pages
-     * fique presa no cache do celular.
-     */
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    (() => {
+  <script src="../config.js"></script>
 
-      const cacheBuster = Date.now();
+  <script src="../defaults.js"></script>
 
-      const scripts = [
-
-        "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
-
-        "../config.js",
-
-        "../defaults.js",
-
-        "./admin.js"
-
-      ];
-
-      scripts.forEach(src => {
-
-        const script = document.createElement("script");
-
-        script.src =
-          src +
-          (src.includes("?") ? "&" : "?") +
-          "cb=" +
-          cacheBuster;
-
-        script.async = false;
-
-        document.body.appendChild(script);
-
-      });
-
-
-      /*
-       * Mostra o HTML depois que os scripts principais
-       * foram adicionados à página.
-       */
-
-      window.addEventListener(
-        "load",
-        () => {
-
-          document.documentElement.classList.add("loaded");
-
-        }
-      );
-
-      /*
-       * Segurança: se alguma coisa impedir o evento load,
-       * libera a página depois de alguns segundos.
-       */
-
-      setTimeout(() => {
-
-        document.documentElement.classList.add("loaded");
-
-      }, 5000);
-
-    })();
-  </script>
+  <script src="./admin.js?v=20261005"></script>
 
 </body>
 </html>
