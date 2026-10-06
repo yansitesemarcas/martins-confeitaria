@@ -17,6 +17,35 @@
     rel="stylesheet"
     href="style.css?v=20261003-11"
   >
+<style id="legacy-encomendas-visual">
+.custom-page{padding:130px 20px 70px;min-height:100vh}
+.custom-page{max-width:1100px;margin:0 auto}
+.custom-page>.section-head{text-align:center;margin-bottom:40px}
+.custom-page>.section-head h1{margin:10px 0}
+.custom-page>.section-head p{max-width:700px;margin:0 auto}
+.cake-builder{display:grid;gap:25px}
+.cake-builder .extras,.cake-builder .kit-section,.cake-builder .brigadeiro-section,.cake-builder .other-orders-section{background:rgba(255,255,255,.96);border-radius:24px;padding:28px;box-shadow:0 15px 40px rgba(0,0,0,.08)}
+.cake-builder .extras legend{font-size:1.35rem;font-weight:800;padding:0 6px}
+.cake-builder .section-head{margin-bottom:25px}
+.cake-builder .section-head h2{margin:10px 0 8px}
+.cake-builder .section-head p{margin:0;opacity:.75}
+.cake-options,.kit-options,.brigadeiro-list,.other-order-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.extra-option{position:relative;display:flex;align-items:center;gap:12px;padding:18px;border:2px solid rgba(103,176,203,.25);border-radius:18px;cursor:pointer;transition:.25s ease;background:#fff}
+.extra-option:hover{transform:translateY(-2px);border-color:#67b0cb}
+.extra-option input{accent-color:#67b0cb}
+.extra-option:has(input:checked){border-color:#67b0cb;background:rgba(103,176,203,.10);box-shadow:0 8px 25px rgba(103,176,203,.15)}
+.extra-option span{display:flex;flex-direction:column;gap:4px;flex:1}
+.extra-option small{opacity:.7}
+.extra-option strong{font-weight:800;color:#2b7896}
+.other-order-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.other-order-list>span{font-weight:700}
+.other-order-list input,.other-order-list textarea,.other-order-list select{width:100%;box-sizing:border-box;border:2px solid rgba(103,176,203,.25);border-radius:14px;padding:13px 15px;font-family:inherit;font-size:1rem;outline:none;transition:.2s ease;background:#fff}
+.other-order-list input:focus,.other-order-list textarea:focus,.other-order-list select:focus{border-color:#67b0cb;box-shadow:0 0 0 4px rgba(103,176,203,.10)}
+.cake-total{position:sticky;bottom:15px;z-index:10;background:#fff;border-radius:20px;padding:20px 25px;box-shadow:0 15px 40px rgba(0,0,0,.15);display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.cake-total span{font-size:1rem;opacity:.7}.cake-total strong{font-size:1.8rem;font-weight:900;color:#2b7896}
+.kit-fixed-cake,.kit-mode-note{background:rgba(103,176,203,.1);border:2px solid rgba(103,176,203,.25);border-radius:18px;padding:16px 18px}
+@media(max-width:760px){.custom-page{padding:110px 14px 50px}.cake-builder .extras,.cake-builder .kit-section,.cake-builder .brigadeiro-section,.cake-builder .other-orders-section{padding:20px;border-radius:18px}.cake-options,.kit-options,.brigadeiro-list,.other-order-list{grid-template-columns:1fr}.cake-total{align-items:flex-start;flex-direction:column}.cake-total strong{font-size:1.5rem}}
+</style>
 </head>
 
 <body>
@@ -480,12 +509,15 @@
       otherItems:[{name:"Petit Brownie",price:0,active:true},{name:"Mini Brownie Recheado",price:0,active:true},{name:"Bem Casado",price:0,active:true},{name:"Cupcakes",price:35,active:true}],
       kits:[{id:"k1",name:"Kit Festa 01",price:150,cake:"Chantininho 10/15 Pessoas",docinhos:20,items:["04 Cupcakes","20 Petit Brownie","20 Docinhos"]},{id:"k2",name:"Kit Festa 02",price:200,cake:"Chantininho 15/20 Pessoas",docinhos:30,items:["05 Cupcakes","30 Petit Brownie","30 Docinhos"]},{id:"k3",name:"Kit Festa 03",price:250,cake:"Chantininho 20/25 Pessoas",docinhos:50,items:["08 Cupcakes","50 Petit Brownie","50 Docinhos"]},{id:"k4",name:"Kit Festa 04",price:430,cake:"Chantininho 30/40 Pessoas",docinhos:60,items:["10 Cupcakes","60 Petit Brownie","60 Docinhos"]},{id:"k5",name:"Kit Festa 05",price:500,cake:"Chantininho 40/50 Pessoas",docinhos:70,items:["12 Cupcakes","70 Petit Brownie","70 Docinhos"]}]
     };
+    const topos=[["Topo simples",20],["Topo 3D",30],["Flores naturais",70],["Scrap Cake",30]];
+    function renderTopos(){const el=document.getElementById("topoOptions");if(!el)return;el.innerHTML=topos.map((x,i)=>`<label class="extra-option"><input type="radio" name="topo" value="${esc(x[0])}" data-price="${x[1]}" ${i===0?"checked":""}><span>${esc(x[0])}</span><strong>${money(x[1])}</strong></label>`).join("")}
     const money=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
     const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const clone=x=>JSON.parse(JSON.stringify(x));
     function merge(v){const x=clone(fallback);if(!v||typeof v!=='object')return x;return {...x,...v,brigadeiros:{...x.brigadeiros,...(v.brigadeiros||{})}}}
     async function getConfig(){try{if(!window.supabase||!CFG.SUPABASE_URL||!CFG.SUPABASE_ANON_KEY)return clone(fallback);const c=window.supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY);const {data,error}=await c.from('settings').select('value').eq('key','encomendas').maybeSingle();if(error)throw error;return merge(data?.value)}catch(e){console.warn('Config encomendas:',e);return clone(fallback)}}
     function render(cfg){
+      renderTopos();
       const cake=document.getElementById('cakeType');
       cake.innerHTML=cfg.cakes.filter(x=>x.active!==false).map((c,ci)=>`<div class="cake-options">${c.options.map((o,i)=>`<label class="extra-option"><input type="radio" name="cakeType" value="${esc(c.name+' — '+o)}" data-price="${Number(c.prices?.[i]||0)}" ${ci===0&&i===0?'checked':''}><span>${esc(c.name)} — ${esc(o)}</span><strong>${money(c.prices?.[i])}</strong></label>`).join('')}</div>`).join('');
       document.getElementById('cakeMassOptions').innerHTML=cfg.masses.map((x,i)=>`<label class="extra-option"><input type="radio" name="massa" value="${esc(x)}" ${i===0?'checked':''}><span>${esc(x)}</span></label>`).join('');
@@ -506,7 +538,7 @@
       document.querySelectorAll('#cakeForm input,#cakeForm select').forEach(x=>x.addEventListener('change',calc));
       document.querySelectorAll('input[name="kit"]').forEach(x=>x.addEventListener('change',()=>{selectedKit=x.value;const k=cfg.kits.find(y=>y.id===selectedKit);kitValue.value=selectedKit;kitFixed.hidden=false;kitName.textContent=k?.cake||'';normalIds.forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=true});calc()}));
       calc();
-      document.getElementById('cakeForm').addEventListener('submit',async e=>{e.preventDefault();const f=new FormData(e.target),name=String(f.get('customerName')||'').trim(),phone=String(f.get('customerPhone')||'').trim(),date=String(f.get('customerDate')||''),notes=String(f.get('customerNotes')||'').trim();if(!name||!phone||!date){alert('Preencha seu nome, WhatsApp e a data desejada.');return}const selected=cfg.kits.find(k=>k.id===selectedKit);const details={tipo:'encomenda',cliente:name,whatsapp:phone,data_desejada:date,kit:selected?.name||null,bolo:selected?.cake||f.get('cakeType')||null,massa:f.get('massa')||null,recheio:f.get('recheio')||null,adicionais:f.getAll('adicional'),personalizacao:f.getAll('personalizacao'),personalizacao_text:document.getElementById('personalizationText')?.value||'',brigadeiros:[...document.querySelectorAll('input[name^="brigadeiro_"]:checked')].filter(x=>x.value!=='0').map(x=>({tipo:x.name.replace('brigadeiro_',''),quantidade:Number(x.value),valor:Number(x.dataset.price||0)})),outros:[...document.querySelectorAll('.other-quantity')].filter(x=>Number(x.value)>0).map(x=>({item:x.dataset.item,quantidade:Number(x.value),preco:Number(x.dataset.price||0)})),observacoes:notes,total_estimado:totalEl.textContent};const text=['Olá! Gostaria de fazer uma encomenda na Martins Confeitaria.','',`Nome: ${name}`,`WhatsApp: ${phone}`,`Data desejada: ${date}`,selected?`Kit: ${selected.name}`:`Bolo: ${details.bolo||'Não informado'}`,details.massa?`Massa: ${details.massa}`:'',details.recheio?`Recheio: ${details.recheio}`:'',details.adicionais.length?`Adicionais: ${details.adicionais.join(', ')}`:'',details.brigadeiros.length?`Brigadeiros: ${JSON.stringify(details.brigadeiros)}`:'',details.outros.length?`Outros itens: ${JSON.stringify(details.outros)}`:'',`Total estimado: ${details.total_estimado}`,notes?`Observações: ${notes}`:''].filter(Boolean).join('\n');try{if(window.supabase&&CFG.SUPABASE_URL&&CFG.SUPABASE_ANON_KEY){const c=window.supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY);const {error}=await c.from('custom_cakes').insert({data:details,status:'novo'});if(error)console.warn('custom_cakes:',error.message)}}catch(err){console.warn(err)}window.open(`https://wa.me/5585981563070?text=${encodeURIComponent(text)}`,'_blank','noopener')});
+      document.getElementById('cakeForm').addEventListener('submit',async e=>{e.preventDefault();const f=new FormData(e.target),name=String(f.get('customerName')||'').trim(),phone=String(f.get('customerPhone')||'').trim(),date=String(f.get('customerDate')||''),notes=String(f.get('customerNotes')||'').trim();if(!name||!phone||!date){alert('Preencha seu nome, WhatsApp e a data desejada.');return}const selected=cfg.kits.find(k=>k.id===selectedKit);const details={tipo:'encomenda',cliente:name,whatsapp:phone,data_desejada:date,kit:selected?.name||null,bolo:selected?.cake||f.get('cakeType')||null,massa:f.get('massa')||null,recheio:f.get('recheio')||null,topo:f.get('topo')||null,adicionais:f.getAll('adicional'),personalizacao:f.getAll('personalizacao'),personalizacao_text:document.getElementById('personalizationText')?.value||'',brigadeiros:[...document.querySelectorAll('input[name^="brigadeiro_"]:checked')].filter(x=>x.value!=='0').map(x=>({tipo:x.name.replace('brigadeiro_',''),quantidade:Number(x.value),valor:Number(x.dataset.price||0)})),outros:[...document.querySelectorAll('.other-quantity')].filter(x=>Number(x.value)>0).map(x=>({item:x.dataset.item,quantidade:Number(x.value),preco:Number(x.dataset.price||0)})),observacoes:notes,total_estimado:totalEl.textContent};const text=['Olá! Gostaria de fazer uma encomenda na Martins Confeitaria.','',`Nome: ${name}`,`WhatsApp: ${phone}`,`Data desejada: ${date}`,selected?`Kit: ${selected.name}`:`Bolo: ${details.bolo||'Não informado'}`,details.topo?`Decoração: ${details.topo}`:'',details.massa?`Massa: ${details.massa}`:'',details.recheio?`Recheio: ${details.recheio}`:'',details.adicionais.length?`Adicionais: ${details.adicionais.join(', ')}`:'',details.brigadeiros.length?`Brigadeiros: ${JSON.stringify(details.brigadeiros)}`:'',details.outros.length?`Outros itens: ${JSON.stringify(details.outros)}`:'',`Total estimado: ${details.total_estimado}`,notes?`Observações: ${notes}`:''].filter(Boolean).join('\n');try{if(window.supabase&&CFG.SUPABASE_URL&&CFG.SUPABASE_ANON_KEY){const c=window.supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY);const {error}=await c.from('custom_cakes').insert({data:details,status:'novo'});if(error)console.warn('custom_cakes:',error.message)}}catch(err){console.warn(err)}window.open(`https://wa.me/5585981563070?text=${encodeURIComponent(text)}`,'_blank','noopener')});
     }
     getConfig().then(render);
   })();
