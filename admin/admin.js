@@ -1,6 +1,7 @@
 /* =========================================================
-   MARTINS CONFEITARIA — PAINEL ADMINISTRATIVO
-   admin/admin.js
+   MARTINS CONFEITARIA
+   PAINEL ADMINISTRATIVO
+   ADMIN.JS — VERSÃO ATUALIZADA
    ========================================================= */
 
 (() => {
@@ -10,62 +11,57 @@
      CONFIGURAÇÃO
      ========================================================= */
 
-  const CONFIG = window.MARTINS_CONFIG || {};
+  const SUPABASE_URL =
+    window.MARTINS_CONFIG?.SUPABASE_URL ||
+    "https://grdyxoflbqilmgpzlrzm.supabase.co";
 
-  if (!window.supabase) {
-    console.error("Supabase JS não foi carregado.");
-    return;
-  }
-
-  if (!CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_ANON_KEY) {
-    console.error("Configuração do Supabase não encontrada.");
-    return;
-  }
+  const SUPABASE_ANON_KEY =
+    window.MARTINS_CONFIG?.SUPABASE_ANON_KEY ||
+    "sb_publishable_RwiMCpC1NAsRIaB1LH5mQw_L-pgOEqH";
 
   const db = window.supabase.createClient(
-    CONFIG.SUPABASE_URL,
-    CONFIG.SUPABASE_ANON_KEY
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
   );
 
   const DEFAULTS = window.MARTINS_DEFAULTS || {};
 
-  const PRODUCT_AREAS = {
-    delivery: "Delivery",
-    encomendas: "Encomendas"
+  /* =========================================================
+     ESTADO
+     ========================================================= */
+
+  const state = {
+    settings: {},
+    products: [],
+    categories: [],
+    editingProductId: null,
+    activeTab: "products",
+    loading: false
   };
 
-  let state = clone(DEFAULTS);
+  /* =========================================================
+     ELEMENTOS
+     ========================================================= */
 
-  let products = [];
-  let orders = [];
-  let cakeOrders = [];
+  const $ = (selector) => document.querySelector(selector);
+  const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
-  let editingProductId = null;
-  let currentTab = "products";
+  const loginScreen = $("#loginScreen");
+  const app = $("#app");
+  const loginForm = $("#loginForm");
+  const loginMsg = $("#loginMsg");
+  const logoutBtn = $("#logout");
+  const refreshBtn = $("#refreshBtn");
+  const tabContent = $("#tabContent");
 
-  let classifications = [];
+  const productModal = $("#productModal");
+  const productForm = $("#productForm");
 
   /* =========================================================
      UTILITÁRIOS
      ========================================================= */
 
-  function clone(value) {
-    try {
-      return JSON.parse(JSON.stringify(value));
-    } catch {
-      return value;
-    }
-  }
-
-  function $(selector, root = document) {
-    return root.querySelector(selector);
-  }
-
-  function $$(selector, root = document) {
-    return Array.from(root.querySelectorAll(selector));
-  }
-
-  function escapeHTML(value) {
+  function escapeHtml(value) {
     return String(value ?? "")
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
@@ -83,452 +79,204 @@
     });
   }
 
-  function showMessage(element, message, type = "error") {
-    if (!element) return;
-
-    element.textContent = message;
-    element.dataset.type = type;
-    element.style.display = message ? "block" : "none";
+  function slugify(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/-+/g, "-");
   }
 
-  function generateId(prefix = "id") {
-    if (window.crypto && crypto.randomUUID) {
-      return `${prefix}_${crypto.randomUUID()}`;
+  function normalizeArea(area, product = {}) {
+    const value = String(area || "").toLowerCase().trim();
+
+    if (
+      value === "encomendas" ||
+      value === "encomenda"
+    ) {
+      return "encomendas";
     }
 
-    return `${prefix}_${Date.now()}_${Math.random()
-      .toString(36)
-      .substring(2, 9)}`;
+    if (
+      value === "pronta-entrega" ||
+      value === "pronta entrega" ||
+      value === "cardapio" ||
+      value === "delivery" ||
+      value === "pronta_entrega"
+    ) {
+      return "cardapio";
+    }
+
+    const name = String(product.name || "").toLowerCase();
+
+    if (
+      name.includes("naked cake") ||
+      name.includes("chantininho")
+    ) {
+      return "encomendas";
+    }
+
+    return "cardapio";
   }
 
-  function normalizeClassification(value) {
-    return String(value || "")
-      .trim()
-      .replace(/\s+/g, " ");
+  function areaLabel(area) {
+    return normalizeArea(area) === "encomendas"
+      ? "Encomendas"
+      : "Delivery";
+  }
+
+  function getProductImage(product) {
+    return (
+      product.image_url ||
+      product.image ||
+      product.photo_url ||
+      product.photo ||
+      product.imagem ||
+      product.foto ||
+      ""
+    );
+  }
+
+  function toast(message, type = "success") {
+    let box = $("#adminToast");
+
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "adminToast";
+
+      Object.assign(box.style, {
+        position: "fixed",
+        right: "20px",
+        bottom: "20px",
+        zIndex: "99999",
+        padding: "14px 18px",
+        borderRadius: "12px",
+        color: "#fff",
+        fontWeight: "700",
+        boxShadow: "0 8px 30px rgba(0,0,0,.18)",
+        maxWidth: "360px",
+        fontSize: "14px"
+      });
+
+      document.body.appendChild(box);
+    }
+
+    box.style.background =
+      type === "error"
+        ? "#c0392b"
+        : type === "warning"
+        ? "#d68910"
+        : "#2b7896";
+
+    box.textContent = message;
+    box.style.display = "block";
+
+    clearTimeout(box._timer);
+
+    box._timer = setTimeout(() => {
+      box.style.display = "none";
+    }, 3500);
+  }
+
+  function showLoginMessage(message, error = true) {
+    if (!loginMsg) return;
+
+    loginMsg.textContent = message;
+    loginMsg.style.color = error ? "#c0392b" : "#2b7896";
+  }
+
+  function setLoading(button, loading, originalText = "Salvar") {
+    if (!button) return;
+
+    if (loading) {
+      button.dataset.originalText =
+        button.textContent || originalText;
+
+      button.disabled = true;
+      button.textContent = "Salvando...";
+    } else {
+      button.disabled = false;
+      button.textContent =
+        button.dataset.originalText || originalText;
+    }
+  }
+
+  /* =========================================================
+     LOGO
+     ========================================================= */
+
+  function loadAdminLogo() {
+    const wrap = $("#loginLogoWrap");
+
+    if (!wrap) return;
+
+    const possibleLogo =
+      DEFAULTS.logo ||
+      DEFAULTS.logo_url ||
+      state.settings.logo ||
+      state.settings.logo_url ||
+      state.settings.logoUrl ||
+      "";
+
+    if (possibleLogo) {
+      wrap.innerHTML = `
+        <img
+          src="${escapeHtml(possibleLogo)}"
+          alt="Martins Confeitaria"
+          class="login-logo"
+        >
+      `;
+    }
   }
 
   /* =========================================================
      CLASSIFICAÇÕES
-     
-     Delivery e Pronta entrega NÃO são classificações.
-     A classificação é algo como:
-     - Bolos
-     - Brownies
-     - Sobremesas
-     - Bolos no pote
-     - etc.
      ========================================================= */
 
-  function getDefaultClassifications() {
-    const defaults = Array.isArray(DEFAULTS.categories)
-      ? DEFAULTS.categories
-      : [];
-
-    return defaults
-      .map(normalizeClassification)
-      .filter(Boolean);
+  function defaultCategories() {
+    return Array.isArray(DEFAULTS.categories)
+      ? [...DEFAULTS.categories]
+      : [
+          "Bolos no Pote",
+          "Sobremesas",
+          "Copos da Felicidade",
+          "Bolos 8 fatias",
+          "Bolos 10 a 12 fatias",
+          "Afogadinhos Baby",
+          "Brownies",
+          "Kits"
+        ];
   }
 
-  function loadClassificationsFromState() {
-    const saved =
-      state &&
-      state.admin &&
-      Array.isArray(state.admin.classifications)
-        ? state.admin.classifications
-        : null;
-
-    if (saved && saved.length) {
-      classifications = saved
-        .map(normalizeClassification)
-        .filter(Boolean);
-    } else {
-      classifications = getDefaultClassifications();
+  function normalizeCategories(categories) {
+    if (!Array.isArray(categories)) {
+      return defaultCategories();
     }
 
-    classifications = [...new Set(classifications)];
-  }
-
-  function saveClassificationsToState() {
-    if (!state.admin || typeof state.admin !== "object") {
-      state.admin = {};
-    }
-
-    state.admin.classifications = [...classifications];
-  }
-
-  function renderClassificationOptions(selected = "") {
-    const select = $("#productClassification");
-
-    if (!select) return;
-
-    const current = normalizeClassification(selected);
-
-    select.innerHTML = `
-      <option value="">Selecione uma classificação</option>
-      ${classifications
-        .map((item) => {
-          const selectedAttr =
-            item === current ? " selected" : "";
-
-          return `
-            <option value="${escapeHTML(item)}"${selectedAttr}>
-              ${escapeHTML(item)}
-            </option>
-          `;
-        })
-        .join("")}
-    `;
-  }
-
-  function createClassification() {
-    const value = window.prompt(
-      "Digite o nome da nova classificação:"
-    );
-
-    if (value === null) return;
-
-    const name = normalizeClassification(value);
-
-    if (!name) {
-      alert("Digite um nome válido.");
-      return;
-    }
-
-    const exists = classifications.some(
-      (item) => item.toLowerCase() === name.toLowerCase()
-    );
-
-    if (exists) {
-      alert("Essa classificação já existe.");
-      return;
-    }
-
-    classifications.push(name);
-    classifications.sort((a, b) =>
-      a.localeCompare(b, "pt-BR")
-    );
-
-    saveClassificationsToState();
-    renderClassificationOptions(name);
-
-    saveSettings().catch((error) => {
-      console.error(error);
-      alert(
-        "A classificação foi criada localmente, mas não foi possível salvar no Supabase."
-      );
-    });
-  }
-
-  function removeClassification() {
-    const select = $("#productClassification");
-
-    if (!select || !select.value) {
-      alert("Selecione uma classificação primeiro.");
-      return;
-    }
-
-    const selected = select.value;
-
-    const confirmed = window.confirm(
-      `Excluir a classificação "${selected}"?\n\nOs produtos existentes não serão apagados.`
-    );
-
-    if (!confirmed) return;
-
-    classifications = classifications.filter(
-      (item) => item !== selected
-    );
-
-    saveClassificationsToState();
-    renderClassificationOptions("");
-
-    saveSettings().catch((error) => {
-      console.error(error);
-      alert(
-        "A classificação foi removida localmente, mas houve um erro ao salvar."
-      );
-    });
-  }
-
-  /* =========================================================
-     LOGO / IDENTIDADE
-     ========================================================= */
-
-  function findLogoUrl() {
-    const candidates = [
-      state?.media?.logo,
-      state?.media?.logo_url,
-      state?.logo,
-      state?.logo_url,
-      "../assets/logo.png",
-      "../logo.png",
-      "../assets/logo.webp"
+    return [
+      ...new Set(
+        categories
+          .map((item) => String(item || "").trim())
+          .filter(Boolean)
+      )
     ];
-
-    return candidates.find(Boolean) || "";
   }
 
-  function applyMartinsBrand() {
-    const logoUrl = findLogoUrl();
+  async function saveCategories() {
+    const payload = {
+      ...state.settings,
+      categories: state.categories
+    };
 
-    const loginLogoWrap = $("#loginLogoWrap");
-
-    if (loginLogoWrap && logoUrl) {
-      loginLogoWrap.innerHTML = `
-        <img
-          src="${escapeHTML(logoUrl)}"
-          alt="Martins Confeitaria"
-          style="
-            max-width:140px;
-            max-height:90px;
-            width:auto;
-            height:auto;
-            object-fit:contain;
-            display:block;
-            margin:auto;
-          "
-          onerror="this.style.display='none'"
-        >
-      `;
-    }
-
-    document.documentElement.style.setProperty(
-      "--blue",
-      "#67b0cb"
-    );
-
-    document.documentElement.style.setProperty(
-      "--blue-dark",
-      "#2b7896"
-    );
-
-    document.documentElement.style.setProperty(
-      "--pink",
-      "#f3b7bb"
-    );
-
-    document.documentElement.style.setProperty(
-      "--white",
-      "#ffffff"
-    );
-
-    document.documentElement.style.setProperty(
-      "--primary",
-      "#67b0cb"
-    );
-
-    document.documentElement.style.setProperty(
-      "--primary-dark",
-      "#2b7896"
-    );
-
-    const brandElements = $$(
-      ".login-brand h1, .brand-name, .sidebar-brand h1"
-    );
-
-    brandElements.forEach((element) => {
-      element.style.color = "#2b7896";
-    });
-  }
-
-  /* =========================================================
-     LOGIN
-     ========================================================= */
-
-  async function checkSession() {
-    try {
-      const {
-        data,
-        error
-      } = await db.auth.getSession();
-
-      if (error) {
-        throw error;
-      }
-
-      if (data?.session) {
-        showApp();
-      } else {
-        showLogin();
-      }
-    } catch (error) {
-      console.error("Erro ao verificar sessão:", error);
-      showLogin();
-    }
-  }
-
-  function showLogin() {
-    const login = $("#loginScreen");
-    const app = $("#app");
-
-    if (login) {
-      login.classList.remove("hidden");
-      login.style.display = "";
-    }
-
-    if (app) {
-      app.classList.add("hidden");
-    }
-  }
-
-  async function showApp() {
-    const login = $("#loginScreen");
-    const app = $("#app");
-
-    if (login) {
-      login.classList.add("hidden");
-    }
-
-    if (app) {
-      app.classList.remove("hidden");
-      app.style.display = "";
-    }
-
-    await loadAll();
-  }
-
-  async function handleLogin(event) {
-    event.preventDefault();
-
-    const form = event.currentTarget;
-
-    const emailInput =
-      $("#loginEmail", form) || $("#loginEmail");
-
-    const passwordInput =
-      $("#loginPassword", form) || $("#loginPassword");
-
-    const message =
-      $("#loginMsg") ||
-      form.querySelector(".login-msg");
-
-    const submitButton =
-      form.querySelector('button[type="submit"]');
-
-    const email = emailInput?.value?.trim() || "";
-    const password = passwordInput?.value || "";
-
-    if (!email || !password) {
-      showMessage(
-        message,
-        "Informe o e-mail e a senha."
-      );
-      return;
-    }
-
-    if (submitButton) {
-      submitButton.disabled = true;
-      submitButton.dataset.originalText =
-        submitButton.textContent;
-      submitButton.textContent = "Entrando...";
-    }
-
-    showMessage(message, "");
-
-    try {
-      const {
-        data,
-        error
-      } = await db.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      if (!data?.session) {
-        throw new Error(
-          "Login realizado, mas nenhuma sessão foi criada."
-        );
-      }
-
-      showMessage(
-        message,
-        "Login realizado com sucesso.",
-        "success"
-      );
-
-      await showApp();
-    } catch (error) {
-      console.error(error);
-
-      showMessage(
-        message,
-        error?.message ||
-          "Não foi possível entrar. Verifique o e-mail e a senha."
-      );
-    } finally {
-      if (submitButton) {
-        submitButton.disabled = false;
-        submitButton.textContent =
-          submitButton.dataset.originalText ||
-          "Entrar";
-      }
-    }
-  }
-
-  async function logout() {
-    try {
-      await db.auth.signOut();
-    } catch (error) {
-      console.error(error);
-    }
-
-    showLogin();
-  }
-
-  /* =========================================================
-     SUPABASE — SETTINGS
-     ========================================================= */
-
-  async function loadSettings() {
-    const {
-      data,
-      error
-    } = await db
-      .from("settings")
-      .select("*")
-      .eq("key", "site")
-      .maybeSingle();
-
-    if (error) {
-      console.warn(
-        "Não foi possível carregar settings:",
-        error
-      );
-      return;
-    }
-
-    if (data?.value) {
-      const saved =
-        typeof data.value === "string"
-          ? JSON.parse(data.value)
-          : data.value;
-
-      if (saved && typeof saved === "object") {
-        state = {
-          ...clone(DEFAULTS),
-          ...saved
-        };
-      }
-    }
-
-    loadClassificationsFromState();
-  }
-
-  async function saveSettings() {
-    saveClassificationsToState();
-
-    const {
-      error
-    } = await db
+    const { error } = await db
       .from("settings")
       .upsert(
         {
           key: "site",
-          value: state
+          value: payload
         },
         {
           onConflict: "key"
@@ -536,140 +284,156 @@
       );
 
     if (error) {
+      console.error(error);
       throw error;
     }
+
+    state.settings = payload;
   }
 
-  /* =========================================================
-     SUPABASE — PRODUCTS
-     ========================================================= */
+  async function createClassification() {
+    const name = window.prompt(
+      "Digite o nome da nova classificação:"
+    );
 
-  async function loadProducts() {
-    const {
-      data,
-      error
-    } = await db
-      .from("products")
-      .select("*")
-      .order("sort", {
-        ascending: true
-      });
+    if (name === null) return;
 
-    if (error) {
-      console.error(
-        "Erro carregando produtos:",
-        error
-      );
+    const cleanName = name.trim();
 
-      products = [];
+    if (!cleanName) {
+      toast("Digite um nome válido.", "warning");
       return;
     }
 
-    products = Array.isArray(data)
-      ? data
-      : [];
-  }
+    const alreadyExists = state.categories.some(
+      (category) =>
+        category.toLowerCase() === cleanName.toLowerCase()
+    );
 
-  /* =========================================================
-     PEDIDOS — MÓDULO OPCIONAL
-     ========================================================= */
-
-  async function loadOrders() {
-    try {
-      const {
-        data,
-        error
-      } = await db
-        .from("orders")
-        .select("*")
-        .order("created_at", {
-          ascending: false
-        });
-
-      if (error) {
-        orders = [];
-        return;
-      }
-
-      orders = Array.isArray(data)
-        ? data
-        : [];
-    } catch {
-      orders = [];
-    }
-  }
-
-  /* =========================================================
-     ENCOMENDAS — MÓDULO OPCIONAL
-     ========================================================= */
-
-  async function loadCakeOrders() {
-    const possibleTables = [
-      "custom_cakes",
-      "cake_orders",
-      "encomendas"
-    ];
-
-    for (const table of possibleTables) {
-      try {
-        const {
-          data,
-          error
-        } = await db
-          .from(table)
-          .select("*")
-          .order("created_at", {
-            ascending: false
-          });
-
-        if (!error && Array.isArray(data)) {
-          cakeOrders = data;
-          return;
-        }
-      } catch {
-        // tenta a próxima tabela
-      }
+    if (alreadyExists) {
+      toast("Essa classificação já existe.", "warning");
+      return;
     }
 
-    cakeOrders = [];
-  }
-
-  /* =========================================================
-     CARREGAMENTO GERAL
-     ========================================================= */
-
-  async function loadAll() {
-    setLoading(true);
+    state.categories.push(cleanName);
+    state.categories.sort((a, b) =>
+      a.localeCompare(b, "pt-BR")
+    );
 
     try {
-      await Promise.all([
-        loadSettings(),
-        loadProducts(),
-        loadOrders(),
-        loadCakeOrders()
-      ]);
-
-      applyMartinsBrand();
-      updateStats();
-      renderCurrentTab();
+      await saveCategories();
+      renderProductTab();
+      toast("Classificação criada com sucesso.");
     } catch (error) {
-      console.error(
-        "Erro carregando painel:",
-        error
+      state.categories = state.categories.filter(
+        (category) => category !== cleanName
       );
 
-      alert(
-        "Algumas informações não puderam ser carregadas. Verifique o console."
+      toast(
+        "Não foi possível salvar a classificação: " +
+          (error.message || "erro desconhecido"),
+        "error"
       );
-    } finally {
-      setLoading(false);
     }
   }
 
-  function setLoading(isLoading) {
-    document.body.dataset.loading = isLoading
-      ? "true"
-      : "false";
+  async function deleteClassification(name) {
+    const used = state.products.some(
+      (product) =>
+        String(product.category || "").trim() ===
+        String(name).trim()
+    );
+
+    if (used) {
+      toast(
+        "Essa classificação está sendo usada por um produto.",
+        "warning"
+      );
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Excluir a classificação "${name}"?`
+    );
+
+    if (!confirmed) return;
+
+    const oldCategories = [...state.categories];
+
+    state.categories = state.categories.filter(
+      (category) => category !== name
+    );
+
+    try {
+      await saveCategories();
+      renderProductTab();
+      toast("Classificação excluída.");
+    } catch (error) {
+      state.categories = oldCategories;
+
+      toast(
+        "Não foi possível excluir a classificação.",
+        "error"
+      );
+    }
+  }
+
+  /* =========================================================
+     CARREGAR CONFIGURAÇÕES
+     ========================================================= */
+
+  async function loadSettings() {
+    const { data, error } = await db
+      .from("settings")
+      .select("*")
+      .eq("key", "site")
+      .maybeSingle();
+
+    if (error) {
+      console.error("Erro settings:", error);
+      state.settings = {};
+      state.categories = defaultCategories();
+      return;
+    }
+
+    const value = data?.value || {};
+
+    state.settings = {
+      ...DEFAULTS,
+      ...value
+    };
+
+    state.categories = normalizeCategories(
+      value.categories || DEFAULTS.categories
+    );
+
+    loadAdminLogo();
+  }
+
+  /* =========================================================
+     CARREGAR PRODUTOS
+     ========================================================= */
+
+  async function loadProducts() {
+    const { data, error } = await db
+      .from("products")
+      .select("*")
+      .order("sort", {
+        ascending: true,
+        nullsFirst: false
+      });
+
+    if (error) {
+      console.error("Erro produtos:", error);
+      throw error;
+    }
+
+    state.products = Array.isArray(data)
+      ? data.map((product) => ({
+          ...product,
+          area: normalizeArea(product.area, product)
+        }))
+      : [];
   }
 
   /* =========================================================
@@ -677,11 +441,20 @@
      ========================================================= */
 
   function updateStats() {
-    const total = products.length;
+    const total = state.products.length;
 
-    const available = products.filter(
-      (product) =>
-        product.available !== false
+    const available = state.products.filter(
+      (product) => product.available !== false
+    ).length;
+
+    const delivery = state.products.filter(
+      (product) => normalizeArea(product.area, product) ===
+        "cardapio"
+    ).length;
+
+    const encomendas = state.products.filter(
+      (product) => normalizeArea(product.area, product) ===
+        "encomendas"
     ).length;
 
     const statProducts = $("#statProducts");
@@ -698,16 +471,286 @@
     }
 
     if (statOrders) {
-      statOrders.textContent = orders.length;
+      statOrders.textContent = encomendas;
     }
 
     if (statCakes) {
-      statCakes.textContent = cakeOrders.length;
+      statCakes.textContent = delivery;
     }
   }
 
   /* =========================================================
-     PRODUTOS — IMAGEM
+     PRODUTO — MODAL
+     ========================================================= */
+
+  function getField(id) {
+    return document.getElementById(id);
+  }
+
+  function setField(id, value) {
+    const field = getField(id);
+
+    if (!field) return;
+
+    if (field.type === "checkbox") {
+      field.checked = Boolean(value);
+    } else {
+      field.value = value ?? "";
+    }
+  }
+
+  function getFieldValue(id) {
+    const field = getField(id);
+
+    if (!field) return "";
+
+    if (field.type === "checkbox") {
+      return field.checked;
+    }
+
+    return field.value;
+  }
+
+  function populateClassificationSelect(selected = "") {
+    const select = getField("productCategory");
+
+    if (!select) return;
+
+    const categories = normalizeCategories([
+      ...state.categories,
+      selected
+    ]);
+
+    select.innerHTML = `
+      <option value="">Selecione uma classificação</option>
+      ${categories
+        .map(
+          (category) => `
+            <option value="${escapeHtml(category)}">
+              ${escapeHtml(category)}
+            </option>
+          `
+        )
+        .join("")}
+    `;
+
+    select.value = selected || "";
+  }
+
+  function populateAreaSelect(selected = "cardapio") {
+    const select = getField("productArea");
+
+    if (!select) return;
+
+    const normalized = normalizeArea(selected);
+
+    select.innerHTML = `
+      <option value="cardapio">Delivery</option>
+      <option value="encomendas">Encomendas</option>
+    `;
+
+    select.value = normalized;
+  }
+
+  function ensureProductFormFields() {
+    if (!productForm) return;
+
+    /*
+      Caso o HTML atual ainda não tenha o campo
+      Classificação, adicionamos automaticamente antes
+      do campo Área.
+    */
+
+    if (!getField("productCategory")) {
+      const areaField =
+        getField("productArea")?.closest(".field") ||
+        getField("productArea")?.parentElement;
+
+      if (areaField) {
+        const wrapper = document.createElement("div");
+
+        wrapper.className = "field";
+
+        wrapper.innerHTML = `
+          <label for="productCategory">
+            Classificação
+          </label>
+
+          <div style="
+            display:flex;
+            gap:8px;
+            align-items:center;
+          ">
+            <select
+              id="productCategory"
+              name="category"
+              style="flex:1"
+            ></select>
+
+            <button
+              type="button"
+              class="btn btn-secondary"
+              id="newClassificationBtn"
+              style="white-space:nowrap"
+            >
+              + Nova
+            </button>
+          </div>
+
+          <small style="
+            display:block;
+            margin-top:6px;
+            opacity:.7;
+          ">
+            Ex.: Bolo, Brownie, Sobremesa...
+          </small>
+        `;
+
+        areaField.parentNode.insertBefore(
+          wrapper,
+          areaField
+        );
+      }
+    }
+
+    /*
+      Corrige automaticamente o campo Área caso o HTML
+      antigo ainda tenha "Pronta entrega".
+    */
+
+    if (getField("productArea")) {
+      populateAreaSelect(
+        getFieldValue("productArea") || "cardapio"
+      );
+    }
+
+    const newClassificationBtn =
+      $("#newClassificationBtn");
+
+    if (
+      newClassificationBtn &&
+      !newClassificationBtn.dataset.bound
+    ) {
+      newClassificationBtn.dataset.bound = "true";
+
+      newClassificationBtn.addEventListener(
+        "click",
+        async () => {
+          await createClassification();
+        }
+      );
+    }
+
+    populateClassificationSelect(
+      getFieldValue("productCategory")
+    );
+  }
+
+  function openProductModal(product = null) {
+    if (!productModal || !productForm) return;
+
+    state.editingProductId = product?.id || null;
+
+    ensureProductFormFields();
+
+    productForm.reset();
+
+    const normalizedArea = product
+      ? normalizeArea(product.area, product)
+      : "cardapio";
+
+    setField(
+      "productPhoto",
+      ""
+    );
+
+    setField(
+      "productName",
+      product?.name || ""
+    );
+
+    setField(
+      "productPrice",
+      product?.price ?? ""
+    );
+
+    setField(
+      "productDiscount",
+      product?.discount_percent ?? ""
+    );
+
+    setField(
+      "productSort",
+      product?.sort ?? ""
+    );
+
+    setField(
+      "productGramatura",
+      product?.gramatura ?? ""
+    );
+
+    setField(
+      "productServeAte",
+      product?.serve_ate ?? ""
+    );
+
+    setField(
+      "productDescription",
+      product?.description ?? ""
+    );
+
+    setField(
+      "productAvailable",
+      product ? product.available !== false : true
+    );
+
+    setField(
+      "productFeatured",
+      product?.featured ?? false
+    );
+
+    setField(
+      "productAppointment",
+      product?.appointment_required ?? false
+    );
+
+    populateClassificationSelect(
+      product?.category || ""
+    );
+
+    populateAreaSelect(normalizedArea);
+
+    const title = productModal.querySelector(
+      ".modal-title, h2, h3"
+    );
+
+    if (title) {
+      title.textContent = product
+        ? "Editar produto"
+        : "Novo produto";
+    }
+
+    productModal.classList.remove("hidden");
+
+    /*
+      Alguns layouts usam display:none diretamente.
+      Garantimos que o modal fique visível.
+    */
+
+    productModal.style.display = "flex";
+  }
+
+  function closeProductModal() {
+    if (!productModal) return;
+
+    productModal.classList.add("hidden");
+    productModal.style.display = "";
+
+    state.editingProductId = null;
+  }
+
+  /* =========================================================
+     IMAGEM
      ========================================================= */
 
   function compressImage(file) {
@@ -717,16 +760,23 @@
         return;
       }
 
+      if (!file.type.startsWith("image/")) {
+        reject(
+          new Error("O arquivo selecionado não é uma imagem.")
+        );
+        return;
+      }
+
       const reader = new FileReader();
 
       reader.onload = () => {
-        const image = new Image();
+        const img = new Image();
 
-        image.onload = () => {
+        img.onload = () => {
           const maxSize = 1000;
 
-          let width = image.width;
-          let height = image.height;
+          let width = img.width;
+          let height = img.height;
 
           if (width > maxSize || height > maxSize) {
             const ratio = Math.min(
@@ -738,48 +788,41 @@
             height = Math.round(height * ratio);
           }
 
-          const canvas =
-            document.createElement("canvas");
+          const canvas = document.createElement("canvas");
 
           canvas.width = width;
           canvas.height = height;
 
-          const context =
-            canvas.getContext("2d");
+          const ctx = canvas.getContext("2d");
 
-          context.drawImage(
-            image,
+          ctx.drawImage(
+            img,
             0,
             0,
             width,
             height
           );
 
-          const dataUrl =
-            canvas.toDataURL(
-              "image/jpeg",
-              0.78
-            );
+          const result = canvas.toDataURL(
+            "image/jpeg",
+            0.78
+          );
 
-          resolve(dataUrl);
+          resolve(result);
         };
 
-        image.onerror = () => {
+        img.onerror = () => {
           reject(
-            new Error(
-              "Não foi possível processar a imagem."
-            )
+            new Error("Não foi possível processar a imagem.")
           );
         };
 
-        image.src = reader.result;
+        img.src = reader.result;
       };
 
       reader.onerror = () => {
         reject(
-          new Error(
-            "Não foi possível ler a imagem."
-          )
+          new Error("Não foi possível ler a imagem.")
         );
       };
 
@@ -788,408 +831,255 @@
   }
 
   /* =========================================================
-     PRODUTOS — MODAL
-     ========================================================= */
-
-  function getProductModal() {
-    return $("#productModal");
-  }
-
-  function openProductModal(product = null) {
-    const modal = getProductModal();
-    const form = $("#productForm");
-
-    if (!modal || !form) return;
-
-    editingProductId = product?.id || null;
-
-    form.reset();
-
-    const title =
-      modal.querySelector(
-        ".modal-title, h2, h3"
-      );
-
-    if (title) {
-      title.textContent = product
-        ? "Editar produto"
-        : "Novo produto";
-    }
-
-    const name = $("#productName");
-    const price = $("#productPrice");
-    const discount = $("#productDiscount");
-    const sort = $("#productSort");
-    const gramatura = $("#productGramatura");
-    const serveAte = $("#productServeAte");
-    const description = $("#productDescription");
-    const available = $("#productAvailable");
-    const featured = $("#productFeatured");
-    const appointment = $("#productAppointment");
-    const photo = $("#productPhoto");
-
-    /* Área não é mais usada como classificação.
-       Naked Cake / Chantininho ficam em Encomendas. */
-
-    const area =
-      $("#productArea");
-
-    if (product) {
-      if (name) {
-        name.value = product.name || "";
-      }
-
-      if (price) {
-        price.value =
-          product.price ?? "";
-      }
-
-      if (discount) {
-        discount.value =
-          product.discount_percent ?? "";
-      }
-
-      if (sort) {
-        sort.value =
-          product.sort ?? 0;
-      }
-
-      if (gramatura) {
-        gramatura.value =
-          product.gramatura || "";
-      }
-
-      if (serveAte) {
-        serveAte.value =
-          product.serve_ate || "";
-      }
-
-      if (description) {
-        description.value =
-          product.description || "";
-      }
-
-      if (available) {
-        available.checked =
-          product.available !== false;
-      }
-
-      if (featured) {
-        featured.checked =
-          product.featured === true;
-      }
-
-      if (appointment) {
-        appointment.checked =
-          product.appointment_required === true;
-      }
-
-      if (photo) {
-        photo.value = "";
-      }
-
-      renderClassificationOptions(
-        product.category || ""
-      );
-
-      if (area) {
-        /*
-          Delivery e Pronta Entrega são a mesma coisa.
-          Para produtos comuns usamos Delivery.
-          Produtos de encomenda ficam em Encomendas.
-        */
-        const currentArea =
-          String(product.area || "")
-            .toLowerCase();
-
-        if (
-          currentArea.includes("encom") ||
-          currentArea.includes("bolo")
-        ) {
-          area.value = "encomendas";
-        } else {
-          area.value = "delivery";
-        }
-      }
-    } else {
-      if (available) {
-        available.checked = true;
-      }
-
-      if (featured) {
-        featured.checked = false;
-      }
-
-      if (appointment) {
-        appointment.checked = false;
-      }
-
-      if (sort) {
-        sort.value = products.length + 1;
-      }
-
-      renderClassificationOptions("");
-
-      if (area) {
-        area.value = "delivery";
-      }
-    }
-
-    modal.classList.remove("hidden");
-    modal.style.display = "flex";
-
-    document.body.classList.add(
-      "modal-open"
-    );
-  }
-
-  function closeProductModal() {
-    const modal = getProductModal();
-
-    if (!modal) return;
-
-    modal.classList.add("hidden");
-    modal.style.display = "none";
-
-    document.body.classList.remove(
-      "modal-open"
-    );
-
-    editingProductId = null;
-  }
-
-  /* =========================================================
-     PRODUTOS — SALVAR
+     SALVAR PRODUTO
      ========================================================= */
 
   async function saveProduct(event) {
     event.preventDefault();
 
-    const form = event.currentTarget;
+    if (!productForm) return;
 
-    const name =
-      $("#productName")?.value?.trim() || "";
-
-    const price =
-      Number($("#productPrice")?.value || 0);
-
-    const discount =
-      Number(
-        $("#productDiscount")?.value || 0
-      );
-
-    const sort =
-      Number($("#productSort")?.value || 0);
-
-    const gramatura =
-      $("#productGramatura")?.value?.trim() ||
-      "";
-
-    const serveAte =
-      $("#productServeAte")?.value?.trim() ||
-      "";
-
-    const description =
-      $("#productDescription")?.value?.trim() ||
-      "";
-
-    const available =
-      $("#productAvailable")?.checked !== false;
-
-    const featured =
-      $("#productFeatured")?.checked === true;
-
-    const appointment =
-      $("#productAppointment")?.checked === true;
-
-    const classification =
-      normalizeClassification(
-        $("#productClassification")?.value || ""
-      );
-
-    const areaValue =
-      $("#productArea")?.value || "delivery";
-
-    const photoFile =
-      $("#productPhoto")?.files?.[0] || null;
-
-    if (!name) {
-      alert("Informe o nome do produto.");
-      return;
-    }
-
-    if (!price || price < 0) {
-      alert("Informe um preço válido.");
-      return;
-    }
-
-    if (!classification) {
-      alert(
-        "Selecione uma classificação para o produto."
-      );
-      return;
-    }
-
-    const existing =
-      editingProductId
-        ? products.find(
-            (item) =>
-              String(item.id) ===
-              String(editingProductId)
-          )
-        : null;
-
-    const saveButton =
-      form.querySelector(
+    const submitButton =
+      productForm.querySelector(
         'button[type="submit"]'
       );
 
-    if (saveButton) {
-      saveButton.disabled = true;
-      saveButton.dataset.originalText =
-        saveButton.textContent;
-      saveButton.textContent =
-        "Salvando...";
-    }
+    setLoading(
+      submitButton,
+      true,
+      "Salvar produto"
+    );
 
     try {
-      let imageUrl =
-        existing?.image_url ||
-        existing?.image ||
-        existing?.photo_url ||
-        existing?.photo ||
-        existing?.imagem ||
-        existing?.foto ||
-        "";
+      const name = String(
+        getFieldValue("productName") || ""
+      ).trim();
 
-      if (photoFile) {
-        imageUrl =
-          await compressImage(photoFile);
+      if (!name) {
+        throw new Error(
+          "Informe o nome do produto."
+        );
       }
 
-      /*
-        IMPORTANTE:
-        A classificação é salva no campo "category"
-        da tabela products.
+      const category = String(
+        getFieldValue("productCategory") || ""
+      ).trim();
 
-        A interface não mostra mais "Categoria".
-        O usuário vê "Classificação".
-      */
+      if (!category) {
+        throw new Error(
+          "Selecione uma classificação."
+        );
+      }
 
-      const productData = {
+      const area = normalizeArea(
+        getFieldValue("productArea"),
+        { name }
+      );
+
+      const priceValue =
+        getFieldValue("productPrice");
+
+      const price =
+        priceValue === ""
+          ? 0
+          : Number(
+              String(priceValue)
+                .replace(",", ".")
+            );
+
+      if (Number.isNaN(price)) {
+        throw new Error(
+          "Informe um preço válido."
+        );
+      }
+
+      const discountValue =
+        getFieldValue("productDiscount");
+
+      const discount =
+        discountValue === ""
+          ? 0
+          : Number(
+              String(discountValue)
+                .replace(",", ".")
+            );
+
+      const sortValue =
+        getFieldValue("productSort");
+
+      const sort =
+        sortValue === ""
+          ? 0
+          : Number(sortValue);
+
+      const file =
+        getField("productPhoto")?.files?.[0];
+
+      let imageUrl = "";
+
+      if (file) {
+        imageUrl = await compressImage(file);
+      }
+
+      const currentProduct =
+        state.products.find(
+          (product) =>
+            product.id === state.editingProductId
+        );
+
+      if (!imageUrl && currentProduct) {
+        imageUrl = getProductImage(currentProduct);
+      }
+
+      const payload = {
         id:
-          existing?.id ||
-          generateId("product"),
+          state.editingProductId ||
+          `${slugify(name)}-${Date.now()}`,
 
         name,
 
         price,
 
-        category: classification,
+        category,
 
         /*
-          Delivery e Pronta Entrega são tratados
-          como uma única área.
-
-          Encomendas continua separado para
-          Naked Cake, Chantininho etc.
+          Delivery = cardapio
+          Encomendas = encomendas
         */
-        area:
-          areaValue === "encomendas"
-            ? "encomendas"
-            : "delivery",
+        area,
 
         discount_percent:
-          discount >= 0
+          Number.isFinite(discount)
             ? discount
             : 0,
 
-        sort,
+        sort:
+          Number.isFinite(sort)
+            ? sort
+            : 0,
 
-        gramatura,
+        gramatura:
+          getFieldValue("productGramatura"),
 
-        serve_ate: serveAte,
+        serve_ate:
+          getFieldValue("productServeAte"),
 
-        description,
+        description:
+          getFieldValue("productDescription"),
 
-        available,
+        available:
+          Boolean(
+            getFieldValue("productAvailable")
+          ),
 
-        featured,
+        featured:
+          Boolean(
+            getFieldValue("productFeatured")
+          ),
 
         appointment_required:
-          appointment,
-
-        ...(imageUrl
-          ? {
-              image_url: imageUrl
-            }
-          : {})
+          Boolean(
+            getFieldValue("productAppointment")
+          )
       };
 
-      const {
-        error
-      } = await db
+      if (imageUrl) {
+        payload.image_url = imageUrl;
+      }
+
+      const { data, error } = await db
         .from("products")
-        .upsert(productData);
+        .upsert(payload, {
+          onConflict: "id"
+        })
+        .select()
+        .single();
 
       if (error) {
+        console.error(
+          "Erro ao salvar produto:",
+          error
+        );
+
         throw error;
       }
 
-      await loadProducts();
+      const normalizedProduct = {
+        ...data,
+        area: normalizeArea(
+          data.area,
+          data
+        )
+      };
 
-      updateStats();
-      renderProducts();
+      const existingIndex =
+        state.products.findIndex(
+          (product) =>
+            product.id === normalizedProduct.id
+        );
+
+      if (existingIndex >= 0) {
+        state.products[existingIndex] =
+          normalizedProduct;
+      } else {
+        state.products.push(
+          normalizedProduct
+        );
+      }
+
+      state.products.sort(
+        (a, b) =>
+          Number(a.sort || 0) -
+          Number(b.sort || 0)
+      );
 
       closeProductModal();
 
-      alert(
-        existing
+      updateStats();
+      renderProductTab();
+
+      toast(
+        state.editingProductId
           ? "Produto atualizado com sucesso."
           : "Produto criado com sucesso."
       );
-    } catch (error) {
-      console.error(
-        "Erro salvando produto:",
-        error
-      );
 
-      alert(
-        error?.message ||
-          "Não foi possível salvar o produto."
+    } catch (error) {
+      console.error(error);
+
+      toast(
+        error.message ||
+          "Não foi possível salvar o produto.",
+        "error"
       );
     } finally {
-      if (saveButton) {
-        saveButton.disabled = false;
-        saveButton.textContent =
-          saveButton.dataset.originalText ||
-          "Salvar";
-      }
+      setLoading(
+        submitButton,
+        false,
+        "Salvar produto"
+      );
     }
   }
 
   /* =========================================================
-     PRODUTOS — EXCLUIR
+     EXCLUIR PRODUTO
      ========================================================= */
 
   async function deleteProduct(id) {
-    const product = products.find(
-      (item) =>
-        String(item.id) === String(id)
+    const product = state.products.find(
+      (item) => item.id === id
     );
 
     if (!product) return;
 
     const confirmed = window.confirm(
-      `Excluir "${product.name}"?\n\nEssa ação não pode ser desfeita.`
+      `Excluir "${product.name}"?`
     );
 
     if (!confirmed) return;
 
     try {
-      const {
-        error
-      } = await db
+      const { error } = await db
         .from("products")
         .delete()
         .eq("id", id);
@@ -1198,28 +1088,87 @@
         throw error;
       }
 
-      await loadProducts();
+      state.products =
+        state.products.filter(
+          (item) => item.id !== id
+        );
 
       updateStats();
-      renderProducts();
+      renderProductTab();
+
+      toast("Produto excluído.");
     } catch (error) {
       console.error(error);
 
-      alert(
-        error?.message ||
-          "Não foi possível excluir o produto."
+      toast(
+        "Não foi possível excluir o produto.",
+        "error"
       );
     }
   }
 
   /* =========================================================
-     PRODUTOS — DISPONIBILIDADE
+     DUPLICAR PRODUTO
      ========================================================= */
 
-  async function toggleProduct(id) {
-    const product = products.find(
-      (item) =>
-        String(item.id) === String(id)
+  async function duplicateProduct(id) {
+    const original = state.products.find(
+      (product) => product.id === id
+    );
+
+    if (!original) return;
+
+    const copy = {
+      ...original,
+
+      id:
+        `${slugify(original.name)}-` +
+        `${Date.now()}`,
+
+      name:
+        `${original.name} — cópia`
+    };
+
+    try {
+      const { data, error } = await db
+        .from("products")
+        .insert(copy)
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      state.products.push({
+        ...data,
+        area: normalizeArea(
+          data.area,
+          data
+        )
+      });
+
+      updateStats();
+      renderProductTab();
+
+      toast("Produto duplicado.");
+    } catch (error) {
+      console.error(error);
+
+      toast(
+        "Não foi possível duplicar o produto.",
+        "error"
+      );
+    }
+  }
+
+  /* =========================================================
+     ALTERAR DISPONIBILIDADE
+     ========================================================= */
+
+  async function toggleProductAvailability(id) {
+    const product = state.products.find(
+      (item) => item.id === id
     );
 
     if (!product) return;
@@ -1228,9 +1177,7 @@
       product.available === false;
 
     try {
-      const {
-        error
-      } = await db
+      const { error } = await db
         .from("products")
         .update({
           available: newValue
@@ -1244,161 +1191,233 @@
       product.available = newValue;
 
       updateStats();
-      renderProducts();
+      renderProductTab();
+
+      toast(
+        newValue
+          ? "Produto ativado."
+          : "Produto ocultado."
+      );
     } catch (error) {
       console.error(error);
 
-      alert(
-        error?.message ||
-          "Não foi possível alterar a disponibilidade."
+      toast(
+        "Não foi possível alterar a disponibilidade.",
+        "error"
       );
     }
   }
 
   /* =========================================================
-     PRODUTOS — LISTAGEM
+     RENDER — PRODUTOS
      ========================================================= */
 
-  function renderProducts() {
-    const container =
-      $("#tabContent");
+  function renderProductTab() {
+    if (!tabContent) return;
 
-    if (!container) return;
+    ensureProductFormFields();
 
-    const search =
-      (
-        $("#productSearch")?.value ||
-        ""
-      )
-        .trim()
-        .toLowerCase();
-
-    let filtered = [...products];
-
-    if (search) {
-      filtered = filtered.filter(
-        (product) => {
-          const text = [
-            product.name,
-            product.category,
-            product.description,
-            product.area
-          ]
-            .filter(Boolean)
-            .join(" ")
-            .toLowerCase();
-
-          return text.includes(search);
-        }
+    const deliveryProducts =
+      state.products.filter(
+        (product) =>
+          normalizeArea(
+            product.area,
+            product
+          ) === "cardapio"
       );
-    }
 
-    if (!filtered.length) {
-      container.innerHTML = `
-        <div class="admin-empty">
-          <h3>Nenhum produto encontrado</h3>
-          <p>
-            ${
-              products.length
-                ? "Tente outra busca."
-                : "Cadastre o primeiro produto."
-            }
-          </p>
-        </div>
-      `;
+    const orderProducts =
+      state.products.filter(
+        (product) =>
+          normalizeArea(
+            product.area,
+            product
+          ) === "encomendas"
+      );
 
-      return;
-    }
+    tabContent.innerHTML = `
+      <div class="product-toolbar">
 
-    container.innerHTML = `
-      <div class="admin-section-head">
         <div>
           <h2>Produtos</h2>
           <p>
-            Gerencie os produtos do cardápio e das encomendas.
+            Gerencie os produtos do Delivery e das Encomendas.
           </p>
         </div>
 
-        <button
-          type="button"
-          class="btn btn-primary"
-          data-action="new-product"
-        >
-          + Novo produto
-        </button>
+        <div style="
+          display:flex;
+          gap:10px;
+          flex-wrap:wrap;
+        ">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            id="manageCategoriesBtn"
+          >
+            Classificações
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="newProductBtn"
+          >
+            + Novo produto
+          </button>
+        </div>
+
       </div>
 
-      <div class="product-toolbar">
-        <input
-          id="productSearch"
-          type="search"
-          placeholder="Buscar produto..."
-          value="${escapeHTML(search)}"
-        >
+      <div
+        id="classificationManager"
+        class="classification-list"
+        style="display:none;"
+      >
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:10px;
+          margin-bottom:12px;
+        ">
+          <strong>Classificações</strong>
 
-        <button
-          type="button"
-          class="btn"
-          data-action="new-classification"
-        >
-          + Classificação
-        </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="addClassificationBtn"
+          >
+            + Nova classificação
+          </button>
+        </div>
+
+        <div id="classificationItems">
+          ${renderClassificationItems()}
+        </div>
       </div>
 
-      <div class="classification-list">
-        ${classifications
-          .map(
-            (item) => `
-              <span class="classification-chip">
-                ${escapeHTML(item)}
-              </span>
-            `
-          )
-          .join("")}
-      </div>
+      <div class="admin-products-area">
 
-      <div class="admin-products-list">
-        ${filtered
-          .map(renderProductCard)
-          .join("")}
+        ${renderAreaSection(
+          "Delivery",
+          "cardapio",
+          deliveryProducts
+        )}
+
+        ${renderAreaSection(
+          "Encomendas",
+          "encomendas",
+          orderProducts
+        )}
+
       </div>
     `;
 
-    const searchInput =
-      $("#productSearch");
+    bindProductTabEvents();
+  }
 
-    if (searchInput) {
-      searchInput.addEventListener(
-        "input",
-        renderProducts
-      );
+  function renderClassificationItems() {
+    if (!state.categories.length) {
+      return `
+        <div class="admin-empty">
+          Nenhuma classificação cadastrada.
+        </div>
+      `;
     }
+
+    return state.categories
+      .map(
+        (category) => `
+          <div class="classification-chip">
+            <span>
+              ${escapeHtml(category)}
+            </span>
+
+            <button
+              type="button"
+              data-delete-category="${escapeHtml(
+                category
+              )}"
+              title="Excluir classificação"
+            >
+              ×
+            </button>
+          </div>
+        `
+      )
+      .join("");
+  }
+
+  function renderAreaSection(
+    title,
+    area,
+    products
+  ) {
+    return `
+      <section class="admin-product-section">
+
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:12px;
+          margin:24px 0 12px;
+        ">
+          <div>
+            <h3 style="margin:0;">
+              ${escapeHtml(title)}
+            </h3>
+
+            <small style="opacity:.7;">
+              ${products.length} produto${
+      products.length === 1 ? "" : "s"
+    }
+            </small>
+          </div>
+        </div>
+
+        ${
+          products.length
+            ? `
+              <div class="admin-products-list">
+                ${products
+                  .map(
+                    (product) =>
+                      renderProductCard(product)
+                  )
+                  .join("")}
+              </div>
+            `
+            : `
+              <div class="admin-empty">
+                Nenhum produto cadastrado nesta área.
+              </div>
+            `
+        }
+
+      </section>
+    `;
   }
 
   function renderProductCard(product) {
-    const image =
-      product.image_url ||
-      product.image ||
-      product.photo_url ||
-      product.photo ||
-      product.imagem ||
-      product.foto ||
-      "";
+    const image = getProductImage(product);
 
-    const isAvailable =
+    const available =
       product.available !== false;
 
-    const area =
-      String(product.area || "")
-        .toLowerCase()
-        .includes("encom")
-        ? "Encomendas"
-        : "Delivery";
+    const category =
+      product.category ||
+      "Sem classificação";
+
+    const area = areaLabel(
+      product.area
+    );
 
     return `
       <article
         class="admin-product-card"
-        data-product-id="${escapeHTML(
+        data-product-id="${escapeHtml(
           product.id
         )}"
       >
@@ -1408,10 +1427,8 @@
             image
               ? `
                 <img
-                  src="${escapeHTML(image)}"
-                  alt="${escapeHTML(
-                    product.name
-                  )}"
+                  src="${escapeHtml(image)}"
+                  alt="${escapeHtml(product.name)}"
                 >
               `
               : `
@@ -1424,62 +1441,50 @@
 
         <div class="admin-product-info">
 
-          <div class="admin-product-top">
-            <div>
-              <h3>
-                ${escapeHTML(
-                  product.name
-                )}
-              </h3>
+          <div style="
+            display:flex;
+            gap:6px;
+            flex-wrap:wrap;
+            margin-bottom:7px;
+          ">
 
-              <span class="product-classification">
-                ${escapeHTML(
-                  product.category ||
-                    "Sem classificação"
-                )}
-              </span>
-            </div>
+            <span class="product-area-choice">
+              ${escapeHtml(area)}
+            </span>
 
-            <strong>
-              ${money(product.price)}
-            </strong>
-          </div>
-
-          <div class="product-meta">
-            <span>
-              ${escapeHTML(area)}
+            <span class="product-classification">
+              ${escapeHtml(category)}
             </span>
 
             ${
-              product.gramatura
+              available
                 ? `
-                  <span>
-                    ${escapeHTML(
-                      product.gramatura
-                    )}
+                  <span class="status-badge status-active">
+                    Disponível
                   </span>
                 `
-                : ""
+                : `
+                  <span class="status-badge status-inactive">
+                    Oculto
+                  </span>
+                `
             }
 
-            ${
-              product.serve_ate
-                ? `
-                  <span>
-                    Serve até ${escapeHTML(
-                      product.serve_ate
-                    )}
-                  </span>
-                `
-                : ""
-            }
           </div>
+
+          <h4>
+            ${escapeHtml(product.name)}
+          </h4>
+
+          <strong>
+            ${money(product.price)}
+          </strong>
 
           ${
             product.description
               ? `
                 <p>
-                  ${escapeHTML(
+                  ${escapeHtml(
                     product.description
                   )}
                 </p>
@@ -1487,60 +1492,53 @@
               : ""
           }
 
-          <div class="product-status">
-            <span class="${
-              isAvailable
-                ? "status-on"
-                : "status-off"
-            }">
-              ${
-                isAvailable
-                  ? "Disponível"
-                  : "Indisponível"
-              }
-            </span>
-          </div>
+        </div>
 
-          <div class="product-actions">
+        <div class="admin-product-actions">
 
-            <button
-              type="button"
-              class="btn"
-              data-action="edit-product"
-              data-id="${escapeHTML(
-                product.id
-              )}"
-            >
-              Editar
-            </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-edit-product="${escapeHtml(
+              product.id
+            )}"
+          >
+            Editar
+          </button>
 
-            <button
-              type="button"
-              class="btn"
-              data-action="toggle-product"
-              data-id="${escapeHTML(
-                product.id
-              )}"
-            >
-              ${
-                isAvailable
-                  ? "Desativar"
-                  : "Ativar"
-              }
-            </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-toggle-product="${escapeHtml(
+              product.id
+            )}"
+          >
+            ${
+              available
+                ? "Ocultar"
+                : "Ativar"
+            }
+          </button>
 
-            <button
-              type="button"
-              class="btn btn-danger"
-              data-action="delete-product"
-              data-id="${escapeHTML(
-                product.id
-              )}"
-            >
-              Excluir
-            </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-duplicate-product="${escapeHtml(
+              product.id
+            )}"
+          >
+            Duplicar
+          </button>
 
-          </div>
+          <button
+            type="button"
+            class="btn btn-danger"
+            data-delete-product="${escapeHtml(
+              product.id
+            )}"
+          >
+            Excluir
+          </button>
 
         </div>
 
@@ -1549,209 +1547,436 @@
   }
 
   /* =========================================================
-     CONTEÚDO
+     EVENTOS — PRODUTOS
      ========================================================= */
 
-  function renderContent() {
-    const container = $("#tabContent");
+  function bindProductTabEvents() {
+    const newProductBtn =
+      $("#newProductBtn");
+
+    if (newProductBtn) {
+      newProductBtn.addEventListener(
+        "click",
+        () => openProductModal()
+      );
+    }
+
+    const manageCategoriesBtn =
+      $("#manageCategoriesBtn");
+
+    const classificationManager =
+      $("#classificationManager");
+
+    if (
+      manageCategoriesBtn &&
+      classificationManager
+    ) {
+      manageCategoriesBtn.addEventListener(
+        "click",
+        () => {
+          classificationManager.style.display =
+            classificationManager.style.display ===
+            "none"
+              ? "block"
+              : "none";
+        }
+      );
+    }
+
+    const addClassificationBtn =
+      $("#addClassificationBtn");
+
+    if (addClassificationBtn) {
+      addClassificationBtn.addEventListener(
+        "click",
+        createClassification
+      );
+    }
+
+    $$("[data-delete-category]").forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          () =>
+            deleteClassification(
+              button.dataset.deleteCategory
+            )
+        );
+      }
+    );
+
+    $$("[data-edit-product]").forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          () => {
+            const product =
+              state.products.find(
+                (item) =>
+                  String(item.id) ===
+                  String(
+                    button.dataset.editProduct
+                  )
+              );
+
+            if (product) {
+              openProductModal(product);
+            }
+          }
+        );
+      }
+    );
+
+    $$("[data-delete-product]").forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          () =>
+            deleteProduct(
+              button.dataset.deleteProduct
+            )
+        );
+      }
+    );
+
+    $$("[data-duplicate-product]").forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          () =>
+            duplicateProduct(
+              button.dataset.duplicateProduct
+            )
+        );
+      }
+    );
+
+    $$("[data-toggle-product]").forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          () =>
+            toggleProductAvailability(
+              button.dataset.toggleProduct
+            )
+        );
+      }
+    );
+  }
+
+  /* =========================================================
+     PEDIDOS
+     ========================================================= */
+
+  async function loadOrders() {
+    const possibleTables = [
+      "orders",
+      "pedidos"
+    ];
+
+    for (const table of possibleTables) {
+      try {
+        const result = await db
+          .from(table)
+          .select("*")
+          .order("created_at", {
+            ascending: false
+          })
+          .limit(100);
+
+        if (!result.error) {
+          return result.data || [];
+        }
+      } catch (_) {}
+    }
+
+    return [];
+  }
+
+  async function renderOrdersTab() {
+    if (!tabContent) return;
+
+    tabContent.innerHTML = `
+      <div class="product-toolbar">
+        <div>
+          <h2>Pedidos</h2>
+          <p>Pedidos recebidos pelo sistema.</p>
+        </div>
+      </div>
+
+      <div id="ordersContainer">
+        <div class="admin-empty">
+          Carregando pedidos...
+        </div>
+      </div>
+    `;
+
+    const orders =
+      await loadOrders();
+
+    const container =
+      $("#ordersContainer");
 
     if (!container) return;
 
-    const about = state.about || {};
-    const address = Array.isArray(
-      state.address
-    )
-      ? state.address.join("\n")
-      : state.address || "";
+    if (!orders.length) {
+      container.innerHTML = `
+        <div class="admin-empty">
+          Nenhum pedido encontrado.
+        </div>
+      `;
+      return;
+    }
 
-    container.innerHTML = `
-      <div class="admin-section-head">
+    container.innerHTML = orders
+      .map(
+        (order) => `
+          <article class="admin-order-card">
+            <strong>
+              Pedido #${escapeHtml(
+                order.id || ""
+              )}
+            </strong>
+
+            <p>
+              ${
+                escapeHtml(
+                  order.customer_name ||
+                    order.name ||
+                    "Cliente"
+                )
+              }
+            </p>
+
+            <small>
+              ${escapeHtml(
+                order.created_at || ""
+              )}
+            </small>
+          </article>
+        `
+      )
+      .join("");
+  }
+
+  /* =========================================================
+     ENCOMENDAS DE BOLOS
+     ========================================================= */
+
+  async function renderCakesTab() {
+    if (!tabContent) return;
+
+    const cake =
+      state.settings.cake ||
+      DEFAULTS.cake ||
+      {};
+
+    const types =
+      Array.isArray(cake.types)
+        ? cake.types
+        : [];
+
+    tabContent.innerHTML = `
+      <div class="product-toolbar">
         <div>
-          <h2>Conteúdo</h2>
+          <h2>Encomendas</h2>
           <p>
-            Edite as informações principais da Martins Confeitaria.
+            Configurações de bolos para encomenda.
           </p>
         </div>
       </div>
 
-      <form id="contentForm" class="admin-form">
+      <div class="admin-panel-box">
 
-        <div class="field">
-          <label>Nome</label>
-          <input
-            id="contentName"
-            value="${escapeHTML(
-              state.name || ""
-            )}"
-          >
+        <h3>Tipos de bolo</h3>
+
+        ${
+          types.length
+            ? `
+              <div class="cake-list">
+                ${types
+                  .map(
+                    (item) => `
+                      <div class="cake-item">
+                        <span>
+                          ${escapeHtml(
+                            item[0]
+                          )}
+                        </span>
+
+                        <strong>
+                          ${money(item[1])}
+                        </strong>
+                      </div>
+                    `
+                  )
+                  .join("")}
+              </div>
+            `
+            : `
+              <div class="admin-empty">
+                Nenhum bolo configurado.
+              </div>
+            `
+        }
+
+      </div>
+    `;
+  }
+
+  /* =========================================================
+     CONTEÚDO
+     ========================================================= */
+
+  async function saveSettingObject() {
+    const { error } = await db
+      .from("settings")
+      .upsert(
+        {
+          key: "site",
+          value: state.settings
+        },
+        {
+          onConflict: "key"
+        }
+      );
+
+    if (error) {
+      throw error;
+    }
+  }
+
+  function renderContentTab() {
+    if (!tabContent) return;
+
+    const about =
+      state.settings.about ||
+      DEFAULTS.about ||
+      {};
+
+    tabContent.innerHTML = `
+      <div class="product-toolbar">
+        <div>
+          <h2>Conteúdo</h2>
+          <p>
+            Edite o conteúdo principal do site.
+          </p>
         </div>
+      </div>
+
+      <div class="admin-panel-box">
 
         <div class="field">
-          <label>WhatsApp</label>
+          <label for="adminAboutTitle">
+            Título da história
+          </label>
+
           <input
-            id="contentWhatsapp"
-            value="${escapeHTML(
-              state.whatsapp || ""
-            )}"
-          >
-        </div>
-
-        <div class="field">
-          <label>Instagram</label>
-          <input
-            id="contentInstagram"
-            value="${escapeHTML(
-              state.instagram || ""
-            )}"
-          >
-        </div>
-
-        <div class="field">
-          <label>Endereço</label>
-          <textarea id="contentAddress">${escapeHTML(
-            address
-          )}</textarea>
-        </div>
-
-        <div class="field">
-          <label>Google Maps</label>
-          <input
-            id="contentMaps"
-            value="${escapeHTML(
-              state.maps || ""
-            )}"
-          >
-        </div>
-
-        <div class="field">
-          <label>Link de avaliação</label>
-          <input
-            id="contentReview"
-            value="${escapeHTML(
-              state.review || ""
-            )}"
-          >
-        </div>
-
-        <div class="field">
-          <label>Título da história</label>
-          <input
-            id="contentAboutTitle"
-            value="${escapeHTML(
+            id="adminAboutTitle"
+            value="${escapeHtml(
               about.title || ""
             )}"
           >
         </div>
 
         <div class="field">
-          <label>Frase</label>
+          <label for="adminAboutQuote">
+            Frase
+          </label>
+
           <input
-            id="contentAboutQuote"
-            value="${escapeHTML(
+            id="adminAboutQuote"
+            value="${escapeHtml(
               about.quote || ""
             )}"
           >
         </div>
 
         <div class="field">
-          <label>História</label>
+          <label for="adminAboutText">
+            História
+          </label>
+
           <textarea
-            id="contentAboutText"
-            rows="12"
-          >${escapeHTML(
+            id="adminAboutText"
+            rows="14"
+          >${escapeHtml(
             about.text || ""
           )}</textarea>
         </div>
 
         <button
-          type="submit"
+          type="button"
           class="btn btn-primary"
+          id="saveContentBtn"
         >
           Salvar conteúdo
         </button>
 
-      </form>
+      </div>
     `;
 
-    $("#contentForm")?.addEventListener(
-      "submit",
-      saveContent
+    $("#saveContentBtn")?.addEventListener(
+      "click",
+      async () => {
+        const button =
+          $("#saveContentBtn");
+
+        setLoading(
+          button,
+          true,
+          "Salvar conteúdo"
+        );
+
+        try {
+          state.settings.about = {
+            ...(state.settings.about || {}),
+            title:
+              $("#adminAboutTitle")?.value || "",
+            quote:
+              $("#adminAboutQuote")?.value || "",
+            text:
+              $("#adminAboutText")?.value || ""
+          };
+
+          await saveSettingObject();
+
+          toast(
+            "Conteúdo salvo com sucesso."
+          );
+        } catch (error) {
+          console.error(error);
+
+          toast(
+            "Não foi possível salvar o conteúdo.",
+            "error"
+          );
+        } finally {
+          setLoading(
+            button,
+            false,
+            "Salvar conteúdo"
+          );
+        }
+      }
     );
-  }
-
-  async function saveContent(event) {
-    event.preventDefault();
-
-    state.name =
-      $("#contentName")?.value?.trim() ||
-      state.name;
-
-    state.whatsapp =
-      $("#contentWhatsapp")?.value?.trim() ||
-      state.whatsapp;
-
-    state.instagram =
-      $("#contentInstagram")?.value?.trim() ||
-      state.instagram;
-
-    state.address =
-      ($("#contentAddress")?.value || "")
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean);
-
-    state.maps =
-      $("#contentMaps")?.value?.trim() ||
-      "";
-
-    state.review =
-      $("#contentReview")?.value?.trim() ||
-      "";
-
-    if (!state.about) {
-      state.about = {};
-    }
-
-    state.about.title =
-      $("#contentAboutTitle")
-        ?.value?.trim() || "";
-
-    state.about.quote =
-      $("#contentAboutQuote")
-        ?.value?.trim() || "";
-
-    state.about.text =
-      $("#contentAboutText")
-        ?.value || "";
-
-    try {
-      await saveSettings();
-
-      applyMartinsBrand();
-
-      alert(
-        "Conteúdo salvo com sucesso."
-      );
-    } catch (error) {
-      console.error(error);
-
-      alert(
-        error?.message ||
-          "Não foi possível salvar o conteúdo."
-      );
-    }
   }
 
   /* =========================================================
      HORÁRIOS
      ========================================================= */
 
-  function renderHours() {
-    const container = $("#tabContent");
+  function renderHoursTab() {
+    if (!tabContent) return;
 
-    if (!container) return;
+    const hours =
+      Array.isArray(state.settings.hours)
+        ? state.settings.hours
+        : Array.isArray(DEFAULTS.hours)
+        ? DEFAULTS.hours
+        : [];
 
-    const days = [
+    const names = [
       "Domingo",
       "Segunda-feira",
       "Terça-feira",
@@ -1761,739 +1986,602 @@
       "Sábado"
     ];
 
-    const hours = Array.isArray(
-      state.hours
-    )
-      ? state.hours
-      : [];
-
-    container.innerHTML = `
-      <div class="admin-section-head">
+    tabContent.innerHTML = `
+      <div class="product-toolbar">
         <div>
           <h2>Horários</h2>
           <p>
-            Configure os horários de funcionamento.
+            Horários de funcionamento.
           </p>
         </div>
       </div>
 
-      <form id="hoursForm">
+      <div class="admin-panel-box">
 
-        <div class="hours-list">
+        ${names
+          .map((name, index) => {
+            const item =
+              hours[index] || {
+                s: "closed",
+                o: "",
+                c: ""
+              };
 
-          ${days
-            .map((day, index) => {
-              const item =
-                hours[index] || {
-                  s: "closed",
-                  o: "",
-                  c: ""
-                };
+            return `
+              <div class="hours-row">
 
-              return `
-                <div
-                  class="hour-row"
-                  data-day="${index}"
+                <strong>
+                  ${name}
+                </strong>
+
+                <select
+                  data-hours-status="${index}"
                 >
-                  <strong>
-                    ${day}
-                  </strong>
-
-                  <select
-                    class="hour-status"
-                    data-index="${index}"
+                  <option
+                    value="open"
+                    ${
+                      item.s === "open"
+                        ? "selected"
+                        : ""
+                    }
                   >
-                    <option
-                      value="open"
-                      ${
-                        item.s === "open"
-                          ? "selected"
-                          : ""
-                      }
-                    >
-                      Aberto
-                    </option>
+                    Aberto
+                  </option>
 
-                    <option
-                      value="closed"
-                      ${
-                        item.s === "closed"
-                          ? "selected"
-                          : ""
-                      }
-                    >
-                      Fechado
-                    </option>
-
-                    <option
-                      value="tbd"
-                      ${
-                        item.s === "tbd"
-                          ? "selected"
-                          : ""
-                      }
-                    >
-                      A confirmar
-                    </option>
-                  </select>
-
-                  <input
-                    type="time"
-                    class="hour-open"
-                    data-index="${index}"
-                    value="${escapeHTML(
-                      item.o || ""
-                    )}"
+                  <option
+                    value="closed"
+                    ${
+                      item.s === "closed"
+                        ? "selected"
+                        : ""
+                    }
                   >
+                    Fechado
+                  </option>
 
-                  <input
-                    type="time"
-                    class="hour-close"
-                    data-index="${index}"
-                    value="${escapeHTML(
-                      item.c || ""
-                    )}"
+                  <option
+                    value="tbd"
+                    ${
+                      item.s === "tbd"
+                        ? "selected"
+                        : ""
+                    }
                   >
-                </div>
-              `;
-            })
-            .join("")}
+                    A confirmar
+                  </option>
+                </select>
 
-        </div>
+                <input
+                  type="time"
+                  data-hours-open="${index}"
+                  value="${escapeHtml(
+                    item.o || ""
+                  )}"
+                >
+
+                <input
+                  type="time"
+                  data-hours-close="${index}"
+                  value="${escapeHtml(
+                    item.c || ""
+                  )}"
+                >
+
+              </div>
+            `;
+          })
+          .join("")}
 
         <button
-          type="submit"
+          type="button"
           class="btn btn-primary"
+          id="saveHoursBtn"
         >
           Salvar horários
         </button>
 
-      </form>
+      </div>
     `;
 
-    $("#hoursForm")?.addEventListener(
-      "submit",
-      saveHours
-    );
-  }
+    $("#saveHoursBtn")?.addEventListener(
+      "click",
+      async () => {
+        const button =
+          $("#saveHoursBtn");
 
-  async function saveHours(event) {
-    event.preventDefault();
+        setLoading(
+          button,
+          true,
+          "Salvar horários"
+        );
 
-    const days = $$(".hour-status");
+        try {
+          const newHours =
+            names.map((_, index) => ({
+              s:
+                $(
+                  `[data-hours-status="${index}"]`
+                )?.value || "closed",
 
-    state.hours = days.map(
-      (select, index) => {
-        const open =
-          $(
-            `.hour-open[data-index="${index}"]`
-          )?.value || "";
+              o:
+                $(
+                  `[data-hours-open="${index}"]`
+                )?.value || "",
 
-        const close =
-          $(
-            `.hour-close[data-index="${index}"]`
-          )?.value || "";
+              c:
+                $(
+                  `[data-hours-close="${index}"]`
+                )?.value || ""
+            }));
 
-        return {
-          s: select.value,
-          o:
-            select.value === "open"
-              ? open
-              : "",
-          c:
-            select.value === "open"
-              ? close
-              : ""
-        };
+          state.settings.hours =
+            newHours;
+
+          await saveSettingObject();
+
+          toast(
+            "Horários salvos com sucesso."
+          );
+        } catch (error) {
+          console.error(error);
+
+          toast(
+            "Não foi possível salvar os horários.",
+            "error"
+          );
+        } finally {
+          setLoading(
+            button,
+            false,
+            "Salvar horários"
+          );
+        }
       }
     );
-
-    try {
-      await saveSettings();
-
-      alert(
-        "Horários salvos com sucesso."
-      );
-    } catch (error) {
-      console.error(error);
-
-      alert(
-        error?.message ||
-          "Não foi possível salvar os horários."
-      );
-    }
   }
 
   /* =========================================================
-     REGRAS DE ENCOMENDAS
+     REGRAS
      ========================================================= */
 
-  function renderRules() {
-    const container = $("#tabContent");
+  function renderRulesTab() {
+    if (!tabContent) return;
 
-    if (!container) return;
+    const rules =
+      state.settings.rules || {};
 
-    const cake =
-      state.cake || {};
-
-    const types =
-      Array.isArray(cake.types)
-        ? cake.types
-        : [];
-
-    const masses =
-      Array.isArray(cake.masses)
-        ? cake.masses
-        : [];
-
-    const fillings =
-      Array.isArray(cake.fillings)
-        ? cake.fillings
-        : [];
-
-    const extras =
-      Array.isArray(cake.extras)
-        ? cake.extras
-        : [];
-
-    container.innerHTML = `
-      <div class="admin-section-head">
+    tabContent.innerHTML = `
+      <div class="product-toolbar">
         <div>
-          <h2>Regras de encomendas</h2>
+          <h2>Regras</h2>
           <p>
-            Gerencie as opções usadas na página de encomendas.
+            Informações e regras das encomendas.
           </p>
         </div>
       </div>
 
-      <form id="rulesForm">
+      <div class="admin-panel-box">
 
         <div class="field">
           <label>
-            Bolos — tipo e tamanho
+            Prazo / observações
           </label>
 
           <textarea
-            id="ruleTypes"
+            id="adminRulesText"
             rows="10"
-            placeholder="Naked Cake — 06/08 pessoas | 55"
-          >${escapeHTML(
-            types
-              .map((item) => {
-                if (
-                  Array.isArray(item)
-                ) {
-                  return `${item[0]} | ${item[1]}`;
-                }
-
-                return String(item);
-              })
-              .join("\n")
+          >${escapeHtml(
+            rules.text || ""
           )}</textarea>
-
-          <small>
-            Use: Nome | Preço
-          </small>
-        </div>
-
-        <div class="field">
-          <label>
-            Massas
-          </label>
-
-          <textarea
-            id="ruleMasses"
-            rows="7"
-          >${escapeHTML(
-            masses.join("\n")
-          )}</textarea>
-        </div>
-
-        <div class="field">
-          <label>
-            Recheios
-          </label>
-
-          <textarea
-            id="ruleFillings"
-            rows="7"
-          >${escapeHTML(
-            fillings.join("\n")
-          )}</textarea>
-        </div>
-
-        <div class="field">
-          <label>
-            Adicionais
-          </label>
-
-          <textarea
-            id="ruleExtras"
-            rows="10"
-            placeholder="Morango | 16"
-          >${escapeHTML(
-            extras
-              .map((item) => {
-                if (
-                  Array.isArray(item)
-                ) {
-                  return `${item[0]} | ${item[1]}`;
-                }
-
-                return String(item);
-              })
-              .join("\n")
-          )}</textarea>
-
-          <small>
-            Use: Nome | Preço
-          </small>
         </div>
 
         <button
-          type="submit"
+          type="button"
           class="btn btn-primary"
+          id="saveRulesBtn"
         >
           Salvar regras
         </button>
 
-      </form>
+      </div>
     `;
 
-    $("#rulesForm")?.addEventListener(
-      "submit",
-      saveRules
+    $("#saveRulesBtn")?.addEventListener(
+      "click",
+      async () => {
+        const button =
+          $("#saveRulesBtn");
+
+        setLoading(
+          button,
+          true,
+          "Salvar regras"
+        );
+
+        try {
+          state.settings.rules = {
+            ...(state.settings.rules || {}),
+            text:
+              $("#adminRulesText")?.value || ""
+          };
+
+          await saveSettingObject();
+
+          toast(
+            "Regras salvas com sucesso."
+          );
+        } catch (error) {
+          console.error(error);
+
+          toast(
+            "Não foi possível salvar as regras.",
+            "error"
+          );
+        } finally {
+          setLoading(
+            button,
+            false,
+            "Salvar regras"
+          );
+        }
+      }
     );
-  }
-
-  async function saveRules(event) {
-    event.preventDefault();
-
-    if (!state.cake) {
-      state.cake = {};
-    }
-
-    const typesText =
-      $("#ruleTypes")?.value || "";
-
-    const massesText =
-      $("#ruleMasses")?.value || "";
-
-    const fillingsText =
-      $("#ruleFillings")?.value || "";
-
-    const extrasText =
-      $("#ruleExtras")?.value || "";
-
-    state.cake.types =
-      typesText
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean)
-        .map((line) => {
-          const parts =
-            line.split("|");
-
-          return [
-            parts[0]?.trim() || "",
-            Number(
-              String(
-                parts[1] || "0"
-              ).replace(",", ".")
-            ) || 0
-          ];
-        });
-
-    state.cake.masses =
-      massesText
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean);
-
-    state.cake.fillings =
-      fillingsText
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean);
-
-    state.cake.extras =
-      extrasText
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean)
-        .map((line) => {
-          const parts =
-            line.split("|");
-
-          return [
-            parts[0]?.trim() || "",
-            Number(
-              String(
-                parts[1] || "0"
-              ).replace(",", ".")
-            ) || 0
-          ];
-        });
-
-    try {
-      await saveSettings();
-
-      alert(
-        "Regras salvas com sucesso."
-      );
-    } catch (error) {
-      console.error(error);
-
-      alert(
-        error?.message ||
-          "Não foi possível salvar as regras."
-      );
-    }
   }
 
   /* =========================================================
      MÍDIA
      ========================================================= */
 
-  function renderMedia() {
-    const container = $("#tabContent");
+  function renderMediaTab() {
+    if (!tabContent) return;
 
-    if (!container) return;
-
-    if (!state.media) {
-      state.media = {};
-    }
-
-    container.innerHTML = `
-      <div class="admin-section-head">
+    tabContent.innerHTML = `
+      <div class="product-toolbar">
         <div>
           <h2>Mídia</h2>
           <p>
-            Configure os endereços das imagens principais.
+            Imagens e materiais utilizados pelo site.
           </p>
         </div>
       </div>
 
-      <form id="mediaForm">
+      <div class="admin-panel-box">
 
-        <div class="field">
-          <label>
-            Logo
-          </label>
+        <p>
+          As imagens dos produtos podem ser adicionadas
+          diretamente pelo cadastro de cada produto.
+        </p>
 
-          <input
-            id="mediaLogo"
-            type="text"
-            placeholder="URL da logo"
-            value="${escapeHTML(
-              state.media.logo ||
-                state.media.logo_url ||
-                ""
-            )}"
-          >
-        </div>
+        <p style="opacity:.7;">
+          O sistema mantém a imagem atual quando nenhum
+          novo arquivo é selecionado.
+        </p>
 
-        <div class="field">
-          <label>
-            Imagem principal
-          </label>
-
-          <input
-            id="mediaHero"
-            type="text"
-            placeholder="URL da imagem principal"
-            value="${escapeHTML(
-              state.media.hero ||
-                state.media.hero_url ||
-                ""
-            )}"
-          >
-        </div>
-
-        <button
-          type="submit"
-          class="btn btn-primary"
-        >
-          Salvar mídia
-        </button>
-
-      </form>
+      </div>
     `;
+  }
 
-    $("#mediaForm")?.addEventListener(
-      "submit",
-      saveMedia
+  /* =========================================================
+     ABAS
+     ========================================================= */
+
+  async function activateTab(tab) {
+    state.activeTab = tab;
+
+    $$(".sidebar-item, [data-tab]").forEach(
+      (element) => {
+        if (
+          element.dataset.tab === tab
+        ) {
+          element.classList.add("active");
+        } else {
+          element.classList.remove("active");
+        }
+      }
+    );
+
+    if (tab === "products") {
+      renderProductTab();
+      return;
+    }
+
+    if (tab === "orders") {
+      await renderOrdersTab();
+      return;
+    }
+
+    if (tab === "cakes") {
+      await renderCakesTab();
+      return;
+    }
+
+    if (tab === "content") {
+      renderContentTab();
+      return;
+    }
+
+    if (tab === "hours") {
+      renderHoursTab();
+      return;
+    }
+
+    if (tab === "rules") {
+      renderRulesTab();
+      return;
+    }
+
+    if (tab === "media") {
+      renderMediaTab();
+      return;
+    }
+
+    renderProductTab();
+  }
+
+  function bindTabs() {
+    $$("[data-tab]").forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          () => {
+            activateTab(
+              button.dataset.tab
+            );
+          }
+        );
+      }
     );
   }
 
-  async function saveMedia(event) {
+  /* =========================================================
+     LOGIN
+     ========================================================= */
+
+  async function handleLogin(event) {
     event.preventDefault();
 
-    if (!state.media) {
-      state.media = {};
+    if (!loginForm) return;
+
+    const email =
+      $("#loginEmail")?.value?.trim();
+
+    const password =
+      $("#loginPassword")?.value || "";
+
+    if (!email || !password) {
+      showLoginMessage(
+        "Informe e-mail e senha."
+      );
+      return;
     }
 
-    state.media.logo =
-      $("#mediaLogo")
-        ?.value?.trim() || "";
+    const submitButton =
+      loginForm.querySelector(
+        'button[type="submit"]'
+      );
 
-    state.media.hero =
-      $("#mediaHero")
-        ?.value?.trim() || "";
+    setLoading(
+      submitButton,
+      true,
+      "Entrar"
+    );
+
+    showLoginMessage(
+      "Entrando...",
+      false
+    );
 
     try {
-      await saveSettings();
+      const {
+        data,
+        error
+      } = await db.auth.signInWithPassword({
+        email,
+        password
+      });
 
-      applyMartinsBrand();
+      if (error) {
+        throw error;
+      }
 
-      alert(
-        "Mídia salva com sucesso."
+      if (!data?.session) {
+        throw new Error(
+          "Login realizado, mas a sessão não foi criada."
+        );
+      }
+
+      showLoginMessage(
+        "Login realizado.",
+        false
       );
+
+      await showApp();
+
     } catch (error) {
       console.error(error);
 
-      alert(
-        error?.message ||
-          "Não foi possível salvar a mídia."
+      showLoginMessage(
+        error.message ||
+          "Não foi possível entrar."
+      );
+    } finally {
+      setLoading(
+        submitButton,
+        false,
+        "Entrar"
+      );
+    }
+  }
+
+  async function handleLogout() {
+    try {
+      await db.auth.signOut();
+    } catch (error) {
+      console.error(error);
+    }
+
+    showLogin();
+  }
+
+  function showLogin() {
+    if (loginScreen) {
+      loginScreen.classList.remove("hidden");
+      loginScreen.style.display = "";
+    }
+
+    if (app) {
+      app.classList.add("hidden");
+      app.style.display = "";
+    }
+  }
+
+  async function showApp() {
+    if (loginScreen) {
+      loginScreen.classList.add("hidden");
+      loginScreen.style.display = "none";
+    }
+
+    if (app) {
+      app.classList.remove("hidden");
+      app.style.display = "";
+    }
+
+    try {
+      await loadSettings();
+      await loadProducts();
+
+      updateStats();
+      bindTabs();
+
+      await activateTab(
+        state.activeTab || "products"
+      );
+
+    } catch (error) {
+      console.error(error);
+
+      toast(
+        "Não foi possível carregar o painel: " +
+          (error.message || "erro desconhecido"),
+        "error"
       );
     }
   }
 
   /* =========================================================
-     PEDIDOS
+     REFRESH
      ========================================================= */
 
-  function renderOrders() {
-    const container = $("#tabContent");
+  async function refreshAdmin() {
+    const oldText =
+      refreshBtn?.textContent ||
+      "Atualizar";
 
-    if (!container) return;
-
-    container.innerHTML = `
-      <div class="admin-section-head">
-        <div>
-          <h2>Pedidos</h2>
-          <p>
-            Pedidos registrados no sistema.
-          </p>
-        </div>
-      </div>
-
-      ${
-        orders.length
-          ? `
-            <div class="admin-orders-list">
-              ${orders
-                .map(
-                  (order) => `
-                    <article class="admin-order-card">
-                      <strong>
-                        Pedido
-                      </strong>
-
-                      <pre>${escapeHTML(
-                        JSON.stringify(
-                          order,
-                          null,
-                          2
-                        )
-                      )}</pre>
-                    </article>
-                  `
-                )
-                .join("")}
-            </div>
-          `
-          : `
-            <div class="admin-empty">
-              <h3>Nenhum pedido encontrado</h3>
-              <p>
-                Não há pedidos registrados na tabela configurada.
-              </p>
-            </div>
-          `
-      }
-    `;
-  }
-
-  /* =========================================================
-     ENCOMENDAS
-     ========================================================= */
-
-  function renderCakeOrders() {
-    const container = $("#tabContent");
-
-    if (!container) return;
-
-    container.innerHTML = `
-      <div class="admin-section-head">
-        <div>
-          <h2>Encomendas</h2>
-          <p>
-            Naked Cake, Chantininho e demais encomendas.
-          </p>
-        </div>
-      </div>
-
-      ${
-        cakeOrders.length
-          ? `
-            <div class="admin-orders-list">
-              ${cakeOrders
-                .map(
-                  (order) => `
-                    <article class="admin-order-card">
-                      <strong>
-                        Encomenda
-                      </strong>
-
-                      <pre>${escapeHTML(
-                        JSON.stringify(
-                          order,
-                          null,
-                          2
-                        )
-                      )}</pre>
-                    </article>
-                  `
-                )
-                .join("")}
-            </div>
-          `
-          : `
-            <div class="admin-empty">
-              <h3>Nenhuma encomenda encontrada</h3>
-              <p>
-                As opções de Naked Cake e Chantininho continuam configuradas em Encomendas.
-              </p>
-            </div>
-          `
-      }
-    `;
-  }
-
-  /* =========================================================
-     RENDERIZAÇÃO DAS ABAS
-     ========================================================= */
-
-  function renderCurrentTab() {
-    switch (currentTab) {
-      case "products":
-        renderProducts();
-        break;
-
-      case "orders":
-        renderOrders();
-        break;
-
-      case "cakes":
-        renderCakeOrders();
-        break;
-
-      case "content":
-        renderContent();
-        break;
-
-      case "hours":
-        renderHours();
-        break;
-
-      case "rules":
-        renderRules();
-        break;
-
-      case "media":
-        renderMedia();
-        break;
-
-      default:
-        currentTab = "products";
-        renderProducts();
+    if (refreshBtn) {
+      refreshBtn.disabled = true;
+      refreshBtn.textContent =
+        "Atualizando...";
     }
-  }
 
-  /* =========================================================
-     NAVEGAÇÃO
-     ========================================================= */
+    try {
+      await loadSettings();
+      await loadProducts();
 
-  function setTab(tab) {
-    if (!tab) return;
+      updateStats();
 
-    currentTab = tab;
-
-    $$(
-      "[data-tab]"
-    ).forEach((element) => {
-      element.classList.toggle(
-        "active",
-        element.dataset.tab === tab
+      await activateTab(
+        state.activeTab || "products"
       );
-    });
 
-    renderCurrentTab();
-  }
+      toast("Painel atualizado.");
+    } catch (error) {
+      console.error(error);
 
-  function detectTabFromElement(element) {
-    if (!element) return "";
-
-    if (element.dataset.tab) {
-      return element.dataset.tab;
-    }
-
-    const id =
-      element.id || "";
-
-    const text =
-      element.textContent
-        ?.trim()
-        .toLowerCase() || "";
-
-    const map = {
-      products: "products",
-      product: "products",
-      pedidos: "orders",
-      orders: "orders",
-      encomendas: "cakes",
-      cakes: "cakes",
-      conteúdo: "content",
-      conteudo: "content",
-      content: "content",
-      horários: "hours",
-      horarios: "hours",
-      hours: "hours",
-      regras: "rules",
-      rules: "rules",
-      mídia: "media",
-      midia: "media",
-      media: "media"
-    };
-
-    if (map[id]) {
-      return map[id];
-    }
-
-    if (map[text]) {
-      return map[text];
-    }
-
-    for (const key of Object.keys(map)) {
-      if (
-        id.toLowerCase().includes(key) ||
-        text.includes(key)
-      ) {
-        return map[key];
+      toast(
+        "Não foi possível atualizar o painel.",
+        "error"
+      );
+    } finally {
+      if (refreshBtn) {
+        refreshBtn.disabled = false;
+        refreshBtn.textContent =
+          oldText;
       }
     }
-
-    return "";
   }
 
   /* =========================================================
-     EVENTOS GERAIS
+     MODAL — EVENTOS
      ========================================================= */
 
-  function setupEvents() {
-    const loginForm =
-      $("#loginForm");
+  function bindModalEvents() {
+    if (!productModal) return;
+
+    productModal.addEventListener(
+      "click",
+      (event) => {
+        if (
+          event.target === productModal
+        ) {
+          closeProductModal();
+        }
+      }
+    );
+
+    const closeButtons =
+      productModal.querySelectorAll(
+        "[data-close], .modal-close, .close-modal"
+      );
+
+    closeButtons.forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          closeProductModal
+        );
+      }
+    );
+  }
+
+  /* =========================================================
+     GARANTIR CAMPOS DO FORMULÁRIO
+     ========================================================= */
+
+  function normalizeExistingProductAreaField() {
+    const area =
+      getField("productArea");
+
+    if (!area) return;
+
+    const current =
+      area.value || "cardapio";
+
+    populateAreaSelect(current);
+  }
+
+  /* =========================================================
+     INICIALIZAÇÃO
+     ========================================================= */
+
+  async function init() {
+    console.log(
+      "Martins Admin — versão atualizada"
+    );
+
+    if (!window.supabase) {
+      console.error(
+        "Supabase JS não foi carregado."
+      );
+
+      showLoginMessage(
+        "Erro: biblioteca do Supabase não carregada."
+      );
+
+      return;
+    }
+
+    ensureProductFormFields();
+    normalizeExistingProductAreaField();
 
     if (loginForm) {
       loginForm.addEventListener(
@@ -2502,30 +2590,19 @@
       );
     }
 
-    const logoutButton =
-      $("#logout");
-
-    if (logoutButton) {
-      logoutButton.addEventListener(
+    if (logoutBtn) {
+      logoutBtn.addEventListener(
         "click",
-        logout
+        handleLogout
       );
     }
 
-    const refreshButton =
-      $("#refreshBtn");
-
-    if (refreshButton) {
-      refreshButton.addEventListener(
+    if (refreshBtn) {
+      refreshBtn.addEventListener(
         "click",
-        async () => {
-          await loadAll();
-        }
+        refreshAdmin
       );
     }
-
-    const productForm =
-      $("#productForm");
 
     if (productForm) {
       productForm.addEventListener(
@@ -2534,10 +2611,27 @@
       );
     }
 
-    document.addEventListener(
-      "click",
-      handleDocumentClick
-    );
+    bindModalEvents();
+
+    /*
+      Verifica se já existe uma sessão.
+    */
+
+    const {
+      data: {
+        session
+      }
+    } = await db.auth.getSession();
+
+    if (session) {
+      await showApp();
+    } else {
+      showLogin();
+    }
+
+    /*
+      Escuta mudanças de autenticação.
+    */
 
     db.auth.onAuthStateChange(
       async (event, session) => {
@@ -2557,305 +2651,12 @@
     );
   }
 
-  function handleDocumentClick(event) {
-    const tabElement =
-      event.target.closest(
-        "[data-tab]"
-      );
-
-    if (tabElement) {
-      event.preventDefault();
-
-      const tab =
-        detectTabFromElement(
-          tabElement
-        );
-
-      if (tab) {
-        setTab(tab);
-      }
-
-      return;
-    }
-
-    const actionElement =
-      event.target.closest(
-        "[data-action]"
-      );
-
-    if (!actionElement) return;
-
-    const action =
-      actionElement.dataset.action;
-
-    switch (action) {
-      case "new-product":
-        openProductModal();
-        break;
-
-      case "edit-product": {
-        const product =
-          products.find(
-            (item) =>
-              String(item.id) ===
-              String(
-                actionElement.dataset.id
-              )
-          );
-
-        if (product) {
-          openProductModal(product);
-        }
-
-        break;
-      }
-
-      case "delete-product":
-        deleteProduct(
-          actionElement.dataset.id
-        );
-        break;
-
-      case "toggle-product":
-        toggleProduct(
-          actionElement.dataset.id
-        );
-        break;
-
-      case "new-classification":
-        createClassification();
-        break;
-
-      case "remove-classification":
-        removeClassification();
-        break;
-
-      case "close-product":
-      case "cancel-product":
-      case "close-modal":
-        closeProductModal();
-        break;
-    }
-  }
-
   /* =========================================================
-     BOTÕES DO MODAL EXISTENTE
+     INICIAR
      ========================================================= */
-
-  function setupModalButtons() {
-    const modal =
-      $("#productModal");
-
-    if (!modal) return;
-
-    $$(
-      "button",
-      modal
-    ).forEach((button) => {
-      const text =
-        button.textContent
-          ?.trim()
-          .toLowerCase() || "";
-
-      if (
-        text === "cancelar" ||
-        text === "fechar"
-      ) {
-        button.addEventListener(
-          "click",
-          (event) => {
-            event.preventDefault();
-            closeProductModal();
-          }
-        );
-      }
-    });
-
-    modal.addEventListener(
-      "click",
-      (event) => {
-        if (
-          event.target === modal
-        ) {
-          closeProductModal();
-        }
-      }
-    );
-  }
-
-  /* =========================================================
-     CLASSIFICAÇÃO — BOTÕES DO HTML
-     ========================================================= */
-
-  function ensureClassificationControls() {
-    const form =
-      $("#productForm");
-
-    if (!form) return;
-
-    /*
-      Se o HTML antigo ainda tiver "Área",
-      escondemos somente o campo de área.
-      Não mexemos no restante do visual.
-    */
-
-    const area =
-      $("#productArea");
-
-    if (area) {
-      const wrapper =
-        area.closest(
-          ".field, .form-group, .input-group"
-        );
-
-      if (wrapper) {
-        wrapper.style.display = "none";
-      } else {
-        area.style.display = "none";
-      }
-    }
-
-    /*
-      Cria a classificação dentro do formulário
-      caso ela ainda não exista no HTML.
-    */
-
-    let classification =
-      $("#productClassification");
-
-    if (!classification) {
-      const areaWrapper =
-        area?.closest(
-          ".field, .form-group, .input-group"
-        );
-
-      const wrapper =
-        document.createElement("div");
-
-      wrapper.className =
-        areaWrapper?.className ||
-        "field";
-
-      wrapper.innerHTML = `
-        <label for="productClassification">
-          Classificação
-        </label>
-
-        <div
-          style="
-            display:flex;
-            gap:8px;
-            align-items:center;
-            flex-wrap:wrap;
-          "
-        >
-          <select
-            id="productClassification"
-            name="classification"
-            style="flex:1;min-width:180px;"
-          ></select>
-
-          <button
-            type="button"
-            class="btn"
-            data-action="new-classification"
-          >
-            +
-          </button>
-        </div>
-      `;
-
-      if (areaWrapper) {
-        areaWrapper.parentNode.insertBefore(
-          wrapper,
-          areaWrapper
-        );
-      } else {
-        form.prepend(wrapper);
-      }
-
-      classification =
-        $("#productClassification");
-    }
-
-    renderClassificationOptions(
-      classification?.value || ""
-    );
-  }
-
-  /* =========================================================
-     CORREÇÕES DE TEXTO NO HTML EXISTENTE
-     ========================================================= */
-
-  function normalizeExistingAreaLabels() {
-    /*
-      No painel:
-      "Delivery" continua significando pronta entrega.
-
-      Naked Cake e Chantininho são mostrados
-      como "Encomendas".
-
-      Não alteramos o layout.
-    */
-
-    $$(
-      "*"
-    ).forEach((element) => {
-      if (
-        element.children.length > 0
-      ) {
-        return;
-      }
-
-      const text =
-        element.textContent
-          ?.trim();
-
-      if (
-        text === "Pronta entrega"
-      ) {
-        element.textContent =
-          "Delivery";
-      }
-
-      if (
-        text === "Pronta Entrega"
-      ) {
-        element.textContent =
-          "Delivery";
-      }
-    });
-  }
-
-  /* =========================================================
-     INICIALIZAÇÃO
-     ========================================================= */
-
-  async function init() {
-    console.log(
-      "Martins Admin — iniciando..."
-    );
-
-    applyMartinsBrand();
-
-    setupEvents();
-
-    setupModalButtons();
-
-    ensureClassificationControls();
-
-    normalizeExistingAreaLabels();
-
-    await checkSession();
-
-    console.log(
-      "Martins Admin — pronto."
-    );
-  }
 
   if (
-    document.readyState ===
-    "loading"
+    document.readyState === "loading"
   ) {
     document.addEventListener(
       "DOMContentLoaded",
