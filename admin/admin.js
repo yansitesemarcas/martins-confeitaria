@@ -99,21 +99,12 @@
       .toLowerCase()
       .trim();
 
-    /*
-      Se o produto já estiver marcado explicitamente
-      como Encomendas, mantém Encomendas.
-    */
-
     if (
       value === "encomendas" ||
       value === "encomenda"
     ) {
       return "encomendas";
     }
-
-    /*
-      Delivery e Pronta Entrega representam a mesma área.
-    */
 
     if (
       value === "pronta-entrega" ||
@@ -122,20 +113,8 @@
       value === "delivery" ||
       value === "pronta_entrega"
     ) {
-      /*
-        Mesmo que esteja salvo como Delivery,
-        verificamos o nome do produto abaixo porque
-        alguns produtos antigos podem ter sido cadastrados
-        na área errada.
-      */
+      // Continua para verificar o nome do produto.
     }
-
-    /*
-      Produtos que pertencem às ENCOMENDAS.
-
-      Essas regras também corrigem produtos antigos que
-      estejam registrados como Delivery no banco.
-    */
 
     const name = String(product.name || "")
       .normalize("NFD")
@@ -155,7 +134,7 @@
     }
 
     /*
-      Sabores/itens de encomenda
+      Itens de encomenda
     */
 
     if (
@@ -169,13 +148,7 @@
     }
 
     /*
-      Brigadeiros de encomenda.
-
-      NÃO colocamos simplesmente "brigadeiro",
-      porque o produto Delivery chamado apenas
-      "Brigadeiro" deve continuar no Delivery.
-
-      Aqui entram somente as versões Clássicas e Premium.
+      Brigadeiros de encomenda
     */
 
     if (
@@ -186,13 +159,6 @@
     ) {
       return "encomendas";
     }
-
-    /*
-      Qualquer outro produto segue a área cadastrada.
-
-      Se estiver como Encomendas, permanece Encomendas.
-      Caso contrário, fica em Delivery.
-    */
 
     if (
       value === "encomendas" ||
@@ -267,10 +233,16 @@
     if (!loginMsg) return;
 
     loginMsg.textContent = message;
-    loginMsg.style.color = error ? "#c0392b" : "#2b7896";
+    loginMsg.style.color = error
+      ? "#c0392b"
+      : "#2b7896";
   }
 
-  function setLoading(button, loading, originalText = "Salvar") {
+  function setLoading(
+    button,
+    loading,
+    originalText = "Salvar"
+  ) {
     if (!button) return;
 
     if (loading) {
@@ -282,7 +254,8 @@
     } else {
       button.disabled = false;
       button.textContent =
-        button.dataset.originalText || originalText;
+        button.dataset.originalText ||
+        originalText;
     }
   }
 
@@ -341,7 +314,9 @@
     return [
       ...new Set(
         categories
-          .map((item) => String(item || "").trim())
+          .map((item) =>
+            String(item || "").trim()
+          )
           .filter(Boolean)
       )
     ];
@@ -383,37 +358,53 @@
     const cleanName = name.trim();
 
     if (!cleanName) {
-      toast("Digite um nome válido.", "warning");
+      toast(
+        "Digite um nome válido.",
+        "warning"
+      );
       return;
     }
 
-    const alreadyExists = state.categories.some(
-      (category) =>
-        category.toLowerCase() === cleanName.toLowerCase()
-    );
+    const alreadyExists =
+      state.categories.some(
+        (category) =>
+          category.toLowerCase() ===
+          cleanName.toLowerCase()
+      );
 
     if (alreadyExists) {
-      toast("Essa classificação já existe.", "warning");
+      toast(
+        "Essa classificação já existe.",
+        "warning"
+      );
       return;
     }
 
     state.categories.push(cleanName);
+
     state.categories.sort((a, b) =>
       a.localeCompare(b, "pt-BR")
     );
 
     try {
       await saveCategories();
+
       renderProductTab();
-      toast("Classificação criada com sucesso.");
-    } catch (error) {
-      state.categories = state.categories.filter(
-        (category) => category !== cleanName
+
+      toast(
+        "Classificação criada com sucesso."
       );
+    } catch (error) {
+      state.categories =
+        state.categories.filter(
+          (category) =>
+            category !== cleanName
+        );
 
       toast(
         "Não foi possível salvar a classificação: " +
-          (error.message || "erro desconhecido"),
+          (error.message ||
+            "erro desconhecido"),
         "error"
       );
     }
@@ -440,18 +431,27 @@
 
     if (!confirmed) return;
 
-    const oldCategories = [...state.categories];
+    const oldCategories = [
+      ...state.categories
+    ];
 
-    state.categories = state.categories.filter(
-      (category) => category !== name
-    );
+    state.categories =
+      state.categories.filter(
+        (category) =>
+          category !== name
+      );
 
     try {
       await saveCategories();
+
       renderProductTab();
-      toast("Classificação excluída.");
+
+      toast(
+        "Classificação excluída."
+      );
     } catch (error) {
-      state.categories = oldCategories;
+      state.categories =
+        oldCategories;
 
       toast(
         "Não foi possível excluir a classificação.",
@@ -472,22 +472,31 @@
       .maybeSingle();
 
     if (error) {
-      console.error("Erro settings:", error);
+      console.error(
+        "Erro settings:",
+        error
+      );
+
       state.settings = {};
-      state.categories = defaultCategories();
+      state.categories =
+        defaultCategories();
+
       return;
     }
 
-    const value = data?.value || {};
+    const value =
+      data?.value || {};
 
     state.settings = {
       ...DEFAULTS,
       ...value
     };
 
-    state.categories = normalizeCategories(
-      value.categories || DEFAULTS.categories
-    );
+    state.categories =
+      normalizeCategories(
+        value.categories ||
+        DEFAULTS.categories
+      );
 
     loadAdminLogo();
   }
@@ -497,25 +506,34 @@
      ========================================================= */
 
   async function loadProducts() {
-    const { data, error } = await db
-      .from("products")
-      .select("*")
-      .order("sort", {
-        ascending: true,
-        nullsFirst: false
-      });
+    const { data, error } =
+      await db
+        .from("products")
+        .select("*")
+        .order("sort", {
+          ascending: true,
+          nullsFirst: false
+        });
 
     if (error) {
-      console.error("Erro produtos:", error);
+      console.error(
+        "Erro produtos:",
+        error
+      );
+
       throw error;
     }
 
-    state.products = Array.isArray(data)
-      ? data.map((product) => ({
-          ...product,
-          area: normalizeArea(product.area, product)
-        }))
-      : [];
+    state.products =
+      Array.isArray(data)
+        ? data.map((product) => ({
+            ...product,
+            area: normalizeArea(
+              product.area,
+              product
+            )
+          }))
+        : [];
   }
 
   /* =========================================================
@@ -523,50 +541,63 @@
      ========================================================= */
 
   function updateStats() {
-    /*
-      O painel agora exibe somente ENCOMENDAS.
-      Portanto, as estatísticas também consideram
-      somente os produtos de Encomendas.
-    */
+    const total =
+      state.products.length;
 
-    const visibleProducts =
+    const available =
+      state.products.filter(
+        (product) =>
+          product.available !== false
+      ).length;
+
+    const delivery =
+      state.products.filter(
+        (product) =>
+          normalizeArea(
+            product.area,
+            product
+          ) === "cardapio"
+      ).length;
+
+    const encomendas =
       state.products.filter(
         (product) =>
           normalizeArea(
             product.area,
             product
           ) === "encomendas"
-      );
+      ).length;
 
-    const total = visibleProducts.length;
+    const statProducts =
+      $("#statProducts");
 
-    const available = visibleProducts.filter(
-      (product) => product.available !== false
-    ).length;
+    const statAvailable =
+      $("#statAvailable");
 
-    const delivery = 0;
+    const statOrders =
+      $("#statOrders");
 
-    const encomendas = visibleProducts.length;
-
-    const statProducts = $("#statProducts");
-    const statAvailable = $("#statAvailable");
-    const statOrders = $("#statOrders");
-    const statCakes = $("#statCakes");
+    const statCakes =
+      $("#statCakes");
 
     if (statProducts) {
-      statProducts.textContent = total;
+      statProducts.textContent =
+        total;
     }
 
     if (statAvailable) {
-      statAvailable.textContent = available;
+      statAvailable.textContent =
+        available;
     }
 
     if (statOrders) {
-      statOrders.textContent = encomendas;
+      statOrders.textContent =
+        encomendas;
     }
 
     if (statCakes) {
-      statCakes.textContent = delivery;
+      statCakes.textContent =
+        delivery;
     }
   }
 
@@ -579,82 +610,134 @@
   }
 
   function setField(id, value) {
-    const field = getField(id);
+    const field =
+      getField(id);
 
     if (!field) return;
 
-    if (field.type === "checkbox") {
-      field.checked = Boolean(value);
+    if (
+      field.type ===
+      "checkbox"
+    ) {
+      field.checked =
+        Boolean(value);
     } else {
-      field.value = value ?? "";
+      field.value =
+        value ?? "";
     }
   }
 
   function getFieldValue(id) {
-    const field = getField(id);
+    const field =
+      getField(id);
 
     if (!field) return "";
 
-    if (field.type === "checkbox") {
+    if (
+      field.type ===
+      "checkbox"
+    ) {
       return field.checked;
     }
 
     return field.value;
   }
 
-  function populateClassificationSelect(selected = "") {
-    const select = getField("productCategory");
+  function populateClassificationSelect(
+    selected = ""
+  ) {
+    const select =
+      getField(
+        "productCategory"
+      );
 
     if (!select) return;
 
-    const categories = normalizeCategories([
-      ...state.categories,
-      selected
-    ]);
+    const categories =
+      normalizeCategories([
+        ...state.categories,
+        selected
+      ]);
 
     select.innerHTML = `
-      <option value="">Selecione uma classificação</option>
+      <option value="">
+        Selecione uma classificação
+      </option>
+
       ${categories
         .map(
           (category) => `
-            <option value="${escapeHtml(category)}">
-              ${escapeHtml(category)}
+            <option
+              value="${escapeHtml(
+                category
+              )}"
+            >
+              ${escapeHtml(
+                category
+              )}
             </option>
           `
         )
         .join("")}
     `;
 
-    select.value = selected || "";
+    select.value =
+      selected || "";
   }
 
-  function populateAreaSelect(selected = "cardapio") {
-    const select = getField("productArea");
+  function populateAreaSelect(
+    selected = "cardapio"
+  ) {
+    const select =
+      getField(
+        "productArea"
+      );
 
     if (!select) return;
 
-    const normalized = normalizeArea(selected);
+    const normalized =
+      normalizeArea(
+        selected
+      );
 
     select.innerHTML = `
-      <option value="cardapio">Delivery</option>
-      <option value="encomendas">Encomendas</option>
+      <option value="cardapio">
+        Delivery
+      </option>
+
+      <option value="encomendas">
+        Encomendas
+      </option>
     `;
 
-    select.value = normalized;
+    select.value =
+      normalized;
   }
 
   function ensureProductFormFields() {
     if (!productForm) return;
 
-    if (!getField("productCategory")) {
+    if (
+      !getField(
+        "productCategory"
+      )
+    ) {
       const areaField =
-        getField("productArea")?.closest(".field") ||
-        getField("productArea")?.parentElement;
+        getField(
+          "productArea"
+        )?.closest(".field") ||
+        getField(
+          "productArea"
+        )?.parentElement;
 
       if (areaField) {
-        const wrapper = document.createElement("div");
+        const wrapper =
+          document.createElement(
+            "div"
+          );
 
-        wrapper.className = "field";
+        wrapper.className =
+          "field";
 
         wrapper.innerHTML = `
           <label for="productCategory">
@@ -698,9 +781,16 @@
       }
     }
 
-    if (getField("productArea")) {
+    if (
+      getField(
+        "productArea"
+      )
+    ) {
       populateAreaSelect(
-        getFieldValue("productArea") || "cardapio"
+        getFieldValue(
+          "productArea"
+        ) ||
+          "cardapio"
       );
     }
 
@@ -711,7 +801,8 @@
       newClassificationBtn &&
       !newClassificationBtn.dataset.bound
     ) {
-      newClassificationBtn.dataset.bound = "true";
+      newClassificationBtn.dataset.bound =
+        "true";
 
       newClassificationBtn.addEventListener(
         "click",
@@ -722,22 +813,28 @@
     }
 
     populateClassificationSelect(
-      getFieldValue("productCategory")
+      getFieldValue(
+        "productCategory"
+      )
     );
   }
 
-  function openProductModal(product = null) {
-    if (!productModal || !productForm) return;
+  function openProductModal(
+    product = null
+  ) {
+    if (
+      !productModal ||
+      !productForm
+    ) {
+      return;
+    }
 
-    state.editingProductId = product?.id || null;
+    state.editingProductId =
+      product?.id || null;
 
     ensureProductFormFields();
 
     productForm.reset();
-
-    const normalizedArea = product
-      ? normalizeArea(product.area, product)
-      : "cardapio";
 
     setField(
       "productPhoto",
@@ -756,7 +853,8 @@
 
     setField(
       "productDiscount",
-      product?.discount_percent ?? ""
+      product?.discount_percent ??
+        ""
     );
 
     setField(
@@ -781,7 +879,9 @@
 
     setField(
       "productAvailable",
-      product ? product.available !== false : true
+      product
+        ? product.available !== false
+        : true
     );
 
     setField(
@@ -791,7 +891,8 @@
 
     setField(
       "productAppointment",
-      product?.appointment_required ?? false
+      product?.appointment_required ??
+        false
     );
 
     populateClassificationSelect(
@@ -805,28 +906,38 @@
       )
     );
 
-    const title = productModal.querySelector(
-      ".modal-title, h2, h3"
-    );
+    const title =
+      productModal.querySelector(
+        ".modal-title, h2, h3"
+      );
 
     if (title) {
-      title.textContent = product
-        ? "Editar produto"
-        : "Novo produto";
+      title.textContent =
+        product
+          ? "Editar produto"
+          : "Novo produto";
     }
 
-    productModal.classList.remove("hidden");
+    productModal.classList.remove(
+      "hidden"
+    );
 
-    productModal.style.display = "flex";
+    productModal.style.display =
+      "flex";
   }
 
   function closeProductModal() {
     if (!productModal) return;
 
-    productModal.classList.add("hidden");
-    productModal.style.display = "";
+    productModal.classList.add(
+      "hidden"
+    );
 
-    state.editingProductId = null;
+    productModal.style.display =
+      "";
+
+    state.editingProductId =
+      null;
   }
 
   /* =========================================================
@@ -834,80 +945,127 @@
      ========================================================= */
 
   function compressImage(file) {
-    return new Promise((resolve, reject) => {
-      if (!file) {
-        resolve("");
-        return;
-      }
+    return new Promise(
+      (resolve, reject) => {
+        if (!file) {
+          resolve("");
+          return;
+        }
 
-      if (!file.type.startsWith("image/")) {
-        reject(
-          new Error("O arquivo selecionado não é uma imagem.")
-        );
-        return;
-      }
+        if (
+          !file.type.startsWith(
+            "image/"
+          )
+        ) {
+          reject(
+            new Error(
+              "O arquivo selecionado não é uma imagem."
+            )
+          );
 
-      const reader = new FileReader();
+          return;
+        }
 
-      reader.onload = () => {
-        const img = new Image();
+        const reader =
+          new FileReader();
 
-        img.onload = () => {
-          const maxSize = 1000;
+        reader.onload = () => {
+          const img =
+            new Image();
 
-          let width = img.width;
-          let height = img.height;
+          img.onload = () => {
+            const maxSize =
+              1000;
 
-          if (width > maxSize || height > maxSize) {
-            const ratio = Math.min(
-              maxSize / width,
-              maxSize / height
+            let width =
+              img.width;
+
+            let height =
+              img.height;
+
+            if (
+              width >
+                maxSize ||
+              height >
+                maxSize
+            ) {
+              const ratio =
+                Math.min(
+                  maxSize /
+                    width,
+                  maxSize /
+                    height
+                );
+
+              width =
+                Math.round(
+                  width * ratio
+                );
+
+              height =
+                Math.round(
+                  height * ratio
+                );
+            }
+
+            const canvas =
+              document.createElement(
+                "canvas"
+              );
+
+            canvas.width =
+              width;
+
+            canvas.height =
+              height;
+
+            const ctx =
+              canvas.getContext(
+                "2d"
+              );
+
+            ctx.drawImage(
+              img,
+              0,
+              0,
+              width,
+              height
             );
 
-            width = Math.round(width * ratio);
-            height = Math.round(height * ratio);
-          }
+            const result =
+              canvas.toDataURL(
+                "image/jpeg",
+                0.78
+              );
 
-          const canvas = document.createElement("canvas");
+            resolve(result);
+          };
 
-          canvas.width = width;
-          canvas.height = height;
+          img.onerror = () => {
+            reject(
+              new Error(
+                "Não foi possível processar a imagem."
+              )
+            );
+          };
 
-          const ctx = canvas.getContext("2d");
-
-          ctx.drawImage(
-            img,
-            0,
-            0,
-            width,
-            height
-          );
-
-          const result = canvas.toDataURL(
-            "image/jpeg",
-            0.78
-          );
-
-          resolve(result);
+          img.src =
+            reader.result;
         };
 
-        img.onerror = () => {
+        reader.onerror = () => {
           reject(
-            new Error("Não foi possível processar a imagem.")
+            new Error(
+              "Não foi possível ler a imagem."
+            )
           );
         };
 
-        img.src = reader.result;
-      };
-
-      reader.onerror = () => {
-        reject(
-          new Error("Não foi possível ler a imagem.")
+        reader.readAsDataURL(
+          file
         );
-      };
-
-      reader.readAsDataURL(file);
-    });
+      }
+    );
   }
 
   /* =========================================================
@@ -934,9 +1092,12 @@
       const editingId =
         state.editingProductId;
 
-      const name = String(
-        getFieldValue("productName") || ""
-      ).trim();
+      const name =
+        String(
+          getFieldValue(
+            "productName"
+          ) || ""
+        ).trim();
 
       if (!name) {
         throw new Error(
@@ -944,9 +1105,12 @@
         );
       }
 
-      const category = String(
-        getFieldValue("productCategory") || ""
-      ).trim();
+      const category =
+        String(
+          getFieldValue(
+            "productCategory"
+          ) || ""
+        ).trim();
 
       if (!category) {
         throw new Error(
@@ -954,70 +1118,105 @@
         );
       }
 
-      const area = normalizeArea(
-        getFieldValue("productArea"),
-        { name }
-      );
+      const area =
+        normalizeArea(
+          getFieldValue(
+            "productArea"
+          ),
+          { name }
+        );
 
       const priceValue =
-        getFieldValue("productPrice");
+        getFieldValue(
+          "productPrice"
+        );
 
       const price =
         priceValue === ""
           ? 0
           : Number(
-              String(priceValue)
-                .replace(",", ".")
+              String(
+                priceValue
+              ).replace(
+                ",",
+                "."
+              )
             );
 
-      if (Number.isNaN(price)) {
+      if (
+        Number.isNaN(price)
+      ) {
         throw new Error(
           "Informe um preço válido."
         );
       }
 
       const discountValue =
-        getFieldValue("productDiscount");
+        getFieldValue(
+          "productDiscount"
+        );
 
       const discount =
         discountValue === ""
           ? 0
           : Number(
-              String(discountValue)
-                .replace(",", ".")
+              String(
+                discountValue
+              ).replace(
+                ",",
+                "."
+              )
             );
 
       const sortValue =
-        getFieldValue("productSort");
+        getFieldValue(
+          "productSort"
+        );
 
       const sort =
         sortValue === ""
           ? 0
-          : Number(sortValue);
+          : Number(
+              sortValue
+            );
 
       const file =
-        getField("productPhoto")?.files?.[0];
+        getField(
+          "productPhoto"
+        )?.files?.[0];
 
       let imageUrl = "";
 
       if (file) {
-        imageUrl = await compressImage(file);
+        imageUrl =
+          await compressImage(
+            file
+          );
       }
 
       const currentProduct =
         state.products.find(
           (product) =>
-            product.id === editingId
+            product.id ===
+            editingId
         );
 
-      if (!imageUrl && currentProduct) {
-        imageUrl = getProductImage(currentProduct);
+      if (
+        !imageUrl &&
+        currentProduct
+      ) {
+        imageUrl =
+          getProductImage(
+            currentProduct
+          );
       }
 
       const payload = {
         id:
           editingId ||
-          `${slugify(name)}-${Date.now()}`,
+          `${slugify(
+            name
+          )}-${Date.now()}`,
 
         name,
 
@@ -1028,49 +1227,72 @@
         area,
 
         discount_percent:
-          Number.isFinite(discount)
+          Number.isFinite(
+            discount
+          )
             ? discount
             : 0,
 
         sort:
-          Number.isFinite(sort)
+          Number.isFinite(
+            sort
+          )
             ? sort
             : 0,
 
         gramatura:
-          getFieldValue("productGramatura"),
+          getFieldValue(
+            "productGramatura"
+          ),
 
         serve_ate:
-          getFieldValue("productServeAte"),
+          getFieldValue(
+            "productServeAte"
+          ),
 
         description:
-          getFieldValue("productDescription"),
+          getFieldValue(
+            "productDescription"
+          ),
 
         available:
           Boolean(
-            getFieldValue("productAvailable")
+            getFieldValue(
+              "productAvailable"
+            )
           ),
 
         featured:
           Boolean(
-            getFieldValue("productFeatured")
+            getFieldValue(
+              "productFeatured"
+            )
           ),
 
         appointment_required:
           Boolean(
-            getFieldValue("productAppointment")
+            getFieldValue(
+              "productAppointment"
+            )
           )
       };
 
       if (imageUrl) {
-        payload.image_url = imageUrl;
+        payload.image_url =
+          imageUrl;
       }
 
-      const { data, error } = await db
+      const {
+        data,
+        error
+      } = await db
         .from("products")
-        .upsert(payload, {
-          onConflict: "id"
-        })
+        .upsert(
+          payload,
+          {
+            onConflict: "id"
+          }
+        )
         .select()
         .single();
 
@@ -1083,22 +1305,28 @@
         throw error;
       }
 
-      const normalizedProduct = {
-        ...data,
-        area: normalizeArea(
-          data.area,
-          data
-        )
-      };
+      const normalizedProduct =
+        {
+          ...data,
+          area: normalizeArea(
+            data.area,
+            data
+          )
+        };
 
       const existingIndex =
         state.products.findIndex(
           (product) =>
-            product.id === normalizedProduct.id
+            product.id ===
+            normalizedProduct.id
         );
 
-      if (existingIndex >= 0) {
-        state.products[existingIndex] =
+      if (
+        existingIndex >= 0
+      ) {
+        state.products[
+          existingIndex
+        ] =
           normalizedProduct;
       } else {
         state.products.push(
@@ -1108,13 +1336,18 @@
 
       state.products.sort(
         (a, b) =>
-          Number(a.sort || 0) -
-          Number(b.sort || 0)
+          Number(
+            a.sort || 0
+          ) -
+          Number(
+            b.sort || 0
+          )
       );
 
       closeProductModal();
 
       updateStats();
+
       renderProductTab();
 
       toast(
@@ -1122,9 +1355,10 @@
           ? "Produto atualizado com sucesso."
           : "Produto criado com sucesso."
       );
-
     } catch (error) {
-      console.error(error);
+      console.error(
+        error
+      );
 
       toast(
         error.message ||
@@ -1144,24 +1378,33 @@
      EXCLUIR PRODUTO
      ========================================================= */
 
-  async function deleteProduct(id) {
-    const product = state.products.find(
-      (item) => item.id === id
-    );
+  async function deleteProduct(
+    id
+  ) {
+    const product =
+      state.products.find(
+        (item) =>
+          item.id === id
+      );
 
     if (!product) return;
 
-    const confirmed = window.confirm(
-      `Excluir "${product.name}"?`
-    );
+    const confirmed =
+      window.confirm(
+        `Excluir "${product.name}"?`
+      );
 
     if (!confirmed) return;
 
     try {
-      const { error } = await db
-        .from("products")
-        .delete()
-        .eq("id", id);
+      const { error } =
+        await db
+          .from("products")
+          .delete()
+          .eq(
+            "id",
+            id
+          );
 
       if (error) {
         throw error;
@@ -1169,15 +1412,21 @@
 
       state.products =
         state.products.filter(
-          (item) => item.id !== id
+          (item) =>
+            item.id !== id
         );
 
       updateStats();
+
       renderProductTab();
 
-      toast("Produto excluído.");
+      toast(
+        "Produto excluído."
+      );
     } catch (error) {
-      console.error(error);
+      console.error(
+        error
+      );
 
       toast(
         "Não foi possível excluir o produto.",
@@ -1190,10 +1439,14 @@
      DUPLICAR PRODUTO
      ========================================================= */
 
-  async function duplicateProduct(id) {
-    const original = state.products.find(
-      (product) => product.id === id
-    );
+  async function duplicateProduct(
+    id
+  ) {
+    const original =
+      state.products.find(
+        (product) =>
+          product.id === id
+      );
 
     if (!original) return;
 
@@ -1201,7 +1454,9 @@
       ...original,
 
       id:
-        `${slugify(original.name)}-` +
+        `${slugify(
+          original.name
+        )}-` +
         `${Date.now()}`,
 
       name:
@@ -1209,7 +1464,10 @@
     };
 
     try {
-      const { data, error } = await db
+      const {
+        data,
+        error
+      } = await db
         .from("products")
         .insert(copy)
         .select()
@@ -1228,11 +1486,16 @@
       });
 
       updateStats();
+
       renderProductTab();
 
-      toast("Produto duplicado.");
+      toast(
+        "Produto duplicado."
+      );
     } catch (error) {
-      console.error(error);
+      console.error(
+        error
+      );
 
       toast(
         "Não foi possível duplicar o produto.",
@@ -1245,10 +1508,14 @@
      ALTERAR DISPONIBILIDADE
      ========================================================= */
 
-  async function toggleProductAvailability(id) {
-    const product = state.products.find(
-      (item) => item.id === id
-    );
+  async function toggleProductAvailability(
+    id
+  ) {
+    const product =
+      state.products.find(
+        (item) =>
+          item.id === id
+      );
 
     if (!product) return;
 
@@ -1256,20 +1523,27 @@
       product.available === false;
 
     try {
-      const { error } = await db
-        .from("products")
-        .update({
-          available: newValue
-        })
-        .eq("id", id);
+      const { error } =
+        await db
+          .from("products")
+          .update({
+            available:
+              newValue
+          })
+          .eq(
+            "id",
+            id
+          );
 
       if (error) {
         throw error;
       }
 
-      product.available = newValue;
+      product.available =
+        newValue;
 
       updateStats();
+
       renderProductTab();
 
       toast(
@@ -1278,7 +1552,9 @@
           : "Produto ocultado."
       );
     } catch (error) {
-      console.error(error);
+      console.error(
+        error
+      );
 
       toast(
         "Não foi possível alterar a disponibilidade.",
@@ -1296,15 +1572,14 @@
 
     ensureProductFormFields();
 
-    /*
-      IMPORTANTE:
-
-      O Delivery NÃO será mais exibido no painel.
-
-      Os produtos continuam existindo no Supabase,
-      mas somente os produtos classificados como
-      ENCOMENDAS são renderizados nesta tela.
-    */
+    const deliveryProducts =
+      state.products.filter(
+        (product) =>
+          normalizeArea(
+            product.area,
+            product
+          ) === "cardapio"
+      );
 
     const orderProducts =
       state.products.filter(
@@ -1320,8 +1595,9 @@
 
         <div>
           <h2>Produtos</h2>
+
           <p>
-            Gerencie os produtos das Encomendas.
+            Gerencie os produtos do Delivery e das Encomendas.
           </p>
         </div>
 
@@ -1330,6 +1606,7 @@
           gap:10px;
           flex-wrap:wrap;
         ">
+
           <button
             type="button"
             class="btn btn-secondary"
@@ -1345,6 +1622,7 @@
           >
             + Novo produto
           </button>
+
         </div>
 
       </div>
@@ -1354,6 +1632,7 @@
         class="classification-list"
         style="display:none;"
       >
+
         <div style="
           display:flex;
           justify-content:space-between;
@@ -1361,7 +1640,10 @@
           gap:10px;
           margin-bottom:12px;
         ">
-          <strong>Classificações</strong>
+
+          <strong>
+            Classificações
+          </strong>
 
           <button
             type="button"
@@ -1370,14 +1652,22 @@
           >
             + Nova classificação
           </button>
+
         </div>
 
         <div id="classificationItems">
           ${renderClassificationItems()}
         </div>
+
       </div>
 
       <div class="admin-products-area">
+
+        ${renderAreaSection(
+          "Delivery",
+          "cardapio",
+          deliveryProducts
+        )}
 
         ${renderAreaSection(
           "Encomendas",
@@ -1392,7 +1682,9 @@
   }
 
   function renderClassificationItems() {
-    if (!state.categories.length) {
+    if (
+      !state.categories.length
+    ) {
       return `
         <div class="admin-empty">
           Nenhuma classificação cadastrada.
@@ -1404,8 +1696,11 @@
       .map(
         (category) => `
           <div class="classification-chip">
+
             <span>
-              ${escapeHtml(category)}
+              ${escapeHtml(
+                category
+              )}
             </span>
 
             <button
@@ -1417,6 +1712,7 @@
             >
               ×
             </button>
+
           </div>
         `
       )
@@ -1438,29 +1734,45 @@
           gap:12px;
           margin:24px 0 12px;
         ">
+
           <div>
+
             <h3 style="margin:0;">
-              ${escapeHtml(title)}
+              ${escapeHtml(
+                title
+              )}
             </h3>
 
             <small style="opacity:.7;">
-              ${products.length} produto${
-      products.length === 1 ? "" : "s"
-    }
+              ${products.length}
+              produto${
+                products.length ===
+                1
+                  ? ""
+                  : "s"
+              }
             </small>
+
           </div>
+
         </div>
 
         ${
           products.length
             ? `
               <div class="admin-products-list">
+
                 ${products
                   .map(
-                    (product) =>
-                      renderProductCard(product)
+                    (
+                      product
+                    ) =>
+                      renderProductCard(
+                        product
+                      )
                   )
                   .join("")}
+
               </div>
             `
             : `
@@ -1474,19 +1786,26 @@
     `;
   }
 
-  function renderProductCard(product) {
-    const image = getProductImage(product);
+  function renderProductCard(
+    product
+  ) {
+    const image =
+      getProductImage(
+        product
+      );
 
     const available =
-      product.available !== false;
+      product.available !==
+      false;
 
     const category =
       product.category ||
       "Sem classificação";
 
-    const area = areaLabel(
-      product.area
-    );
+    const area =
+      areaLabel(
+        product.area
+      );
 
     return `
       <article
@@ -1497,12 +1816,17 @@
       >
 
         <div class="admin-product-image">
+
           ${
             image
               ? `
                 <img
-                  src="${escapeHtml(image)}"
-                  alt="${escapeHtml(product.name)}"
+                  src="${escapeHtml(
+                    image
+                  )}"
+                  alt="${escapeHtml(
+                    product.name
+                  )}"
                 >
               `
               : `
@@ -1511,6 +1835,7 @@
                 </div>
               `
           }
+
         </div>
 
         <div class="admin-product-info">
@@ -1523,11 +1848,15 @@
           ">
 
             <span class="product-area-choice">
-              ${escapeHtml(area)}
+              ${escapeHtml(
+                area
+              )}
             </span>
 
             <span class="product-classification">
-              ${escapeHtml(category)}
+              ${escapeHtml(
+                category
+              )}
             </span>
 
             ${
@@ -1547,11 +1876,15 @@
           </div>
 
           <h4>
-            ${escapeHtml(product.name)}
+            ${escapeHtml(
+              product.name
+            )}
           </h4>
 
           <strong>
-            ${money(product.price)}
+            ${money(
+              product.price
+            )}
           </strong>
 
           ${
@@ -1631,7 +1964,8 @@
     if (newProductBtn) {
       newProductBtn.addEventListener(
         "click",
-        () => openProductModal()
+        () =>
+          openProductModal()
       );
     }
 
@@ -1667,19 +2001,24 @@
       );
     }
 
-    $$("[data-delete-category]").forEach(
+    $$(
+      "[data-delete-category]"
+    ).forEach(
       (button) => {
         button.addEventListener(
           "click",
           () =>
             deleteClassification(
-              button.dataset.deleteCategory
+              button.dataset
+                .deleteCategory
             )
         );
       }
     );
 
-    $$("[data-edit-product]").forEach(
+    $$(
+      "[data-edit-product]"
+    ).forEach(
       (button) => {
         button.addEventListener(
           "click",
@@ -1687,51 +2026,65 @@
             const product =
               state.products.find(
                 (item) =>
-                  String(item.id) ===
                   String(
-                    button.dataset.editProduct
+                    item.id
+                  ) ===
+                  String(
+                    button.dataset
+                      .editProduct
                   )
               );
 
             if (product) {
-              openProductModal(product);
+              openProductModal(
+                product
+              );
             }
           }
         );
       }
     );
 
-    $$("[data-delete-product]").forEach(
+    $$(
+      "[data-delete-product]"
+    ).forEach(
       (button) => {
         button.addEventListener(
           "click",
           () =>
             deleteProduct(
-              button.dataset.deleteProduct
+              button.dataset
+                .deleteProduct
             )
         );
       }
     );
 
-    $$("[data-duplicate-product]").forEach(
+    $$(
+      "[data-duplicate-product]"
+    ).forEach(
       (button) => {
         button.addEventListener(
           "click",
           () =>
             duplicateProduct(
-              button.dataset.duplicateProduct
+              button.dataset
+                .duplicateProduct
             )
         );
       }
     );
 
-    $$("[data-toggle-product]").forEach(
+    $$(
+      "[data-toggle-product]"
+    ).forEach(
       (button) => {
         button.addEventListener(
           "click",
           () =>
             toggleProductAvailability(
-              button.dataset.toggleProduct
+              button.dataset
+                .toggleProduct
             )
         );
       }
@@ -1748,18 +2101,27 @@
       "pedidos"
     ];
 
-    for (const table of possibleTables) {
+    for (
+      const table of possibleTables
+    ) {
       try {
-        const result = await db
-          .from(table)
-          .select("*")
-          .order("created_at", {
-            ascending: false
-          })
-          .limit(100);
+        const result =
+          await db
+            .from(table)
+            .select("*")
+            .order(
+              "created_at",
+              {
+                ascending:
+                  false
+              }
+            )
+            .limit(100);
 
         if (!result.error) {
-          return result.data || [];
+          return (
+            result.data || []
+          );
         }
       } catch (_) {}
     }
@@ -1772,16 +2134,23 @@
 
     tabContent.innerHTML = `
       <div class="product-toolbar">
+
         <div>
           <h2>Pedidos</h2>
-          <p>Pedidos recebidos pelo sistema.</p>
+
+          <p>
+            Pedidos recebidos pelo sistema.
+          </p>
         </div>
+
       </div>
 
       <div id="ordersContainer">
+
         <div class="admin-empty">
           Carregando pedidos...
         </div>
+
       </div>
     `;
 
@@ -1799,42 +2168,47 @@
           Nenhum pedido encontrado.
         </div>
       `;
+
       return;
     }
 
-    container.innerHTML = orders
-      .map(
-        (order) => `
-          <article class="admin-order-card">
-            <strong>
-              Pedido #${escapeHtml(
-                order.id || ""
-              )}
-            </strong>
+    container.innerHTML =
+      orders
+        .map(
+          (order) => `
+            <article class="admin-order-card">
 
-            <p>
-              ${
-                escapeHtml(
-                  order.customer_name ||
-                    order.name ||
-                    "Cliente"
-                )
-              }
-            </p>
+              <strong>
+                Pedido #${escapeHtml(
+                  order.id || ""
+                )}
+              </strong>
 
-            <small>
-              ${escapeHtml(
-                order.created_at || ""
-              )}
-            </small>
-          </article>
-        `
-      )
-      .join("");
+              <p>
+                ${
+                  escapeHtml(
+                    order.customer_name ||
+                      order.name ||
+                      "Cliente"
+                  )
+                }
+              </p>
+
+              <small>
+                ${escapeHtml(
+                  order.created_at ||
+                    ""
+                )}
+              </small>
+
+            </article>
+          `
+        )
+        .join("");
   }
 
   /* =========================================================
-     ENCOMENDAS DE BOLOS
+     PEDIDOS DE BOLOS PERSONALIZADOS
      ========================================================= */
 
   async function renderCakesTab() {
@@ -1846,32 +2220,52 @@
       {};
 
     const types =
-      Array.isArray(cake.types)
+      Array.isArray(
+        cake.types
+      )
         ? cake.types
         : [];
 
     tabContent.innerHTML = `
       <div class="product-toolbar">
+
         <div>
-          <h2>Encomendas</h2>
+
+          <h2>
+            Pedidos de Bolos
+          </h2>
+
           <p>
-            Configurações de bolos para encomenda.
+            Gerencie os pedidos de bolos personalizados.
           </p>
+
         </div>
+
       </div>
 
       <div class="admin-panel-box">
 
-        <h3>Tipos de bolo</h3>
+        <h3>
+          Tipos de bolo
+        </h3>
+
+        <p style="
+          margin-top:-4px;
+          opacity:.7;
+        ">
+          Esta área é destinada às opções utilizadas nos pedidos de bolos personalizados.
+        </p>
 
         ${
           types.length
             ? `
               <div class="cake-list">
+
                 ${types
                   .map(
                     (item) => `
                       <div class="cake-item">
+
                         <span>
                           ${escapeHtml(
                             item[0]
@@ -1879,17 +2273,21 @@
                         </span>
 
                         <strong>
-                          ${money(item[1])}
+                          ${money(
+                            item[1]
+                          )}
                         </strong>
+
                       </div>
                     `
                   )
                   .join("")}
+
               </div>
             `
             : `
               <div class="admin-empty">
-                Nenhum bolo configurado.
+                Nenhum tipo de bolo configurado.
               </div>
             `
         }
@@ -1899,21 +2297,57 @@
   }
 
   /* =========================================================
+     RENOMEAR VISUALMENTE A ABA DE BOLOS
+     ========================================================= */
+
+  function updateCakesTabLabel() {
+    $$("[data-tab]").forEach(
+      (button) => {
+        if (
+          button.dataset.tab ===
+          "cakes"
+        ) {
+          const textNodes =
+            Array.from(
+              button.childNodes
+            ).filter(
+              (node) =>
+                node.nodeType ===
+                Node.TEXT_NODE
+            );
+
+          if (
+            textNodes.length
+          ) {
+            textNodes[
+              textNodes.length - 1
+            ].textContent =
+              " Pedidos de Bolos";
+          }
+        }
+      }
+    );
+  }
+
+  /* =========================================================
      CONTEÚDO
      ========================================================= */
 
   async function saveSettingObject() {
-    const { error } = await db
-      .from("settings")
-      .upsert(
-        {
-          key: "site",
-          value: state.settings
-        },
-        {
-          onConflict: "key"
-        }
-      );
+    const { error } =
+      await db
+        .from("settings")
+        .upsert(
+          {
+            key: "site",
+            value:
+              state.settings
+          },
+          {
+            onConflict:
+              "key"
+          }
+        );
 
     if (error) {
       throw error;
@@ -1930,17 +2364,25 @@
 
     tabContent.innerHTML = `
       <div class="product-toolbar">
+
         <div>
-          <h2>Conteúdo</h2>
+
+          <h2>
+            Conteúdo
+          </h2>
+
           <p>
             Edite o conteúdo principal do site.
           </p>
+
         </div>
+
       </div>
 
       <div class="admin-panel-box">
 
         <div class="field">
+
           <label for="adminAboutTitle">
             Título da história
           </label>
@@ -1948,12 +2390,15 @@
           <input
             id="adminAboutTitle"
             value="${escapeHtml(
-              about.title || ""
+              about.title ||
+                ""
             )}"
           >
+
         </div>
 
         <div class="field">
+
           <label for="adminAboutQuote">
             Frase
           </label>
@@ -1961,12 +2406,15 @@
           <input
             id="adminAboutQuote"
             value="${escapeHtml(
-              about.quote || ""
+              about.quote ||
+                ""
             )}"
           >
+
         </div>
 
         <div class="field">
+
           <label for="adminAboutText">
             História
           </label>
@@ -1975,8 +2423,10 @@
             id="adminAboutText"
             rows="14"
           >${escapeHtml(
-            about.text || ""
+            about.text ||
+              ""
           )}</textarea>
+
         </div>
 
         <button
@@ -1990,7 +2440,9 @@
       </div>
     `;
 
-    $("#saveContentBtn")?.addEventListener(
+    $(
+      "#saveContentBtn"
+    )?.addEventListener(
       "click",
       async () => {
         const button =
@@ -2003,15 +2455,31 @@
         );
 
         try {
-          state.settings.about = {
-            ...(state.settings.about || {}),
-            title:
-              $("#adminAboutTitle")?.value || "",
-            quote:
-              $("#adminAboutQuote")?.value || "",
-            text:
-              $("#adminAboutText")?.value || ""
-          };
+          state.settings.about =
+            {
+              ...(
+                state.settings.about ||
+                {}
+              ),
+
+              title:
+                $(
+                  "#adminAboutTitle"
+                )?.value ||
+                "",
+
+              quote:
+                $(
+                  "#adminAboutQuote"
+                )?.value ||
+                "",
+
+              text:
+                $(
+                  "#adminAboutText"
+                )?.value ||
+                ""
+            };
 
           await saveSettingObject();
 
@@ -2019,7 +2487,9 @@
             "Conteúdo salvo com sucesso."
           );
         } catch (error) {
-          console.error(error);
+          console.error(
+            error
+          );
 
           toast(
             "Não foi possível salvar o conteúdo.",
@@ -2044,9 +2514,13 @@
     if (!tabContent) return;
 
     const hours =
-      Array.isArray(state.settings.hours)
+      Array.isArray(
+        state.settings.hours
+      )
         ? state.settings.hours
-        : Array.isArray(DEFAULTS.hours)
+        : Array.isArray(
+            DEFAULTS.hours
+          )
         ? DEFAULTS.hours
         : [];
 
@@ -2062,88 +2536,108 @@
 
     tabContent.innerHTML = `
       <div class="product-toolbar">
+
         <div>
-          <h2>Horários</h2>
+
+          <h2>
+            Horários
+          </h2>
+
           <p>
             Horários de funcionamento.
           </p>
+
         </div>
+
       </div>
 
       <div class="admin-panel-box">
 
         ${names
-          .map((name, index) => {
-            const item =
-              hours[index] || {
-                s: "closed",
-                o: "",
-                c: ""
-              };
+          .map(
+            (
+              name,
+              index
+            ) => {
+              const item =
+                hours[index] ||
+                {
+                  s: "closed",
+                  o: "",
+                  c: ""
+                };
 
-            return `
-              <div class="hours-row">
+              return `
+                <div class="hours-row">
 
-                <strong>
-                  ${name}
-                </strong>
+                  <strong>
+                    ${name}
+                  </strong>
 
-                <select
-                  data-hours-status="${index}"
-                >
-                  <option
-                    value="open"
-                    ${
-                      item.s === "open"
-                        ? "selected"
-                        : ""
-                    }
+                  <select
+                    data-hours-status="${index}"
                   >
-                    Aberto
-                  </option>
 
-                  <option
-                    value="closed"
-                    ${
-                      item.s === "closed"
-                        ? "selected"
-                        : ""
-                    }
+                    <option
+                      value="open"
+                      ${
+                        item.s ===
+                        "open"
+                          ? "selected"
+                          : ""
+                      }
+                    >
+                      Aberto
+                    </option>
+
+                    <option
+                      value="closed"
+                      ${
+                        item.s ===
+                        "closed"
+                          ? "selected"
+                          : ""
+                      }
+                    >
+                      Fechado
+                    </option>
+
+                    <option
+                      value="tbd"
+                      ${
+                        item.s ===
+                        "tbd"
+                          ? "selected"
+                          : ""
+                      }
+                    >
+                      A confirmar
+                    </option>
+
+                  </select>
+
+                  <input
+                    type="time"
+                    data-hours-open="${index}"
+                    value="${escapeHtml(
+                      item.o ||
+                        ""
+                    )}"
                   >
-                    Fechado
-                  </option>
 
-                  <option
-                    value="tbd"
-                    ${
-                      item.s === "tbd"
-                        ? "selected"
-                        : ""
-                    }
+                  <input
+                    type="time"
+                    data-hours-close="${index}"
+                    value="${escapeHtml(
+                      item.c ||
+                        ""
+                    )}"
                   >
-                    A confirmar
-                  </option>
-                </select>
 
-                <input
-                  type="time"
-                  data-hours-open="${index}"
-                  value="${escapeHtml(
-                    item.o || ""
-                  )}"
-                >
-
-                <input
-                  type="time"
-                  data-hours-close="${index}"
-                  value="${escapeHtml(
-                    item.c || ""
-                  )}"
-                >
-
-              </div>
-            `;
-          })
+                </div>
+              `;
+            }
+          )
           .join("")}
 
         <button
@@ -2157,7 +2651,9 @@
       </div>
     `;
 
-    $("#saveHoursBtn")?.addEventListener(
+    $(
+      "#saveHoursBtn"
+    )?.addEventListener(
       "click",
       async () => {
         const button =
@@ -2171,22 +2667,27 @@
 
         try {
           const newHours =
-            names.map((_, index) => ({
-              s:
-                $(
-                  `[data-hours-status="${index}"]`
-                )?.value || "closed",
+            names.map(
+              (_, index) => ({
+                s:
+                  $(
+                    `[data-hours-status="${index}"]`
+                  )?.value ||
+                  "closed",
 
-              o:
-                $(
-                  `[data-hours-open="${index}"]`
-                )?.value || "",
+                o:
+                  $(
+                    `[data-hours-open="${index}"]`
+                  )?.value ||
+                  "",
 
-              c:
-                $(
-                  `[data-hours-close="${index}"]`
-                )?.value || ""
-            }));
+                c:
+                  $(
+                    `[data-hours-close="${index}"]`
+                  )?.value ||
+                  ""
+              })
+            );
 
           state.settings.hours =
             newHours;
@@ -2197,7 +2698,9 @@
             "Horários salvos com sucesso."
           );
         } catch (error) {
-          console.error(error);
+          console.error(
+            error
+          );
 
           toast(
             "Não foi possível salvar os horários.",
@@ -2222,21 +2725,30 @@
     if (!tabContent) return;
 
     const rules =
-      state.settings.rules || {};
+      state.settings.rules ||
+      {};
 
     tabContent.innerHTML = `
       <div class="product-toolbar">
+
         <div>
-          <h2>Regras</h2>
+
+          <h2>
+            Regras
+          </h2>
+
           <p>
             Informações e regras das encomendas.
           </p>
+
         </div>
+
       </div>
 
       <div class="admin-panel-box">
 
         <div class="field">
+
           <label>
             Prazo / observações
           </label>
@@ -2245,8 +2757,10 @@
             id="adminRulesText"
             rows="10"
           >${escapeHtml(
-            rules.text || ""
+            rules.text ||
+              ""
           )}</textarea>
+
         </div>
 
         <button
@@ -2260,7 +2774,9 @@
       </div>
     `;
 
-    $("#saveRulesBtn")?.addEventListener(
+    $(
+      "#saveRulesBtn"
+    )?.addEventListener(
       "click",
       async () => {
         const button =
@@ -2273,11 +2789,19 @@
         );
 
         try {
-          state.settings.rules = {
-            ...(state.settings.rules || {}),
-            text:
-              $("#adminRulesText")?.value || ""
-          };
+          state.settings.rules =
+            {
+              ...(
+                state.settings.rules ||
+                {}
+              ),
+
+              text:
+                $(
+                  "#adminRulesText"
+                )?.value ||
+                ""
+            };
 
           await saveSettingObject();
 
@@ -2285,7 +2809,9 @@
             "Regras salvas com sucesso."
           );
         } catch (error) {
-          console.error(error);
+          console.error(
+            error
+          );
 
           toast(
             "Não foi possível salvar as regras.",
@@ -2311,12 +2837,19 @@
 
     tabContent.innerHTML = `
       <div class="product-toolbar">
+
         <div>
-          <h2>Mídia</h2>
+
+          <h2>
+            Mídia
+          </h2>
+
           <p>
             Imagens e materiais utilizados pelo site.
           </p>
+
         </div>
+
       </div>
 
       <div class="admin-panel-box">
@@ -2339,52 +2872,85 @@
      ABAS
      ========================================================= */
 
-  async function activateTab(tab) {
-    state.activeTab = tab;
+  async function activateTab(
+    tab
+  ) {
+    state.activeTab =
+      tab;
 
-    $$(".sidebar-item, [data-tab]").forEach(
-      (element) => {
-        if (
-          element.dataset.tab === tab
-        ) {
-          element.classList.add("active");
-        } else {
-          element.classList.remove("active");
+    $$(".sidebar-item, [data-tab]")
+      .forEach(
+        (element) => {
+          if (
+            element.dataset
+              .tab ===
+            tab
+          ) {
+            element.classList.add(
+              "active"
+            );
+          } else {
+            element.classList.remove(
+              "active"
+            );
+          }
         }
-      }
-    );
+      );
 
-    if (tab === "products") {
+    updateCakesTabLabel();
+
+    if (
+      tab ===
+      "products"
+    ) {
       renderProductTab();
       return;
     }
 
-    if (tab === "orders") {
+    if (
+      tab ===
+      "orders"
+    ) {
       await renderOrdersTab();
       return;
     }
 
-    if (tab === "cakes") {
+    if (
+      tab ===
+      "cakes"
+    ) {
       await renderCakesTab();
       return;
     }
 
-    if (tab === "content") {
+    if (
+      tab ===
+      "content"
+    ) {
       renderContentTab();
       return;
     }
 
-    if (tab === "hours") {
+    if (
+      tab ===
+      "hours"
+    ) {
       renderHoursTab();
       return;
     }
 
-    if (tab === "rules") {
+    if (
+      tab ===
+      "rules"
+    ) {
       renderRulesTab();
       return;
     }
 
-    if (tab === "media") {
+    if (
+      tab ===
+      "media"
+    ) {
       renderMediaTab();
       return;
     }
@@ -2393,39 +2959,53 @@
   }
 
   function bindTabs() {
-    $$("[data-tab]").forEach(
-      (button) => {
-        button.addEventListener(
-          "click",
-          () => {
-            activateTab(
-              button.dataset.tab
-            );
-          }
-        );
-      }
-    );
+    $$("[data-tab]")
+      .forEach(
+        (button) => {
+          button.addEventListener(
+            "click",
+            () => {
+              activateTab(
+                button.dataset
+                  .tab
+              );
+            }
+          );
+        }
+      );
+
+    updateCakesTabLabel();
   }
 
   /* =========================================================
      LOGIN
      ========================================================= */
 
-  async function handleLogin(event) {
+  async function handleLogin(
+    event
+  ) {
     event.preventDefault();
 
     if (!loginForm) return;
 
     const email =
-      $("#loginEmail")?.value?.trim();
+      $("#loginEmail")
+        ?.value
+        ?.trim();
 
     const password =
-      $("#loginPassword")?.value || "";
+      $("#loginPassword")
+        ?.value ||
+      "";
 
-    if (!email || !password) {
+    if (
+      !email ||
+      !password
+    ) {
       showLoginMessage(
         "Informe e-mail e senha."
       );
+
       return;
     }
 
@@ -2449,16 +3029,21 @@
       const {
         data,
         error
-      } = await db.auth.signInWithPassword({
-        email,
-        password
-      });
+      } =
+        await db.auth.signInWithPassword(
+          {
+            email,
+            password
+          }
+        );
 
       if (error) {
         throw error;
       }
 
-      if (!data?.session) {
+      if (
+        !data?.session
+      ) {
         throw new Error(
           "Login realizado, mas a sessão não foi criada."
         );
@@ -2470,9 +3055,10 @@
       );
 
       await showApp();
-
     } catch (error) {
-      console.error(error);
+      console.error(
+        error
+      );
 
       showLoginMessage(
         error.message ||
@@ -2491,7 +3077,9 @@
     try {
       await db.auth.signOut();
     } catch (error) {
-      console.error(error);
+      console.error(
+        error
+      );
     }
 
     showLogin();
@@ -2499,44 +3087,67 @@
 
   function showLogin() {
     if (loginScreen) {
-      loginScreen.classList.remove("hidden");
-      loginScreen.style.display = "";
+      loginScreen.classList.remove(
+        "hidden"
+      );
+
+      loginScreen.style.display =
+        "";
     }
 
     if (app) {
-      app.classList.add("hidden");
-      app.style.display = "";
+      app.classList.add(
+        "hidden"
+      );
+
+      app.style.display =
+        "";
     }
   }
 
   async function showApp() {
     if (loginScreen) {
-      loginScreen.classList.add("hidden");
-      loginScreen.style.display = "none";
+      loginScreen.classList.add(
+        "hidden"
+      );
+
+      loginScreen.style.display =
+        "none";
     }
 
     if (app) {
-      app.classList.remove("hidden");
-      app.style.display = "";
+      app.classList.remove(
+        "hidden"
+      );
+
+      app.style.display =
+        "";
     }
 
     try {
       await loadSettings();
+
       await loadProducts();
 
       updateStats();
+
       bindTabs();
 
       await activateTab(
-        state.activeTab || "products"
+        state.activeTab ||
+          "products"
       );
-
     } catch (error) {
-      console.error(error);
+      console.error(
+        error
+      );
 
       toast(
         "Não foi possível carregar o painel: " +
-          (error.message || "erro desconhecido"),
+          (
+            error.message ||
+            "erro desconhecido"
+          ),
         "error"
       );
     }
@@ -2552,24 +3163,32 @@
       "Atualizar";
 
     if (refreshBtn) {
-      refreshBtn.disabled = true;
+      refreshBtn.disabled =
+        true;
+
       refreshBtn.textContent =
         "Atualizando...";
     }
 
     try {
       await loadSettings();
+
       await loadProducts();
 
       updateStats();
 
       await activateTab(
-        state.activeTab || "products"
+        state.activeTab ||
+          "products"
       );
 
-      toast("Painel atualizado.");
+      toast(
+        "Painel atualizado."
+      );
     } catch (error) {
-      console.error(error);
+      console.error(
+        error
+      );
 
       toast(
         "Não foi possível atualizar o painel.",
@@ -2577,7 +3196,9 @@
       );
     } finally {
       if (refreshBtn) {
-        refreshBtn.disabled = false;
+        refreshBtn.disabled =
+          false;
+
         refreshBtn.textContent =
           oldText;
       }
@@ -2595,7 +3216,8 @@
       "click",
       (event) => {
         if (
-          event.target === productModal
+          event.target ===
+          productModal
         ) {
           closeProductModal();
         }
@@ -2623,14 +3245,19 @@
 
   function normalizeExistingProductAreaField() {
     const area =
-      getField("productArea");
+      getField(
+        "productArea"
+      );
 
     if (!area) return;
 
     const current =
-      area.value || "cardapio";
+      area.value ||
+      "cardapio";
 
-    populateAreaSelect(current);
+    populateAreaSelect(
+      current
+    );
   }
 
   /* =========================================================
@@ -2642,7 +3269,9 @@
       "Martins Admin — versão atualizada"
     );
 
-    if (!window.supabase) {
+    if (
+      !window.supabase
+    ) {
       console.error(
         "Supabase JS não foi carregado."
       );
@@ -2655,6 +3284,7 @@
     }
 
     ensureProductFormFields();
+
     normalizeExistingProductAreaField();
 
     if (loginForm) {
@@ -2687,15 +3317,12 @@
 
     bindModalEvents();
 
-    /*
-      Verifica se já existe uma sessão.
-    */
-
     const {
       data: {
         session
       }
-    } = await db.auth.getSession();
+    } =
+      await db.auth.getSession();
 
     if (session) {
       await showApp();
@@ -2703,21 +3330,22 @@
       showLogin();
     }
 
-    /*
-      Escuta mudanças de autenticação.
-    */
-
     db.auth.onAuthStateChange(
-      async (event, session) => {
+      async (
+        event,
+        session
+      ) => {
         if (
-          event === "SIGNED_IN" &&
+          event ===
+            "SIGNED_IN" &&
           session
         ) {
           await showApp();
         }
 
         if (
-          event === "SIGNED_OUT"
+          event ===
+          "SIGNED_OUT"
         ) {
           showLogin();
         }
@@ -2730,7 +3358,8 @@
      ========================================================= */
 
   if (
-    document.readyState === "loading"
+    document.readyState ===
+    "loading"
   ) {
     document.addEventListener(
       "DOMContentLoaded",
