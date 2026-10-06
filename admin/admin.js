@@ -90,8 +90,19 @@
       .replace(/-+/g, "-");
   }
 
+  /* =========================================================
+     NORMALIZAÇÃO DA ÁREA
+     ========================================================= */
+
   function normalizeArea(area, product = {}) {
-    const value = String(area || "").toLowerCase().trim();
+    const value = String(area || "")
+      .toLowerCase()
+      .trim();
+
+    /*
+      Se o produto já estiver marcado explicitamente
+      como Encomendas, mantém Encomendas.
+    */
 
     if (
       value === "encomendas" ||
@@ -100,6 +111,10 @@
       return "encomendas";
     }
 
+    /*
+      Delivery e Pronta Entrega representam a mesma área.
+    */
+
     if (
       value === "pronta-entrega" ||
       value === "pronta entrega" ||
@@ -107,14 +122,81 @@
       value === "delivery" ||
       value === "pronta_entrega"
     ) {
-      return "cardapio";
+      /*
+        Mesmo que esteja salvo como Delivery,
+        verificamos o nome do produto abaixo porque
+        alguns produtos antigos podem ter sido cadastrados
+        na área errada.
+      */
     }
 
-    const name = String(product.name || "").toLowerCase();
+    /*
+      Produtos que pertencem às ENCOMENDAS.
+
+      Essas regras também corrigem produtos antigos que
+      estejam registrados como Delivery no banco.
+    */
+
+    const name = String(product.name || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+
+    /*
+      Bolos de encomenda
+    */
 
     if (
       name.includes("naked cake") ||
       name.includes("chantininho")
+    ) {
+      return "encomendas";
+    }
+
+    /*
+      Sabores/itens de encomenda
+    */
+
+    if (
+      name.includes("oreo") ||
+      name.includes("kit kat") ||
+      name.includes("kitkat") ||
+      name.includes("nutella") ||
+      name.includes("kinder bueno")
+    ) {
+      return "encomendas";
+    }
+
+    /*
+      Brigadeiros de encomenda.
+
+      NÃO colocamos simplesmente "brigadeiro",
+      porque o produto Delivery chamado apenas
+      "Brigadeiro" deve continuar no Delivery.
+
+      Aqui entram somente as versões Clássicas e Premium.
+    */
+
+    if (
+      name.includes("brigadeiro classico") ||
+      name.includes("brigadeiros classicos") ||
+      name.includes("brigadeiro premium") ||
+      name.includes("brigadeiros premium")
+    ) {
+      return "encomendas";
+    }
+
+    /*
+      Qualquer outro produto segue a área cadastrada.
+
+      Se estiver como Encomendas, permanece Encomendas.
+      Caso contrário, fica em Delivery.
+    */
+
+    if (
+      value === "encomendas" ||
+      value === "encomenda"
     ) {
       return "encomendas";
     }
@@ -448,12 +530,14 @@
     ).length;
 
     const delivery = state.products.filter(
-      (product) => normalizeArea(product.area, product) ===
+      (product) =>
+        normalizeArea(product.area, product) ===
         "cardapio"
     ).length;
 
     const encomendas = state.products.filter(
-      (product) => normalizeArea(product.area, product) ===
+      (product) =>
+        normalizeArea(product.area, product) ===
         "encomendas"
     ).length;
 
@@ -555,12 +639,6 @@
   function ensureProductFormFields() {
     if (!productForm) return;
 
-    /*
-      Caso o HTML atual ainda não tenha o campo
-      Classificação, adicionamos automaticamente antes
-      do campo Área.
-    */
-
     if (!getField("productCategory")) {
       const areaField =
         getField("productArea")?.closest(".field") ||
@@ -612,11 +690,6 @@
         );
       }
     }
-
-    /*
-      Corrige automaticamente o campo Área caso o HTML
-      antigo ainda tenha "Pronta entrega".
-    */
 
     if (getField("productArea")) {
       populateAreaSelect(
@@ -718,7 +791,17 @@
       product?.category || ""
     );
 
-    populateAreaSelect(normalizedArea);
+    /*
+      Aqui usamos o próprio produto para determinar
+      automaticamente a área correta.
+    */
+
+    populateAreaSelect(
+      normalizeArea(
+        product?.area,
+        product || {}
+      )
+    );
 
     const title = productModal.querySelector(
       ".modal-title, h2, h3"
@@ -731,11 +814,6 @@
     }
 
     productModal.classList.remove("hidden");
-
-    /*
-      Alguns layouts usam display:none diretamente.
-      Garantimos que o modal fique visível.
-    */
 
     productModal.style.display = "flex";
   }
@@ -851,6 +929,9 @@
     );
 
     try {
+      const editingId =
+        state.editingProductId;
+
       const name = String(
         getFieldValue("productName") || ""
       ).trim();
@@ -924,7 +1005,7 @@
       const currentProduct =
         state.products.find(
           (product) =>
-            product.id === state.editingProductId
+            product.id === editingId
         );
 
       if (!imageUrl && currentProduct) {
@@ -933,7 +1014,7 @@
 
       const payload = {
         id:
-          state.editingProductId ||
+          editingId ||
           `${slugify(name)}-${Date.now()}`,
 
         name,
@@ -946,6 +1027,7 @@
           Delivery = cardapio
           Encomendas = encomendas
         */
+
         area,
 
         discount_percent:
@@ -1039,7 +1121,7 @@
       renderProductTab();
 
       toast(
-        state.editingProductId
+        editingId
           ? "Produto atualizado com sucesso."
           : "Produto criado com sucesso."
       );
