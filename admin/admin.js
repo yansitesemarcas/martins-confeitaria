@@ -523,23 +523,30 @@
      ========================================================= */
 
   function updateStats() {
-    const total = state.products.length;
+    /*
+      O painel agora exibe somente ENCOMENDAS.
+      Portanto, as estatísticas também consideram
+      somente os produtos de Encomendas.
+    */
 
-    const available = state.products.filter(
+    const visibleProducts =
+      state.products.filter(
+        (product) =>
+          normalizeArea(
+            product.area,
+            product
+          ) === "encomendas"
+      );
+
+    const total = visibleProducts.length;
+
+    const available = visibleProducts.filter(
       (product) => product.available !== false
     ).length;
 
-    const delivery = state.products.filter(
-      (product) =>
-        normalizeArea(product.area, product) ===
-        "cardapio"
-    ).length;
+    const delivery = 0;
 
-    const encomendas = state.products.filter(
-      (product) =>
-        normalizeArea(product.area, product) ===
-        "encomendas"
-    ).length;
+    const encomendas = visibleProducts.length;
 
     const statProducts = $("#statProducts");
     const statAvailable = $("#statAvailable");
@@ -791,11 +798,6 @@
       product?.category || ""
     );
 
-    /*
-      Aqui usamos o próprio produto para determinar
-      automaticamente a área correta.
-    */
-
     populateAreaSelect(
       normalizeArea(
         product?.area,
@@ -1022,11 +1024,6 @@
         price,
 
         category,
-
-        /*
-          Delivery = cardapio
-          Encomendas = encomendas
-        */
 
         area,
 
@@ -1299,14 +1296,15 @@
 
     ensureProductFormFields();
 
-    const deliveryProducts =
-      state.products.filter(
-        (product) =>
-          normalizeArea(
-            product.area,
-            product
-          ) === "cardapio"
-      );
+    /*
+      IMPORTANTE:
+
+      O Delivery NÃO será mais exibido no painel.
+
+      Os produtos continuam existindo no Supabase,
+      mas somente os produtos classificados como
+      ENCOMENDAS são renderizados nesta tela.
+    */
 
     const orderProducts =
       state.products.filter(
@@ -1323,7 +1321,7 @@
         <div>
           <h2>Produtos</h2>
           <p>
-            Gerencie os produtos do Delivery e das Encomendas.
+            Gerencie os produtos das Encomendas.
           </p>
         </div>
 
@@ -1380,12 +1378,6 @@
       </div>
 
       <div class="admin-products-area">
-
-        ${renderAreaSection(
-          "Delivery",
-          "cardapio",
-          deliveryProducts
-        )}
 
         ${renderAreaSection(
           "Encomendas",
