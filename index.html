@@ -26,7 +26,10 @@
     href="logo.png"
   >
 
-  <!-- FONTES -->
+  <!-- =====================================================
+       FONTES
+  ====================================================== -->
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
 
   <link
@@ -40,10 +43,13 @@
     rel="stylesheet"
   >
 
-  <!-- CSS -->
+  <!-- =====================================================
+       CSS
+  ====================================================== -->
+
   <link
     rel="stylesheet"
-    href="style.css?v=20261003-07"
+    href="style.css?v=20261006-01"
   >
 </head>
 
@@ -66,6 +72,7 @@
       >
     </a>
 
+
     <nav aria-label="Navegação principal">
 
       <a href="#inicio">
@@ -80,7 +87,6 @@
         Pronta Entrega / Cardápio
       </a>
 
-      <!-- ENCOMENDA -->
       <a href="./encomendas.html">
         Encomenda
       </a>
@@ -91,7 +97,10 @@
 
     </nav>
 
-    <!-- ÚNICO BOTÃO DO CARRINHO NO CABEÇALHO -->
+
+    <!-- ===================================================
+         CARRINHO
+    ==================================================== -->
 
     <button
       type="button"
@@ -100,17 +109,25 @@
       aria-label="Abrir carrinho"
     >
       🛒
-      <span id="cartCount">0</span>
+
+      <span id="cartCount">
+        0
+      </span>
+
     </button>
 
   </header>
 
 
+  <!-- =====================================================
+       CONTEÚDO PRINCIPAL
+  ====================================================== -->
+
   <main>
 
-    <!-- =====================================================
+    <!-- ===================================================
          INÍCIO
-    ====================================================== -->
+    ==================================================== -->
 
     <section
       id="inicio"
@@ -134,11 +151,11 @@
 
       </video>
 
+
       <div class="hero-overlay"></div>
 
-      <div class="hero-content reveal">
 
-        <!-- LOGO CENTRALIZADA -->
+      <div class="hero-content reveal">
 
         <div class="hero-logo">
 
@@ -150,20 +167,22 @@
 
         </div>
 
+
         <p class="hero-kicker">
           Martins Confeitaria
         </p>
 
+
         <h1>
           Por uma vida mais doce e feliz 🩵🧁
         </h1>
+
 
         <p class="hero-description">
           Bolos, doces e momentos especiais
           preparados com carinho.
         </p>
 
-        <!-- APENAS UM BOTÃO -->
 
         <div class="hero-actions">
 
@@ -181,9 +200,9 @@
     </section>
 
 
-    <!-- =====================================================
+    <!-- ===================================================
          NOSSA HISTÓRIA
-    ====================================================== -->
+    ==================================================== -->
 
     <section
       id="sobre"
@@ -197,6 +216,7 @@
           <span class="eyebrow">
             Nossa história
           </span>
+
 
           <h2 id="aboutTitle">
             ✨ De um sonho na calçada para a realização de um grande sonho 🤍
@@ -216,6 +236,7 @@
               Por uma vida mais doce e feliz.
             </p>
 
+
             <div id="aboutText">
 
               <p>
@@ -224,15 +245,18 @@
                 a pandemia.
               </p>
 
+
               <p>
                 Foi ali, em meio às incertezas e desafios,
                 que nasceu a coragem de começar.
               </p>
 
+
               <p>
                 Com muito esforço, coloquei meus primeiros bolos
                 afogadinhos e bolos caseiros na calçada da minha casa.
               </p>
+
 
               <p>
                 Depois vieram as vendas no shopping, de porta em porta,
@@ -240,16 +264,19 @@
                 para continuar.
               </p>
 
+
               <p>
                 Para me aperfeiçoar e oferecer cada vez mais qualidade,
                 também busquei conhecimento e fiz o curso técnico
                 profissional de Confeitaria pelo Senac.
               </p>
 
+
               <p>
                 Hoje, olhar para tudo isso é lembrar que nenhum começo
                 é pequeno quando existe um sonho grande por trás.
               </p>
+
 
               <p>
                 Minha confeitaria nasceu de um sonho, cresceu com muito
@@ -257,11 +284,13 @@
                 com amor, dedicação e propósito.
               </p>
 
+
               <p>
                 E o meu maior propósito continua sendo o mesmo:
                 levar doces para tornar a vida das pessoas um pouquinho
                 mais doce, feliz e especial. 🤍🧁
               </p>
+
 
               <div class="about-signature">
 
@@ -269,9 +298,11 @@
                   🩵 Feito com carinho, sabor e muitos sonhos
                 </span>
 
+
                 <strong>
                   👨‍🍳 Chef Denilson Martins ✨
                 </strong>
+
 
                 <small>
                   O coração por trás de cada doce da
@@ -291,9 +322,9 @@
     </section>
 
 
-    <!-- =====================================================
+    <!-- ===================================================
          PRONTA ENTREGA
-    ====================================================== -->
+    ==================================================== -->
 
     <section
       id="pronta"
@@ -308,9 +339,11 @@
             Para adoçar seu dia
           </span>
 
+
           <h2>
             Pronta entrega 🍰
           </h2>
+
 
           <p>
             Confira algumas opções disponíveis
@@ -319,11 +352,18 @@
 
         </div>
 
+
+        <!--
+          O script.js carrega aqui somente os produtos
+          classificados como Pronta Entrega.
+        -->
+
         <div
           id="readyProducts"
           class="products-grid reveal"
         >
         </div>
+
 
         <div class="section-action reveal">
 
@@ -341,9 +381,9 @@
     </section>
 
 
-    <!-- =====================================================
-         BOLOS / ENCOMENDAS
-    ====================================================== -->
+    <!-- ===================================================
+         BOLO / ENCOMENDA
+    ==================================================== -->
 
     <section
       id="bolo"
@@ -371,6 +411,7 @@
 
             </video>
 
+
             <div class="cake-video-overlay"></div>
 
           </div>
@@ -382,10 +423,12 @@
               Feito especialmente para você
             </span>
 
+
             <h2>
               Seu bolo,
               do seu jeito 🎂
             </h2>
+
 
             <p>
               Escolha o tamanho, massa, recheio
@@ -393,16 +436,14 @@
               personalizada para o seu momento.
             </p>
 
+
             <div class="cake-actions">
 
-              <!-- ENCOMENDA -->
-             <a
-  href="encomendas.html"
-  class="btn primary"
-  target="_self"
->
-  Monte sua encomenda
-</a>
+              <a
+                href="./encomendas.html"
+                class="btn primary"
+              >
+                Monte sua encomenda
               </a>
 
             </div>
@@ -416,9 +457,9 @@
     </section>
 
 
-    <!-- =====================================================
+    <!-- ===================================================
          CARDÁPIO
-    ====================================================== -->
+    ==================================================== -->
 
     <section
       id="cardapio"
@@ -433,9 +474,11 @@
             Sabores Martins
           </span>
 
+
           <h2>
             Nosso cardápio 🧁
           </h2>
+
 
           <p>
             Escolha uma categoria e confira
@@ -444,6 +487,11 @@
 
         </div>
 
+
+        <!--
+          Categorias carregadas pelo script.js.
+          Aqui ficam os produtos do cardápio/pronta entrega.
+        -->
 
         <div
           id="categories"
@@ -474,9 +522,9 @@
     </section>
 
 
-    <!-- =====================================================
+    <!-- ===================================================
          CONTATO
-    ====================================================== -->
+    ==================================================== -->
 
     <section
       id="contato"
@@ -491,9 +539,11 @@
             Fale com a gente
           </span>
 
+
           <h2>
             Vamos deixar seu dia mais doce? 🩵
           </h2>
+
 
           <p>
             Entre em contato com a Martins Confeitaria
@@ -505,11 +555,16 @@
 
         <div class="contact-grid">
 
+          <!-- =================================================
+               INFORMAÇÕES
+          ================================================== -->
+
           <div class="contact-card reveal">
 
             <h3>
               Martins Confeitaria
             </h3>
+
 
             <div class="contact-info">
 
@@ -518,6 +573,7 @@
                 <span>
                   📍
                 </span>
+
 
                 <p id="address">
                   Rua 1018, 65<br>
@@ -536,6 +592,7 @@
                   🕐
                 </span>
 
+
                 <div>
 
                   <div
@@ -544,6 +601,7 @@
                   >
                     Verificando horário...
                   </div>
+
 
                   <div id="hours"></div>
 
@@ -566,6 +624,7 @@
                 💬 Falar pelo WhatsApp
               </a>
 
+
               <a
                 id="instagram"
                 href="#"
@@ -581,7 +640,9 @@
           </div>
 
 
-          <!-- GOOGLE MAPS -->
+          <!-- =================================================
+               GOOGLE MAPS
+          ================================================== -->
 
           <div class="map-card reveal">
 
@@ -593,11 +654,13 @@
                   Localização
                 </span>
 
+
                 <h3>
                   Onde estamos
                 </h3>
 
               </div>
+
 
               <a
                 id="maps"
@@ -640,9 +703,11 @@
               Sua opinião importa
             </span>
 
+
             <h3>
               Gostou da experiência? ⭐
             </h3>
+
 
             <p>
               Conte para outras pessoas como foi
@@ -650,6 +715,7 @@
             </p>
 
           </div>
+
 
           <a
             id="review"
@@ -685,6 +751,7 @@
           alt="Martins Confeitaria"
         >
 
+
         <p>
           Por uma vida mais doce e feliz. 🩵🧁
         </p>
@@ -698,18 +765,21 @@
           Início
         </a>
 
+
         <a href="#sobre">
           Um pouco da nossa história
         </a>
+
 
         <a href="./delivery.html">
           Pronta Entrega / Cardápio
         </a>
 
-        <!-- ENCOMENDA -->
+
         <a href="./encomendas.html">
           Encomenda
         </a>
+
 
         <a href="#contato">
           Contato
@@ -731,6 +801,7 @@
         Todos os direitos reservados.
       </p>
 
+
       <p>
         Feito com carinho. 🩵
       </p>
@@ -741,7 +812,7 @@
 
 
   <!-- =====================================================
-       CARRINHO
+       FUNDO DO CARRINHO
   ====================================================== -->
 
   <div
@@ -750,6 +821,10 @@
     aria-hidden="true"
   ></div>
 
+
+  <!-- =====================================================
+       CARRINHO LATERAL
+  ====================================================== -->
 
   <aside
     id="drawer"
@@ -766,11 +841,13 @@
           Seu pedido
         </span>
 
+
         <h2>
           Carrinho 🛒
         </h2>
 
       </div>
+
 
       <button
         type="button"
@@ -803,6 +880,7 @@
         <span>
           Total
         </span>
+
 
         <strong id="cartTotal">
           R$ 0,00
@@ -857,11 +935,13 @@
             Finalizar pedido
           </span>
 
+
           <h2>
             Seus dados 🩵
           </h2>
 
         </div>
+
 
         <button
           type="button"
@@ -875,6 +955,8 @@
       </div>
 
 
+      <!-- NOME -->
+
       <label>
         Nome
 
@@ -882,11 +964,14 @@
           type="text"
           name="customer"
           placeholder="Seu nome"
+          autocomplete="name"
           required
         >
 
       </label>
 
+
+      <!-- WHATSAPP -->
 
       <label>
         WhatsApp
@@ -895,11 +980,14 @@
           type="tel"
           name="phone"
           placeholder="(85) 99999-9999"
+          autocomplete="tel"
           required
         >
 
       </label>
 
+
+      <!-- ENTREGA / RETIRADA -->
 
       <label>
         Como deseja receber?
@@ -913,9 +1001,11 @@
             Selecione
           </option>
 
+
           <option value="Retirada">
             Retirada
           </option>
+
 
           <option value="Entrega">
             Entrega
@@ -925,6 +1015,8 @@
 
       </label>
 
+
+      <!-- ENDEREÇO -->
 
       <div
         id="addressWrap"
@@ -945,6 +1037,8 @@
       </div>
 
 
+      <!-- PAGAMENTO -->
+
       <label>
         Forma de pagamento
 
@@ -957,13 +1051,16 @@
             Selecione
           </option>
 
+
           <option value="Pix">
             Pix
           </option>
 
+
           <option value="Dinheiro">
             Dinheiro
           </option>
+
 
           <option value="Cartão">
             Cartão
@@ -973,6 +1070,8 @@
 
       </label>
 
+
+      <!-- OBSERVAÇÕES -->
 
       <label>
         Observações
@@ -996,6 +1095,7 @@
           Voltar
         </button>
 
+
         <button
           type="submit"
           class="btn primary"
@@ -1018,11 +1118,16 @@
     src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
   ></script>
 
-  <script src="config.js"></script>
 
-  <script src="defaults.js"></script>
+  <script src="./config.js"></script>
 
-  <script src="script.js"></script>
+
+  <script src="./defaults.js"></script>
+
+
+  <script
+    src="./script.js?v=20261006-01"
+  ></script>
 
 </body>
 </html>
