@@ -1,7 +1,7 @@
 /* =========================================================
    MARTINS CONFEITARIA
    PAINEL ADMINISTRATIVO
-   ADMIN.JS — VERSÃO ATUALIZADA
+   ADMIN.JS
    ========================================================= */
 
 (() => {
@@ -24,7 +24,8 @@
     SUPABASE_ANON_KEY
   );
 
-  const DEFAULTS = window.MARTINS_DEFAULTS || {};
+  const DEFAULTS =
+    window.MARTINS_DEFAULTS || {};
 
   /* =========================================================
      ESTADO
@@ -43,19 +44,40 @@
      ELEMENTOS
      ========================================================= */
 
-  const $ = (selector) => document.querySelector(selector);
-  const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+  const $ = (selector) =>
+    document.querySelector(selector);
 
-  const loginScreen = $("#loginScreen");
-  const app = $("#app");
-  const loginForm = $("#loginForm");
-  const loginMsg = $("#loginMsg");
-  const logoutBtn = $("#logout");
-  const refreshBtn = $("#refreshBtn");
-  const tabContent = $("#tabContent");
+  const $$ = (selector) =>
+    Array.from(
+      document.querySelectorAll(selector)
+    );
 
-  const productModal = $("#productModal");
-  const productForm = $("#productForm");
+  const loginScreen =
+    $("#loginScreen");
+
+  const app =
+    $("#app");
+
+  const loginForm =
+    $("#loginForm");
+
+  const loginMsg =
+    $("#loginMsg");
+
+  const logoutBtn =
+    $("#logout");
+
+  const refreshBtn =
+    $("#refreshBtn");
+
+  const tabContent =
+    $("#tabContent");
+
+  const productModal =
+    $("#productModal");
+
+  const productForm =
+    $("#productForm");
 
   /* =========================================================
      UTILITÁRIOS
@@ -71,145 +93,75 @@
   }
 
   function money(value) {
-    const number = Number(value || 0);
+    const number =
+      Number(value || 0);
 
-    return number.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL"
-    });
+    return number.toLocaleString(
+      "pt-BR",
+      {
+        style: "currency",
+        currency: "BRL"
+      }
+    );
   }
 
   function slugify(value) {
     return String(value || "")
       .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
+      .replace(
+        /[\u0300-\u036f]/g,
+        ""
+      )
       .toLowerCase()
       .trim()
       .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "")
-      .replace(/-+/g, "-");
+      .replace(
+        /[^a-z0-9-]/g,
+        ""
+      )
+      .replace(
+        /-+/g,
+        "-"
+      );
   }
 
-  /* =========================================================
-     NORMALIZAÇÃO DA ÁREA
-     ========================================================= */
-
-  function normalizeArea(area, product = {}) {
-    const value = String(area || "")
-      .toLowerCase()
-      .trim();
-
-    if (
-      value === "encomendas" ||
-      value === "encomenda"
-    ) {
-      return "encomendas";
-    }
-
-    if (
-      value === "pronta-entrega" ||
-      value === "pronta entrega" ||
-      value === "cardapio" ||
-      value === "delivery" ||
-      value === "pronta_entrega"
-    ) {
-      // Continua para verificar o nome do produto.
-    }
-
-    const name = String(product.name || "")
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .trim();
-
-    /*
-      Bolos de encomenda
-    */
-
-    if (
-      name.includes("naked cake") ||
-      name.includes("chantininho")
-    ) {
-      return "encomendas";
-    }
-
-    /*
-      Itens de encomenda
-    */
-
-    if (
-      name.includes("oreo") ||
-      name.includes("kit kat") ||
-      name.includes("kitkat") ||
-      name.includes("nutella") ||
-      name.includes("kinder bueno")
-    ) {
-      return "encomendas";
-    }
-
-    /*
-      Brigadeiros de encomenda
-    */
-
-    if (
-      name.includes("brigadeiro classico") ||
-      name.includes("brigadeiros classicos") ||
-      name.includes("brigadeiro premium") ||
-      name.includes("brigadeiros premium")
-    ) {
-      return "encomendas";
-    }
-
-    if (
-      value === "encomendas" ||
-      value === "encomenda"
-    ) {
-      return "encomendas";
-    }
-
-    return "cardapio";
-  }
-
-  function areaLabel(area) {
-    return normalizeArea(area) === "encomendas"
-      ? "Encomendas"
-      : "Delivery";
-  }
-
-  function getProductImage(product) {
-    return (
-      product.image_url ||
-      product.image ||
-      product.photo_url ||
-      product.photo ||
-      product.imagem ||
-      product.foto ||
-      ""
-    );
-  }
-
-  function toast(message, type = "success") {
-    let box = $("#adminToast");
+  function toast(
+    message,
+    type = "success"
+  ) {
+    let box =
+      $("#adminToast");
 
     if (!box) {
-      box = document.createElement("div");
-      box.id = "adminToast";
+      box =
+        document.createElement(
+          "div"
+        );
 
-      Object.assign(box.style, {
-        position: "fixed",
-        right: "20px",
-        bottom: "20px",
-        zIndex: "99999",
-        padding: "14px 18px",
-        borderRadius: "12px",
-        color: "#fff",
-        fontWeight: "700",
-        boxShadow: "0 8px 30px rgba(0,0,0,.18)",
-        maxWidth: "360px",
-        fontSize: "14px"
-      });
+      box.id =
+        "adminToast";
 
-      document.body.appendChild(box);
+      Object.assign(
+        box.style,
+        {
+          position: "fixed",
+          right: "20px",
+          bottom: "20px",
+          zIndex: "99999",
+          padding: "14px 18px",
+          borderRadius: "12px",
+          color: "#fff",
+          fontWeight: "700",
+          boxShadow:
+            "0 8px 30px rgba(0,0,0,.18)",
+          maxWidth: "360px",
+          fontSize: "14px"
+        }
+      );
+
+      document.body.appendChild(
+        box
+      );
     }
 
     box.style.background =
@@ -219,23 +171,39 @@
         ? "#d68910"
         : "#2b7896";
 
-    box.textContent = message;
-    box.style.display = "block";
+    box.textContent =
+      message;
 
-    clearTimeout(box._timer);
+    box.style.display =
+      "block";
 
-    box._timer = setTimeout(() => {
-      box.style.display = "none";
-    }, 3500);
+    clearTimeout(
+      box._timer
+    );
+
+    box._timer =
+      setTimeout(
+        () => {
+          box.style.display =
+            "none";
+        },
+        3500
+      );
   }
 
-  function showLoginMessage(message, error = true) {
+  function showLoginMessage(
+    message,
+    error = true
+  ) {
     if (!loginMsg) return;
 
-    loginMsg.textContent = message;
-    loginMsg.style.color = error
-      ? "#c0392b"
-      : "#2b7896";
+    loginMsg.textContent =
+      message;
+
+    loginMsg.style.color =
+      error
+        ? "#c0392b"
+        : "#2b7896";
   }
 
   function setLoading(
@@ -247,14 +215,21 @@
 
     if (loading) {
       button.dataset.originalText =
-        button.textContent || originalText;
+        button.textContent ||
+        originalText;
 
-      button.disabled = true;
-      button.textContent = "Salvando...";
-    } else {
-      button.disabled = false;
+      button.disabled =
+        true;
+
       button.textContent =
-        button.dataset.originalText ||
+        "Salvando...";
+    } else {
+      button.disabled =
+        false;
+
+      button.textContent =
+        button.dataset
+          .originalText ||
         originalText;
     }
   }
@@ -264,7 +239,8 @@
      ========================================================= */
 
   function loadAdminLogo() {
-    const wrap = $("#loginLogoWrap");
+    const wrap =
+      $("#loginLogoWrap");
 
     if (!wrap) return;
 
@@ -279,7 +255,9 @@
     if (possibleLogo) {
       wrap.innerHTML = `
         <img
-          src="${escapeHtml(possibleLogo)}"
+          src="${escapeHtml(
+            possibleLogo
+          )}"
           alt="Martins Confeitaria"
           class="login-logo"
         >
@@ -292,8 +270,12 @@
      ========================================================= */
 
   function defaultCategories() {
-    return Array.isArray(DEFAULTS.categories)
-      ? [...DEFAULTS.categories]
+    return Array.isArray(
+      DEFAULTS.categories
+    )
+      ? [
+          ...DEFAULTS.categories
+        ]
       : [
           "Bolos no Pote",
           "Sobremesas",
@@ -306,8 +288,14 @@
         ];
   }
 
-  function normalizeCategories(categories) {
-    if (!Array.isArray(categories)) {
+  function normalizeCategories(
+    categories
+  ) {
+    if (
+      !Array.isArray(
+        categories
+      )
+    ) {
       return defaultCategories();
     }
 
@@ -315,7 +303,9 @@
       ...new Set(
         categories
           .map((item) =>
-            String(item || "").trim()
+            String(
+              item || ""
+            ).trim()
           )
           .filter(Boolean)
       )
@@ -325,51 +315,66 @@
   async function saveCategories() {
     const payload = {
       ...state.settings,
-      categories: state.categories
+      categories:
+        state.categories
     };
 
-    const { error } = await db
-      .from("settings")
-      .upsert(
-        {
-          key: "site",
-          value: payload
-        },
-        {
-          onConflict: "key"
-        }
-      );
+    const {
+      error
+    } =
+      await db
+        .from("settings")
+        .upsert(
+          {
+            key: "site",
+            value: payload
+          },
+          {
+            onConflict:
+              "key"
+          }
+        );
 
     if (error) {
-      console.error(error);
+      console.error(
+        error
+      );
+
       throw error;
     }
 
-    state.settings = payload;
+    state.settings =
+      payload;
   }
 
   async function createClassification() {
-    const name = window.prompt(
-      "Digite o nome da nova classificação:"
-    );
+    const name =
+      window.prompt(
+        "Digite o nome da nova classificação:"
+      );
 
-    if (name === null) return;
+    if (name === null)
+      return;
 
-    const cleanName = name.trim();
+    const cleanName =
+      name.trim();
 
     if (!cleanName) {
       toast(
         "Digite um nome válido.",
         "warning"
       );
+
       return;
     }
 
     const alreadyExists =
       state.categories.some(
         (category) =>
-          category.toLowerCase() ===
-          cleanName.toLowerCase()
+          category
+            .toLowerCase() ===
+          cleanName
+            .toLowerCase()
       );
 
     if (alreadyExists) {
@@ -377,13 +382,20 @@
         "Essa classificação já existe.",
         "warning"
       );
+
       return;
     }
 
-    state.categories.push(cleanName);
+    state.categories.push(
+      cleanName
+    );
 
-    state.categories.sort((a, b) =>
-      a.localeCompare(b, "pt-BR")
+    state.categories.sort(
+      (a, b) =>
+        a.localeCompare(
+          b,
+          "pt-BR"
+        )
     );
 
     try {
@@ -398,38 +410,50 @@
       state.categories =
         state.categories.filter(
           (category) =>
-            category !== cleanName
+            category !==
+            cleanName
         );
 
       toast(
         "Não foi possível salvar a classificação: " +
-          (error.message ||
-            "erro desconhecido"),
+          (
+            error.message ||
+            "erro desconhecido"
+          ),
         "error"
       );
     }
   }
 
-  async function deleteClassification(name) {
-    const used = state.products.some(
-      (product) =>
-        String(product.category || "").trim() ===
-        String(name).trim()
-    );
+  async function deleteClassification(
+    name
+  ) {
+    const used =
+      state.products.some(
+        (product) =>
+          String(
+            product.category ||
+              ""
+          ).trim() ===
+          String(name).trim()
+      );
 
     if (used) {
       toast(
         "Essa classificação está sendo usada por um produto.",
         "warning"
       );
+
       return;
     }
 
-    const confirmed = window.confirm(
-      `Excluir a classificação "${name}"?`
-    );
+    const confirmed =
+      window.confirm(
+        `Excluir a classificação "${name}"?`
+      );
 
-    if (!confirmed) return;
+    if (!confirmed)
+      return;
 
     const oldCategories = [
       ...state.categories
@@ -461,15 +485,155 @@
   }
 
   /* =========================================================
-     CARREGAR CONFIGURAÇÕES
+     NORMALIZAÇÃO DA ÁREA
+     ========================================================= */
+
+  function normalizeArea(
+    area,
+    product = {}
+  ) {
+    const value =
+      String(area || "")
+        .toLowerCase()
+        .trim();
+
+    if (
+      value ===
+        "encomendas" ||
+      value ===
+        "encomenda"
+    ) {
+      return "encomendas";
+    }
+
+    if (
+      value ===
+        "pronta-entrega" ||
+      value ===
+        "pronta entrega" ||
+      value ===
+        "cardapio" ||
+      value ===
+        "delivery" ||
+      value ===
+        "pronta_entrega"
+    ) {
+      // Continua para verificar o nome.
+    }
+
+    const name =
+      String(
+        product.name || ""
+      )
+        .normalize("NFD")
+        .replace(
+          /[\u0300-\u036f]/g,
+          ""
+        )
+        .toLowerCase()
+        .trim();
+
+    if (
+      name.includes(
+        "naked cake"
+      ) ||
+      name.includes(
+        "chantininho"
+      )
+    ) {
+      return "encomendas";
+    }
+
+    if (
+      name.includes(
+        "oreo"
+      ) ||
+      name.includes(
+        "kit kat"
+      ) ||
+      name.includes(
+        "kitkat"
+      ) ||
+      name.includes(
+        "nutella"
+      ) ||
+      name.includes(
+        "kinder bueno"
+      )
+    ) {
+      return "encomendas";
+    }
+
+    if (
+      name.includes(
+        "brigadeiro classico"
+      ) ||
+      name.includes(
+        "brigadeiros classicos"
+      ) ||
+      name.includes(
+        "brigadeiro premium"
+      ) ||
+      name.includes(
+        "brigadeiros premium"
+      )
+    ) {
+      return "encomendas";
+    }
+
+    if (
+      value ===
+        "encomendas" ||
+      value ===
+        "encomenda"
+    ) {
+      return "encomendas";
+    }
+
+    return "cardapio";
+  }
+
+  function areaLabel(
+    area
+  ) {
+    return normalizeArea(
+      area
+    ) === "encomendas"
+      ? "Encomendas"
+      : "Delivery";
+  }
+
+  function getProductImage(
+    product
+  ) {
+    return (
+      product.image_url ||
+      product.image ||
+      product.photo_url ||
+      product.photo ||
+      product.imagem ||
+      product.foto ||
+      ""
+    );
+  }
+
+  /* =========================================================
+     CONFIGURAÇÕES
      ========================================================= */
 
   async function loadSettings() {
-    const { data, error } = await db
-      .from("settings")
-      .select("*")
-      .eq("key", "site")
-      .maybeSingle();
+    const {
+      data,
+      error
+    } =
+      await db
+        .from("settings")
+        .select("*")
+        .eq(
+          "key",
+          "site"
+        )
+        .maybeSingle();
 
     if (error) {
       console.error(
@@ -477,7 +641,9 @@
         error
       );
 
-      state.settings = {};
+      state.settings =
+        {};
+
       state.categories =
         defaultCategories();
 
@@ -495,25 +661,33 @@
     state.categories =
       normalizeCategories(
         value.categories ||
-        DEFAULTS.categories
+          DEFAULTS.categories
       );
 
     loadAdminLogo();
   }
 
   /* =========================================================
-     CARREGAR PRODUTOS
+     PRODUTOS
      ========================================================= */
 
   async function loadProducts() {
-    const { data, error } =
+    const {
+      data,
+      error
+    } =
       await db
         .from("products")
         .select("*")
-        .order("sort", {
-          ascending: true,
-          nullsFirst: false
-        });
+        .order(
+          "sort",
+          {
+            ascending:
+              true,
+            nullsFirst:
+              false
+          }
+        );
 
     if (error) {
       console.error(
@@ -526,13 +700,16 @@
 
     state.products =
       Array.isArray(data)
-        ? data.map((product) => ({
-            ...product,
-            area: normalizeArea(
-              product.area,
-              product
-            )
-          }))
+        ? data.map(
+            (product) => ({
+              ...product,
+              area:
+                normalizeArea(
+                  product.area,
+                  product
+                )
+            })
+          )
         : [];
   }
 
@@ -547,7 +724,8 @@
     const available =
       state.products.filter(
         (product) =>
-          product.available !== false
+          product.available !==
+          false
       ).length;
 
     const delivery =
@@ -556,7 +734,8 @@
           normalizeArea(
             product.area,
             product
-          ) === "cardapio"
+          ) ===
+          "cardapio"
       ).length;
 
     const encomendas =
@@ -565,7 +744,8 @@
           normalizeArea(
             product.area,
             product
-          ) === "encomendas"
+          ) ===
+          "encomendas"
       ).length;
 
     const statProducts =
@@ -602,14 +782,19 @@
   }
 
   /* =========================================================
-     PRODUTO — MODAL
+     CAMPOS
      ========================================================= */
 
   function getField(id) {
-    return document.getElementById(id);
+    return document.getElementById(
+      id
+    );
   }
 
-  function setField(id, value) {
+  function setField(
+    id,
+    value
+  ) {
     const field =
       getField(id);
 
@@ -627,11 +812,14 @@
     }
   }
 
-  function getFieldValue(id) {
+  function getFieldValue(
+    id
+  ) {
     const field =
       getField(id);
 
-    if (!field) return "";
+    if (!field)
+      return "";
 
     if (
       field.type ===
@@ -651,7 +839,8 @@
         "productCategory"
       );
 
-    if (!select) return;
+    if (!select)
+      return;
 
     const categories =
       normalizeCategories([
@@ -686,14 +875,16 @@
   }
 
   function populateAreaSelect(
-    selected = "cardapio"
+    selected =
+      "cardapio"
   ) {
     const select =
       getField(
         "productArea"
       );
 
-    if (!select) return;
+    if (!select)
+      return;
 
     const normalized =
       normalizeArea(
@@ -715,7 +906,8 @@
   }
 
   function ensureProductFormFields() {
-    if (!productForm) return;
+    if (!productForm)
+      return;
 
     if (
       !getField(
@@ -725,7 +917,9 @@
       const areaField =
         getField(
           "productArea"
-        )?.closest(".field") ||
+        )?.closest(
+          ".field"
+        ) ||
         getField(
           "productArea"
         )?.parentElement;
@@ -749,6 +943,7 @@
             gap:8px;
             align-items:center;
           ">
+
             <select
               id="productCategory"
               name="category"
@@ -763,6 +958,7 @@
             >
               + Nova
             </button>
+
           </div>
 
           <small style="
@@ -799,7 +995,8 @@
 
     if (
       newClassificationBtn &&
-      !newClassificationBtn.dataset.bound
+      !newClassificationBtn
+        .dataset.bound
     ) {
       newClassificationBtn.dataset.bound =
         "true";
@@ -819,6 +1016,10 @@
     );
   }
 
+  /* =========================================================
+     MODAL PRODUTO
+     ========================================================= */
+
   function openProductModal(
     product = null
   ) {
@@ -830,25 +1031,23 @@
     }
 
     state.editingProductId =
-      product?.id || null;
+      product?.id ||
+      null;
 
     ensureProductFormFields();
 
     productForm.reset();
 
     setField(
-      "productPhoto",
-      ""
-    );
-
-    setField(
       "productName",
-      product?.name || ""
+      product?.name ||
+        ""
     );
 
     setField(
       "productPrice",
-      product?.price ?? ""
+      product?.price ??
+        ""
     );
 
     setField(
@@ -859,34 +1058,40 @@
 
     setField(
       "productSort",
-      product?.sort ?? ""
+      product?.sort ??
+        ""
     );
 
     setField(
       "productGramatura",
-      product?.gramatura ?? ""
+      product?.gramatura ??
+        ""
     );
 
     setField(
       "productServeAte",
-      product?.serve_ate ?? ""
+      product?.serve_ate ??
+        ""
     );
 
     setField(
       "productDescription",
-      product?.description ?? ""
+      product?.description ??
+        ""
     );
 
     setField(
       "productAvailable",
       product
-        ? product.available !== false
+        ? product.available !==
+            false
         : true
     );
 
     setField(
       "productFeatured",
-      product?.featured ?? false
+      product?.featured ??
+        false
     );
 
     setField(
@@ -896,7 +1101,8 @@
     );
 
     populateClassificationSelect(
-      product?.category || ""
+      product?.category ||
+        ""
     );
 
     populateAreaSelect(
@@ -927,7 +1133,8 @@
   }
 
   function closeProductModal() {
-    if (!productModal) return;
+    if (!productModal)
+      return;
 
     productModal.classList.add(
       "hidden"
@@ -941,12 +1148,17 @@
   }
 
   /* =========================================================
-     IMAGEM
+     COMPRESSÃO DE IMAGEM
      ========================================================= */
 
-  function compressImage(file) {
+  function compressImage(
+    file
+  ) {
     return new Promise(
-      (resolve, reject) => {
+      (
+        resolve,
+        reject
+      ) => {
         if (!file) {
           resolve("");
           return;
@@ -969,97 +1181,102 @@
         const reader =
           new FileReader();
 
-        reader.onload = () => {
-          const img =
-            new Image();
+        reader.onload =
+          () => {
+            const img =
+              new Image();
 
-          img.onload = () => {
-            const maxSize =
-              1000;
+            img.onload =
+              () => {
+                const maxSize =
+                  1000;
 
-            let width =
-              img.width;
+                let width =
+                  img.width;
 
-            let height =
-              img.height;
+                let height =
+                  img.height;
 
-            if (
-              width >
-                maxSize ||
-              height >
-                maxSize
-            ) {
-              const ratio =
-                Math.min(
-                  maxSize /
-                    width,
-                  maxSize /
-                    height
+                if (
+                  width >
+                    maxSize ||
+                  height >
+                    maxSize
+                ) {
+                  const ratio =
+                    Math.min(
+                      maxSize /
+                        width,
+                      maxSize /
+                        height
+                    );
+
+                  width =
+                    Math.round(
+                      width *
+                        ratio
+                    );
+
+                  height =
+                    Math.round(
+                      height *
+                        ratio
+                    );
+                }
+
+                const canvas =
+                  document.createElement(
+                    "canvas"
+                  );
+
+                canvas.width =
+                  width;
+
+                canvas.height =
+                  height;
+
+                const ctx =
+                  canvas.getContext(
+                    "2d"
+                  );
+
+                ctx.drawImage(
+                  img,
+                  0,
+                  0,
+                  width,
+                  height
                 );
 
-              width =
-                Math.round(
-                  width * ratio
+                resolve(
+                  canvas.toDataURL(
+                    "image/jpeg",
+                    0.78
+                  )
                 );
+              };
 
-              height =
-                Math.round(
-                  height * ratio
+            img.onerror =
+              () => {
+                reject(
+                  new Error(
+                    "Não foi possível processar a imagem."
+                  )
                 );
-            }
+              };
 
-            const canvas =
-              document.createElement(
-                "canvas"
-              );
-
-            canvas.width =
-              width;
-
-            canvas.height =
-              height;
-
-            const ctx =
-              canvas.getContext(
-                "2d"
-              );
-
-            ctx.drawImage(
-              img,
-              0,
-              0,
-              width,
-              height
-            );
-
-            const result =
-              canvas.toDataURL(
-                "image/jpeg",
-                0.78
-              );
-
-            resolve(result);
+            img.src =
+              reader.result;
           };
 
-          img.onerror = () => {
+        reader.onerror =
+          () => {
             reject(
               new Error(
-                "Não foi possível processar a imagem."
+                "Não foi possível ler a imagem."
               )
             );
           };
-
-          img.src =
-            reader.result;
-        };
-
-        reader.onerror = () => {
-          reject(
-            new Error(
-              "Não foi possível ler a imagem."
-            )
-          );
-        };
 
         reader.readAsDataURL(
           file
@@ -1072,10 +1289,13 @@
      SALVAR PRODUTO
      ========================================================= */
 
-  async function saveProduct(event) {
+  async function saveProduct(
+    event
+  ) {
     event.preventDefault();
 
-    if (!productForm) return;
+    if (!productForm)
+      return;
 
     const submitButton =
       productForm.querySelector(
@@ -1123,7 +1343,9 @@
           getFieldValue(
             "productArea"
           ),
-          { name }
+          {
+            name
+          }
         );
 
       const priceValue =
@@ -1185,7 +1407,8 @@
           "productPhoto"
         )?.files?.[0];
 
-      let imageUrl = "";
+      let imageUrl =
+        "";
 
       if (file) {
         imageUrl =
@@ -1285,16 +1508,18 @@
       const {
         data,
         error
-      } = await db
-        .from("products")
-        .upsert(
-          payload,
-          {
-            onConflict: "id"
-          }
-        )
-        .select()
-        .single();
+      } =
+        await db
+          .from("products")
+          .upsert(
+            payload,
+            {
+              onConflict:
+                "id"
+            }
+          )
+          .select()
+          .single();
 
       if (error) {
         console.error(
@@ -1308,10 +1533,11 @@
       const normalizedProduct =
         {
           ...data,
-          area: normalizeArea(
-            data.area,
-            data
-          )
+          area:
+            normalizeArea(
+              data.area,
+              data
+            )
         };
 
       const existingIndex =
@@ -1322,7 +1548,8 @@
         );
 
       if (
-        existingIndex >= 0
+        existingIndex >=
+        0
       ) {
         state.products[
           existingIndex
@@ -1387,17 +1614,21 @@
           item.id === id
       );
 
-    if (!product) return;
+    if (!product)
+      return;
 
     const confirmed =
       window.confirm(
         `Excluir "${product.name}"?`
       );
 
-    if (!confirmed) return;
+    if (!confirmed)
+      return;
 
     try {
-      const { error } =
+      const {
+        error
+      } =
         await db
           .from("products")
           .delete()
@@ -1406,9 +1637,8 @@
             id
           );
 
-      if (error) {
+      if (error)
         throw error;
-      }
 
       state.products =
         state.products.filter(
@@ -1448,7 +1678,8 @@
           product.id === id
       );
 
-    if (!original) return;
+    if (!original)
+      return;
 
     const copy = {
       ...original,
@@ -1456,8 +1687,7 @@
       id:
         `${slugify(
           original.name
-        )}-` +
-        `${Date.now()}`,
+        )}-${Date.now()}`,
 
       name:
         `${original.name} — cópia`
@@ -1467,23 +1697,26 @@
       const {
         data,
         error
-      } = await db
-        .from("products")
-        .insert(copy)
-        .select()
-        .single();
+      } =
+        await db
+          .from("products")
+          .insert(copy)
+          .select()
+          .single();
 
-      if (error) {
+      if (error)
         throw error;
-      }
 
-      state.products.push({
-        ...data,
-        area: normalizeArea(
-          data.area,
-          data
-        )
-      });
+      state.products.push(
+        {
+          ...data,
+          area:
+            normalizeArea(
+              data.area,
+              data
+            )
+        }
+      );
 
       updateStats();
 
@@ -1505,7 +1738,7 @@
   }
 
   /* =========================================================
-     ALTERAR DISPONIBILIDADE
+     DISPONIBILIDADE
      ========================================================= */
 
   async function toggleProductAvailability(
@@ -1517,13 +1750,17 @@
           item.id === id
       );
 
-    if (!product) return;
+    if (!product)
+      return;
 
     const newValue =
-      product.available === false;
+      product.available ===
+      false;
 
     try {
-      const { error } =
+      const {
+        error
+      } =
         await db
           .from("products")
           .update({
@@ -1535,9 +1772,8 @@
             id
           );
 
-      if (error) {
+      if (error)
         throw error;
-      }
 
       product.available =
         newValue;
@@ -1564,13 +1800,12 @@
   }
 
   /* =========================================================
-     RENDER — PRODUTOS
+     RENDER PRODUTOS
      ========================================================= */
 
   function renderProductTab() {
-    if (!tabContent) return;
-
-    ensureProductFormFields();
+    if (!tabContent)
+      return;
 
     const deliveryProducts =
       state.products.filter(
@@ -1578,7 +1813,8 @@
           normalizeArea(
             product.area,
             product
-          ) === "cardapio"
+          ) ===
+          "cardapio"
       );
 
     const orderProducts =
@@ -1587,18 +1823,23 @@
           normalizeArea(
             product.area,
             product
-          ) === "encomendas"
+          ) ===
+          "encomendas"
       );
 
     tabContent.innerHTML = `
       <div class="product-toolbar">
 
         <div>
-          <h2>Produtos</h2>
+
+          <h2>
+            Produtos
+          </h2>
 
           <p>
             Gerencie os produtos do Delivery e das Encomendas.
           </p>
+
         </div>
 
         <div style="
@@ -1725,7 +1966,9 @@
     products
   ) {
     return `
-      <section class="admin-product-section">
+      <section
+        class="admin-product-section"
+      >
 
         <div style="
           display:flex;
@@ -1954,7 +2197,7 @@
   }
 
   /* =========================================================
-     EVENTOS — PRODUTOS
+     EVENTOS PRODUTOS
      ========================================================= */
 
   function bindProductTabEvents() {
@@ -1994,7 +2237,9 @@
     const addClassificationBtn =
       $("#addClassificationBtn");
 
-    if (addClassificationBtn) {
+    if (
+      addClassificationBtn
+    ) {
       addClassificationBtn.addEventListener(
         "click",
         createClassification
@@ -2030,7 +2275,8 @@
                     item.id
                   ) ===
                   String(
-                    button.dataset
+                    button
+                      .dataset
                       .editProduct
                   )
               );
@@ -2092,14 +2338,15 @@
   }
 
   /* =========================================================
-     PEDIDOS
+     PEDIDOS NORMAIS
      ========================================================= */
 
   async function loadOrders() {
-    const possibleTables = [
-      "orders",
-      "pedidos"
-    ];
+    const possibleTables =
+      [
+        "orders",
+        "pedidos"
+      ];
 
     for (
       const table of possibleTables
@@ -2116,11 +2363,14 @@
                   false
               }
             )
-            .limit(100);
+            .limit(200);
 
-        if (!result.error) {
+        if (
+          !result.error
+        ) {
           return (
-            result.data || []
+            result.data ||
+            []
           );
         }
       } catch (_) {}
@@ -2130,17 +2380,22 @@
   }
 
   async function renderOrdersTab() {
-    if (!tabContent) return;
+    if (!tabContent)
+      return;
 
     tabContent.innerHTML = `
       <div class="product-toolbar">
 
         <div>
-          <h2>Pedidos</h2>
+
+          <h2>
+            Pedidos
+          </h2>
 
           <p>
             Pedidos recebidos pelo sistema.
           </p>
+
         </div>
 
       </div>
@@ -2160,7 +2415,8 @@
     const container =
       $("#ordersContainer");
 
-    if (!container) return;
+    if (!container)
+      return;
 
     if (!orders.length) {
       container.innerHTML = `
@@ -2176,22 +2432,23 @@
       orders
         .map(
           (order) => `
-            <article class="admin-order-card">
+            <article
+              class="admin-order-card"
+            >
 
               <strong>
                 Pedido #${escapeHtml(
-                  order.id || ""
+                  order.id ||
+                    ""
                 )}
               </strong>
 
               <p>
-                ${
-                  escapeHtml(
-                    order.customer_name ||
-                      order.name ||
-                      "Cliente"
-                  )
-                }
+                ${escapeHtml(
+                  order.customer_name ||
+                    order.name ||
+                    "Cliente"
+                )}
               </p>
 
               <small>
@@ -2212,19 +2469,8 @@
      ========================================================= */
 
   async function renderCakesTab() {
-    if (!tabContent) return;
-
-    const cake =
-      state.settings.cake ||
-      DEFAULTS.cake ||
-      {};
-
-    const types =
-      Array.isArray(
-        cake.types
-      )
-        ? cake.types
-        : [];
+    if (!tabContent)
+      return;
 
     tabContent.innerHTML = `
       <div class="product-toolbar">
@@ -2236,126 +2482,900 @@
           </h2>
 
           <p>
-            Gerencie os pedidos de bolos personalizados.
+            Consulte os pedidos de bolos personalizados recebidos dos clientes.
           </p>
 
         </div>
 
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="refreshCakeOrdersBtn"
+        >
+          Atualizar pedidos
+        </button>
+
       </div>
 
-      <div class="admin-panel-box">
+      <div id="cakeOrdersContainer">
 
-        <h3>
-          Tipos de bolo
-        </h3>
+        <div class="admin-empty">
+          Carregando pedidos...
+        </div>
 
-        <p style="
-          margin-top:-4px;
-          opacity:.7;
+      </div>
+    `;
+
+    const container =
+      $("#cakeOrdersContainer");
+
+    if (!container)
+      return;
+
+    const possibleTables =
+      [
+        "orders",
+        "pedidos"
+      ];
+
+    let orders = [];
+
+    let loaded =
+      false;
+
+    for (
+      const table of possibleTables
+    ) {
+      try {
+        const result =
+          await db
+            .from(table)
+            .select("*")
+            .order(
+              "created_at",
+              {
+                ascending:
+                  false
+              }
+            )
+            .limit(200);
+
+        if (
+          !result.error
+        ) {
+          orders =
+            Array.isArray(
+              result.data
+            )
+              ? result.data
+              : [];
+
+          loaded =
+            true;
+
+          break;
+        }
+      } catch (error) {
+        console.warn(
+          `Não foi possível consultar a tabela ${table}.`,
+          error
+        );
+      }
+    }
+
+    if (!loaded) {
+      container.innerHTML = `
+        <div class="admin-empty">
+
+          <strong>
+            Nenhum pedido disponível.
+          </strong>
+
+          <p style="margin-top:8px;">
+            Não foi possível carregar os pedidos recebidos.
+          </p>
+
+        </div>
+      `;
+
+      bindCakeOrdersRefresh();
+
+      return;
+    }
+
+    const cakeOrders =
+      orders.filter(
+        (order) => {
+
+          const text =
+            JSON.stringify(
+              order
+            )
+              .normalize(
+                "NFD"
+              )
+              .replace(
+                /[\u0300-\u036f]/g,
+                ""
+              )
+              .toLowerCase();
+
+          return (
+            text.includes(
+              "bolo"
+            ) ||
+            text.includes(
+              "naked"
+            ) ||
+            text.includes(
+              "chantininho"
+            ) ||
+            text.includes(
+              "encomenda"
+            ) ||
+            text.includes(
+              "massa"
+            ) ||
+            text.includes(
+              "recheio"
+            ) ||
+            text.includes(
+              "personalizacao"
+            )
+          );
+        }
+      );
+
+    if (!cakeOrders.length) {
+      container.innerHTML = `
+        <div class="admin-empty">
+
+          <strong>
+            Nenhum pedido de bolo encontrado.
+          </strong>
+
+          <p style="margin-top:8px;">
+            Quando um cliente enviar um pedido de bolo personalizado,
+            ele aparecerá nesta área.
+          </p>
+
+        </div>
+      `;
+
+      bindCakeOrdersRefresh();
+
+      return;
+    }
+
+    container.innerHTML =
+      cakeOrders
+        .map(
+          (
+            order,
+            index
+          ) =>
+            renderCakeOrderCard(
+              order,
+              index
+            )
+        )
+        .join("");
+
+    bindCakeOrdersRefresh();
+  }
+
+  /* =========================================================
+     CARD DO PEDIDO
+     ========================================================= */
+
+  function renderCakeOrderCard(
+    order,
+    index
+  ) {
+    const getValue = (
+      ...keys
+    ) => {
+
+      for (
+        const key of keys
+      ) {
+        if (
+          order[key] !==
+            undefined &&
+          order[key] !==
+            null &&
+          String(
+            order[key]
+          ).trim() !==
+            ""
+        ) {
+          return order[key];
+        }
+      }
+
+      return "";
+    };
+
+    const customerName =
+      getValue(
+        "customer_name",
+        "client_name",
+        "cliente",
+        "nome",
+        "name"
+      ) ||
+      "Não informado";
+
+    const phone =
+      getValue(
+        "customer_phone",
+        "client_phone",
+        "telefone",
+        "phone",
+        "whatsapp"
+      ) ||
+      "Não informado";
+
+    const orderDate =
+      getValue(
+        "created_at",
+        "date",
+        "data"
+      );
+
+    const requestedDate =
+      getValue(
+        "delivery_date",
+        "pickup_date",
+        "event_date",
+        "requested_date",
+        "data_entrega",
+        "data_retirada",
+        "data_evento"
+      );
+
+    const cakeType =
+      getValue(
+        "cake_type",
+        "tipo_bolo",
+        "bolo",
+        "tipo"
+      );
+
+    const size =
+      getValue(
+        "size",
+        "tamanho",
+        "cake_size",
+        "tamanho_bolo"
+      );
+
+    const mass =
+      getValue(
+        "mass",
+        "massa",
+        "cake_mass",
+        "massa_bolo"
+      );
+
+    const filling =
+      getValue(
+        "filling",
+        "recheio",
+        "cake_filling",
+        "recheios"
+      );
+
+    const extras =
+      getValue(
+        "extras",
+        "adicionais",
+        "additional",
+        "adicionais_bolo"
+      );
+
+    const personalization =
+      getValue(
+        "personalization",
+        "personalizacao",
+        "personalisation",
+        "decoracao",
+        "decoração"
+      );
+
+    const brigadeiros =
+      getValue(
+        "brigadeiros",
+        "brigadeiro",
+        "brigadeiros_classicos",
+        "brigadeiros_premium"
+      );
+
+    const kits =
+      getValue(
+        "kits",
+        "kit",
+        "kit_bolo"
+      );
+
+    const otherItems =
+      getValue(
+        "other_items",
+        "outros_itens",
+        "outros",
+        "itens"
+      );
+
+    const notes =
+      getValue(
+        "notes",
+        "observations",
+        "observacoes",
+        "observações",
+        "obs"
+      );
+
+    const total =
+      getValue(
+        "total",
+        "total_price",
+        "valor_total",
+        "valor"
+      );
+
+    const orderId =
+      getValue(
+        "id",
+        "order_id",
+        "pedido_id"
+      ) ||
+      index + 1;
+
+    return `
+      <article
+        class="admin-panel-box cake-order-card"
+        id="cake-order-${escapeHtml(
+          String(
+            orderId
+          )
+        )}"
+        style="
+          margin-bottom:18px;
+          page-break-inside:avoid;
+        "
+      >
+
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:flex-start;
+          gap:16px;
+          flex-wrap:wrap;
+          margin-bottom:18px;
         ">
-          Esta área é destinada às opções utilizadas nos pedidos de bolos personalizados.
-        </p>
+
+          <div>
+
+            <span style="
+              display:inline-block;
+              font-size:12px;
+              font-weight:700;
+              color:#2b7896;
+              margin-bottom:5px;
+            ">
+              PEDIDO DE BOLO
+            </span>
+
+            <h3 style="
+              margin:0;
+            ">
+              ${escapeHtml(
+                String(
+                  customerName
+                )
+              )}
+            </h3>
+
+            <p style="
+              margin:5px 0 0;
+              opacity:.7;
+            ">
+              Pedido #${escapeHtml(
+                String(
+                  orderId
+                )
+              )}
+            </p>
+
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-primary print-cake-order"
+            data-print-order="${escapeHtml(
+              String(
+                orderId
+              )
+            )}"
+          >
+            🖨 Imprimir pedido
+          </button>
+
+        </div>
+
+        <div style="
+          margin-bottom:20px;
+        ">
+
+          <h4>
+            Dados do cliente
+          </h4>
+
+          <div style="
+            display:grid;
+            grid-template-columns:
+              repeat(
+                auto-fit,
+                minmax(220px, 1fr)
+              );
+            gap:10px;
+          ">
+
+            ${renderOrderInfo(
+              "Cliente",
+              customerName
+            )}
+
+            ${renderOrderInfo(
+              "Telefone / WhatsApp",
+              phone
+            )}
+
+            ${renderOrderInfo(
+              "Data do pedido",
+              formatOrderDate(
+                orderDate
+              )
+            )}
+
+            ${renderOrderInfo(
+              "Data desejada",
+              formatOrderDate(
+                requestedDate
+              )
+            )}
+
+          </div>
+
+        </div>
+
+        <div style="
+          margin-bottom:20px;
+        ">
+
+          <h4>
+            Informações do bolo
+          </h4>
+
+          <div style="
+            display:grid;
+            grid-template-columns:
+              repeat(
+                auto-fit,
+                minmax(220px, 1fr)
+              );
+            gap:10px;
+          ">
+
+            ${renderOrderInfo(
+              "Tipo de bolo",
+              cakeType
+            )}
+
+            ${renderOrderInfo(
+              "Tamanho",
+              size
+            )}
+
+            ${renderOrderInfo(
+              "Massa",
+              mass
+            )}
+
+            ${renderOrderInfo(
+              "Recheio",
+              filling
+            )}
+
+            ${renderOrderInfo(
+              "Adicionais",
+              extras
+            )}
+
+            ${renderOrderInfo(
+              "Personalização",
+              personalization
+            )}
+
+          </div>
+
+        </div>
+
+        <div style="
+          margin-bottom:20px;
+        ">
+
+          <h4>
+            Itens solicitados
+          </h4>
+
+          <div style="
+            display:grid;
+            grid-template-columns:
+              repeat(
+                auto-fit,
+                minmax(220px, 1fr)
+              );
+            gap:10px;
+          ">
+
+            ${renderOrderInfo(
+              "Brigadeiros",
+              brigadeiros
+            )}
+
+            ${renderOrderInfo(
+              "Kits",
+              kits
+            )}
+
+            ${renderOrderInfo(
+              "Outros itens",
+              otherItems
+            )}
+
+          </div>
+
+        </div>
 
         ${
-          types.length
+          notes
             ? `
-              <div class="cake-list">
+              <div style="
+                margin-bottom:20px;
+              ">
 
-                ${types
-                  .map(
-                    (item) => `
-                      <div class="cake-item">
+                <h4>
+                  Observações
+                </h4>
 
-                        <span>
-                          ${escapeHtml(
-                            item[0]
-                          )}
-                        </span>
-
-                        <strong>
-                          ${money(
-                            item[1]
-                          )}
-                        </strong>
-
-                      </div>
-                    `
-                  )
-                  .join("")}
+                <div style="
+                  padding:14px;
+                  border:1px solid #e1e8ec;
+                  border-radius:10px;
+                  background:#fff;
+                  white-space:pre-wrap;
+                ">
+                  ${escapeHtml(
+                    String(
+                      notes
+                    )
+                  )}
+                </div>
 
               </div>
             `
-            : `
-              <div class="admin-empty">
-                Nenhum tipo de bolo configurado.
-              </div>
-            `
+            : ""
         }
+
+        ${
+          total !== ""
+            ? `
+              <div style="
+                display:flex;
+                justify-content:flex-end;
+                padding-top:15px;
+                border-top:1px solid #e1e8ec;
+              ">
+
+                <strong style="
+                  font-size:18px;
+                  color:#2b7896;
+                ">
+                  Total:
+                  ${money(
+                    total
+                  )}
+                </strong>
+
+              </div>
+            `
+            : ""
+        }
+
+      </article>
+    `;
+  }
+
+  /* =========================================================
+     INFORMAÇÕES DO PEDIDO
+     ========================================================= */
+
+  function renderOrderInfo(
+    label,
+    value
+  ) {
+    if (
+      value ===
+        undefined ||
+      value ===
+        null ||
+      String(
+        value
+      ).trim() ===
+        ""
+    ) {
+      value =
+        "Não informado";
+    }
+
+    return `
+      <div style="
+        padding:12px;
+        border:1px solid #e1e8ec;
+        border-radius:10px;
+        background:#fff;
+      ">
+
+        <small style="
+          display:block;
+          margin-bottom:4px;
+          color:#71808a;
+          font-weight:700;
+        ">
+          ${escapeHtml(
+            label
+          )}
+        </small>
+
+        <div style="
+          white-space:pre-wrap;
+        ">
+          ${escapeHtml(
+            String(
+              value
+            )
+          )}
+        </div>
 
       </div>
     `;
   }
 
   /* =========================================================
-     RENOMEAR VISUALMENTE A ABA DE BOLOS
+     DATA
      ========================================================= */
 
-  function updateCakesTabLabel() {
-    $$("[data-tab]").forEach(
+  function formatOrderDate(
+    value
+  ) {
+    if (!value) {
+      return "Não informado";
+    }
+
+    const date =
+      new Date(value);
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return String(
+        value
+      );
+    }
+
+    return date.toLocaleString(
+      "pt-BR"
+    );
+  }
+
+  /* =========================================================
+     ATUALIZAR PEDIDOS
+     ========================================================= */
+
+  function bindCakeOrdersRefresh() {
+    const button =
+      $("#refreshCakeOrdersBtn");
+
+    if (
+      button &&
+      !button.dataset.bound
+    ) {
+      button.dataset.bound =
+        "true";
+
+      button.addEventListener(
+        "click",
+        () => {
+          renderCakesTab();
+        }
+      );
+    }
+
+    bindPrintCakeOrders();
+  }
+
+  /* =========================================================
+     IMPRESSÃO
+     ========================================================= */
+
+  function bindPrintCakeOrders() {
+    $$(
+      ".print-cake-order"
+    ).forEach(
       (button) => {
+
         if (
-          button.dataset.tab ===
-          "cakes"
+          button.dataset
+            .bound
         ) {
-          const textNodes =
-            Array.from(
-              button.childNodes
-            ).filter(
-              (node) =>
-                node.nodeType ===
-                Node.TEXT_NODE
+          return;
+        }
+
+        button.dataset.bound =
+          "true";
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            const orderId =
+              button.dataset
+                .printOrder;
+
+            printCakeOrder(
+              orderId
             );
 
-          if (
-            textNodes.length
-          ) {
-            textNodes[
-              textNodes.length - 1
-            ].textContent =
-              " Pedidos de Bolos";
           }
-        }
+        );
       }
     );
+  }
+
+  function printCakeOrder(
+    orderId
+  ) {
+    const original =
+      document.getElementById(
+        `cake-order-${orderId}`
+      );
+
+    if (!original) {
+      toast(
+        "Não foi possível localizar este pedido.",
+        "error"
+      );
+
+      return;
+    }
+
+    const printWindow =
+      window.open(
+        "",
+        "_blank",
+        "width=900,height=700"
+      );
+
+    if (!printWindow) {
+      toast(
+        "O navegador bloqueou a janela de impressão.",
+        "warning"
+      );
+
+      return;
+    }
+
+    printWindow.document.open();
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+
+      <html lang="pt-BR">
+
+      <head>
+
+        <meta charset="UTF-8">
+
+        <title>
+          Pedido de Bolo #${escapeHtml(
+            String(
+              orderId
+            )
+          )} — Martins Confeitaria
+        </title>
+
+        <style>
+
+          * {
+            box-sizing:border-box;
+          }
+
+          body {
+            margin:0;
+            padding:30px;
+            font-family:
+              Arial,
+              Helvetica,
+              sans-serif;
+            color:#263238;
+            background:#fff;
+          }
+
+          h3 {
+            font-size:24px;
+            margin:0;
+          }
+
+          h4 {
+            margin:
+              0 0 10px;
+          }
+
+          button {
+            display:none !important;
+          }
+
+          article {
+            border:none !important;
+            box-shadow:none !important;
+            margin:0 !important;
+            padding:0 !important;
+          }
+
+          @media print {
+
+            body {
+              padding:15mm;
+            }
+
+            .print-cake-order {
+              display:none !important;
+            }
+
+          }
+
+        </style>
+
+      </head>
+
+      <body>
+
+        ${original.outerHTML}
+
+        <script>
+          window.onload = function() {
+            window.print();
+          };
+        <\/script>
+
+      </body>
+
+      </html>
+    `);
+
+    printWindow.document.close();
   }
 
   /* =========================================================
      CONTEÚDO
      ========================================================= */
 
-  async function saveSettingObject() {
-    const { error } =
-      await db
-        .from("settings")
-        .upsert(
-          {
-            key: "site",
-            value:
-              state.settings
-          },
-          {
-            onConflict:
-              "key"
-          }
-        );
-
-    if (error) {
-      throw error;
-    }
-  }
-
   function renderContentTab() {
-    if (!tabContent) return;
+    if (!tabContent)
+      return;
 
     const about =
       state.settings.about ||
@@ -2445,8 +3465,11 @@
     )?.addEventListener(
       "click",
       async () => {
+
         const button =
-          $("#saveContentBtn");
+          $(
+            "#saveContentBtn"
+          );
 
         setLoading(
           button,
@@ -2458,7 +3481,8 @@
           state.settings.about =
             {
               ...(
-                state.settings.about ||
+                state.settings
+                  .about ||
                 {}
               ),
 
@@ -2507,11 +3531,38 @@
   }
 
   /* =========================================================
+     SALVAR CONFIGURAÇÃO
+     ========================================================= */
+
+  async function saveSettingObject() {
+    const {
+      error
+    } =
+      await db
+        .from("settings")
+        .upsert(
+          {
+            key: "site",
+            value:
+              state.settings
+          },
+          {
+            onConflict:
+              "key"
+          }
+        );
+
+    if (error)
+      throw error;
+  }
+
+  /* =========================================================
      HORÁRIOS
      ========================================================= */
 
   function renderHoursTab() {
-    if (!tabContent) return;
+    if (!tabContent)
+      return;
 
     const hours =
       Array.isArray(
@@ -2559,6 +3610,7 @@
               name,
               index
             ) => {
+
               const item =
                 hours[index] ||
                 {
@@ -2656,8 +3708,11 @@
     )?.addEventListener(
       "click",
       async () => {
+
         const button =
-          $("#saveHoursBtn");
+          $(
+            "#saveHoursBtn"
+          );
 
         setLoading(
           button,
@@ -2666,9 +3721,13 @@
         );
 
         try {
+
           const newHours =
             names.map(
-              (_, index) => ({
+              (
+                _,
+                index
+              ) => ({
                 s:
                   $(
                     `[data-hours-status="${index}"]`
@@ -2697,7 +3756,9 @@
           toast(
             "Horários salvos com sucesso."
           );
+
         } catch (error) {
+
           console.error(
             error
           );
@@ -2706,12 +3767,15 @@
             "Não foi possível salvar os horários.",
             "error"
           );
+
         } finally {
+
           setLoading(
             button,
             false,
             "Salvar horários"
           );
+
         }
       }
     );
@@ -2722,7 +3786,8 @@
      ========================================================= */
 
   function renderRulesTab() {
-    if (!tabContent) return;
+    if (!tabContent)
+      return;
 
     const rules =
       state.settings.rules ||
@@ -2779,8 +3844,11 @@
     )?.addEventListener(
       "click",
       async () => {
+
         const button =
-          $("#saveRulesBtn");
+          $(
+            "#saveRulesBtn"
+          );
 
         setLoading(
           button,
@@ -2789,10 +3857,12 @@
         );
 
         try {
+
           state.settings.rules =
             {
               ...(
-                state.settings.rules ||
+                state.settings
+                  .rules ||
                 {}
               ),
 
@@ -2808,7 +3878,9 @@
           toast(
             "Regras salvas com sucesso."
           );
+
         } catch (error) {
+
           console.error(
             error
           );
@@ -2817,12 +3889,15 @@
             "Não foi possível salvar as regras.",
             "error"
           );
+
         } finally {
+
           setLoading(
             button,
             false,
             "Salvar regras"
           );
+
         }
       }
     );
@@ -2833,7 +3908,8 @@
      ========================================================= */
 
   function renderMediaTab() {
-    if (!tabContent) return;
+    if (!tabContent)
+      return;
 
     tabContent.innerHTML = `
       <div class="product-toolbar">
@@ -2881,6 +3957,7 @@
     $$(".sidebar-item, [data-tab]")
       .forEach(
         (element) => {
+
           if (
             element.dataset
               .tab ===
@@ -2894,6 +3971,7 @@
               "active"
             );
           }
+
         }
       );
 
@@ -2958,21 +4036,83 @@
     renderProductTab();
   }
 
-  function bindTabs() {
-    $$("[data-tab]")
-      .forEach(
-        (button) => {
-          button.addEventListener(
-            "click",
-            () => {
-              activateTab(
-                button.dataset
-                  .tab
-              );
-            }
-          );
+  function updateCakesTabLabel() {
+    $$(
+      "[data-tab]"
+    ).forEach(
+      (button) => {
+
+        if (
+          button.dataset
+            .tab ===
+          "cakes"
+        ) {
+
+          const textNodes =
+            Array.from(
+              button.childNodes
+            ).filter(
+              (node) =>
+                node.nodeType ===
+                Node.TEXT_NODE
+            );
+
+          if (
+            textNodes.length
+          ) {
+
+            textNodes[
+              textNodes.length -
+                1
+            ].textContent =
+              " Pedidos de Bolos";
+
+          } else {
+
+            button.appendChild(
+              document.createTextNode(
+                " Pedidos de Bolos"
+              )
+            );
+
+          }
+
         }
-      );
+
+      }
+    );
+  }
+
+  function bindTabs() {
+    $$(
+      "[data-tab]"
+    ).forEach(
+      (button) => {
+
+        if (
+          button.dataset
+            .tabBound
+        ) {
+          return;
+        }
+
+        button.dataset.tabBound =
+          "true";
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            activateTab(
+              button.dataset
+                .tab
+            );
+
+          }
+        );
+
+      }
+    );
 
     updateCakesTabLabel();
   }
@@ -2986,7 +4126,8 @@
   ) {
     event.preventDefault();
 
-    if (!loginForm) return;
+    if (!loginForm)
+      return;
 
     const email =
       $("#loginEmail")
@@ -3002,6 +4143,7 @@
       !email ||
       !password
     ) {
+
       showLoginMessage(
         "Informe e-mail e senha."
       );
@@ -3026,6 +4168,7 @@
     );
 
     try {
+
       const {
         data,
         error
@@ -3037,16 +4180,17 @@
           }
         );
 
-      if (error) {
+      if (error)
         throw error;
-      }
 
       if (
         !data?.session
       ) {
+
         throw new Error(
           "Login realizado, mas a sessão não foi criada."
         );
+
       }
 
       showLoginMessage(
@@ -3055,7 +4199,9 @@
       );
 
       await showApp();
+
     } catch (error) {
+
       console.error(
         error
       );
@@ -3064,22 +4210,29 @@
         error.message ||
           "Não foi possível entrar."
       );
+
     } finally {
+
       setLoading(
         submitButton,
         false,
         "Entrar"
       );
+
     }
   }
 
   async function handleLogout() {
     try {
+
       await db.auth.signOut();
+
     } catch (error) {
+
       console.error(
         error
       );
+
     }
 
     showLogin();
@@ -3087,44 +4240,53 @@
 
   function showLogin() {
     if (loginScreen) {
+
       loginScreen.classList.remove(
         "hidden"
       );
 
       loginScreen.style.display =
         "";
+
     }
 
     if (app) {
+
       app.classList.add(
         "hidden"
       );
 
       app.style.display =
         "";
+
     }
   }
 
   async function showApp() {
     if (loginScreen) {
+
       loginScreen.classList.add(
         "hidden"
       );
 
       loginScreen.style.display =
         "none";
+
     }
 
     if (app) {
+
       app.classList.remove(
         "hidden"
       );
 
       app.style.display =
         "";
+
     }
 
     try {
+
       await loadSettings();
 
       await loadProducts();
@@ -3137,7 +4299,9 @@
         state.activeTab ||
           "products"
       );
+
     } catch (error) {
+
       console.error(
         error
       );
@@ -3150,11 +4314,12 @@
           ),
         "error"
       );
+
     }
   }
 
   /* =========================================================
-     REFRESH
+     ATUALIZAR PAINEL
      ========================================================= */
 
   async function refreshAdmin() {
@@ -3163,14 +4328,17 @@
       "Atualizar";
 
     if (refreshBtn) {
+
       refreshBtn.disabled =
         true;
 
       refreshBtn.textContent =
         "Atualizando...";
+
     }
 
     try {
+
       await loadSettings();
 
       await loadProducts();
@@ -3185,7 +4353,9 @@
       toast(
         "Painel atualizado."
       );
+
     } catch (error) {
+
       console.error(
         error
       );
@@ -3194,33 +4364,41 @@
         "Não foi possível atualizar o painel.",
         "error"
       );
+
     } finally {
+
       if (refreshBtn) {
+
         refreshBtn.disabled =
           false;
 
         refreshBtn.textContent =
           oldText;
+
       }
+
     }
   }
 
   /* =========================================================
-     MODAL — EVENTOS
+     MODAL
      ========================================================= */
 
   function bindModalEvents() {
-    if (!productModal) return;
+    if (!productModal)
+      return;
 
     productModal.addEventListener(
       "click",
       (event) => {
+
         if (
           event.target ===
           productModal
         ) {
           closeProductModal();
         }
+
       }
     );
 
@@ -3231,32 +4409,13 @@
 
     closeButtons.forEach(
       (button) => {
+
         button.addEventListener(
           "click",
           closeProductModal
         );
+
       }
-    );
-  }
-
-  /* =========================================================
-     GARANTIR CAMPOS DO FORMULÁRIO
-     ========================================================= */
-
-  function normalizeExistingProductAreaField() {
-    const area =
-      getField(
-        "productArea"
-      );
-
-    if (!area) return;
-
-    const current =
-      area.value ||
-      "cardapio";
-
-    populateAreaSelect(
-      current
     );
   }
 
@@ -3265,6 +4424,7 @@
      ========================================================= */
 
   async function init() {
+
     console.log(
       "Martins Admin — versão atualizada"
     );
@@ -3272,6 +4432,7 @@
     if (
       !window.supabase
     ) {
+
       console.error(
         "Supabase JS não foi carregado."
       );
@@ -3285,34 +4446,40 @@
 
     ensureProductFormFields();
 
-    normalizeExistingProductAreaField();
-
     if (loginForm) {
+
       loginForm.addEventListener(
         "submit",
         handleLogin
       );
+
     }
 
     if (logoutBtn) {
+
       logoutBtn.addEventListener(
         "click",
         handleLogout
       );
+
     }
 
     if (refreshBtn) {
+
       refreshBtn.addEventListener(
         "click",
         refreshAdmin
       );
+
     }
 
     if (productForm) {
+
       productForm.addEventListener(
         "submit",
         saveProduct
       );
+
     }
 
     bindModalEvents();
@@ -3325,9 +4492,13 @@
       await db.auth.getSession();
 
     if (session) {
+
       await showApp();
+
     } else {
+
       showLogin();
+
     }
 
     db.auth.onAuthStateChange(
@@ -3335,20 +4506,26 @@
         event,
         session
       ) => {
+
         if (
           event ===
             "SIGNED_IN" &&
           session
         ) {
+
           await showApp();
+
         }
 
         if (
           event ===
           "SIGNED_OUT"
         ) {
+
           showLogin();
+
         }
+
       }
     );
   }
@@ -3361,12 +4538,16 @@
     document.readyState ===
     "loading"
   ) {
+
     document.addEventListener(
       "DOMContentLoaded",
       init
     );
+
   } else {
+
     init();
+
   }
 
 })();
