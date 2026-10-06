@@ -510,15 +510,6 @@
       await client
         .from('products')
         .select('*')
-        .in(
-          'area',
-          [
-            'pronta',
-            'pronta-entrega',
-            'ready',
-            'delivery'
-          ]
-        )
         .order(
           'sort',
           {
@@ -551,7 +542,21 @@
 
     products =
       Array.isArray(data)
-        ? data
+        ? data.filter(p => {
+            const area =
+              String(p.area || '')
+                .trim()
+                .toLowerCase()
+                .replace(/_/g, '-')
+                .replace(/\s+/g, '-');
+
+            return [
+              'pronta',
+              'pronta-entrega',
+              'ready',
+              'delivery'
+            ].includes(area);
+          })
         : [];
 
 
