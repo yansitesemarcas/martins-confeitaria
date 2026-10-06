@@ -45,7 +45,9 @@
     document.querySelector(selector);
 
   const $$ = (selector) =>
-    Array.from(document.querySelectorAll(selector));
+    Array.from(
+      document.querySelectorAll(selector)
+    );
 
   const loginScreen = $("#loginScreen");
   const app = $("#app");
@@ -90,7 +92,10 @@
       .replace(/-+/g, "-");
   }
 
-  function toast(message, type = "success") {
+  function toast(
+    message,
+    type = "success"
+  ) {
     let box = $("#adminToast");
 
     if (!box) {
@@ -106,7 +111,8 @@
         borderRadius: "12px",
         color: "#fff",
         fontWeight: "700",
-        boxShadow: "0 8px 30px rgba(0,0,0,.18)",
+        boxShadow:
+          "0 8px 30px rgba(0,0,0,.18)",
         maxWidth: "360px",
         fontSize: "14px"
       });
@@ -131,12 +137,18 @@
     }, 3500);
   }
 
-  function showLoginMessage(message, error = true) {
+  function showLoginMessage(
+    message,
+    error = true
+  ) {
     if (!loginMsg) return;
 
     loginMsg.textContent = message;
+
     loginMsg.style.color =
-      error ? "#c0392b" : "#2b7896";
+      error
+        ? "#c0392b"
+        : "#2b7896";
   }
 
   function setLoading(
@@ -148,12 +160,15 @@
 
     if (loading) {
       button.dataset.originalText =
-        button.textContent || originalText;
+        button.textContent ||
+        originalText;
 
       button.disabled = true;
-      button.textContent = "Salvando...";
+      button.textContent =
+        "Salvando...";
     } else {
       button.disabled = false;
+
       button.textContent =
         button.dataset.originalText ||
         originalText;
@@ -193,7 +208,9 @@
      ========================================================= */
 
   function defaultCategories() {
-    return Array.isArray(DEFAULTS.categories)
+    return Array.isArray(
+      DEFAULTS.categories
+    )
       ? [...DEFAULTS.categories]
       : [
           "Bolos no Pote",
@@ -207,7 +224,9 @@
         ];
   }
 
-  function normalizeCategories(categories) {
+  function normalizeCategories(
+    categories
+  ) {
     if (!Array.isArray(categories)) {
       return defaultCategories();
     }
@@ -232,20 +251,22 @@
 
     const payload = {
       ...state.settings,
-      categories: state.categories
+      categories:
+        state.categories
     };
 
-    const { error } = await db
-      .from("settings")
-      .upsert(
-        {
-          key: "site",
-          value: payload
-        },
-        {
-          onConflict: "key"
-        }
-      );
+    const { error } =
+      await db
+        .from("settings")
+        .upsert(
+          {
+            key: "site",
+            value: payload
+          },
+          {
+            onConflict: "key"
+          }
+        );
 
     if (error) {
       console.error(error);
@@ -262,7 +283,8 @@
 
     if (name === null) return;
 
-    const cleanName = name.trim();
+    const cleanName =
+      name.trim();
 
     if (!cleanName) {
       toast(
@@ -287,10 +309,16 @@
       return;
     }
 
-    state.categories.push(cleanName);
+    state.categories.push(
+      cleanName
+    );
 
-    state.categories.sort((a, b) =>
-      a.localeCompare(b, "pt-BR")
+    state.categories.sort(
+      (a, b) =>
+        a.localeCompare(
+          b,
+          "pt-BR"
+        )
     );
 
     try {
@@ -301,8 +329,6 @@
         "Classificação criada com sucesso."
       );
     } catch (error) {
-      console.error(error);
-
       state.categories =
         state.categories.filter(
           (category) =>
@@ -310,68 +336,25 @@
         );
 
       toast(
-        "Não foi possível salvar a classificação.",
+        "Não foi possível salvar a classificação: " +
+          (error.message ||
+            "erro desconhecido"),
         "error"
       );
     }
   }
 
-  /* =========================================================
-     ÁREAS DOS PRODUTOS
-     ========================================================= */
-
-  function normalizeArea(area, product = {}) {
-    const value = String(area || "")
-      .toLowerCase()
-      .trim();
-
-    if (
-      value === "encomendas" ||
-      value === "encomenda"
-    ) {
-      return "encomendas";
-    }
-
-    const name = String(product.name || "")
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .trim();
-
-    if (
-      name.includes("naked cake") ||
-      name.includes("chantininho")
-    ) {
-      return "encomendas";
-    }
-
-    if (
-      name.includes("oreo") ||
-      name.includes("kit kat") ||
-      name.includes("kitkat") ||
-      name.includes("nutella") ||
-      name.includes("kinder bueno")
-    ) {
-      return "encomendas";
-    }
-
-    if (
-      name.includes("brigadeiro classico") ||
-      name.includes("brigadeiros classicos") ||
-      name.includes("brigadeiro premium") ||
-      name.includes("brigadeiros premium")
-    ) {
-      return "encomendas";
-    }
-
-    return "cardapio";
-  }
-    async function deleteClassification(name) {
-    const used = state.products.some(
-      (product) =>
-        String(product.category || "").trim() ===
-        String(name).trim()
-    );
+  async function deleteClassification(
+    name
+  ) {
+    const used =
+      state.products.some(
+        (product) =>
+          String(
+            product.category || ""
+          ).trim() ===
+          String(name).trim()
+      );
 
     if (used) {
       toast(
@@ -381,9 +364,10 @@
       return;
     }
 
-    const confirmed = window.confirm(
-      `Excluir a classificação "${name}"?`
-    );
+    const confirmed =
+      window.confirm(
+        `Excluir a classificação "${name}"?`
+      );
 
     if (!confirmed) return;
 
@@ -401,9 +385,12 @@
       await saveCategories();
       renderProductTab();
 
-      toast("Classificação excluída.");
+      toast(
+        "Classificação excluída."
+      );
     } catch (error) {
-      state.categories = oldCategories;
+      state.categories =
+        oldCategories;
 
       toast(
         "Não foi possível excluir a classificação.",
@@ -416,10 +403,14 @@
      NORMALIZAÇÃO DA ÁREA
      ========================================================= */
 
-  function normalizeArea(area, product = {}) {
-    const value = String(area || "")
-      .toLowerCase()
-      .trim();
+  function normalizeArea(
+    area,
+    product = {}
+  ) {
+    const value =
+      String(area || "")
+        .toLowerCase()
+        .trim();
 
     if (
       value === "encomendas" ||
@@ -428,11 +419,15 @@
       return "encomendas";
     }
 
-    const name = String(product.name || "")
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .trim();
+    const name =
+      String(product.name || "")
+        .normalize("NFD")
+        .replace(
+          /[\u0300-\u036f]/g,
+          ""
+        )
+        .toLowerCase()
+        .trim();
 
     if (
       name.includes("naked cake") ||
@@ -452,10 +447,18 @@
     }
 
     if (
-      name.includes("brigadeiro classico") ||
-      name.includes("brigadeiros classicos") ||
-      name.includes("brigadeiro premium") ||
-      name.includes("brigadeiros premium")
+      name.includes(
+        "brigadeiro classico"
+      ) ||
+      name.includes(
+        "brigadeiros classicos"
+      ) ||
+      name.includes(
+        "brigadeiro premium"
+      ) ||
+      name.includes(
+        "brigadeiros premium"
+      )
     ) {
       return "encomendas";
     }
@@ -464,12 +467,15 @@
   }
 
   function areaLabel(area) {
-    return normalizeArea(area) === "encomendas"
+    return normalizeArea(area) ===
+      "encomendas"
       ? "Encomendas"
       : "Delivery";
   }
 
-  function getProductImage(product) {
+  function getProductImage(
+    product
+  ) {
     return (
       product.image_url ||
       product.image ||
@@ -492,11 +498,12 @@
       );
     }
 
-    const { data, error } = await db
-      .from("settings")
-      .select("*")
-      .eq("key", "site")
-      .maybeSingle();
+    const { data, error } =
+      await db
+        .from("settings")
+        .select("*")
+        .eq("key", "site")
+        .maybeSingle();
 
     if (error) {
       console.error(
@@ -516,7 +523,8 @@
       return;
     }
 
-    const value = data?.value || {};
+    const value =
+      data?.value || {};
 
     state.settings = {
       ...DEFAULTS,
@@ -543,67 +551,42 @@
       );
     }
 
-    const { data, error } = await db
-      .from("products")
-      .select("*")
-      .order("sort", {
-        ascending: true,
-        nullsFirst: false
-      });
-
-    if (error) {
+    const { data, error } =
+      await db
+        .from("products")
+        .select("*")
+        .order("sort", {
+          ascending: true
+        });
+         if (error) {
       console.error(
-        "Erro produtos:",
+        "Erro products:",
         error
       );
 
-      throw error;
+      state.products = [];
+
+      return;
     }
 
     state.products =
       Array.isArray(data)
-        ? data.map((product) => ({
-            ...product,
-            area: normalizeArea(
-              product.area,
-              product
-            )
-          }))
+        ? data
         : [];
+
+    state.products =
+      state.products.map(
+        (product) => ({
+          ...product,
+          area: normalizeArea(
+            product.area,
+            product
+          )
+        })
+      );
   }
 
-  /* =========================================================
-     ESTATÍSTICAS
-     ========================================================= */
-
   function updateStats() {
-    const total =
-      state.products.length;
-
-    const available =
-      state.products.filter(
-        (product) =>
-          product.available !== false
-      ).length;
-
-    const delivery =
-      state.products.filter(
-        (product) =>
-          normalizeArea(
-            product.area,
-            product
-          ) === "cardapio"
-      ).length;
-
-    const encomendas =
-      state.products.filter(
-        (product) =>
-          normalizeArea(
-            product.area,
-            product
-          ) === "encomendas"
-      ).length;
-
     const statProducts =
       $("#statProducts");
 
@@ -616,302 +599,300 @@
     const statCakes =
       $("#statCakes");
 
-    if (statProducts)
-      statProducts.textContent = total;
+    if (statProducts) {
+      statProducts.textContent =
+        state.products.length;
+    }
 
-    if (statAvailable)
-      statAvailable.textContent = available;
+    if (statAvailable) {
+      statAvailable.textContent =
+        state.products.filter(
+          (product) =>
+            product.available !==
+              false &&
+            product.available !==
+              "false"
+        ).length;
+    }
 
-    if (statOrders)
-      statOrders.textContent = encomendas;
+    if (statOrders) {
+      statOrders.textContent =
+        "—";
+    }
 
-    if (statCakes)
-      statCakes.textContent = delivery;
+    if (statCakes) {
+      statCakes.textContent =
+        "—";
+    }
   }
 
   /* =========================================================
-     CAMPOS
+     CAMPOS DO PRODUTO
      ========================================================= */
-
-  function getField(id) {
-    return document.getElementById(id);
-  }
-
-  function setField(id, value) {
-    const field = getField(id);
-
-    if (!field) return;
-
-    if (field.type === "checkbox") {
-      field.checked = Boolean(value);
-    } else {
-      field.value = value ?? "";
-    }
-  }
-    function getFieldValue(id) {
-    const field = getField(id);
-
-    if (!field) return "";
-
-    if (field.type === "checkbox") {
-      return field.checked;
-    }
-
-    return field.value;
-  }
-
-  function populateClassificationSelect(
-    selected = ""
-  ) {
-    const select =
-      getField("productCategory");
-
-    if (!select) return;
-
-    const categories =
-      normalizeCategories([
-        ...state.categories,
-        selected
-      ]);
-
-    select.innerHTML = `
-      <option value="">
-        Selecione uma classificação
-      </option>
-
-      ${categories
-        .map(
-          (category) => `
-            <option value="${escapeHtml(
-              category
-            )}">
-              ${escapeHtml(
-                category
-              )}
-            </option>
-          `
-        )
-        .join("")}
-    `;
-
-    select.value = selected || "";
-  }
-
-  function populateAreaSelect(
-    selected = "cardapio"
-  ) {
-    const select =
-      getField("productArea");
-
-    if (!select) return;
-
-    const normalized =
-      normalizeArea(selected);
-
-    select.innerHTML = `
-      <option value="cardapio">
-        Delivery
-      </option>
-
-      <option value="encomendas">
-        Encomendas
-      </option>
-    `;
-
-    select.value = normalized;
-  }
 
   function ensureProductFormFields() {
-    if (!productForm) return;
+    const area =
+      $("#productArea");
 
-    if (!getField("productCategory")) {
-      const areaField =
-        getField("productArea")?.closest(
-          ".field"
-        ) ||
-        getField("productArea")?.parentElement;
+    if (area) {
+      const current =
+        area.value;
 
-      if (areaField) {
-        const wrapper =
-          document.createElement("div");
+      const hasDelivery =
+        Array.from(
+          area.options
+        ).some(
+          (option) =>
+            option.value ===
+            "cardapio"
+        );
 
-        wrapper.className = "field";
+      const hasPronta =
+        Array.from(
+          area.options
+        ).some(
+          (option) =>
+            option.value ===
+            "pronta-entrega"
+        );
 
-        wrapper.innerHTML = `
-          <label for="productCategory">
-            Classificação
-          </label>
+      const hasEncomendas =
+        Array.from(
+          area.options
+        ).some(
+          (option) =>
+            option.value ===
+            "encomendas"
+        );
 
-          <div style="
-            display:flex;
-            gap:8px;
-            align-items:center;
-          ">
-
-            <select
-              id="productCategory"
-              name="category"
-              style="flex:1"
-            ></select>
-
-            <button
-              type="button"
-              class="btn btn-secondary"
-              id="newClassificationBtn"
-              style="white-space:nowrap"
-            >
-              + Nova
-            </button>
-
-          </div>
-
-          <small style="
-            display:block;
-            margin-top:6px;
-            opacity:.7;
-          ">
-            Ex.: Bolo, Brownie, Sobremesa...
-          </small>
-        `;
-
-        areaField.parentNode.insertBefore(
-          wrapper,
-          areaField
+      if (!hasDelivery) {
+        area.insertAdjacentHTML(
+          "beforeend",
+          `
+            <option value="cardapio">
+              Delivery
+            </option>
+          `
         );
       }
+
+      if (!hasPronta) {
+        area.insertAdjacentHTML(
+          "beforeend",
+          `
+            <option value="pronta-entrega">
+              Pronta entrega
+            </option>
+          `
+        );
+      }
+
+      if (!hasEncomendas) {
+        area.insertAdjacentHTML(
+          "beforeend",
+          `
+            <option value="encomendas">
+              Encomendas
+            </option>
+          `
+        );
+      }
+
+      if (current) {
+        area.value = current;
+      }
     }
-
-    if (getField("productArea")) {
-      populateAreaSelect(
-        getFieldValue(
-          "productArea"
-        ) || "cardapio"
-      );
-    }
-
-    const newClassificationBtn =
-      $("#newClassificationBtn");
-
-    if (
-      newClassificationBtn &&
-      !newClassificationBtn.dataset.bound
-    ) {
-      newClassificationBtn.dataset.bound =
-        "true";
-
-      newClassificationBtn.addEventListener(
-        "click",
-        async () => {
-          await createClassification();
-        }
-      );
-    }
-
-    populateClassificationSelect(
-      getFieldValue(
-        "productCategory"
-      )
-    );
   }
 
-  /* =========================================================
-     MODAL PRODUTO
-     ========================================================= */
+  function getProductFormData() {
+    const name =
+      $("#productName")?.value
+        ?.trim() || "";
 
-  function openProductModal(product = null) {
-    if (!productModal || !productForm) {
-      return;
+    const area =
+      $("#productArea")?.value ||
+      "cardapio";
+
+    const category =
+      $("#productCategory")?.value
+        ?.trim() || "";
+
+    const price =
+      Number(
+        $("#productPrice")?.value ||
+          0
+      );
+
+    const discount =
+      Number(
+        $("#productDiscount")?.value ||
+          0
+      );
+
+    const sort =
+      Number(
+        $("#productSort")?.value ||
+          0
+      );
+
+    const gramatura =
+      $("#productGramatura")?.value
+        ?.trim() || "";
+
+    const serveAte =
+      $("#productServeAte")?.value
+        ?.trim() || "";
+
+    const description =
+      $("#productDescription")?.value
+        ?.trim() || "";
+
+    const available =
+      $("#productAvailable")?.checked ??
+      true;
+
+    const featured =
+      $("#productFeatured")?.checked ??
+      false;
+
+    const appointment =
+      $("#productAppointment")?.checked ??
+      false;
+
+    return {
+      name,
+      area,
+      category,
+      price,
+      discount,
+      sort,
+      gramatura,
+      serve_ate: serveAte,
+      description,
+      available,
+      featured,
+      appointment
+    };
+  }
+
+  function fillProductForm(
+    product
+  ) {
+    if (!product) return;
+
+    $("#productName").value =
+      product.name || "";
+
+    $("#productArea").value =
+      normalizeArea(
+        product.area,
+        product
+      );
+
+    $("#productCategory").value =
+      product.category || "";
+
+    $("#productPrice").value =
+      product.price ?? "";
+
+    $("#productDiscount").value =
+      product.discount ?? "";
+
+    $("#productSort").value =
+      product.sort ?? 0;
+
+    $("#productGramatura").value =
+      product.gramatura || "";
+
+    $("#productServeAte").value =
+      product.serve_ate || "";
+
+    $("#productDescription").value =
+      product.description || "";
+
+    $("#productAvailable").checked =
+      product.available !== false;
+
+    $("#productFeatured").checked =
+      product.featured === true;
+
+    $("#productAppointment").checked =
+      product.appointment === true;
+
+    const image =
+      getProductImage(product);
+
+    const preview =
+      $("#photoPreview");
+
+    if (preview) {
+      if (image) {
+        preview.innerHTML = `
+          <img
+            src="${escapeHtml(image)}"
+            alt="${escapeHtml(
+              product.name || ""
+            )}"
+          >
+        `;
+      } else {
+        preview.innerHTML =
+          "Nenhuma imagem";
+      }
     }
+  }
 
-    /*
-      IMPORTANTE:
-      Quando editamos, guardamos o ID numérico existente.
-      Quando criamos, fica null.
-    */
-    state.editingProductId =
-      product?.id || null;
-
-    ensureProductFormFields();
+  function clearProductForm() {
+    if (!productForm) return;
 
     productForm.reset();
 
-    setField(
-      "productName",
-      product?.name || ""
-    );
-
-    setField(
-      "productPrice",
-      product?.price ?? ""
-    );
-
-    setField(
-      "productDiscount",
-      product?.discount_percent ?? ""
-    );
-
-    setField(
-      "productSort",
-      product?.sort ?? ""
-    );
-
-    setField(
-      "productGramatura",
-      product?.gramatura ?? ""
-    );
-
-    setField(
-      "productServeAte",
-      product?.serve_ate ?? ""
-    );
-
-    setField(
-      "productDescription",
-      product?.description ?? ""
-    );
-
-    setField(
-      "productAvailable",
-      product
-        ? product.available !== false
-        : true
-    );
-
-    setField(
-      "productFeatured",
-      product?.featured ?? false
-    );
-
-    setField(
-      "productAppointment",
-      product?.appointment_required ?? false
-    );
-
-    populateClassificationSelect(
-      product?.category || ""
-    );
-
-    populateAreaSelect(
-      normalizeArea(
-        product?.area,
-        product || {}
-      )
-    );
+    state.editingProductId =
+      null;
 
     const title =
-      productModal.querySelector(
-        ".modal-title, h2, h3"
-      );
+      $("#productModalTitle");
 
     if (title) {
       title.textContent =
-        product
-          ? "Editar produto"
-          : "Novo produto";
+        "Novo produto";
     }
 
-    productModal.classList.remove(
-      "hidden"
+    const preview =
+      $("#photoPreview");
+
+    if (preview) {
+      preview.innerHTML =
+        "Nenhuma imagem";
+    }
+
+    ensureProductFormFields();
+  }
+
+  function openProductModal(
+    product = null
+  ) {
+    if (!productModal) return;
+
+    clearProductForm();
+
+    if (product) {
+      state.editingProductId =
+        product.id;
+
+      const title =
+        $("#productModalTitle");
+
+      if (title) {
+        title.textContent =
+          "Editar produto";
+      }
+
+      fillProductForm(product);
+    }
+
+    productModal.classList.add(
+      "open"
     );
 
     productModal.style.display =
@@ -921,135 +902,25 @@
   function closeProductModal() {
     if (!productModal) return;
 
-    productModal.classList.add(
-      "hidden"
+    productModal.classList.remove(
+      "open"
     );
 
-    productModal.style.display = "";
+    productModal.style.display =
+      "none";
 
-    state.editingProductId = null;
+    state.editingProductId =
+      null;
   }
 
   /* =========================================================
-     COMPRESSÃO DE IMAGEM
+     PRODUTOS — SALVAR
      ========================================================= */
 
-  function compressImage(file) {
-    return new Promise(
-      (resolve, reject) => {
-        if (!file) {
-          resolve("");
-          return;
-        }
-
-        if (
-          !file.type.startsWith("image/")
-        ) {
-          reject(
-            new Error(
-              "O arquivo selecionado não é uma imagem."
-            )
-          );
-
-          return;
-        }
-
-        const reader =
-          new FileReader();
-
-        reader.onload = () => {
-          const img =
-            new Image();
-
-          img.onload = () => {
-            const maxSize = 1200;
-
-            let width =
-              img.width;
-
-            let height =
-              img.height;
-
-            if (
-              width > maxSize ||
-              height > maxSize
-            ) {
-              const ratio =
-                Math.min(
-                  maxSize / width,
-                  maxSize / height
-                );
-
-              width =
-                Math.round(
-                  width * ratio
-                );
-
-              height =
-                Math.round(
-                  height * ratio
-                );
-            }
-
-            const canvas =
-              document.createElement(
-                "canvas"
-              );
-
-            canvas.width = width;
-            canvas.height = height;
-
-            const ctx =
-              canvas.getContext(
-                "2d"
-              );
-
-            ctx.drawImage(
-              img,
-              0,
-              0,
-              width,
-              height
-            );
-
-            resolve(
-              canvas.toDataURL(
-                "image/jpeg",
-                0.82
-              )
-            );
-          };
-
-          img.onerror = () =>
-            reject(
-              new Error(
-                "Não foi possível carregar a imagem."
-              )
-            );
-
-          img.src =
-            reader.result;
-        };
-
-        reader.onerror = () =>
-          reject(
-            new Error(
-              "Não foi possível ler a imagem."
-            )
-          );
-
-        reader.readAsDataURL(file);
-      }
-    );
-  }
-    /* =========================================================
-     SALVAR PRODUTO
-     ========================================================= */
-
-  async function saveProduct(event) {
-    event.preventDefault();
-
-    if (!productForm) return;
+  async function saveProduct(
+    event
+  ) {
+    event?.preventDefault();
 
     if (!db) {
       toast(
@@ -1059,355 +930,221 @@
       return;
     }
 
-    const submitButton =
-      productForm.querySelector(
+    const button =
+      productForm?.querySelector(
         'button[type="submit"]'
       );
 
     setLoading(
-      submitButton,
+      button,
       true,
       "Salvar produto"
     );
 
     try {
-      /*
-        editingId:
-        - null = produto novo
-        - número = produto existente
-      */
-      const editingId =
-        state.editingProductId;
+      const formData =
+        getProductFormData();
 
-      const name =
-        String(
-          getFieldValue(
-            "productName"
-          ) || ""
-        ).trim();
-
-      if (!name) {
+      if (!formData.name) {
         throw new Error(
           "Informe o nome do produto."
         );
       }
 
-      const category =
-        String(
-          getFieldValue(
-            "productCategory"
-          ) || ""
-        ).trim();
-
-      if (!category) {
+      if (!formData.category) {
         throw new Error(
-          "Selecione uma classificação."
+          "Informe a categoria do produto."
         );
       }
-
-      const area =
-        normalizeArea(
-          getFieldValue(
-            "productArea"
-          ),
-          {
-            name
-          }
-        );
-
-      const priceValue =
-        getFieldValue(
-          "productPrice"
-        );
-
-      const price =
-        priceValue === ""
-          ? 0
-          : Number(
-              String(priceValue).replace(
-                ",",
-                "."
-              )
-            );
-
-      if (Number.isNaN(price)) {
-        throw new Error(
-          "Informe um preço válido."
-        );
-      }
-
-      const discountValue =
-        getFieldValue(
-          "productDiscount"
-        );
-
-      const discount =
-        discountValue === ""
-          ? 0
-          : Number(
-              String(
-                discountValue
-              ).replace(
-                ",",
-                "."
-              )
-            );
-
-      const sortValue =
-        getFieldValue(
-          "productSort"
-        );
-
-      const sort =
-        sortValue === ""
-          ? 0
-          : Number(sortValue);
-
-      const file =
-        getField(
-          "productPhoto"
-        )?.files?.[0];
-
-      let imageUrl = "";
-
-      if (file) {
-        imageUrl =
-          await compressImage(file);
-      }
-
-      /*
-        Procura o produto original quando estamos editando.
-      */
-      const currentProduct =
-        state.products.find(
-          (product) =>
-            String(product.id) ===
-            String(editingId)
-        );
-
-      if (
-        !imageUrl &&
-        currentProduct
-      ) {
-        imageUrl =
-          getProductImage(
-            currentProduct
-          );
-      }
-
-      /*
-        ======================================================
-        CORREÇÃO PRINCIPAL
-        ======================================================
-
-        NÃO criamos mais um ID como:
-        "brigadeiro-1791250127782"
-
-        A coluna products.id é BIGINT.
-
-        Produto novo:
-        -> NÃO enviamos id.
-        -> Supabase gera o ID numérico.
-
-        Produto existente:
-        -> enviamos somente o ID numérico existente.
-      */
 
       const payload = {
-        name,
-
-        price,
-
-        category,
-
-        area,
-
-        discount_percent:
-          Number.isFinite(discount)
-            ? discount
-            : 0,
-
-        sort:
-          Number.isFinite(sort)
-            ? sort
-            : 0,
-
+        name: formData.name,
+        area: formData.area,
+        category:
+          formData.category,
+        price: formData.price,
+        discount:
+          formData.discount,
+        sort: formData.sort,
         gramatura:
-          getFieldValue(
-            "productGramatura"
-          ),
-
+          formData.gramatura,
         serve_ate:
-          getFieldValue(
-            "productServeAte"
-          ),
-
+          formData.serve_ate,
         description:
-          getFieldValue(
-            "productDescription"
-          ),
-
+          formData.description,
         available:
-          Boolean(
-            getFieldValue(
-              "productAvailable"
-            )
-          ),
-
+          formData.available,
         featured:
-          Boolean(
-            getFieldValue(
-              "productFeatured"
-            )
-          ),
-
-        appointment_required:
-          Boolean(
-            getFieldValue(
-              "productAppointment"
-            )
-          ),
-
-        image_url:
-          imageUrl || null
+          formData.featured,
+        appointment:
+          formData.appointment
       };
 
-      let response;
+      const file =
+        $("#productPhoto")?.files?.[0];
 
-      if (editingId) {
-        response = await db
+      if (file) {
+        const extension =
+          file.name
+            .split(".")
+            .pop()
+            ?.toLowerCase() ||
+          "jpg";
+
+        const fileName =
+          `${Date.now()}-${slugify(
+            formData.name
+          )}.${extension}`;
+
+        const filePath =
+          `products/${fileName}`;
+
+        const {
+          error:
+            uploadError
+        } = await db.storage
+          .from("images")
+          .upload(
+            filePath,
+            file,
+            {
+              upsert: true
+            }
+          );
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const {
+          data:
+            publicUrlData
+        } = db.storage
+          .from("images")
+          .getPublicUrl(
+            filePath
+          );
+
+        payload.image_url =
+          publicUrlData?.publicUrl ||
+          "";
+      }
+
+      const editingId =
+        state.editingProductId;
+
+      if (editingId !== null &&
+          editingId !== undefined &&
+          editingId !== "") {
+
+        const numericId =
+          Number(editingId);
+
+        const {
+          error
+        } = await db
           .from("products")
           .update(payload)
-          .eq("id", editingId)
-          .select()
-          .single();
-      } else {
-        response = await db
-          .from("products")
-          .insert(payload)
-          .select()
-          .single();
-      }
-
-      if (response.error) {
-        console.error(
-          "Erro ao salvar produto:",
-          response.error
-        );
-
-        throw response.error;
-      }
-
-      const savedProduct =
-        response.data;
-
-      if (editingId) {
-        state.products =
-          state.products.map(
-            (product) =>
-              String(product.id) ===
-              String(editingId)
-                ? {
-                    ...savedProduct,
-                    area: normalizeArea(
-                      savedProduct.area,
-                      savedProduct
-                    )
-                  }
-                : product
-          );
-      } else {
-        state.products.push({
-          ...savedProduct,
-          area: normalizeArea(
-            savedProduct.area,
-            savedProduct
-          )
-        });
-      }
-
-      closeProductModal();
-
-      renderProductTab();
-
-      updateStats();
-
-      toast(
-        editingId
-          ? "Produto atualizado com sucesso."
-          : "Produto criado com sucesso."
-      );
-    } catch (error) {
-      console.error(error);
-
-      toast(
-        error?.message ||
-          "Não foi possível salvar o produto.",
-        "error"
-      );
-    } finally {
-      setLoading(
-        submitButton,
-        false,
-        "Salvar produto"
-      );
-    }
-  }
-    /* =========================================================
-     EXCLUIR PRODUTO
-     ========================================================= */
-
-  async function deleteProduct(id) {
-    if (!db) {
-      toast(
-        "Supabase não está disponível.",
-        "error"
-      );
-      return;
-    }
-
-    const product =
-      state.products.find(
-        (item) =>
-          String(item.id) ===
-          String(id)
-      );
-
-    if (!product) return;
-
-    const confirmed =
-      window.confirm(
-        `Excluir "${product.name}"?`
-      );
-
-    if (!confirmed) return;
-
-    try {
-      const numericId =
-        Number(id);
-
-      if (!Number.isInteger(numericId)) {
-        throw new Error(
-          "ID do produto inválido."
-        );
-      }
-
-      const { error } =
-        await db
-          .from("products")
-          .delete()
           .eq(
             "id",
             numericId
           );
 
-      if (error) throw error;
+        if (error) {
+          throw error;
+        }
+
+        toast(
+          "Produto atualizado com sucesso."
+        );
+
+      } else {
+        const {
+          data,
+          error
+        } = await db
+          .from("products")
+          .insert(payload)
+          .select()
+          .single();
+
+        if (error) {
+          throw error;
+        }
+
+        if (data) {
+          state.products.push(
+            data
+          );
+        }
+
+        toast(
+          "Produto criado com sucesso."
+        );
+      }
+
+      await loadProducts();
+
+      updateStats();
+
+      closeProductModal();
+
+      renderProductTab();
+
+    } catch (error) {
+      console.error(error);
+
+      toast(
+        error.message ||
+          "Não foi possível salvar o produto.",
+        "error"
+      );
+
+    } finally {
+      setLoading(
+        button,
+        false,
+        "Salvar produto"
+      );
+    }
+  }
+
+  /* =========================================================
+     PRODUTOS — EXCLUIR
+     ========================================================= */
+
+  async function deleteProduct(
+    product
+  ) {
+    if (!product?.id) return;
+
+    const confirmed =
+      window.confirm(
+        `Excluir o produto "${product.name || ""}"?`
+      );
+
+    if (!confirmed) return;
+
+    try {
+      const {
+        error
+      } = await db
+        .from("products")
+        .delete()
+        .eq(
+          "id",
+          Number(product.id)
+        );
+
+      if (error) {
+        throw error;
+      }
 
       state.products =
         state.products.filter(
           (item) =>
             String(item.id) !==
-            String(id)
+            String(product.id)
         );
 
       updateStats();
@@ -1415,7 +1152,7 @@
       renderProductTab();
 
       toast(
-        "Produto excluído."
+        "Produto excluído com sucesso."
       );
 
     } catch (error) {
@@ -1427,116 +1164,8 @@
       );
     }
   }
-
-  /* =========================================================
-     DUPLICAR PRODUTO
-     ========================================================= */
-
-  async function duplicateProduct(id) {
-    if (!db) {
-      toast(
-        "Supabase não está disponível.",
-        "error"
-      );
-      return;
-    }
-
-    const original =
-      state.products.find(
-        (product) =>
-          String(product.id) ===
-          String(id)
-      );
-
-    if (!original) return;
-
-    /*
-      IMPORTANTE:
-      Não copiamos o ID original.
-
-      Também não criamos mais:
-      "nome-123456789"
-
-      O banco vai gerar um novo BIGINT.
-    */
-
-    const copy = {
-      ...original,
-
-      name:
-        `${original.name} — cópia`
-    };
-
-    /*
-      Remove completamente o ID.
-      Assim o PostgreSQL/Supabase usa
-      o valor padrão/sequence da coluna.
-    */
-    delete copy.id;
-
-    try {
-      const { data, error } =
-        await db
-          .from("products")
-          .insert(copy)
-          .select()
-          .single();
-
-      if (error) {
-        console.error(
-          "Erro ao duplicar produto:",
-          error
-        );
-
-        throw error;
-      }
-
-      if (!data) {
-        throw new Error(
-          "O Supabase não retornou o produto duplicado."
-        );
-      }
-
-      const normalizedProduct = {
-        ...data,
-
-        area: normalizeArea(
-          data.area,
-          data
-        )
-      };
-
-      state.products.push(
-        normalizedProduct
-      );
-
-      state.products.sort(
-        (a, b) =>
-          Number(a.sort || 0) -
-          Number(b.sort || 0)
-      );
-
-      updateStats();
-
-      renderProductTab();
-
-      toast(
-        "Produto duplicado com sucesso."
-      );
-
-    } catch (error) {
-      console.error(error);
-
-      toast(
-        error.message ||
-          "Não foi possível duplicar o produto.",
-        "error"
-      );
-    }
-  }
-
-  /* =========================================================
-     RENDER PRODUTOS
+     /* =========================================================
+     PRODUTOS — RENDERIZAÇÃO
      ========================================================= */
 
   function renderProductTab() {
@@ -1544,7 +1173,16 @@
 
     ensureProductFormFields();
 
-    const deliveryProducts =
+    const prontaEntrega =
+      state.products.filter(
+        (product) =>
+          normalizeArea(
+            product.area,
+            product
+          ) === "pronta-entrega"
+      );
+
+    const delivery =
       state.products.filter(
         (product) =>
           normalizeArea(
@@ -1553,7 +1191,7 @@
           ) === "cardapio"
       );
 
-    const encomendaProducts =
+    const encomendas =
       state.products.filter(
         (product) =>
           normalizeArea(
@@ -1563,120 +1201,347 @@
       );
 
     tabContent.innerHTML = `
-      <div class="content-header">
+      <div class="product-toolbar">
+
         <div>
-          <h2>Produtos</h2>
+          <h2>
+            Produtos
+          </h2>
+
           <p>
             Gerencie os produtos do site.
           </p>
         </div>
 
-        <button
-          class="btn btn-primary"
-          id="addProductBtn"
-          type="button"
-        >
-          + Novo produto
-        </button>
-      </div>
+        <div class="product-toolbar-actions">
 
-      <div class="product-area-block">
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="newProductBtn"
+          >
+            Novo produto
+          </button>
 
-        <div class="section-heading">
-          <div>
-            <h3>Pronta Entrega</h3>
-            <p>
-              Produtos disponíveis para pronta entrega.
-            </p>
-          </div>
-
-          <span class="count-badge">
-            ${deliveryProducts.length}
-          </span>
-        </div>
-
-        <div
-          class="products-grid"
-          id="deliveryProductsGrid"
-        >
-          ${
-            deliveryProducts.length
-              ? deliveryProducts
-                  .map(
-                    renderProductCard
-                  )
-                  .join("")
-              : `
-                <div class="empty-state">
-                  Nenhum produto de pronta entrega.
-                </div>
-              `
-          }
         </div>
 
       </div>
 
-      <div class="product-area-block">
+      <div class="admin-panel-box">
 
-        <div class="section-heading">
-          <div>
-            <h3>Encomendas</h3>
-            <p>
-              Produtos utilizados na área de encomendas.
-            </p>
+        <div class="product-section">
+
+          <div class="product-section-header">
+            <div>
+              <h3>
+                Pronta Entrega
+              </h3>
+
+              <p>
+                Produtos disponíveis para pronta entrega.
+              </p>
+            </div>
+
+            <strong>
+              ${prontaEntrega.length}
+            </strong>
           </div>
 
-          <span class="count-badge">
-            ${encomendaProducts.length}
-          </span>
+          <div
+            class="products-grid"
+            id="prontaEntregaProducts"
+          >
+            ${
+              prontaEntrega.length
+                ? prontaEntrega
+                    .map(
+                      renderProductCard
+                    )
+                    .join("")
+                : `
+                  <div class="empty-state">
+                    Nenhum produto cadastrado
+                    em pronta entrega.
+                  </div>
+                `
+            }
+          </div>
+
         </div>
 
-        <div
-          class="products-grid"
-          id="encomendasProductsGrid"
-        >
-          ${
-            encomendaProducts.length
-              ? encomendaProducts
-                  .map(
-                    renderProductCard
-                  )
-                  .join("")
-              : `
-                <div class="empty-state">
-                  Nenhum produto de encomenda.
-                </div>
-              `
-          }
+        <div class="product-section">
+
+          <div class="product-section-header">
+            <div>
+              <h3>
+                Delivery
+              </h3>
+
+              <p>
+                Produtos do cardápio de delivery.
+              </p>
+            </div>
+
+            <strong>
+              ${delivery.length}
+            </strong>
+          </div>
+
+          <div
+            class="products-grid"
+            id="deliveryProducts"
+          >
+            ${
+              delivery.length
+                ? delivery
+                    .map(
+                      renderProductCard
+                    )
+                    .join("")
+                : `
+                  <div class="empty-state">
+                    Nenhum produto cadastrado
+                    no delivery.
+                  </div>
+                `
+            }
+          </div>
+
+        </div>
+
+        <div class="product-section">
+
+          <div class="product-section-header">
+            <div>
+              <h3>
+                Encomendas
+              </h3>
+
+              <p>
+                Produtos utilizados na área de encomendas.
+              </p>
+            </div>
+
+            <strong>
+              ${encomendas.length}
+            </strong>
+          </div>
+
+          <div
+            class="products-grid"
+            id="encomendasProducts"
+          >
+            ${
+              encomendas.length
+                ? encomendas
+                    .map(
+                      renderProductCard
+                    )
+                    .join("")
+                : `
+                  <div class="empty-state">
+                    Nenhum produto cadastrado
+                    em encomendas.
+                  </div>
+                `
+            }
+          </div>
+
         </div>
 
       </div>
     `;
 
-    const addProductBtn =
-      $("#addProductBtn");
-
-    if (addProductBtn) {
-      addProductBtn.addEventListener(
+    $("#newProductBtn")
+      ?.addEventListener(
         "click",
         () => {
           openProductModal();
         }
       );
-    }
 
-    $$(".edit-product-btn").forEach(
+    bindProductTabEvents();
+  }
+
+  function renderProductCard(
+    product
+  ) {
+    const image =
+      getProductImage(product);
+
+    const area =
+      normalizeArea(
+        product.area,
+        product
+      );
+
+    const available =
+      product.available !== false &&
+      product.available !== "false";
+
+    const price =
+      Number(product.price || 0);
+
+    const discount =
+      Number(
+        product.discount || 0
+      );
+
+    const finalPrice =
+      discount > 0
+        ? price -
+          price *
+            (discount / 100)
+        : price;
+
+    return `
+      <article
+        class="product-card"
+        data-product-id="${escapeHtml(
+          product.id
+        )}"
+      >
+
+        <div class="product-card-image">
+
+          ${
+            image
+              ? `
+                <img
+                  src="${escapeHtml(
+                    image
+                  )}"
+                  alt="${escapeHtml(
+                    product.name ||
+                      ""
+                  )}"
+                >
+              `
+              : `
+                <div class="product-image-placeholder">
+                  Sem imagem
+                </div>
+              `
+          }
+
+        </div>
+
+        <div class="product-card-body">
+
+          <div class="product-card-top">
+
+            <span class="product-area-badge">
+              ${escapeHtml(
+                areaLabel(area)
+              )}
+            </span>
+
+            ${
+              available
+                ? `
+                  <span class="product-status available">
+                    Disponível
+                  </span>
+                `
+                : `
+                  <span class="product-status">
+                    Indisponível
+                  </span>
+                `
+            }
+
+          </div>
+
+          <h3>
+            ${escapeHtml(
+              product.name || ""
+            )}
+          </h3>
+
+          <p class="product-category">
+            ${escapeHtml(
+              product.category || ""
+            )}
+          </p>
+
+          <div class="product-price">
+
+            ${
+              discount > 0
+                ? `
+                  <span class="old-price">
+                    ${money(price)}
+                  </span>
+                `
+                : ""
+            }
+
+            <strong>
+              ${money(finalPrice)}
+            </strong>
+
+          </div>
+
+          ${
+            product.description
+              ? `
+                <p class="product-description">
+                  ${escapeHtml(
+                    product.description
+                  )}
+                </p>
+              `
+              : ""
+          }
+
+          <div class="product-card-actions">
+
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-product-edit="${escapeHtml(
+                product.id
+              )}"
+            >
+              Editar
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-danger"
+              data-product-delete="${escapeHtml(
+                product.id
+              )}"
+            >
+              Excluir
+            </button>
+
+          </div>
+
+        </div>
+
+      </article>
+    `;
+  }
+
+  function bindProductTabEvents() {
+    $$(
+      "[data-product-edit]"
+    ).forEach(
       (button) => {
         button.addEventListener(
           "click",
           () => {
             const id =
-              button.dataset.id;
+              button.dataset
+                .productEdit;
 
             const product =
               state.products.find(
                 (item) =>
-                  String(item.id) ===
+                  String(
+                    item.id
+                  ) ===
                   String(id)
               );
 
@@ -1690,128 +1555,344 @@
       }
     );
 
-    $$(".delete-product-btn").forEach(
+    $$(
+      "[data-product-delete]"
+    ).forEach(
       (button) => {
         button.addEventListener(
           "click",
-          async () => {
-            await deleteProduct(
-              button.dataset.id
-            );
+          () => {
+            const id =
+              button.dataset
+                .productDelete;
+
+            const product =
+              state.products.find(
+                (item) =>
+                  String(
+                    item.id
+                  ) ===
+                  String(id)
+              );
+
+            if (product) {
+              deleteProduct(
+                product
+              );
+            }
           }
         );
       }
     );
-
-    $$(".duplicate-product-btn").forEach(
-      (button) => {
-        button.addEventListener(
-          "click",
-          async () => {
-            await duplicateProduct(
-              button.dataset.id
-            );
-          }
-        );
-      }
-    );
-
-    updateStats();
   }
-    function renderProductCard(product) {
-    const image =
-      getProductImage(product);
 
-    const available =
-      product.available !== false;
+  /* =========================================================
+     PEDIDOS
+     ========================================================= */
 
-    const category =
-      product.category ||
-      "Sem classificação";
+  async function loadOrders() {
+    if (!db) {
+      throw new Error(
+        "Supabase não está disponível."
+      );
+    }
 
-    const area =
-      areaLabel(product.area);
+    const {
+      data,
+      error
+    } = await db
+      .from("orders")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
 
-    return `
-      <article
-        class="admin-product-card"
-        data-product-id="${escapeHtml(
-          product.id
-        )}"
-      >
+    if (error) {
+      console.error(
+        "Erro orders:",
+        error
+      );
 
-        <div class="admin-product-image">
+      return [];
+    }
 
-          ${
-            image
-              ? `
-                <img
-                  src="${escapeHtml(
-                    image
-                  )}"
-                  alt="${escapeHtml(
-                    product.name
-                  )}"
-                >
-              `
-              : `
-                <div class="product-image-placeholder">
-                  🍰
-                </div>
-              `
-          }
+    return Array.isArray(data)
+      ? data
+      : [];
+  }
+
+  async function renderOrdersTab() {
+    if (!tabContent) return;
+
+    let orders = [];
+
+    try {
+      orders =
+        await loadOrders();
+    } catch (error) {
+      console.error(error);
+    }
+
+    const prontaEntrega =
+      orders.filter(
+        (order) =>
+          String(
+            order.receiving ||
+              order.area ||
+              ""
+          )
+            .toLowerCase()
+            .includes(
+              "pronta"
+            )
+      );
+
+    const encomendas =
+      orders.filter(
+        (order) =>
+          !String(
+            order.receiving ||
+              order.area ||
+              ""
+          )
+            .toLowerCase()
+            .includes(
+              "pronta"
+            )
+      );
+
+    tabContent.innerHTML = `
+      <div class="product-toolbar">
+
+        <div>
+          <h2>
+            Pedidos
+          </h2>
+
+          <p>
+            Acompanhe os pedidos recebidos pelo site.
+          </p>
+        </div>
+
+        <div class="product-toolbar-actions">
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            id="refreshOrdersBtn"
+          >
+            Atualizar
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            id="printOrdersBtn"
+          >
+            Imprimir
+          </button>
 
         </div>
 
-        <div class="admin-product-info">
+      </div>
 
-          <div style="
-            display:flex;
-            gap:6px;
-            flex-wrap:wrap;
-            margin-bottom:7px;
-          ">
+      <div class="admin-panel-box">
 
-            <span class="product-area-choice">
-              ${escapeHtml(area)}
-            </span>
+        <div class="product-section">
 
-            <span class="product-classification">
-              ${escapeHtml(category)}
-            </span>
+          <div class="product-section-header">
+            <div>
+              <h3>
+                Pronta Entrega
+              </h3>
 
-            ${
-              available
-                ? `
-                  <span class="status-badge status-active">
-                    Disponível
-                  </span>
-                `
-                : `
-                  <span class="status-badge status-inactive">
-                    Oculto
-                  </span>
-                `
-            }
+              <p>
+                Pedidos de produtos de pronta entrega.
+              </p>
+            </div>
 
+            <strong>
+              ${prontaEntrega.length}
+            </strong>
           </div>
 
-          <h4>
-            ${escapeHtml(
-              product.name
-            )}
-          </h4>
+          <div
+            class="orders-list"
+            id="prontaEntregaOrders"
+          >
+            ${
+              prontaEntrega.length
+                ? prontaEntrega
+                    .map(
+                      renderOrderCard
+                    )
+                    .join("")
+                : `
+                  <div class="empty-state">
+                    Nenhum pedido de pronta entrega.
+                  </div>
+                `
+            }
+          </div>
+
+        </div>
+
+        <div class="product-section">
+
+          <div class="product-section-header">
+            <div>
+              <h3>
+                Encomendas
+              </h3>
+
+              <p>
+                Pedidos de encomendas recebidos pelo site.
+              </p>
+            </div>
+
+            <strong>
+              ${encomendas.length}
+            </strong>
+          </div>
+
+          <div
+            class="orders-list"
+            id="encomendasOrders"
+          >
+            ${
+              encomendas.length
+                ? encomendas
+                    .map(
+                      renderOrderCard
+                    )
+                    .join("")
+                : `
+                  <div class="empty-state">
+                    Nenhum pedido de encomenda.
+                  </div>
+                `
+            }
+          </div>
+
+        </div>
+
+      </div>
+    `;
+
+    $("#refreshOrdersBtn")
+      ?.addEventListener(
+        "click",
+        async () => {
+          await renderOrdersTab();
+        }
+      );
+
+    $("#printOrdersBtn")
+      ?.addEventListener(
+        "click",
+        printOrders
+      );
+  }
+
+  function renderOrderCard(
+    order
+  ) {
+    const customer =
+      order.customer ||
+      order.name ||
+      "Cliente";
+
+    const phone =
+      order.phone ||
+      "";
+
+    const receiving =
+      order.receiving ||
+      "";
+
+    const total =
+      getOrderValue(order);
+
+    const date =
+      formatOrderDate(
+        order.created_at
+      );
+
+    return `
+      <article class="order-card">
+
+        <div class="order-card-header">
+
+          <div>
+            <h3>
+              ${escapeHtml(
+                customer
+              )}
+            </h3>
+
+            ${
+              phone
+                ? `
+                  <p>
+                    ${escapeHtml(
+                      phone
+                    )}
+                  </p>
+                `
+                : ""
+            }
+          </div>
 
           <strong>
-            ${money(product.price)}
+            ${money(total)}
           </strong>
 
+        </div>
+
+        <div class="order-card-body">
+
           ${
-            product.description
+            receiving
               ? `
                 <p>
+                  <strong>
+                    Recebimento:
+                  </strong>
                   ${escapeHtml(
-                    product.description
+                    receiving
+                  )}
+                </p>
+              `
+              : ""
+          }
+
+          ${
+            order.address
+              ? `
+                <p>
+                  <strong>
+                    Endereço:
+                  </strong>
+                  ${escapeHtml(
+                    order.address
+                  )}
+                </p>
+              `
+              : ""
+          }
+
+          ${
+            order.payment
+              ? `
+                <p>
+                  <strong>
+                    Pagamento:
+                  </strong>
+                  ${escapeHtml(
+                    order.payment
                   )}
                 </p>
               `
@@ -1820,1442 +1901,284 @@
 
         </div>
 
-        <div class="admin-product-actions">
-
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-edit-product="${escapeHtml(
-              product.id
-            )}"
-          >
-            Editar
-          </button>
-
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-toggle-product="${escapeHtml(
-              product.id
-            )}"
-          >
-            ${
-              available
-                ? "Ocultar"
-                : "Ativar"
-            }
-          </button>
-
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-duplicate-product="${escapeHtml(
-              product.id
-            )}"
-          >
-            Duplicar
-          </button>
-
-          <button
-            type="button"
-            class="btn btn-danger"
-            data-delete-product="${escapeHtml(
-              product.id
-            )}"
-          >
-            Excluir
-          </button>
-
-        </div>
-
       </article>
     `;
   }
-
-  /* =========================================================
-     EVENTOS PRODUTOS
+     /* =========================================================
+     PEDIDOS — UTILITÁRIOS
      ========================================================= */
 
-  function bindProductTabEvents() {
-    const newProductBtn =
-      $("#newProductBtn");
-
-    if (newProductBtn) {
-      newProductBtn.addEventListener(
-        "click",
-        () => openProductModal()
-      );
-    }
-
-    const manageCategoriesBtn =
-      $("#manageCategoriesBtn");
-
-    const classificationManager =
-      $("#classificationManager");
-
-    if (
-      manageCategoriesBtn &&
-      classificationManager
-    ) {
-      manageCategoriesBtn.addEventListener(
-        "click",
-        () => {
-          classificationManager.style.display =
-            classificationManager.style.display ===
-            "none"
-              ? "block"
-              : "none";
-        }
-      );
-    }
-
-    const addClassificationBtn =
-      $("#addClassificationBtn");
-
-    if (addClassificationBtn) {
-      addClassificationBtn.addEventListener(
-        "click",
-        createClassification
-      );
-    }
-
-    $$("[data-delete-category]")
-      .forEach((button) => {
-        button.addEventListener(
-          "click",
-          () =>
-            deleteClassification(
-              button.dataset
-                .deleteCategory
-            )
-        );
-      });
-
-    $$("[data-edit-product]")
-      .forEach((button) => {
-        button.addEventListener(
-          "click",
-          () => {
-            const product =
-              state.products.find(
-                (item) =>
-                  String(item.id) ===
-                  String(
-                    button.dataset
-                      .editProduct
-                  )
-              );
-
-            if (product) {
-              openProductModal(
-                product
-              );
-            }
-          }
-        );
-      });
-
-    $$("[data-delete-product]")
-      .forEach((button) => {
-        button.addEventListener(
-          "click",
-          () =>
-            deleteProduct(
-              button.dataset
-                .deleteProduct
-            )
-        );
-      });
-
-    $$("[data-duplicate-product]")
-      .forEach((button) => {
-        button.addEventListener(
-          "click",
-          () =>
-            duplicateProduct(
-              button.dataset
-                .duplicateProduct
-            )
-        );
-      });
-
-    $$("[data-toggle-product]")
-      .forEach((button) => {
-        button.addEventListener(
-          "click",
-          () =>
-            toggleProductAvailability(
-              button.dataset
-                .toggleProduct
-            )
-        );
-      });
-  }
-
-  /* =========================================================
-     PEDIDOS NORMAIS
-     ========================================================= */
-
-  async function loadOrders() {
-    if (!db) return [];
-
-    const possibleTables = [
-      "orders"
-    ];
-
-    for (const table of possibleTables) {
-      try {
-        const { data, error } =
-          await db
-            .from(table)
-            .select("*")
-            .order(
-              "created_at",
-              {
-                ascending: false
-              }
-            );
-
-        if (!error) {
-          return Array.isArray(data)
-            ? data
-            : [];
-        }
-      } catch (error) {
-        console.error(
-          `Erro ao carregar ${table}:`,
-          error
-        );
-      }
-    }
-
-    return [];
-  }
-        "orders",
-      "pedidos"
-    ];
-
-    for (
-      const table of possibleTables
-    ) {
-      try {
-        const result =
-          await db
-            .from(table)
-            .select("*")
-            .order(
-              "created_at",
-              {
-                ascending: false
-              }
-            )
-            .limit(200);
-
-        if (!result.error) {
-          return result.data || [];
-        }
-      } catch (_) {}
-    }
-
-    return [];
-  }
-
-  async function renderOrdersTab() {
-    if (!tabContent) return;
-
-    tabContent.innerHTML = `
-      <div class="product-toolbar">
-
-        <div>
-
-          <h2>
-            Pedidos
-          </h2>
-
-          <p>
-            Pedidos recebidos pelo sistema.
-          </p>
-
-        </div>
-
-      </div>
-
-      <div id="ordersContainer">
-
-        <div class="admin-empty">
-          Carregando pedidos...
-        </div>
-
-      </div>
-    `;
-
-    const orders =
-      await loadOrders();
-
-    const container =
-      $("#ordersContainer");
-
-    if (!container) return;
-
-    if (!orders.length) {
-      container.innerHTML = `
-        <div class="admin-empty">
-          Nenhum pedido encontrado.
-        </div>
-      `;
-
-      return;
-    }
-
-    container.innerHTML =
-      orders
-        .map(
-          (order) => `
-            <article
-              class="admin-order-card"
-            >
-
-              <strong>
-                Pedido #${escapeHtml(
-                  order.id || ""
-                )}
-              </strong>
-
-              <p>
-                ${escapeHtml(
-                  order.customer_name ||
-                    order.name ||
-                    "Cliente"
-                )}
-              </p>
-
-              <small>
-                ${escapeHtml(
-                  order.created_at ||
-                    ""
-                )}
-              </small>
-
-            </article>
-          `
-        )
-        .join("");
-  }
-
-  /* =========================================================
-     PEDIDOS DE BOLOS PERSONALIZADOS
-     ========================================================= */
-
-  async function renderCakesTab() {
-    if (!tabContent) return;
-
-    tabContent.innerHTML = `
-      <div class="product-toolbar">
-
-        <div>
-
-          <h2>
-            Pedidos de Bolo
-          </h2>
-
-          <p>
-            Pedidos de bolos personalizados enviados pelos clientes.
-          </p>
-
-        </div>
-
-        <button
-          type="button"
-          class="btn btn-secondary"
-          id="refreshCakeOrdersBtn"
-        >
-          Atualizar pedidos
-        </button>
-
-      </div>
-
-      <div id="cakeOrdersContainer">
-
-        <div class="admin-empty">
-          Carregando pedidos...
-        </div>
-
-      </div>
-    `;
-
-    const container =
-      $("#cakeOrdersContainer");
-
-    if (!container) return;
-
-    if (!db) {
-      container.innerHTML = `
-        <div class="admin-empty">
-          Não foi possível conectar ao Supabase.
-        </div>
-      `;
-
-      bindCakeOrdersRefresh();
-
-      return;
-    }
-
-    const possibleTables = [
-      "orders",
-      "pedidos"
-    ];
-
-    let orders = [];
-    let loaded = false;
-
-    for (
-      const table of possibleTables
-    ) {
-      try {
-        const result =
-          await db
-            .from(table)
-            .select("*")
-            .order(
-              "created_at",
-              {
-                ascending: false
-              }
-            )
-            .limit(200);
-
-        if (!result.error) {
-          orders =
-            Array.isArray(
-              result.data
-            )
-              ? result.data
-              : [];
-
-          loaded = true;
-          break;
-        }
-      } catch (error) {
-        console.warn(
-          `Não foi possível consultar a tabela ${table}.`,
-          error
-        );
-      }
-    }
-
-    if (!loaded) {
-      container.innerHTML = `
-        <div class="admin-empty">
-
-          <strong>
-            Não foi possível carregar os pedidos.
-          </strong>
-
-          <p style="margin-top:8px;">
-            Verifique se os pedidos estão sendo gravados
-            na tabela de pedidos do Supabase.
-          </p>
-
-        </div>
-      `;
-
-      bindCakeOrdersRefresh();
-
-      return;
-    }
-
-    const cakeOrders =
-      orders.filter((order) => {
-        const text =
-          JSON.stringify(order)
-            .normalize("NFD")
-            .replace(
-              /[\u0300-\u036f]/g,
-              ""
-            )
-            .toLowerCase();
-
-        return (
-          text.includes("bolo") ||
-          text.includes("naked") ||
-          text.includes("chantininho") ||
-          text.includes("encomenda") ||
-          text.includes("massa") ||
-          text.includes("recheio") ||
-          text.includes("personalizacao")
-        );
-      });
-
-    if (!cakeOrders.length) {
-      container.innerHTML = `
-        <div class="admin-empty">
-
-          <strong>
-            Nenhum pedido de bolo encontrado.
-          </strong>
-
-          <p style="margin-top:8px;">
-            Quando um cliente enviar um pedido de bolo personalizado,
-            ele aparecerá nesta área.
-          </p>
-
-        </div>
-      `;
-
-      bindCakeOrdersRefresh();
-
-      return;
-    }
-
-    container.innerHTML =
-      cakeOrders
-        .map(
-          (order, index) =>
-            renderCakeOrderCard(
-              order,
-              index
-            )
-        )
-        .join("");
-
-    bindCakeOrdersRefresh();
-  }
-
-  /* =========================================================
-     NORMALIZAR VALORES DOS PEDIDOS
-     ========================================================= */
-
-  function formatOrderValue(value) {
-    if (
-      value === undefined ||
-      value === null ||
-      value === ""
-    ) {
-            return "";
-    }
-
-    if (Array.isArray(value)) {
-      return value
-        .map((item) =>
-          formatOrderValue(item)
-        )
-        .filter(Boolean)
-        .join(", ");
-    }
-
-    if (
-      typeof value === "object"
-    ) {
-      return Object.entries(value)
-        .map(
-          ([key, item]) =>
-            `${formatOrderLabel(
-              key
-            )}: ${formatOrderValue(
-              item
-            )}`
-        )
-        .join(" | ");
-    }
-
-    return String(value);
-  }
-
-  function getOrderValue(
-    order,
-    ...keys
-  ) {
-    for (const key of keys) {
-      if (
-        order[key] !== undefined &&
-        order[key] !== null &&
-        String(
-          formatOrderValue(
-            order[key]
-          )
-        ).trim() !== ""
-      ) {
-        return order[key];
-      }
-    }
-
-    return "";
-  }
-
-  /* =========================================================
-     CARD DO PEDIDO
-     ========================================================= */
-
-  function renderCakeOrderCard(
-    order,
-    index
-  ) {
-    const customerName =
-      getOrderValue(
-        order,
-        "customer_name",
-        "client_name",
-        "cliente",
-        "nome",
-        "name"
-      ) || "Não informado";
-
-    const phone =
-      getOrderValue(
-        order,
-        "customer_phone",
-        "client_phone",
-        "telefone",
-        "phone",
-        "whatsapp"
-      ) || "Não informado";
-
-    const orderDate =
-      getOrderValue(
-        order,
-        "created_at",
-        "order_date",
-        "createdDate"
-      );
-
-    const requestedDate =
-      getOrderValue(
-        order,
-        "delivery_date",
-        "pickup_date",
-        "event_date",
-        "requested_date",
-        "data_entrega",
-        "data_retirada",
-        "data_evento",
-        "data"
-      );
-
-    const cakeType =
-      getOrderValue(
-        order,
-        "cake_type",
-        "tipo_bolo",
-        "bolo",
-        "tipo"
-      );
-
-    const size =
-      getOrderValue(
-        order,
-        "size",
-        "tamanho",
-        "cake_size",
-        "tamanho_bolo",
-        "pessoas",
-        "quantidade_pessoas"
-      );
-
-    const mass =
-      getOrderValue(
-        order,
-        "mass",
-        "massa",
-        "cake_mass",
-        "massa_bolo"
-      );
-
-    const filling =
-      getOrderValue(
-        order,
-        "filling",
-        "recheio",
-        "cake_filling",
-        "recheios"
-      );
-
-    const extras =
-      getOrderValue(
-        order,
-        "extras",
-        "adicionais",
-        "additional",
-        "adicionais_bolo"
-      );
-
-    const personalization =
-      getOrderValue(
-        order,
-        "personalization",
-        "personalizacao",
-        "personalisation",
-        "decoracao",
-        "decoração"
-      );
-
-    const brigadeiros =
-      getOrderValue(
-        order,
-        "brigadeiros",
-        "brigadeiro",
-        "brigadeiros_classicos",
-        "brigadeiros_premium"
-      );
-
-    const kits =
-      getOrderValue(
-        order,
-        "kits",
-        "kit",
-        "kit_bolo"
-      );
-
-    const otherItems =
-      getOrderValue(
-        order,
-        "other_items",
-        "outros_itens",
-        "outros",
-        "itens"
-      );
-
-    const notes =
-      getOrderValue(
-        order,
-        "notes",
-        "observations",
-        "observacoes",
-        "observações",
-        "obs"
-      );
-
+  function getOrderValue(order) {
     const total =
-      getOrderValue(
-        order,
-        "total",
-        "total_price",
-        "valor_total",
-        "valor"
-      );
+      Number(order?.total || 0);
 
-    const orderId =
-      getOrderValue(
-        order,
-        "id",
-        "order_id",
-        "pedido_id"
-      ) || index + 1;
-
-    const knownKeys =
-      new Set([
-        "id",
-        "order_id",
-        "pedido_id",
-        "customer_name",
-        "client_name",
-        "cliente",
-        "nome",
-        "name",
-        "customer_phone",
-        "client_phone",
-        "telefone",
-        "phone",
-        "whatsapp",
-        "created_at",
-        "order_date",
-        "createdDate",
-        "delivery_date",
-        "pickup_date",
-        "event_date",
-        "requested_date",
-        "data_entrega",
-        "data_retirada",
-        "data_evento",
-        "data",
-        "cake_type",
-        "tipo_bolo",
-        "bolo",
-        "tipo",
-        "size",
-        "tamanho",
-        "cake_size",
-        "tamanho_bolo",
-        "pessoas",
-        "quantidade_pessoas",
-        "mass",
-        "massa",
-        "cake_mass",
-        "massa_bolo",
-        "filling",
-        "recheio",
-        "cake_filling",
-        "recheios",
-        "extras",
-        "adicionais",
-        "additional",
-        "adicionais_bolo",
-        "personalization",
-        "personalizacao",
-        "personalisation",
-        "decoracao",
-        "decoração",
-        "brigadeiros",
-        "brigadeiro",
-        "brigadeiros_classicos",
-        "brigadeiros_premium",
-        "kits",
-        "kit",
-        "kit_bolo",
-        "other_items",
-        "outros_itens",
-        "outros",
-        "itens",
-        "notes",
-        "observations",
-        "observacoes",
-        "observações",
-        "obs",
-        "total",
-        "total_price",
-        "valor_total",
-        "valor"
-      ]);
-
-    const extraFields =
-      Object.entries(order).filter(
-        ([key, value]) =>
-          !knownKeys.has(key) &&
-          value !== null &&
-          value !== undefined &&
-          String(
-            formatOrderValue(value)
-          ).trim() !== ""
-      );
-
-    return `
-      <article
-        class="admin-panel-box cake-order-card"
-        id="cake-order-${escapeHtml(
-          orderId
-        )}"
-      >
-                String(orderId)
-        )}"
-        style="
-          margin-bottom:18px;
-          page-break-inside:avoid;
-        "
-      >
-
-        <div style="
-          display:flex;
-          justify-content:space-between;
-          align-items:flex-start;
-          gap:16px;
-          flex-wrap:wrap;
-          margin-bottom:18px;
-        ">
-
-          <div>
-
-            <span style="
-              display:inline-block;
-              font-size:12px;
-              font-weight:700;
-              color:#2b7896;
-              margin-bottom:5px;
-            ">
-              PEDIDO DE BOLO
-            </span>
-
-            <h3 style="margin:0;">
-              ${escapeHtml(
-                formatOrderValue(
-                  customerName
-                )
-              )}
-            </h3>
-
-            <p style="
-              margin:5px 0 0;
-              opacity:.7;
-            ">
-              Pedido #${escapeHtml(
-                String(orderId)
-              )}
-            </p>
-
-          </div>
-
-          <button
-            type="button"
-            class="btn btn-primary print-cake-order"
-            data-print-order="${escapeHtml(
-              String(orderId)
-            )}"
-          >
-            🖨 Imprimir pedido
-          </button>
-
-        </div>
-
-        <div style="margin-bottom:20px;">
-
-          <h4>
-            Dados do cliente
-          </h4>
-
-          <div style="
-            display:grid;
-            grid-template-columns:
-              repeat(
-                auto-fit,
-                minmax(220px, 1fr)
-              );
-            gap:10px;
-          ">
-
-            ${renderOrderInfo(
-              "Cliente",
-              customerName
-            )}
-
-            ${renderOrderInfo(
-              "Telefone / WhatsApp",
-              phone
-            )}
-
-            ${renderOrderInfo(
-              "Data do pedido",
-              formatOrderDate(
-                orderDate
-              )
-            )}
-
-            ${renderOrderInfo(
-              "Data desejada",
-              formatOrderDate(
-                requestedDate
-              )
-            )}
-
-          </div>
-
-        </div>
-
-        <div style="margin-bottom:20px;">
-
-          <h4>
-            Informações do bolo
-          </h4>
-
-          <div style="
-            display:grid;
-            grid-template-columns:
-              repeat(
-                auto-fit,
-                minmax(220px, 1fr)
-              );
-            gap:10px;
-          ">
-
-            ${renderOrderInfo(
-              "Tipo de bolo",
-              cakeType
-            )}
-
-            ${renderOrderInfo(
-              "Tamanho / Pessoas",
-              size
-            )}
-
-            ${renderOrderInfo(
-              "Massa",
-              mass
-            )}
-
-            ${renderOrderInfo(
-              "Recheio",
-              filling
-            )}
-
-            ${renderOrderInfo(
-              "Adicionais",
-              extras
-            )}
-
-            ${renderOrderInfo(
-              "Personalização",
-              personalization
-            )}
-
-          </div>
-
-        </div>
-
-        <div style="margin-bottom:20px;">
-
-          <h4>
-            Itens solicitados
-          </h4>
-
-          <div style="
-            display:grid;
-            grid-template-columns:
-              repeat(
-                auto-fit,
-                minmax(220px, 1fr)
-              );
-            gap:10px;
-          ">
-
-            ${renderOrderInfo(
-              "Brigadeiros",
-              brigadeiros
-            )}
-
-            ${renderOrderInfo(
-              "Kits",
-              kits
-            )}
-
-            ${renderOrderInfo(
-              "Outros itens",
-              otherItems
-            )}
-
-          </div>
-
-        </div>
-
-        ${
-          notes
-            ? `
-              <div style="margin-bottom:20px;">
-
-                <h4>
-                  Observações
-                </h4>
-
-                <div style="
-                  padding:14px;
-                  border:1px solid #e1e8ec;
-                  border-radius:10px;
-                  background:#fff;
-                  white-space:pre-wrap;
-                ">
-                  ${escapeHtml(
-                    formatOrderValue(
-                      notes
-                    )
-                  )}
-                </div>
-
-              </div>
-            `
-            : ""
-        }
-
-        ${
-          extraFields.length
-            ? `
-              <div style="margin-bottom:20px;">
-
-                <h4>
-                  Outras informações do pedido
-                </h4>
-
-                <div style="
-                  display:grid;
-                  grid-template-columns:
-                    repeat(
-                      auto-fit,
-                      minmax(220px, 1fr)
-                    );
-                  gap:10px;
-                ">
-
-                  ${extraFields
-                    .map(
-                      ([key, value]) =>
-                        renderOrderInfo(
-                          formatOrderLabel(
-                            key
-                          ),
-                          value
-                        )
-                    )
-                    .join("")}
-
-                </div>
-
-              </div>
-            `
-            : ""
-        }
-
-        ${
-          total !== ""
-            ? `
-              <div style="
-                display:flex;
-                justify-content:flex-end;
-                padding-top:15px;
-                border-top:1px solid #e1e8ec;
-              ">
-
-                <strong style="
-                  font-size:18px;
-                  color:#2b7896;
-                ">
-                  Total:
-                  ${money(total)}
-                </strong>
-
-              </div>
-            `
-            : ""
-        }
-
-      </article>
-    `;
-  }
-
-  /* =========================================================
-     NOME DOS CAMPOS EXTRAS
-     ========================================================= */
-
-  function formatOrderLabel(key) {
-    const labels = {
-      customer_name:
-        "Nome do cliente",
-
-      client_name:
-        "Nome do cliente",
-
-      customer_phone:
-        "Telefone",
-
-      client_phone:
-        "Telefone",
-            cake_type:
-        "Tipo de bolo",
-
-      tipo_bolo:
-        "Tipo de bolo",
-
-      cake_size:
-        "Tamanho do bolo",
-
-      tamanho_bolo:
-        "Tamanho do bolo",
-
-      event_date:
-        "Data do evento",
-
-      delivery_date:
-        "Data de entrega",
-
-      pickup_date:
-        "Data de retirada",
-
-      massa:
-        "Massa",
-
-      recheio:
-        "Recheio",
-
-      adicionais:
-        "Adicionais",
-
-      personalizacao:
-        "Personalização",
-
-      observacoes:
-        "Observações",
-
-      total_price:
-        "Valor total",
-
-      valor_total:
-        "Valor total"
-    };
-
-    if (labels[key]) {
-      return labels[key];
+    if (Number.isFinite(total)) {
+      return total;
     }
 
-    return String(key || "")
-      .replace(/[_-]+/g, " ")
-      .replace(
-        /([a-z])([A-Z])/g,
-        "$1 $2"
-      )
-      .replace(/\s+/g, " ")
-      .trim()
-      .replace(
-        /^./,
-        (letter) =>
-          letter.toUpperCase()
-      );
+    return 0;
   }
 
-  /* =========================================================
-     INFORMAÇÕES DO PEDIDO
-     ========================================================= */
-
-  function renderOrderInfo(
-    label,
+  function formatOrderDate(
     value
   ) {
-    if (
-      value === undefined ||
-      value === null ||
-      String(
-        formatOrderValue(value)
-      ).trim() === ""
-    ) {
-      value = "Não informado";
-    }
-
-    return `
-      <div style="
-        padding:12px;
-        border:1px solid #e1e8ec;
-        border-radius:10px;
-        background:#fff;
-      ">
-
-        <small style="
-          display:block;
-          margin-bottom:4px;
-          color:#71808a;
-          font-weight:700;
-        ">
-          ${escapeHtml(label)}
-        </small>
-
-        <div style="
-          white-space:pre-wrap;
-        ">
-          ${escapeHtml(
-            formatOrderValue(value)
-          )}
-        </div>
-
-      </div>
-    `;
-  }
-
-  /* =========================================================
-     DATA
-     ========================================================= */
-
-  function formatOrderDate(value) {
     if (!value) {
-      return "Não informado";
+      return "";
     }
 
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-      return formatOrderValue(value);
-    }
-
-    return date.toLocaleString("pt-BR");
-  }
-
-  /* =========================================================
-     ATUALIZAR PEDIDOS
-     ========================================================= */
-
-  function bindCakeOrdersRefresh() {
-    const button =
-      $("#refreshCakeOrdersBtn");
+    const date =
+      new Date(value);
 
     if (
-      button &&
-      !button.dataset.bound
+      Number.isNaN(
+        date.getTime()
+      )
     ) {
-      button.dataset.bound = "true";
-
-      button.addEventListener(
-        "click",
-        () => {
-          renderCakesTab();
-        }
-      );
+      return String(value);
     }
 
-    bindPrintCakeOrders();
-  }
-
-  /* =========================================================
-     IMPRESSÃO
-     ========================================================= */
-
-  function bindPrintCakeOrders() {
-    $$(".print-cake-order").forEach(
-      (button) => {
-        if (button.dataset.bound) {
-          return;
-        }
-
-        button.dataset.bound = "true";
-
-        button.addEventListener(
-          "click",
-          () => {
-            const orderId =
-              button.dataset
-                .printOrder;
-
-            printCakeOrder(orderId);
-          }
-        );
+    return date.toLocaleString(
+      "pt-BR",
+      {
+        dateStyle: "short",
+        timeStyle: "short"
       }
     );
   }
 
-  function printCakeOrder(orderId) {
-    const original =
-      document.getElementById(
-        `cake-order-${orderId}`
-      );
-
-    if (!original) {
-      toast(
-        "Não foi possível localizar este pedido.",
-        "error"
-      );
-
-      return;
-    }
-
+  function printOrders() {
     const printWindow =
       window.open(
         "",
-        "_blank",
-        "width=900,height=700"
+        "_blank"
       );
 
     if (!printWindow) {
       toast(
-        "O navegador bloqueou a janela de impressão.",
+        "Não foi possível abrir a impressão. Verifique o bloqueador de pop-ups.",
         "warning"
       );
-
       return;
     }
 
-    printWindow.document.open();
+    const content =
+      tabContent?.innerHTML ||
+      "";
 
     printWindow.document.write(`
       <!DOCTYPE html>
-
       <html lang="pt-BR">
-
       <head>
-
         <meta charset="UTF-8">
-
         <title>
-          Pedido de Bolo #${escapeHtml(
-            String(orderId)
-          )} — Martins Confeitaria
+          Pedidos — Martins Confeitaria
         </title>
 
         <style>
-
           * {
-            box-sizing:border-box;
+            box-sizing: border-box;
           }
 
           body {
-            margin:0;
-            padding:30px;
+            margin: 0;
+            padding: 30px;
             font-family:
               Arial,
               Helvetica,
               sans-serif;
-            color:#263238;
-            background:#fff;
+            color: #222;
+            background: #fff;
           }
 
+          h1 {
+            margin: 0 0 8px;
+            color: #2b7896;
+          }
+
+          h2,
           h3 {
-            font-size:24px;
-            margin:0;
+            margin-top: 0;
           }
 
-          h4 {
-            margin:
-              0 0 10px;
-          }
-
+          .product-toolbar,
+          .product-toolbar-actions,
           button {
-            display:none !important;
+            display: none !important;
           }
 
-          article {
-            border:none !important;
-            box-shadow:none !important;
-            margin:0 !important;
-            padding:0 !important;
+          .admin-panel-box {
+            width: 100%;
+          }
+
+          .product-section {
+            margin-bottom: 35px;
+            page-break-inside: avoid;
+          }
+
+          .product-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            border-bottom:
+              2px solid #67b0cb;
+          }
+
+          .orders-list {
+            display: grid;
+            gap: 14px;
+          }
+
+          .order-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 16px;
+            page-break-inside: avoid;
+          }
+
+          .order-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 12px;
+          }
+
+          .order-card-header h3 {
+            margin: 0 0 5px;
+          }
+
+          .order-card-header p {
+            margin: 0;
+            color: #666;
+          }
+
+          .order-card-header strong {
+            color: #2b7896;
+            font-size: 18px;
+          }
+
+          .order-card-body p {
+            margin: 7px 0;
+          }
+
+          .empty-state {
+            padding: 20px;
+            border: 1px dashed #ccc;
+            border-radius: 10px;
+            color: #777;
           }
 
           @media print {
-
             body {
-              padding:15mm;
+              padding: 15px;
             }
-
-            .print-cake-order {
-              display:none !important;
-            }
-
           }
-
         </style>
-
       </head>
 
       <body>
 
-        ${original.outerHTML}
+        <h1>
+          Martins Confeitaria
+        </h1>
 
-        <script>
-          window.onload = function() {
-            window.print();
-          };
-        <\/script>
+        <p>
+          Relatório de pedidos
+        </p>
+
+        ${content}
 
       </body>
-
       </html>
     `);
 
     printWindow.document.close();
+
+    printWindow.focus();
+
+    setTimeout(
+      () => {
+        printWindow.print();
+      },
+      300
+    );
   }
 
   /* =========================================================
-     CONTEÚDO
+     BOLOS PERSONALIZADOS
      ========================================================= */
 
-  function renderContentTab() {
+  async function loadCustomCakes() {
+    if (!db) {
+      throw new Error(
+        "Supabase não está disponível."
+      );
+    }
+
+    const {
+      data,
+      error
+    } = await db
+      .from("custom_cakes")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+
+    if (error) {
+      console.error(
+        "Erro custom_cakes:",
+        error
+      );
+
+      return [];
+    }
+
+    return Array.isArray(data)
+      ? data
+      : [];
+  }
+
+  async function renderCakesTab() {
     if (!tabContent) return;
 
-    const about =
-      state.settings.about ||
-      DEFAULTS.about ||
-      {};
+    let cakes = [];
+
+    try {
+      cakes =
+        await loadCustomCakes();
+    } catch (error) {
+      console.error(error);
+    }
 
     tabContent.innerHTML = `
       <div class="product-toolbar">
 
         <div>
-
           <h2>
-            Conteúdo
+            Bolos personalizados
           </h2>
 
           <p>
-            Edite o conteúdo principal do site.
+            Solicitações recebidas pela área de encomendas.
           </p>
+        </div>
+
+        <div class="product-toolbar-actions">
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            id="refreshCakesBtn"
+          >
+            Atualizar
+          </button>
 
         </div>
 
@@ -3263,142 +2186,399 @@
 
       <div class="admin-panel-box">
 
-        <div class="field">
-
-          <label for="adminAboutTitle">
-            Título da história
-          </label>
-
-          <input
-            id="adminAboutTitle"
-            value="${escapeHtml(
-              about.title || ""
-            )}"
-          >
-
-        </div>
-
-        <div class="field">
-
-          <label for="adminAboutQuote">
-            Frase
-          </label>
-
-          <input
-            id="adminAboutQuote"
-            value="${escapeHtml(
-              about.quote || ""
-            )}"
-          >
-
-        </div>
-
-        <div class="field">
-
-          <label for="adminAboutText">
-            História
-          </label>
-
-          <textarea
-            id="adminAboutText"
-            rows="14"
-          >${escapeHtml(
-            about.text || ""
-          )}</textarea>
-
-        </div>
-
-        <button
-          type="button"
-          class="btn btn-primary"
-          id="saveContentBtn"
+        <div
+          class="orders-list"
+          id="customCakesList"
         >
-          Salvar conteúdo
-        </button>
+
+          ${
+            cakes.length
+              ? cakes
+                  .map(
+                    renderCustomCakeCard
+                  )
+                  .join("")
+              : `
+                <div class="empty-state">
+                  Nenhuma encomenda personalizada recebida.
+                </div>
+              `
+          }
+
+        </div>
 
       </div>
     `;
 
-    $("#saveContentBtn")?.addEventListener(
-      "click",
-      async () => {
-        const button =
-          $("#saveContentBtn");
+    $("#refreshCakesBtn")
+      ?.addEventListener(
+        "click",
+        async () => {
+          await renderCakesTab();
+        }
+      );
+  }
 
-        setLoading(
-          button,
-          true,
-          "Salvar conteúdo"
-        );
+  function renderCustomCakeCard(
+    cake
+  ) {
+    const customer =
+      cake.customer ||
+      cake.name ||
+      "Cliente";
 
-        try {
-          state.settings.about = {
-            ...(state.settings.about || {}),
+    const phone =
+      cake.phone ||
+      "";
 
-            title:
-              $("#adminAboutTitle")
-                ?.value || "",
+    const date =
+      formatOrderDate(
+        cake.created_at
+      );
 
-            quote:
-              $("#adminAboutQuote")
-                ?.value || "",
+    const fields = [];
 
-            text:
-              $("#adminAboutText")
-                ?.value || ""
-          };
+    const possibleFields = [
+      [
+        "Data",
+        cake.date ||
+          cake.event_date
+      ],
+      [
+        "Massa",
+        cake.massa
+      ],
+      [
+        "Recheio",
+        cake.recheio
+      ],
+      [
+        "Tamanho",
+        cake.size
+      ],
+      [
+        "Quantidade",
+        cake.quantity
+      ],
+      [
+        "Adicionais",
+        cake.adicionais
+      ],
+      [
+        "Personalização",
+        cake.personalizacao
+      ],
+      [
+        "Observações",
+        cake.notes ||
+          cake.observations
+      ]
+    ];
 
-          await saveSettingObject();
-
-          toast(
-            "Conteúdo salvo com sucesso."
-          );
-        } catch (error) {
-          console.error(error);
-
-          toast(
-            "Não foi possível salvar o conteúdo.",
-            "error"
-          );
-        } finally {
-          setLoading(
-            button,
-            false,
-            "Salvar conteúdo"
-          );
+    possibleFields.forEach(
+      ([label, value]) => {
+        if (
+          value !==
+            undefined &&
+          value !==
+            null &&
+          String(value).trim()
+        ) {
+          fields.push(`
+            <p>
+              <strong>
+                ${escapeHtml(
+                  label
+                )}:
+              </strong>
+              ${escapeHtml(
+                String(value)
+              )}
+            </p>
+          `);
         }
       }
     );
+
+    return `
+      <article class="order-card">
+
+        <div class="order-card-header">
+
+          <div>
+            <h3>
+              ${escapeHtml(
+                customer
+              )}
+            </h3>
+
+            ${
+              phone
+                ? `
+                  <p>
+                    ${escapeHtml(
+                      phone
+                    )}
+                  </p>
+                `
+                : ""
+            }
+
+            ${
+              date
+                ? `
+                  <p>
+                    ${escapeHtml(
+                      date
+                    )}
+                  </p>
+                `
+                : ""
+            }
+          </div>
+
+        </div>
+
+        <div class="order-card-body">
+
+          ${
+            fields.length
+              ? fields.join("")
+              : `
+                <p>
+                  Nenhuma informação adicional.
+                </p>
+              `
+          }
+
+        </div>
+
+      </article>
+    `;
   }
 
   /* =========================================================
-     SALVAR CONFIGURAÇÃO
+     CONTEÚDOS
      ========================================================= */
 
-  async function saveSettingObject() {
-    if (!db) {
-      throw new Error(
-        "Supabase não está disponível."
-      );
-    }
+  function renderContentTab() {
+    if (!tabContent) return;
 
-    const { error } =
-      await db
+    const settings =
+      state.settings || {};
+
+    tabContent.innerHTML = `
+      <div class="product-toolbar">
+
+        <div>
+          <h2>
+            Conteúdos
+          </h2>
+
+          <p>
+            Edite as informações principais exibidas no site.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="admin-panel-box">
+
+        <form
+          id="contentForm"
+          class="admin-form"
+        >
+
+          <div class="form-group">
+            <label for="contentTitle">
+              Título principal
+            </label>
+
+            <input
+              type="text"
+              id="contentTitle"
+              value="${escapeHtml(
+                settings.title ||
+                  ""
+              )}"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="contentSubtitle">
+              Subtítulo
+            </label>
+
+            <input
+              type="text"
+              id="contentSubtitle"
+              value="${escapeHtml(
+                settings.subtitle ||
+                  ""
+              )}"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="contentDescription">
+              Descrição
+            </label>
+
+            <textarea
+              id="contentDescription"
+              rows="5"
+            >${escapeHtml(
+              settings.description ||
+                ""
+            )}</textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="contentInstagram">
+              Instagram
+            </label>
+
+            <input
+              type="text"
+              id="contentInstagram"
+              value="${escapeHtml(
+                settings.instagram ||
+                  ""
+              )}"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="contentWhatsapp">
+              WhatsApp
+            </label>
+
+            <input
+              type="text"
+              id="contentWhatsapp"
+              value="${escapeHtml(
+                settings.whatsapp ||
+                  "5585981563070"
+              )}"
+            >
+          </div>
+
+          <div class="form-actions">
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+            >
+              Salvar alterações
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+    `;
+
+    $("#contentForm")
+      ?.addEventListener(
+        "submit",
+        saveContent
+      );
+  }
+
+  async function saveContent(
+    event
+  ) {
+    event.preventDefault();
+
+    const form =
+      event.currentTarget;
+
+    const button =
+      form.querySelector(
+        'button[type="submit"]'
+      );
+
+    setLoading(
+      button,
+      true,
+      "Salvar alterações"
+    );
+
+    try {
+      const payload = {
+        ...state.settings,
+
+        title:
+          $("#contentTitle")
+            ?.value
+            ?.trim() || "",
+
+        subtitle:
+          $("#contentSubtitle")
+            ?.value
+            ?.trim() || "",
+
+        description:
+          $("#contentDescription")
+            ?.value
+            ?.trim() || "",
+
+        instagram:
+          $("#contentInstagram")
+            ?.value
+            ?.trim() || "",
+
+        whatsapp:
+          $("#contentWhatsapp")
+            ?.value
+            ?.trim() ||
+          "5585981563070"
+      };
+
+      const {
+        error
+      } = await db
         .from("settings")
         .upsert(
           {
             key: "site",
-            value: state.settings
+            value: payload
           },
           {
             onConflict: "key"
           }
         );
 
-    if (error) throw error;
-  }
+      if (error) {
+        throw error;
+      }
 
-  /* =========================================================
+      state.settings =
+        payload;
+
+      toast(
+        "Conteúdos salvos com sucesso."
+      );
+
+    } catch (error) {
+      console.error(error);
+
+      toast(
+        error.message ||
+          "Não foi possível salvar os conteúdos.",
+        "error"
+      );
+
+    } finally {
+      setLoading(
+        button,
+        false,
+        "Salvar alterações"
+      );
+    }
+  }
+     /* =========================================================
      HORÁRIOS
      ========================================================= */
 
@@ -3406,196 +2586,213 @@
     if (!tabContent) return;
 
     const hours =
-      Array.isArray(
-        state.settings.hours
-      )
-        ? state.settings.hours
-        : Array.isArray(
-            DEFAULTS.hours
-          )
-        ? DEFAULTS.hours
-        : [];
+      state.settings.hours ||
+      {};
 
-    const names = [
-      "Domingo",
-      "Segunda-feira",
-      "Terça-feira",
-      "Quarta-feira",
-      "Quinta-feira",
-      "Sexta-feira",
-      "Sábado"
+    const days = [
+      ["segunda", "Segunda-feira"],
+      ["terca", "Terça-feira"],
+      ["quarta", "Quarta-feira"],
+      ["quinta", "Quinta-feira"],
+      ["sexta", "Sexta-feira"],
+      ["sabado", "Sábado"],
+      ["domingo", "Domingo"]
     ];
 
     tabContent.innerHTML = `
       <div class="product-toolbar">
 
         <div>
-
           <h2>
             Horários
           </h2>
 
           <p>
-            Horários de funcionamento.
+            Configure os horários de funcionamento da confeitaria.
           </p>
-
         </div>
 
       </div>
 
       <div class="admin-panel-box">
 
-        ${names
-          .map(
-            (name, index) => {
-              const item =
-                hours[index] || {
-                  s: "closed",
-                  o: "",
-                  c: ""
-                };
-
-              return `
-                <div class="hours-row">
-
-                  <strong>
-                    ${name}
-                  </strong>
-
-                  <select
-                    data-hours-status="${index}"
-                  >
-
-                    <option
-                      value="open"
-                      ${
-                        item.s ===
-                        "open"
-                          ? "selected"
-                          : ""
-                      }
-                    >
-                      Aberto
-                    </option>
-
-                    <option
-                      value="closed"
-                      ${
-                        item.s ===
-                        "closed"
-                          ? "selected"
-                          : ""
-                      }
-                    >
-                      Fechado
-                    </option>
-
-                    <option
-                      value="tbd"
-                      ${
-                        item.s ===
-                        "tbd"
-                          ? "selected"
-                          : ""
-                      }
-                    >
-                      A confirmar
-                    </option>
-
-                  </select>
-
-                  <input
-                    type="time"
-                    data-hours-open="${index}"
-                    value="${escapeHtml(
-                      item.o || ""
-                    )}"
-                  >
-
-                  <input
-                    type="time"
-                    data-hours-close="${index}"
-                    value="${escapeHtml(
-                      item.c || ""
-                    )}"
-                  >
-
-                </div>
-              `;
-            }
-          )
-          .join("")}
-
-        <button
-          type="button"
-          class="btn btn-primary"
-          id="saveHoursBtn"
+        <form
+          id="hoursForm"
+          class="admin-form"
         >
-          Salvar horários
-        </button>
-              </div>
+
+          <div class="hours-grid">
+
+            ${days
+              .map(
+                ([key, label]) => {
+                  const current =
+                    hours[key] ||
+                    {};
+
+                  return `
+                    <div class="hours-row">
+
+                      <div class="hours-day">
+                        <strong>
+                          ${label}
+                        </strong>
+                      </div>
+
+                      <div class="hours-fields">
+
+                        <input
+                          type="text"
+                          name="${key}_open"
+                          value="${escapeHtml(
+                            current.open ||
+                              ""
+                          )}"
+                          placeholder="Ex.: 11:00"
+                        >
+
+                        <span>
+                          até
+                        </span>
+
+                        <input
+                          type="text"
+                          name="${key}_close"
+                          value="${escapeHtml(
+                            current.close ||
+                              ""
+                          )}"
+                          placeholder="Ex.: 23:00"
+                        >
+
+                      </div>
+
+                    </div>
+                  `;
+                }
+              )
+              .join("")}
+
+          </div>
+
+          <div class="form-actions">
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+            >
+              Salvar alterações
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
     `;
 
-    $("#saveHoursBtn")?.addEventListener(
-      "click",
-      async () => {
-        const button =
-          $("#saveHoursBtn");
+    $("#hoursForm")
+      ?.addEventListener(
+        "submit",
+        saveHours
+      );
+  }
 
-        setLoading(
-          button,
-          true,
-          "Salvar horários"
+  async function saveHours(
+    event
+  ) {
+    event.preventDefault();
+
+    const form =
+      event.currentTarget;
+
+    const button =
+      form.querySelector(
+        'button[type="submit"]'
+      );
+
+    setLoading(
+      button,
+      true,
+      "Salvar alterações"
+    );
+
+    try {
+      const days = [
+        "segunda",
+        "terca",
+        "quarta",
+        "quinta",
+        "sexta",
+        "sabado",
+        "domingo"
+      ];
+
+      const hours = {};
+
+      days.forEach(
+        (day) => {
+          hours[day] = {
+            open:
+              form.elements[
+                `${day}_open`
+              ]?.value?.trim() ||
+              "",
+            close:
+              form.elements[
+                `${day}_close`
+              ]?.value?.trim() ||
+              ""
+          };
+        }
+      );
+
+      const payload = {
+        ...state.settings,
+        hours
+      };
+
+      const {
+        error
+      } = await db
+        .from("settings")
+        .upsert(
+          {
+            key: "site",
+            value: payload
+          },
+          {
+            onConflict: "key"
+          }
         );
 
-        try {
-          const newHours =
-            names.map(
-              (_, index) => ({
-                s:
-                  $(
-                    `[data-hours-status="${index}"]`
-                  )?.value ||
-                  "closed",
-
-                o:
-                  $(
-                    `[data-hours-open="${index}"]`
-                  )?.value ||
-                  "",
-
-                c:
-                  $(
-                    `[data-hours-close="${index}"]`
-                  )?.value ||
-                  ""
-              })
-            );
-
-          state.settings.hours =
-            newHours;
-
-          await saveSettingObject();
-
-          toast(
-            "Horários salvos com sucesso."
-          );
-        } catch (error) {
-          console.error(error);
-
-          toast(
-            "Não foi possível salvar os horários.",
-            "error"
-          );
-        } finally {
-          setLoading(
-            button,
-            false,
-            "Salvar horários"
-          );
-        }
+      if (error) {
+        throw error;
       }
-    );
+
+      state.settings =
+        payload;
+
+      toast(
+        "Horários salvos com sucesso."
+      );
+
+    } catch (error) {
+      console.error(error);
+
+      toast(
+        error.message ||
+          "Não foi possível salvar os horários.",
+        "error"
+      );
+
+    } finally {
+      setLoading(
+        button,
+        false,
+        "Salvar alterações"
+      );
+    }
   }
 
   /* =========================================================
@@ -3606,96 +2803,211 @@
     if (!tabContent) return;
 
     const rules =
-      state.settings.rules || {};
+      state.settings.rules ||
+      {};
 
     tabContent.innerHTML = `
       <div class="product-toolbar">
 
         <div>
-
           <h2>
             Regras
           </h2>
 
           <p>
-            Informações e regras das encomendas.
+            Configure informações e regras das encomendas.
           </p>
-
         </div>
 
       </div>
 
       <div class="admin-panel-box">
 
-        <div class="field">
-
-          <label>
-            Prazo / observações
-          </label>
-
-          <textarea
-            id="adminRulesText"
-            rows="10"
-          >${escapeHtml(
-            rules.text || ""
-          )}</textarea>
-
-        </div>
-
-        <button
-          type="button"
-          class="btn btn-primary"
-          id="saveRulesBtn"
+        <form
+          id="rulesForm"
+          class="admin-form"
         >
-          Salvar regras
-        </button>
+
+          <div class="form-group">
+
+            <label for="ruleMinimum">
+              Pedido mínimo
+            </label>
+
+            <input
+              type="text"
+              id="ruleMinimum"
+              value="${escapeHtml(
+                rules.minimum ||
+                  ""
+              )}"
+              placeholder="Ex.: Pedido mínimo de 48h"
+            >
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="rulePayment">
+              Forma de pagamento
+            </label>
+
+            <textarea
+              id="rulePayment"
+              rows="4"
+              placeholder="Informe as formas de pagamento aceitas."
+            >${escapeHtml(
+              rules.payment ||
+                ""
+            )}</textarea>
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="ruleDelivery">
+              Entrega
+            </label>
+
+            <textarea
+              id="ruleDelivery"
+              rows="4"
+              placeholder="Informe as regras de entrega."
+            >${escapeHtml(
+              rules.delivery ||
+                ""
+            )}</textarea>
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="ruleCancellation">
+              Cancelamento
+            </label>
+
+            <textarea
+              id="ruleCancellation"
+              rows="4"
+              placeholder="Informe as regras de cancelamento."
+            >${escapeHtml(
+              rules.cancellation ||
+                ""
+            )}</textarea>
+
+          </div>
+
+          <div class="form-actions">
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+            >
+              Salvar alterações
+            </button>
+
+          </div>
+
+        </form>
 
       </div>
     `;
 
-    $("#saveRulesBtn")?.addEventListener(
-      "click",
-      async () => {
-        const button =
-          $("#saveRulesBtn");
+    $("#rulesForm")
+      ?.addEventListener(
+        "submit",
+        saveRules
+      );
+  }
 
-        setLoading(
-          button,
-          true,
-          "Salvar regras"
+  async function saveRules(
+    event
+  ) {
+    event.preventDefault();
+
+    const form =
+      event.currentTarget;
+
+    const button =
+      form.querySelector(
+        'button[type="submit"]'
+      );
+
+    setLoading(
+      button,
+      true,
+      "Salvar alterações"
+    );
+
+    try {
+      const rules = {
+        minimum:
+          $("#ruleMinimum")
+            ?.value
+            ?.trim() || "",
+
+        payment:
+          $("#rulePayment")
+            ?.value
+            ?.trim() || "",
+
+        delivery:
+          $("#ruleDelivery")
+            ?.value
+            ?.trim() || "",
+
+        cancellation:
+          $("#ruleCancellation")
+            ?.value
+            ?.trim() || ""
+      };
+
+      const payload = {
+        ...state.settings,
+        rules
+      };
+
+      const {
+        error
+      } = await db
+        .from("settings")
+        .upsert(
+          {
+            key: "site",
+            value: payload
+          },
+          {
+            onConflict: "key"
+          }
         );
 
-        try {
-          state.settings.rules = {
-            ...(state.settings.rules ||
-              {}),
-
-            text:
-              $("#adminRulesText")
-                ?.value || ""
-          };
-
-          await saveSettingObject();
-
-          toast(
-            "Regras salvas com sucesso."
-          );
-        } catch (error) {
-          console.error(error);
-
-          toast(
-            "Não foi possível salvar as regras.",
-            "error"
-          );
-        } finally {
-          setLoading(
-            button,
-            false,
-            "Salvar regras"
-          );
-        }
+      if (error) {
+        throw error;
       }
-    );
+
+      state.settings =
+        payload;
+
+      toast(
+        "Regras salvas com sucesso."
+      );
+
+    } catch (error) {
+      console.error(error);
+
+      toast(
+        error.message ||
+          "Não foi possível salvar as regras.",
+        "error"
+      );
+
+    } finally {
+      setLoading(
+        button,
+        false,
+        "Salvar alterações"
+      );
+    }
   }
 
   /* =========================================================
@@ -3705,382 +3017,366 @@
   function renderMediaTab() {
     if (!tabContent) return;
 
+    const settings =
+      state.settings || {};
+
     tabContent.innerHTML = `
       <div class="product-toolbar">
 
         <div>
-
           <h2>
             Mídia
           </h2>
 
           <p>
-            Imagens e materiais utilizados pelo site.
+            Configure as imagens e vídeos utilizados no site.
           </p>
-
         </div>
 
       </div>
 
       <div class="admin-panel-box">
 
-        <p>
-          As imagens dos produtos podem ser adicionadas
-          diretamente pelo cadastro de cada produto.
-        </p>
+        <form
+          id="mediaForm"
+          class="admin-form"
+        >
 
-        <p style="opacity:.7;">
-          O sistema mantém a imagem atual quando nenhum
-          novo arquivo é selecionado.
-        </p>
+          <div class="form-group">
+
+            <label for="mediaLogo">
+              Logo
+            </label>
+
+            <input
+              type="url"
+              id="mediaLogo"
+              value="${escapeHtml(
+                settings.logo ||
+                  settings.logo_url ||
+                  ""
+              )}"
+              placeholder="URL da logo"
+            >
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="mediaHero">
+              Imagem principal
+            </label>
+
+            <input
+              type="url"
+              id="mediaHero"
+              value="${escapeHtml(
+                settings.hero ||
+                  settings.hero_url ||
+                  ""
+              )}"
+              placeholder="URL da imagem principal"
+            >
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="mediaVideo">
+              Vídeo principal
+            </label>
+
+            <input
+              type="url"
+              id="mediaVideo"
+              value="${escapeHtml(
+                settings.video ||
+                  settings.video_url ||
+                  ""
+              )}"
+              placeholder="URL do vídeo"
+            >
+
+          </div>
+
+          <div class="form-actions">
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+            >
+              Salvar alterações
+            </button>
+
+          </div>
+
+        </form>
 
       </div>
     `;
+
+    $("#mediaForm")
+      ?.addEventListener(
+        "submit",
+        saveMedia
+      );
   }
 
-  /* =========================================================
-     ABAS
-     ========================================================= */
-
-  async function activateTab(tab) {
-    state.activeTab = tab;
-
-    $$(".sidebar-item, [data-tab]")
-      .forEach((element) => {
-        if (
-          element.dataset.tab ===
-          tab
-        ) {
-          element.classList.add(
-            "active"
-          );
-        } else {
-          element.classList.remove(
-            "active"
-          );
-        }
-      });
-
-    updateCakesTabLabel();
-
-    if (tab === "products") {
-      renderProductTab();
-      return;
-    }
-
-    if (tab === "orders") {
-      await renderOrdersTab();
-      return;
-    }
-
-    if (tab === "cakes") {
-      await renderCakesTab();
-      return;
-    }
-
-    if (tab === "content") {
-      renderContentTab();
-      return;
-    }
-
-    if (tab === "hours") {
-      renderHoursTab();
-      return;
-    }
-
-    if (tab === "rules") {
-      renderRulesTab();
-      return;
-    }
-
-    if (tab === "media") {
-      renderMediaTab();
-      return;
-    }
-
-    renderProductTab();
-  }
-
-  function updateCakesTabLabel() {
-    $$('[data-tab="cakes"]')
-      .forEach((button) => {
-        const span =
-          button.querySelector(
-            "span"
-          );
-
-        if (span) {
-          span.textContent =
-            "Pedidos de Bolo";
-
-          return;
-        }
-
-        const textNodes =
-          Array.from(
-            button.childNodes
-          ).filter(
-            (node) =>
-              node.nodeType ===
-              Node.TEXT_NODE
-          );
-
-        if (textNodes.length) {
-          textNodes.forEach(
-            (node, index) => {
-              node.textContent =
-                index ===
-                textNodes.length - 1
-                  ? "Pedidos de Bolo"
-                                  : "";
-            }
-          );
-        } else {
-          button.appendChild(
-            document.createTextNode(
-              "Pedidos de Bolo"
-            )
-          );
-        }
-      });
-  }
-
-  function bindTabs() {
-    $$("[data-tab]")
-      .forEach((button) => {
-        if (button.dataset.tabBound) {
-          return;
-        }
-
-        button.dataset.tabBound =
-          "true";
-
-        button.addEventListener(
-          "click",
-          () => {
-            activateTab(
-              button.dataset.tab
-            );
-          }
-        );
-      });
-
-    updateCakesTabLabel();
-  }
-
-  /* =========================================================
-     LOGIN
-     ========================================================= */
-
-  async function handleLogin(event) {
+  async function saveMedia(
+    event
+  ) {
     event.preventDefault();
 
-    if (!loginForm) return;
+    const form =
+      event.currentTarget;
 
-    if (!db) {
-      showLoginMessage(
-        "Erro: conexão com o Supabase não está disponível."
-      );
-      return;
-    }
-
-    const email =
-      $("#loginEmail")
-        ?.value
-        ?.trim();
-
-    const password =
-      $("#loginPassword")
-        ?.value || "";
-
-    if (!email || !password) {
-      showLoginMessage(
-        "Informe e-mail e senha."
-      );
-
-      return;
-    }
-
-    const submitButton =
-      loginForm.querySelector(
+    const button =
+      form.querySelector(
         'button[type="submit"]'
       );
 
     setLoading(
-      submitButton,
+      button,
       true,
-      "Entrar"
-    );
-
-    showLoginMessage(
-      "Entrando...",
-      false
+      "Salvar alterações"
     );
 
     try {
+      const logo =
+        $("#mediaLogo")
+          ?.value
+          ?.trim() || "";
+
+      const hero =
+        $("#mediaHero")
+          ?.value
+          ?.trim() || "";
+
+      const video =
+        $("#mediaVideo")
+          ?.value
+          ?.trim() || "";
+
+      const payload = {
+        ...state.settings,
+        logo,
+        logo_url: logo,
+        hero,
+        hero_url: hero,
+        video,
+        video_url: video
+      };
+
       const {
-        data,
         error
-      } =
-        await db.auth.signInWithPassword({
-          email,
-          password
-        });
-
-      if (error) throw error;
-
-      if (!data?.session) {
-        throw new Error(
-          "Login realizado, mas a sessão não foi criada."
+      } = await db
+        .from("settings")
+        .upsert(
+          {
+            key: "site",
+            value: payload
+          },
+          {
+            onConflict: "key"
+          }
         );
+
+      if (error) {
+        throw error;
       }
 
-      showLoginMessage(
-        "Login realizado.",
-        false
-      );
+      state.settings =
+        payload;
 
-      await showApp();
+      loadAdminLogo();
+
+      toast(
+        "Mídia salva com sucesso."
+      );
 
     } catch (error) {
       console.error(error);
 
-      showLoginMessage(
+      toast(
         error.message ||
-          "Não foi possível entrar."
+          "Não foi possível salvar a mídia.",
+        "error"
       );
 
     } finally {
       setLoading(
-        submitButton,
+        button,
         false,
-        "Entrar"
+        "Salvar alterações"
       );
     }
   }
+     /* =========================================================
+     NAVEGAÇÃO ENTRE ABAS
+     ========================================================= */
 
-  async function handleLogout() {
-    if (db) {
-      try {
-        await db.auth.signOut();
-      } catch (error) {
-        console.error(error);
+  function setActiveTab(
+    tab
+  ) {
+    state.activeTab =
+      tab || "products";
+
+    $$("[data-tab]").forEach(
+      (button) => {
+        button.classList.toggle(
+          "active",
+          button.dataset.tab ===
+            state.activeTab
+        );
       }
+    );
+
+    const titles = {
+      products: [
+        "Produtos",
+        "Gerencie os produtos cadastrados."
+      ],
+
+      orders: [
+        "Pedidos",
+        "Acompanhe os pedidos recebidos."
+      ],
+
+      cakes: [
+        "Bolos personalizados",
+        "Gerencie as encomendas personalizadas."
+      ],
+
+      content: [
+        "Conteúdos",
+        "Edite os conteúdos do site."
+      ],
+
+      hours: [
+        "Horários",
+        "Configure os horários de funcionamento."
+      ],
+
+      rules: [
+        "Regras",
+        "Configure as regras das encomendas."
+      ],
+
+      media: [
+        "Mídia",
+        "Gerencie imagens e vídeos do site."
+      ]
+    };
+
+    const title =
+      titles[
+        state.activeTab
+      ] || titles.products;
+
+    const pageTitle =
+      $("#pageTitle");
+
+    const pageSubtitle =
+      $("#pageSubtitle");
+
+    if (pageTitle) {
+      pageTitle.textContent =
+        title[0];
     }
 
-    showLogin();
+    if (pageSubtitle) {
+      pageSubtitle.textContent =
+        title[1];
+    }
+
+    switch (
+      state.activeTab
+    ) {
+      case "orders":
+        renderOrdersTab();
+        break;
+
+      case "cakes":
+        renderCakesTab();
+        break;
+
+      case "content":
+        renderContentTab();
+        break;
+
+      case "hours":
+        renderHoursTab();
+        break;
+
+      case "rules":
+        renderRulesTab();
+        break;
+
+      case "media":
+        renderMediaTab();
+        break;
+
+      case "products":
+      default:
+        renderProductTab();
+        break;
+    }
   }
 
-  function showLogin() {
-    if (loginScreen) {
-      loginScreen.classList.remove(
-        "hidden"
-      );
-
-      loginScreen.style.display = "";
-    }
-
-    if (app) {
-      app.classList.add("hidden");
-      app.style.display = "";
-    }
-  }
-
-  async function showApp() {
-    if (loginScreen) {
-      loginScreen.classList.add(
-        "hidden"
-      );
-
-      loginScreen.style.display =
-        "none";
-    }
-
-    if (app) {
-      app.classList.remove("hidden");
-      app.style.display = "";
-    }
-
-    try {
-      await loadSettings();
-      await loadProducts();
-
-      updateStats();
-
-      bindTabs();
-
-      await activateTab(
-        state.activeTab ||
-          "products"
-      );
-
-    } catch (error) {
-      console.error(error);
-
-      toast(
-        "Não foi possível carregar o painel: " +
-          (error.message ||
-            "erro desconhecido"),
-        "error"
-      );
-    }
+  function bindNavigation() {
+    $$("[data-tab]").forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          () => {
+            setActiveTab(
+              button.dataset.tab
+            );
+          }
+        );
+      }
+    );
   }
 
   /* =========================================================
-     ATUALIZAR PAINEL
+     MODAL DO PRODUTO
      ========================================================= */
 
-  async function refreshAdmin() {
-    const oldText =
-      refreshBtn?.textContent ||
-      "Atualizar";
-
-    if (refreshBtn) {
-      refreshBtn.disabled = true;
-      refreshBtn.textContent =
-        "Atualizando...";
+  function bindProductModal() {
+    if (productForm) {
+      productForm.addEventListener(
+        "submit",
+        saveProduct
+      );
     }
 
-    try {
-      await loadSettings();
-      await loadProducts();
-
-      updateStats();
-
-      await activateTab(
-        state.activeTab ||
-          "products"
+    const closeButtons =
+      $$(
+        "[data-close-product-modal]"
       );
 
-      toast(
-        "Painel atualizado."
-      );
-
-    } catch (error) {
-      console.error(error);
-
-      toast(
-        "Não foi possível atualizar o painel.",
-        "error"
-      );
-
-    } finally {
-      if (refreshBtn) {
-        refreshBtn.disabled = false;
-        refreshBtn.textContent =
-          oldText;
+    closeButtons.forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          closeProductModal
+        );
       }
+    );
+
+    const modalClose =
+      productModal?.querySelector(
+        ".modal-close"
+      );
+
+    if (modalClose) {
+      modalClose.addEventListener(
+        "click",
+        closeProductModal
+      );
     }
-  }
 
-  /* =========================================================
-     MODAL
-     ========================================================= */
-
-  function bindModalEvents() {
-    if (!productModal) return;
-
-    productModal.addEventListener(
+    productModal?.addEventListener(
       "click",
       (event) => {
         if (
@@ -4092,34 +3388,397 @@
       }
     );
 
-    const closeButtons =
-      productModal.querySelectorAll(
-        "[data-close], .modal-close, .close-modal"
-      );
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (
+          event.key ===
+          "Escape"
+        ) {
+          closeProductModal();
+        }
+      }
+    );
+  }
 
-    closeButtons.forEach(
-      (button) => {
-        button.addEventListener(
-          "click",
-          closeProductModal
+  /* =========================================================
+     FOTO DO PRODUTO
+     ========================================================= */
+
+  function bindProductPhoto() {
+    const input =
+      $("#productPhoto");
+
+    const preview =
+      $("#photoPreview");
+
+    if (!input || !preview) {
+      return;
+    }
+
+    input.addEventListener(
+      "change",
+      () => {
+        const file =
+          input.files?.[0];
+
+        if (!file) {
+          preview.innerHTML =
+            "Nenhuma imagem";
+          return;
+        }
+
+        if (
+          !file.type.startsWith(
+            "image/"
+          )
+        ) {
+          preview.innerHTML =
+            "Arquivo inválido";
+
+          input.value = "";
+
+          toast(
+            "Selecione uma imagem válida.",
+            "warning"
+          );
+
+          return;
+        }
+
+        const reader =
+          new FileReader();
+
+        reader.onload = (
+          event
+        ) => {
+          preview.innerHTML = `
+            <img
+              src="${event.target.result}"
+              alt="Prévia"
+            >
+          `;
+        };
+
+        reader.readAsDataURL(
+          file
         );
       }
     );
   }
 
   /* =========================================================
+     CATEGORIAS
+     ========================================================= */
+
+  function renderCategoryOptions() {
+    const select =
+      $("#productCategory");
+
+    if (!select) return;
+
+    const current =
+      select.value;
+
+    const categories =
+      normalizeCategories(
+        state.categories
+      );
+
+    select.innerHTML = `
+      <option value="">
+        Selecione uma categoria
+      </option>
+
+      ${categories
+        .map(
+          (category) => `
+            <option
+              value="${escapeHtml(
+                category
+              )}"
+            >
+              ${escapeHtml(
+                category
+              )}
+            </option>
+          `
+        )
+        .join("")}
+    `;
+
+    if (current) {
+      select.value =
+        current;
+    }
+  }
+
+  function bindCategoryControls() {
+    const select =
+      $("#productCategory");
+
+    const newField =
+      $("#newCategoryField");
+
+    const newCategory =
+      $("#newCategory");
+
+    if (select) {
+      select.addEventListener(
+        "change",
+        () => {
+          if (
+            select.value ===
+            "__new__"
+          ) {
+            if (newField) {
+              newField.style.display =
+                "block";
+            }
+
+            if (newCategory) {
+              newCategory.focus();
+            }
+          } else {
+            if (newField) {
+              newField.style.display =
+                "none";
+            }
+          }
+        }
+      );
+    }
+
+    const addCategoryBtn =
+      $("#addCategoryBtn");
+
+    if (addCategoryBtn) {
+      addCategoryBtn.addEventListener(
+        "click",
+        async () => {
+          const value =
+            newCategory
+              ?.value
+              ?.trim() || "";
+
+          if (!value) {
+            toast(
+              "Digite o nome da classificação.",
+              "warning"
+            );
+            return;
+          }
+
+          if (
+            state.categories.some(
+              (category) =>
+                category.toLowerCase() ===
+                value.toLowerCase()
+            )
+          ) {
+            toast(
+              "Essa classificação já existe.",
+              "warning"
+            );
+            return;
+          }
+
+          state.categories.push(
+            value
+          );
+
+          state.categories.sort(
+            (a, b) =>
+              a.localeCompare(
+                b,
+                "pt-BR"
+              )
+          );
+
+          try {
+            await saveCategories();
+
+            renderCategoryOptions();
+
+            if (select) {
+              select.value =
+                value;
+            }
+
+            if (newCategory) {
+              newCategory.value =
+                "";
+            }
+
+            if (newField) {
+              newField.style.display =
+                "none";
+            }
+
+            toast(
+              "Classificação adicionada."
+            );
+          } catch (error) {
+            state.categories =
+              state.categories.filter(
+                (category) =>
+                  category !==
+                  value
+              );
+
+            toast(
+              "Não foi possível adicionar a classificação.",
+              "error"
+            );
+          }
+        }
+      );
+    }
+  }
+
+  /* =========================================================
+     LOGIN
+     ========================================================= */
+
+  async function login(
+    event
+  ) {
+    event.preventDefault();
+
+    if (!db) {
+      showLoginMessage(
+        "Supabase não está disponível."
+      );
+      return;
+    }
+
+    const email =
+      $("#loginEmail")
+        ?.value
+        ?.trim() || "";
+
+    const password =
+      $("#loginPassword")
+        ?.value || "";
+
+    if (!email || !password) {
+      showLoginMessage(
+        "Informe e-mail e senha."
+      );
+      return;
+    }
+
+    const button =
+      loginForm?.querySelector(
+        'button[type="submit"]'
+      );
+
+    setLoading(
+      button,
+      true,
+      "Entrar"
+    );
+
+    showLoginMessage(
+      "",
+      false
+    );
+
+    try {
+      const {
+        data,
+        error
+      } = await db.auth
+        .signInWithPassword({
+          email,
+          password
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data?.session) {
+        throw new Error(
+          "Não foi possível iniciar a sessão."
+        );
+      }
+
+      showLoginMessage(
+        "Login realizado.",
+        false
+      );
+
+      await initializeApp();
+
+    } catch (error) {
+      console.error(
+        "Erro login:",
+        error
+      );
+
+      showLoginMessage(
+        error.message ||
+          "E-mail ou senha incorretos."
+      );
+
+    } finally {
+      setLoading(
+        button,
+        false,
+        "Entrar"
+      );
+    }
+  }
+
+  async function logout() {
+    if (!db) return;
+
+    try {
+      await db.auth.signOut();
+    } catch (error) {
+      console.error(
+        "Erro logout:",
+        error
+      );
+    }
+
+    if (app) {
+      app.style.display =
+        "none";
+    }
+
+    if (loginScreen) {
+      loginScreen.style.display =
+        "flex";
+    }
+
+    if (loginForm) {
+      loginForm.reset();
+    }
+  }
+     /* =========================================================
      INICIALIZAÇÃO DO SUPABASE
      ========================================================= */
 
   function initializeSupabase() {
     if (
-      !window.supabase ||
-      typeof window.supabase
-        .createClient !==
-        "function"
+      typeof window.supabase ===
+      "undefined"
     ) {
       console.error(
-        "Supabase JS não foi carregado corretamente."
+        "Supabase JS não foi carregado."
+      );
+
+      return false;
+    }
+
+    if (
+      !SUPABASE_URL ||
+      !SUPABASE_ANON_KEY
+    ) {
+      console.error(
+        "Credenciais do Supabase não configuradas."
       );
 
       return false;
@@ -4131,7 +3790,8 @@
           SUPABASE_URL,
           SUPABASE_ANON_KEY
         );
-            return Boolean(db);
+
+      return true;
 
     } catch (error) {
       console.error(
@@ -4146,69 +3806,109 @@
   }
 
   /* =========================================================
-     INICIALIZAÇÃO
+     INTERFACE
      ========================================================= */
 
-  async function init() {
-    console.log(
-      "Martins Admin — versão atualizada"
-    );
+  function showApp() {
+    if (loginScreen) {
+      loginScreen.style.display =
+        "none";
+    }
 
-    const supabaseReady =
-      initializeSupabase();
+    if (app) {
+      app.style.display =
+        "block";
+    }
+  }
 
-    if (!supabaseReady) {
-      showLoginMessage(
-        "Erro: biblioteca do Supabase não foi carregada. Atualize a página e tente novamente."
+  function showLogin() {
+    if (app) {
+      app.style.display =
+        "none";
+    }
+
+    if (loginScreen) {
+      loginScreen.style.display =
+        "flex";
+    }
+  }
+
+  /* =========================================================
+     CARREGAMENTO INICIAL
+     ========================================================= */
+
+  async function initializeApp() {
+    if (!db) {
+      const initialized =
+        initializeSupabase();
+
+      if (!initialized) {
+        showLoginMessage(
+          "Não foi possível conectar ao Supabase."
+        );
+
+        return;
+      }
+    }
+
+    try {
+      showApp();
+
+      await loadSettings();
+
+      await loadProducts();
+
+      updateStats();
+
+      renderCategoryOptions();
+
+      setActiveTab(
+        state.activeTab
       );
 
+      toast(
+        "Painel carregado com sucesso."
+      );
+
+    } catch (error) {
+      console.error(
+        "Erro ao inicializar painel:",
+        error
+      );
+
+      toast(
+        error.message ||
+          "Não foi possível carregar o painel.",
+        "error"
+      );
+    }
+  }
+
+  /* =========================================================
+     VERIFICAÇÃO DE SESSÃO
+     ========================================================= */
+
+  async function checkSession() {
+    if (!db) {
       showLogin();
 
       return;
     }
 
-    ensureProductFormFields();
-
-    if (loginForm) {
-      loginForm.addEventListener(
-        "submit",
-        handleLogin
-      );
-    }
-
-    if (logoutBtn) {
-      logoutBtn.addEventListener(
-        "click",
-        handleLogout
-      );
-    }
-
-    if (refreshBtn) {
-      refreshBtn.addEventListener(
-        "click",
-        refreshAdmin
-      );
-    }
-
-    if (productForm) {
-      productForm.addEventListener(
-        "submit",
-        saveProduct
-      );
-    }
-
-    bindModalEvents();
-
     try {
       const {
-        data: {
-          session
-        } = {}
-      } =
-        await db.auth.getSession();
+        data,
+        error
+      } = await db.auth.getSession();
 
-      if (session) {
-        await showApp();
+      if (error) {
+        throw error;
+      }
+
+      if (
+        data?.session
+      ) {
+        await initializeApp();
       } else {
         showLogin();
       }
@@ -4219,12 +3919,101 @@
         error
       );
 
-      showLoginMessage(
-        "Não foi possível verificar a sessão. Atualize a página e tente novamente."
-      );
-
       showLogin();
     }
+  }
+
+  /* =========================================================
+     EVENTOS GERAIS
+     ========================================================= */
+
+  function bindGlobalEvents() {
+    if (loginForm) {
+      loginForm.addEventListener(
+        "submit",
+        login
+      );
+    }
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener(
+        "click",
+        logout
+      );
+    }
+
+    if (refreshBtn) {
+      refreshBtn.addEventListener(
+        "click",
+        async () => {
+          try {
+            refreshBtn.disabled =
+              true;
+
+            await loadSettings();
+
+            await loadProducts();
+
+            updateStats();
+
+            setActiveTab(
+              state.activeTab
+            );
+
+            toast(
+              "Dados atualizados."
+            );
+
+          } catch (error) {
+            console.error(error);
+
+            toast(
+              "Não foi possível atualizar os dados.",
+              "error"
+            );
+
+          } finally {
+            refreshBtn.disabled =
+              false;
+          }
+        }
+      );
+    }
+
+    const mobileMenu =
+      $("#mobileMenu");
+
+    if (mobileMenu) {
+      mobileMenu.addEventListener(
+        "click",
+        () => {
+          document.body.classList.toggle(
+            "sidebar-open"
+          );
+        }
+      );
+    }
+
+    $$("[data-tab]").forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          () => {
+            document.body.classList.remove(
+              "sidebar-open"
+            );
+          }
+        );
+      }
+    );
+  }
+
+  /* =========================================================
+     OBSERVADOR DE AUTENTICAÇÃO
+     ========================================================= */
+
+  function bindAuthListener() {
+    if (!db) return;
 
     db.auth.onAuthStateChange(
       async (
@@ -4232,14 +4021,18 @@
         session
       ) => {
         if (
-          event === "SIGNED_IN" &&
+          event ===
+            "SIGNED_IN" &&
           session
         ) {
-          await showApp();
+          await initializeApp();
+
+          return;
         }
 
         if (
-          event === "SIGNED_OUT"
+          event ===
+          "SIGNED_OUT"
         ) {
           showLogin();
         }
@@ -4248,7 +4041,66 @@
   }
 
   /* =========================================================
-     INICIAR
+     PREPARAÇÃO DO FORMULÁRIO
+     ========================================================= */
+
+  function prepareProductForm() {
+    ensureProductFormFields();
+
+    renderCategoryOptions();
+
+    bindCategoryControls();
+
+    bindProductPhoto();
+  }
+
+  /* =========================================================
+     INICIALIZAÇÃO
+     ========================================================= */
+
+  async function boot() {
+    try {
+      const connected =
+        initializeSupabase();
+
+      if (!connected) {
+        showLogin();
+
+        showLoginMessage(
+          "Não foi possível conectar ao sistema."
+        );
+
+        return;
+      }
+
+      bindGlobalEvents();
+
+      bindNavigation();
+
+      bindProductModal();
+
+      prepareProductForm();
+
+      bindAuthListener();
+
+      await checkSession();
+
+    } catch (error) {
+      console.error(
+        "Erro fatal no painel:",
+        error
+      );
+
+      showLogin();
+
+      showLoginMessage(
+        "Ocorreu um erro ao carregar o painel."
+      );
+    }
+  }
+
+  /* =========================================================
+     DOM READY
      ========================================================= */
 
   if (
@@ -4257,13 +4109,81 @@
   ) {
     document.addEventListener(
       "DOMContentLoaded",
-      init,
-      {
-        once: true
-      }
+      boot
     );
   } else {
-    init();
+    boot();
   }
+     /* =========================================================
+     FUNÇÕES DE APOIO
+     ========================================================= */
+
+  function refreshProductData() {
+    return Promise.all([
+      loadSettings(),
+      loadProducts()
+    ]);
+  }
+
+  async function refreshCurrentTab() {
+    try {
+      await refreshProductData();
+
+      updateStats();
+
+      renderCategoryOptions();
+
+      setActiveTab(
+        state.activeTab
+      );
+
+    } catch (error) {
+      console.error(
+        "Erro ao atualizar:",
+        error
+      );
+
+      toast(
+        "Não foi possível atualizar os dados.",
+        "error"
+      );
+    }
+  }
+
+  /* =========================================================
+     EXPOSIÇÃO PARA DEBUG
+     ========================================================= */
+
+  window.MartinsAdmin = {
+    state,
+
+    refresh: refreshCurrentTab,
+
+    loadProducts,
+
+    loadSettings,
+
+    renderProductTab,
+
+    renderOrdersTab,
+
+    renderCakesTab,
+
+    renderContentTab,
+
+    renderHoursTab,
+
+    renderRulesTab,
+
+    renderMediaTab,
+
+    openProductModal,
+
+    closeProductModal
+  };
+
+  /* =========================================================
+     FINAL
+     ========================================================= */
 
 })();
