@@ -223,12 +223,10 @@
     ======================================================= */
 
     masses: [
-      "Amanteigado",
-      "Ninho",
-      "Chocolate",
       "Baunilha",
-      "Coco",
-      "Limão"
+      "Chocolate",
+      "Red Velvet",
+      "Cenoura"
     ],
 
     /* =======================================================
@@ -236,13 +234,14 @@
     ======================================================= */
 
     fillings: [
-      "Ninho",
       "Brigadeiro",
-      "Leite condensado",
-      "Oreo",
-      "Beijinho",
-      "Doce de leite",
-      "Limão"
+      "Brigadeiro Branco",
+      "Doce de Leite",
+      "Ninho",
+      "Ninho com Morango",
+      "Ninho com Nutella",
+      "Prestígio",
+      "Dois Amores"
     ],
 
     /* =======================================================
@@ -251,64 +250,44 @@
 
     extras: [
       [
-        "Abacaxi",
-        10
+        "Morangos",
+        15
       ],
 
       [
-        "Morango",
-        16
+        "Uvas",
+        15
       ],
 
       [
-        "Crocante de Castanha",
-        10
-      ],
-
-      [
-        "Kit Kat",
-        12
-      ],
-
-      [
-        "Geleia de Morango",
-        16
-      ],
-
-      [
-        "Ouro Branco",
-        10
-      ],
-
-      [
-        "Nutella",
-        16
-      ],
-
-      [
-        "Kinder Bueno",
-        16
-      ]
-    ],
-
-    /* =======================================================
-       PERSONALIZAÇÕES
-    ======================================================= */
-
-    personalizations: [
-      [
-        "Topo simples",
+        "Frutas",
         20
       ],
 
       [
-        "Topo 3D",
-        30
+        "Nutella",
+        15
+      ]
+    ],
+
+    /* =======================================================
+       PERSONALIZAÇÃO
+    ======================================================= */
+
+    personalization: [
+      [
+        "Sem personalização",
+        0
       ],
 
       [
-        "Flores naturais",
-        70
+        "Nome / frase",
+        10
+      ],
+
+      [
+        "Tema personalizado",
+        20
       ]
     ],
 
@@ -317,41 +296,19 @@
     ======================================================= */
 
     brigadeiros: {
-      classica: [
-        "Brigadeiro Tradicional",
-        "Brigadeiro Branco Ninho",
-        "Casadinho",
-        "Limão",
+      classicos: [
+        "Brigadeiro",
+        "Brigadeiro Branco",
         "Beijinho",
-        "Doce de Leite"
+        "Cajuzinho"
       ],
 
       premium: [
         "Ninho com Nutella",
-        "Moça Cremoso",
-        "Surpresa de Uva",
-        "Belga ao Leite",
-        "Belga Amargo",
-        "Creme Bruleé",
-        "Brigadeiro com Castanha",
-        "Doce de Leite com Castanha",
-        "Kit Kat",
+        "Ferrero",
+        "Pistache",
         "Oreo"
-      ],
-
-      classicaPrices: [
-        62.5,
-        125
-      ],
-
-      premiumPrices: [
-        72.5,
-        145
-      ],
-
-      flavorLimit50: 2,
-
-      flavorLimit100: 4
+      ]
     },
 
     /* =======================================================
@@ -361,26 +318,26 @@
     otherItems: [
       {
         name: "Petit Brownie",
-        active: true,
-        price: 0
+        price: 0,
+        active: true
       },
 
       {
         name: "Mini Brownie Recheado",
-        active: true,
-        price: 0
+        price: 0,
+        active: true
       },
 
       {
         name: "Bem Casado",
-        active: true,
-        price: 0
+        price: 0,
+        active: true
       },
 
       {
         name: "Cupcakes",
-        active: true,
-        price: 35
+        price: 35,
+        active: true
       }
     ],
 
@@ -391,63 +348,57 @@
     kits: [
       {
         id: "k1",
-        name: "Kit Festa 01",
+        name: "Kit 1",
         price: 150,
-        cake: "Chantininho 10/15 Pessoas",
-        docinhos: 20,
-        items: [
-          "04 Cupcakes",
-          "20 Petit Brownie",
-          "20 Docinhos"
-        ],
-        active: true
-      },
-
-      {
-        id: "k2",
-        name: "Kit Festa 02",
-        price: 200,
-        cake: "Chantininho 15/20 Pessoas",
+        cake: "Naked Cake 06/08 Pessoas",
         docinhos: 30,
         items: [
-          "05 Cupcakes",
-          "30 Petit Brownie",
           "30 Docinhos"
         ],
         active: true
       },
 
       {
-        id: "k3",
-        name: "Kit Festa 03",
-        price: 250,
-        cake: "Chantininho 20/25 Pessoas",
+        id: "k2",
+        name: "Kit 2",
+        price: 200,
+        cake: "Naked Cake 10/12 Pessoas",
         docinhos: 50,
         items: [
-          "08 Cupcakes",
-          "50 Petit Brownie",
           "50 Docinhos"
         ],
         active: true
       },
 
       {
+        id: "k3",
+        name: "Kit 3",
+        price: 250,
+        cake: "Chantininho 15/20 Pessoas",
+        docinhos: 70,
+        items: [
+          "70 Docinhos"
+        ],
+        active: true
+      },
+
+      {
         id: "k4",
-        name: "Kit Festa 04",
+        name: "Kit 4",
         price: 430,
         cake: "Chantininho 30/40 Pessoas",
-        docinhos: 60,
+        docinhos: 70,
         items: [
-          "10 Cupcakes",
-          "60 Petit Brownie",
-          "60 Docinhos"
+          "12 Cupcakes",
+          "70 Petit Brownie",
+          "70 Docinhos"
         ],
         active: true
       },
 
       {
         id: "k5",
-        name: "Kit Festa 05",
+        name: "Kit 5",
         price: 500,
         cake: "Chantininho 40/50 Pessoas",
         docinhos: 70,
@@ -518,34 +469,107 @@
   ========================================================= */
 
   async function checkSession() {
-    if (!db) {
-      return false;
-    }
+       /* =========================================================
+     VERIFICAÇÃO DA SESSÃO
+  ========================================================= */
 
+  if (!db) {
+    S.on = false;
+    return false;
+  }
+
+  try {
     const {
       data,
       error
     } = await db.auth.getSession();
 
     if (error) {
-      console.error(error);
+      console.warn(
+        "Erro ao verificar sessão:",
+        error.message
+      );
+
+      S.on = false;
       return false;
     }
 
-    return !!data?.session;
+    S.on = !!data?.session;
+
+    return S.on;
+  } catch (error) {
+    console.warn(
+      "Erro ao verificar sessão:",
+      error
+    );
+
+    S.on = false;
+
+    return false;
+  }
+}
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+async function login(event) {
+  event?.preventDefault();
+
+  if (!db) {
+    toast(
+      "Supabase não conectado.",
+      "error"
+    );
+
+    return false;
   }
 
-  async function login(
-    email,
-    password
-  ) {
-    if (!db) {
-      throw new Error(
-        "Supabase não foi configurado."
-      );
-    }
+  const email =
+    $("#login-email")?.value?.trim() ||
+    "";
 
+  const password =
+    $("#login-password")?.value ||
+    "";
+
+  if (!email) {
+    toast(
+      "Digite seu e-mail.",
+      "error"
+    );
+
+    $("#login-email")?.focus();
+
+    return false;
+  }
+
+  if (!password) {
+    toast(
+      "Digite sua senha.",
+      "error"
+    );
+
+    $("#login-password")?.focus();
+
+    return false;
+  }
+
+  const button =
+    $("#login-submit");
+
+  if (button) {
+    button.disabled = true;
+    button.dataset.oldText =
+      button.textContent;
+
+    button.textContent =
+      "Entrando...";
+  }
+
+  try {
     const {
+      data,
       error
     } = await db.auth.signInWithPassword({
       email,
@@ -556,61 +580,135 @@
       throw error;
     }
 
+    if (!data?.session) {
+      throw new Error(
+        "Não foi possível iniciar a sessão."
+      );
+    }
+
     S.on = true;
 
-    $("#login")?.classList.add(
-      "hidden"
+    showApp();
+
+    await initApp();
+
+    toast(
+      "Login realizado com sucesso."
     );
 
-    $("#app")?.classList.remove(
-      "hidden"
+    return true;
+  } catch (error) {
+    console.error(
+      "Erro no login:",
+      error
     );
 
-    await start();
+    toast(
+      error?.message ||
+        "E-mail ou senha incorretos.",
+      "error"
+    );
+
+    return false;
+  } finally {
+    if (button) {
+      button.disabled = false;
+
+      button.textContent =
+        button.dataset.oldText ||
+        "Entrar";
+    }
+  }
+}
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+async function logout() {
+  try {
+    if (db) {
+      await db.auth.signOut();
+    }
+  } catch (error) {
+    console.warn(
+      "Erro ao sair:",
+      error
+    );
   }
 
-  async function logout() {
-    try {
-      if (db) {
-        await db.auth.signOut();
-      }
-    } catch (error) {
-      console.error(error);
-    }
+  S.on = false;
 
-    S.on = false;
+  showLogin();
 
-    $("#app")?.classList.add(
-      "hidden"
-    );
+  toast(
+    "Sessão encerrada."
+  );
+}
 
-    $("#login")?.classList.remove(
-      "hidden"
-    );
+/* =========================================================
+   EXIBIÇÃO LOGIN / PAINEL
+========================================================= */
+
+function showLogin() {
+  const login =
+    $("#login-screen");
+
+  const app =
+    $("#app");
+
+  if (login) {
+    login.hidden = false;
+    login.style.display = "";
   }
 
-  /* =========================================================
-     LOAD SITE
-  ========================================================= */
+  if (app) {
+    app.hidden = true;
+    app.style.display = "none";
+  }
+}
 
-  async function loadSite() {
-    if (!db) {
-      S.site = {};
-      return;
-    }
+function showApp() {
+  const login =
+    $("#login-screen");
 
+  const app =
+    $("#app");
+
+  if (login) {
+    login.hidden = true;
+    login.style.display = "none";
+  }
+
+  if (app) {
+    app.hidden = false;
+    app.style.display = "";
+  }
+}
+
+/* =========================================================
+   CARREGAR CONFIGURAÇÕES DO SITE
+========================================================= */
+
+async function loadSite() {
+  if (!db) {
+    S.site = {};
+    return;
+  }
+
+  try {
     const {
       data,
       error
     } = await db
-      .from("settings")
-      .select("value")
-      .eq("key", "site")
+      .from("site_settings")
+      .select("*")
+      .limit(1)
       .maybeSingle();
 
     if (error) {
       console.warn(
-        "Erro ao carregar site:",
+        "Erro ao carregar configurações do site:",
         error.message
       );
 
@@ -619,142 +717,189 @@
     }
 
     S.site =
-      data?.value &&
-      typeof data.value === "object"
-        ? data.value
+      data && typeof data === "object"
+        ? data
         : {};
-  }
-
-  /* =========================================================
-     SAVE SITE
-  ========================================================= */
-
-  async function saveSite(
-    patch
-  ) {
-    if (!db) {
-      throw new Error(
-        "Supabase não conectado."
-      );
-    }
-
-    S.site = {
-      ...(S.site || {}),
-      ...(patch || {})
-    };
-
-    const {
+  } catch (error) {
+    console.warn(
+      "Erro ao carregar site:",
       error
-    } = await db
-      .from("settings")
-      .upsert(
-        {
-          key: "site",
-          value: S.site
-        },
-        {
-          onConflict: "key"
-        }
-      );
+    );
 
-    if (error) {
-      throw error;
-    }
+    S.site = {};
+  }
+}
+
+/* =========================================================
+   CARREGAR CONFIGURAÇÃO DE ENCOMENDAS
+========================================================= */
+
+async function loadEnc() {
+  const fallback =
+    mergeEnc(
+      DEF.encomendas ||
+      DEF.enc ||
+      DEF.orders ||
+      null
+    );
+
+  if (!db) {
+    S.enc = fallback;
+    return;
   }
 
-  /* =========================================================
-     LOAD ENCOMENDAS
-  ========================================================= */
-
-  async function loadEnc() {
-    if (!db) {
-      S.enc = clone(
-        DEFAULT_ENC
-      );
-
-      return;
-    }
-
+  try {
     const {
       data,
       error
     } = await db
-      .from("settings")
-      .select("value")
-      .eq("key", "encomendas")
+      .from("site_settings")
+      .select("*")
+      .limit(1)
       .maybeSingle();
 
     if (error) {
       console.warn(
-        "Erro ao carregar configuração de encomendas:",
+        "Erro ao carregar encomendas:",
         error.message
       );
 
-      S.enc = clone(
-        DEFAULT_ENC
-      );
-
+      S.enc = fallback;
       return;
+    }
+
+    let remote = null;
+
+    if (data) {
+      remote =
+        data.encomendas ||
+        data.encomenda ||
+        data.custom_cakes ||
+        data.custom_cake ||
+        null;
     }
 
     S.enc =
       mergeEnc(
-        data?.value
+        remote || fallback
       );
-  }
-
-  /* =========================================================
-     SAVE ENCOMENDAS
-  ========================================================= */
-
-  async function saveEnc() {
-    if (!db) {
-      throw new Error(
-        "Supabase não conectado."
-      );
-    }
-
-    const {
+  } catch (error) {
+    console.warn(
+      "Erro ao carregar configuração de encomendas:",
       error
-    } = await db
-      .from("settings")
-      .upsert(
-        {
-          key: "encomendas",
-          value: S.enc
-        },
-        {
-          onConflict: "key"
-        }
-      );
+    );
 
-    if (error) {
-      throw error;
-    }
+    S.enc = fallback;
+  }
+}
+
+/* =========================================================
+   SALVAR CONFIGURAÇÃO DE ENCOMENDAS
+========================================================= */
+
+async function saveEnc() {
+  if (!db) {
+    toast(
+      "Supabase não conectado.",
+      "error"
+    );
+
+    return false;
   }
 
-  /* =========================================================
-     LOAD PRODUCTS
-  ========================================================= */
+  if (!S.enc) {
+    S.enc = mergeEnc(null);
+  }
 
-  async function loadProducts() {
-    if (!db) {
-      S.products = [];
-      return;
+  try {
+    const {
+      data: current,
+      error: readError
+    } = await db
+      .from("site_settings")
+      .select("*")
+      .limit(1)
+      .maybeSingle();
+
+    if (readError) {
+      throw readError;
     }
 
+    const payload = {
+      ...(current || {}),
+      encomendas: S.enc
+    };
+
+    let result;
+
+    if (current?.id) {
+      result = await db
+        .from("site_settings")
+        .update({
+          encomendas: S.enc
+        })
+        .eq("id", current.id);
+    } else {
+      result = await db
+        .from("site_settings")
+        .insert(payload);
+    }
+
+    if (result?.error) {
+      throw result.error;
+    }
+
+    toast(
+      "Alterações salvas com sucesso."
+    );
+
+    return true;
+  } catch (error) {
+    console.error(
+      "Erro ao salvar encomendas:",
+      error
+    );
+
+    toast(
+      error?.message ||
+        error?.details ||
+        "Erro ao salvar alterações.",
+      "error"
+    );
+
+    return false;
+  }
+}
+
+/* =========================================================
+   CARREGAR PRODUTOS
+========================================================= */
+
+async function loadProducts() {
+  if (!db) {
+    S.products = [];
+    return;
+  }
+
+  try {
     const {
       data,
       error
     } = await db
       .from("products")
       .select("*")
-      .order("sort_order", {
-        ascending: true
-      })
-      .order("created_at", {
-        ascending: true
-      });
+      .order(
+        "sort_order",
+        {
+          ascending: true
+        }
+      )
+      .order(
+        "created_at",
+        {
+          ascending: true
+        }
+      );
 
     if (error) {
       console.warn(
@@ -771,1719 +916,174 @@
       Array.isArray(data)
         ? data
         : [];
+  } catch (error) {
+    console.warn(
+      "Erro ao carregar produtos:",
+      error
+    );
+
+    S.products = [];
   }
+}
 
-  /* =========================================================
-     LOAD PEDIDOS
-  ========================================================= */
+/* =========================================================
+   IDENTIFICAR ÁREA DO PRODUTO
+========================================================= */
 
-  async function loadOrders() {
-    S.readyOrders = [];
-    S.customOrders = [];
+function productArea(product) {
+  const area =
+    String(
+      product?.area ||
+      product?.tipo ||
+      product?.type ||
+      ""
+    )
+      .trim()
+      .toLowerCase();
 
-    if (!db) {
-      return;
-    }
-
-    /* =======================================================
-       PRONTA ENTREGA
-    ======================================================= */
-
-    try {
-      const {
-        data,
-        error
-      } = await db
-        .from("orders")
-        .select("*")
-        .order("created_at", {
-          ascending: false
-        });
-
-      if (error) {
-        console.warn(
-          "Tabela orders:",
-          error.message
-        );
-      } else {
-        S.readyOrders =
-          Array.isArray(data)
-            ? data
-            : [];
-      }
-    } catch (error) {
-      console.warn(error);
-    }
-
-    /* =======================================================
-       ENCOMENDAS
-    ======================================================= */
-
-    try {
-      const {
-        data,
-        error
-      } = await db
-        .from("custom_cakes")
-        .select("*")
-        .order("created_at", {
-          ascending: false
-        });
-
-      if (error) {
-        console.warn(
-          "Tabela custom_cakes:",
-          error.message
-        );
-      } else {
-        S.customOrders =
-          Array.isArray(data)
-            ? data
-            : [];
-      }
-    } catch (error) {
-      console.warn(error);
-    }
-  }
-
-  /* =========================================================
-     ÁREA DO PRODUTO
-  ========================================================= */
-
-  function productArea(
-    product
+  if (
+    area === "encomendas" ||
+    area === "encomenda" ||
+    area === "order" ||
+    area === "orders"
   ) {
-    const area =
-      String(
-        product?.area ||
-        product?.tipo ||
-        product?.type ||
-        ""
+    return "encomendas";
+  }
+
+  return "pronta";
+}
+
+/* =========================================================
+   FILTRAR PRODUTOS
+========================================================= */
+
+function productsView(kind) {
+  const products =
+    Array.isArray(S.products)
+      ? S.products
+      : [];
+
+  if (kind === "orders") {
+    return products.filter(
+      (product) =>
+        productArea(product) ===
+        "encomendas"
+    );
+  }
+
+  return products.filter(
+    (product) =>
+      productArea(product) ===
+      "pronta"
+  );
+}
+
+/* =========================================================
+   CATEGORIAS
+========================================================= */
+
+function getCategories() {
+  const defaults = [
+    "Bolos",
+    "Doces",
+    "Salgados",
+    "Brownies",
+    "Cupcakes",
+    "Outros"
+  ];
+
+  const categories =
+    Array.isArray(
+      DEF.categories
+    )
+      ? DEF.categories
+      : defaults;
+
+  return [
+    ...new Set(
+      categories
+        .map((item) =>
+          String(item || "").trim()
+        )
+        .filter(Boolean)
+    )
+  ];
+}
+
+/* =========================================================
+   POPULAR CATEGORIAS
+========================================================= */
+
+function populateCategories(
+  selected = ""
+) {
+  const select =
+    $("#f-cat");
+
+  if (!select) {
+    return;
+  }
+
+  const categories =
+    getCategories();
+
+  const current =
+    String(
+      selected || ""
+    ).trim();
+
+  if (
+    current &&
+    !categories.includes(current)
+  ) {
+    categories.push(current);
+  }
+
+  select.innerHTML =
+    `<option value="">Sem categoria</option>` +
+    categories
+      .map(
+        (category) =>
+          `<option value="${esc(
+            category
+          )}">${esc(
+            category
+          )}</option>`
       )
-        .trim()
-        .toLowerCase();
+      .join("");
 
-    if (
-      area === "encomendas" ||
-      area === "encomenda" ||
-      area === "order" ||
-      area === "orders"
-    ) {
-      return "encomendas";
-    }
+  select.value = current;
+}
 
-    return "pronta";
+/* =========================================================
+   ENCONTRAR PRODUTO
+========================================================= */
+
+function getProduct(id) {
+  if (!id) {
+    return null;
   }
 
-  /* =========================================================
-     DASHBOARD
-  ========================================================= */
+  return (
+    S.products.find(
+      (product) =>
+        String(product.id) ===
+        String(id)
+    ) ||
+    null
+  );
+}
 
-  function dashboardView() {
-    const readyProducts =
-      S.products.filter(
-        (p) =>
-          productArea(p) ===
-          "pronta"
-      );
+/* =========================================================
+   FORMATAR DATA
+========================================================= */
 
-    const orderProducts =
-      S.products.filter(
-        (p) =>
-          productArea(p) ===
-          "encomendas"
-      );
-
-    const readyOrders =
-      S.readyOrders.length;
-
-    const customOrders =
-      S.customOrders.length;
-
-    const pending =
-      [
-        ...S.readyOrders,
-        ...S.customOrders
-      ].filter(
-        (o) =>
-          String(
-            o?.status ||
-              "novo"
-          ).toLowerCase() ===
-          "novo"
-      ).length;
-
-    return `
-      <div class="stats">
-
-        <div class="stat-card">
-          <span>Pronta Entrega</span>
-          <strong>${readyProducts.length}</strong>
-          <small>produtos</small>
-        </div>
-
-        <div class="stat-card">
-          <span>Encomendas</span>
-          <strong>${orderProducts.length}</strong>
-          <small>produtos cadastrados</small>
-        </div>
-
-        <div class="stat-card">
-          <span>Pedidos</span>
-          <strong>${readyOrders + customOrders}</strong>
-          <small>pedidos registrados</small>
-        </div>
-
-        <div class="stat-card">
-          <span>Novos</span>
-          <strong>${pending}</strong>
-          <small>aguardando atendimento</small>
-        </div>
-
-      </div>
-
-      <div class="panel">
-
-        <div class="panel-head">
-
-          <div>
-            <h2>Resumo</h2>
-
-            <p class="muted">
-              Visão geral do painel da Martins Confeitaria.
-            </p>
-          </div>
-
-        </div>
-
-        <div class="dashboard-actions">
-
-          <button
-            class="btn primary"
-            data-view="prod-ready"
-          >
-            🍰 Pronta Entrega
-          </button>
-
-          <button
-            class="btn primary"
-            data-view="prod-orders"
-          >
-            🎂 Encomendas
-          </button>
-
-          <button
-            class="btn soft"
-            data-view="ord-ready"
-          >
-            🛒 Pedidos Pronta Entrega
-          </button>
-
-          <button
-            class="btn soft"
-            data-view="ord-orders"
-          >
-            📋 Pedidos Encomendas
-          </button>
-
-        </div>
-
-      </div>
-    `;
+function formatDate(value) {
+  if (!value) {
+    return "—";
   }
 
-  /* =========================================================
-     PRODUTOS
-  ========================================================= */
-
-  function productsView(
-    kind
-  ) {
-    const isReady =
-      kind === "ready";
-
-    const products =
-      S.products.filter(
-        (product) =>
-          productArea(product) ===
-          (
-            isReady
-              ? "pronta"
-              : "encomendas"
-          )
-      );
-
-    return `
-      <div class="panel">
-
-        <div class="panel-head">
-
-          <div>
-
-            <h2>
-              ${
-                isReady
-                  ? "Pronta Entrega"
-                  : "Encomendas"
-              }
-            </h2>
-
-            <p class="muted">
-              ${
-                isReady
-                  ? "Produtos disponíveis para venda imediata."
-                  : "Produtos utilizados na área de encomendas."
-              }
-            </p>
-
-          </div>
-
-          <button
-            class="btn primary"
-            data-act="new-product"
-            data-area="${
-              isReady
-                ? "pronta"
-                : "encomendas"
-            }"
-          >
-            + Novo produto
-          </button>
-
-        </div>
-
-        ${
-          products.length
-            ? `
-              <div class="product-grid">
-
-                ${products
-                  .map(
-                    productCard
-                  )
-                  .join("")}
-
-              </div>
-            `
-            : `
-              <div class="empty">
-                Nenhum produto cadastrado nesta área.
-              </div>
-            `
-        }
-
-      </div>
-
-      ${
-        !isReady
-          ? encomendasConfigView()
-          : ""
-      }
-    `;
-  }
-
-  /* =========================================================
-     CARD DE PRODUTO
-  ========================================================= */
-
-  function productCard(
-    product
-  ) {
-    const image =
-      product.image_url ||
-      product.image ||
-      "";
-
-    const active =
-      product.active !== false;
-
-    const area =
-      productArea(product);
-
-    return `
-      <article class="product-card">
-
-        ${
-          image
-            ? `
-              <div class="product-image">
-
-                <img
-                  src="${esc(image)}"
-                  alt="${esc(
-                    product.name ||
-                    "Produto"
-                  )}"
-                >
-
-              </div>
-            `
-            : `
-              <div class="product-image empty-image">
-                <span>Sem foto</span>
-              </div>
-            `
-        }
-
-        <div class="product-body">
-
-          <div class="product-top">
-
-            <h3>
-              ${esc(
-                product.name ||
-                "Produto"
-              )}
-            </h3>
-
-            <span class="badge ${
-              active
-                ? "ok"
-                : "off"
-            }">
-
-              ${
-                active
-                  ? "Ativo"
-                  : "Inativo"
-              }
-
-            </span>
-
-          </div>
-
-          <small class="muted">
-            Área:
-            ${
-              area === "pronta"
-                ? "Pronta Entrega"
-                : "Encomendas"
-            }
-          </small>
-
-          ${
-            product.category
-              ? `
-                <small class="muted">
-                  Classificação:
-                  ${esc(
-                    product.category
-                  )}
-                </small>
-              `
-              : ""
-          }
-
-          ${
-            product.description
-              ? `
-                <p class="muted">
-                  ${esc(
-                    product.description
-                  )}
-                </p>
-              `
-              : ""
-          }
-
-          <strong class="product-price">
-            ${brl(
-              product.price
-            )}
-          </strong>
-
-          ${
-            Number(
-              product.discount || 0
-            ) > 0
-              ? `
-                <small>
-                  Desconto:
-                  ${Number(
-                    product.discount
-                  )}%
-                </small>
-              `
-              : ""
-          }
-
-          <div class="product-actions">
-
-            <button
-              class="btn soft"
-              data-act="edit-product"
-              data-id="${esc(
-                product.id
-              )}"
-            >
-              Editar
-            </button>
-
-            <button
-              class="btn danger"
-              data-act="delete-product"
-              data-id="${esc(
-                product.id
-              )}"
-            >
-              Excluir
-            </button>
-
-          </div>
-
-        </div>
-
-      </article>
-    `;
-  }
-
-  /* =========================================================
-     CONFIGURAÇÃO DE ENCOMENDAS
-  ========================================================= */
-
-  function encomendasConfigView() {
-    const enc =
-      S.enc ||
-      clone(DEFAULT_ENC);
-
-    return `
-      <div class="panel enc-config">
-
-        <div class="panel-head">
-
-          <div>
-
-            <h2>
-              Configuração das Encomendas
-            </h2>
-
-            <p class="muted">
-              Tudo abaixo alimenta a página
-              <strong>encomendas.html</strong>.
-            </p>
-
-          </div>
-
-          <button
-            class="btn primary"
-            data-act="save-enc"
-          >
-            💾 Salvar alterações
-          </button>
-
-        </div>
-
-        ${renderCakeConfig(enc)}
-
-        ${renderSimpleList(
-          "Decoração / Topo",
-          "topes",
-          enc.topes
-        )}
-
-        ${renderSimpleStringList(
-          "Massas",
-          "masses",
-          enc.masses
-        )}
-
-        ${renderSimpleStringList(
-          "Recheios",
-          "fillings",
-          enc.fillings
-        )}
-
-        ${renderPriceList(
-          "Adicionais",
-          "extras",
-          enc.extras
-        )}
-
-        ${renderPriceList(
-          "Personalizações",
-          "personalizations",
-          enc.personalizations
-        )}
-
-        ${renderBrigadeiroConfig(
-          enc.brigadeiros
-        )}
-
-        ${renderOtherItems(
-          enc.otherItems
-        )}
-
-        ${renderKits(
-          enc.kits
-        )}
-
-      </div>
-    `;
-  }
-
-  /* =========================================================
-     BOLOS
-  ========================================================= */
-
-  function renderCakeConfig(
-    enc
-  ) {
-    return `
-      <div class="enc-section">
-
-        <div class="enc-section-head">
-
-          <div>
-
-            <h3>Bolos</h3>
-
-            <p class="muted">
-              Tipos, tamanhos e preços.
-            </p>
-
-          </div>
-
-        </div>
-
-        <div class="enc-list">
-
-          ${(
-            enc.cakes || []
-          )
-            .map(
-              (
-                cake,
-                index
-              ) => `
-                <div
-                  class="enc-card"
-                  data-cake-index="${index}"
-                >
-
-                  <div class="enc-card-head">
-
-                    <div>
-                      <strong>
-                        ${esc(
-                          cake.name
-                        )}
-                      </strong>
-                    </div>
-
-                    <label class="switch-row">
-
-                      <input
-                        type="checkbox"
-                        data-enc-cake-active="${index}"
-                        ${
-                          cake.active !== false
-                            ? "checked"
-                            : ""
-                        }
-                      >
-
-                      Ativo
-
-                    </label>
-
-                  </div>
-
-                  <div class="enc-options">
-
-                    ${(
-                      cake.options ||
-                      []
-                    )
-                      .map(
-                        (
-                          option,
-                          optionIndex
-                        ) => `
-                          <div class="enc-row">
-
-                            <input
-                              type="text"
-                              data-cake-name="${index}"
-                              data-option="${optionIndex}"
-                              value="${esc(
-                                option
-                              )}"
-                            >
-
-                            <input
-                              type="number"
-                              step="0.01"
-                              min="0"
-                              data-cake-price="${index}"
-                              data-option="${optionIndex}"
-                              value="${Number(
-                                cake.prices?.[
-                                  optionIndex
-                                ] || 0
-                              )}"
-                            >
-
-                          </div>
-                        `
-                      )
-                      .join("")}
-
-                  </div>
-
-                </div>
-              `
-            )
-            .join("")}
-
-        </div>
-
-      </div>
-    `;
-  }
-
-  /* =========================================================
-     LISTA SIMPLES COM PREÇO
-  ========================================================= */
-
-  function renderSimpleList(
-    title,
-    key,
-    items
-  ) {
-    return `
-      <div class="enc-section">
-
-        <div class="enc-section-head">
-
-          <h3>
-            ${esc(title)}
-          </h3>
-
-          <button
-            class="btn soft"
-            data-act="add-enc-item"
-            data-key="${key}"
-          >
-            + Adicionar
-          </button>
-
-        </div>
-
-        <div class="enc-list">
-
-          ${(items || [])
-            .map(
-              (
-                item,
-                index
-              ) => `
-                <div class="enc-row">
-
-                  <input
-                    type="text"
-                    data-simple-key="${key}"
-                    data-simple-index="${index}"
-                    value="${esc(
-                      Array.isArray(item)
-                        ? item[0]
-                        : item
-                    )}"
-                  >
-
-                  ${
-                    Array.isArray(
-                      item
-                    )
-                      ? `
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          data-price-key="${key}"
-                          data-price-index="${index}"
-                          value="${Number(
-                            item[1] || 0
-                          )}"
-                        >
-                      `
-                      : ""
-                  }
-
-                  <button
-                    class="btn danger"
-                    data-act="remove-enc-item"
-                    data-key="${key}"
-                    data-index="${index}"
-                  >
-                    ×
-                  </button>
-
-                </div>
-              `
-            )
-            .join("")}
-
-        </div>
-
-      </div>
-    `;
-  }
-
-  /* =========================================================
-     LISTA DE TEXTOS
-  ========================================================= */
-
-  function renderSimpleStringList(
-    title,
-    key,
-    items
-  ) {
-    return `
-      <div class="enc-section">
-
-        <div class="enc-section-head">
-
-          <h3>
-            ${esc(title)}
-          </h3>
-
-          <button
-            class="btn soft"
-            data-act="add-enc-item"
-            data-key="${key}"
-          >
-            + Adicionar
-          </button>
-
-        </div>
-
-        <div class="enc-list">
-
-          ${(items || [])
-            .map(
-              (
-                item,
-                index
-              ) => `
-                <div class="enc-row">
-
-                  <input
-                    type="text"
-                    data-simple-key="${key}"
-                    data-simple-index="${index}"
-                    value="${esc(
-                      item
-                    )}"
-                  >
-
-                  <button
-                    class="btn danger"
-                    data-act="remove-enc-item"
-                    data-key="${key}"
-                    data-index="${index}"
-                  >
-                    ×
-                  </button>
-
-                </div>
-              `
-            )
-            .join("")}
-
-        </div>
-
-      </div>
-    `;
-  }
-
-  /* =========================================================
-     LISTA DE PREÇOS
-  ========================================================= */
-
-  function renderPriceList(
-    title,
-    key,
-    items
-  ) {
-    return `
-      <div class="enc-section">
-
-        <div class="enc-section-head">
-
-          <h3>
-            ${esc(title)}
-          </h3>
-
-          <button
-            class="btn soft"
-            data-act="add-enc-item"
-            data-key="${key}"
-          >
-            + Adicionar
-          </button>
-
-        </div>
-
-        <div class="enc-list">
-
-          ${(items || [])
-            .map(
-              (
-                item,
-                index
-              ) => `
-                <div class="enc-row">
-
-                  <input
-                    type="text"
-                    data-price-name="${key}"
-                    data-price-index="${index}"
-                    value="${esc(
-                      item?.[0]
-                    )}"
-                  >
-
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    data-price-value="${key}"
-                    data-price-index="${index}"
-                    value="${Number(
-                      item?.[1] || 0
-                    )}"
-                  >
-
-                  <button
-                    class="btn danger"
-                    data-act="remove-enc-item"
-                    data-key="${key}"
-                    data-index="${index}"
-                  >
-                    ×
-                  </button>
-
-                </div>
-              `
-            )
-            .join("")}
-
-        </div>
-
-      </div>
-    `;
-  }
-
-  /* =========================================================
-     BRIGADEIROS
-  ========================================================= */
-
-  function renderBrigadeiroConfig(
-    brigadeiros
-  ) {
-    const b =
-      brigadeiros ||
-      DEFAULT_ENC.brigadeiros;
-
-    return `
-      <div class="enc-section">
-
-        <div class="enc-section-head">
-
-          <div>
-
-            <h3>Brigadeiros</h3>
-
-            <p class="muted">
-              Sabores e valores das caixas de
-              50 e 100 unidades.
-            </p>
-
-          </div>
-
-        </div>
-
-        <div class="enc-card">
-
-          <h4>Clássicos</h4>
-
-          <div class="enc-list">
-
-            ${(b.classica || [])
-              .map(
-                (
-                  name,
-                  index
-                ) => `
-                  <div class="enc-row">
-
-                    <input
-                      type="text"
-                      data-brig-classic="${index}"
-                      value="${esc(
-                        name
-                      )}"
-                    >
-
-                    <button
-                      class="btn danger"
-                      data-act="remove-brig"
-                      data-type="classica"
-                      data-index="${index}"
-                    >
-                      ×
-                    </button>
-
-                  </div>
-                `
-              )
-              .join("")}
-
-          </div>
-
-          <button
-            class="btn soft"
-            data-act="add-brig"
-            data-type="classica"
-          >
-            + Adicionar sabor
-          </button>
-
-        </div>
-
-        <div class="enc-card">
-
-          <h4>Premium</h4>
-
-          <div class="enc-list">
-
-            ${(b.premium || [])
-              .map(
-                (
-                  name,
-                  index
-                ) => `
-                  <div class="enc-row">
-
-                    <input
-                      type="text"
-                      data-brig-premium="${index}"
-                      value="${esc(
-                        name
-                      )}"
-                    >
-
-                    <button
-                      class="btn danger"
-                      data-act="remove-brig"
-                      data-type="premium"
-                      data-index="${index}"
-                    >
-                      ×
-                    </button>
-
-                  </div>
-                `
-              )
-              .join("")}
-
-          </div>
-
-          <button
-            class="btn soft"
-            data-act="add-brig"
-            data-type="premium"
-          >
-            + Adicionar sabor
-          </button>
-
-        </div>
-
-        <div class="enc-card">
-
-          <h4>Valores</h4>
-
-          <div class="enc-row">
-
-            <label>
-              Clássicos — 50 unidades
-
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                data-brig-price="classica"
-                data-brig-size="0"
-                value="${Number(
-                  b.classicaPrices?.[0] || 0
-                )}"
-              >
-
-            </label>
-
-            <label>
-              Clássicos — 100 unidades
-
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                data-brig-price="classica"
-                data-brig-size="1"
-                value="${Number(
-                  b.classicaPrices?.[1] || 0
-                )}"
-              >
-
-            </label>
-
-          </div>
-
-          <div class="enc-row">
-
-            <label>
-              Premium — 50 unidades
-
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                data-brig-price="premium"
-                data-brig-size="0"
-                value="${Number(
-                  b.premiumPrices?.[0] || 0
-                )}"
-              >
-
-            </label>
-
-            <label>
-              Premium — 100 unidades
-
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                data-brig-price="premium"
-                data-brig-size="1"
-                value="${Number(
-                  b.premiumPrices?.[1] || 0
-                )}"
-              >
-
-            </label>
-
-          </div>
-
-        </div>
-
-        <div class="enc-card">
-
-          <h4>Limite de sabores</h4>
-
-          <div class="enc-row">
-
-            <label>
-              Limite para 50 unidades
-
-              <input
-                type="number"
-                min="1"
-                step="1"
-                data-brig-limit="50"
-                value="${Number(
-                  b.flavorLimit50 || 2
-                )}"
-              >
-
-            </label>
-
-            <label>
-              Limite para 100 unidades
-
-              <input
-                type="number"
-                min="1"
-                step="1"
-                data-brig-limit="100"
-                value="${Number(
-                  b.flavorLimit100 || 4
-                )}"
-              >
-
-            </label>
-
-          </div>
-
-        </div>
-
-      </div>
-    `;
-  }
-
-  /* =========================================================
-     OUTROS ITENS
-  ========================================================= */
-
-  function renderOtherItems(
-    items
-  ) {
-    return `
-      <div class="enc-section">
-
-        <div class="enc-section-head">
-
-          <div>
-
-            <h3>Outros itens</h3>
-
-            <p class="muted">
-              Itens mostrados em
-              “Outros itens” na encomenda.
-            </p>
-
-          </div>
-
-          <button
-            class="btn soft"
-            data-act="add-other-item"
-          >
-            + Adicionar
-          </button>
-
-        </div>
-
-        <div class="enc-list">
-
-          ${(items || [])
-            .map(
-              (
-                item,
-                index
-              ) => `
-                <div class="enc-row">
-
-                  <input
-                    type="text"
-                    data-other-name="${index}"
-                    value="${esc(
-                      item.name
-                    )}"
-                  >
-
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    data-other-price="${index}"
-                    value="${Number(
-                      item.price || 0
-                    )}"
-                  >
-
-                  <label class="switch-row">
-
-                    <input
-                      type="checkbox"
-                      data-other-active="${index}"
-                      ${
-                        item.active !== false
-                          ? "checked"
-                          : ""
-                      }
-                    >
-
-                    Ativo
-
-                  </label>
-
-                  <button
-                    class="btn danger"
-                    data-act="remove-other-item"
-                    data-index="${index}"
-                  >
-                    ×
-                  </button>
-
-                </div>
-              `
-            )
-            .join("")}
-
-        </div>
-
-      </div>
-    `;
-  }
-
-  /* =========================================================
-     KITS
-  ========================================================= */
-
-  function renderKits(
-    kits
-  ) {
-    return `
-      <div class="enc-section">
-
-        <div class="enc-section-head">
-
-          <div>
-
-            <h3>Kits</h3>
-
-            <p class="muted">
-              Os kits possuem bolo e docinhos
-              inclusos conforme definido abaixo.
-            </p>
-
-          </div>
-
-          <button
-            class="btn soft"
-            data-act="add-kit"
-          >
-            + Novo kit
-          </button>
-
-        </div>
-
-        <div class="enc-list">
-
-          ${(kits || [])
-            .map(
-              (
-                kit,
-                index
-              ) => `
-                <div class="enc-card">
-
-                  <div class="enc-card-head">
-
-                    <strong>
-                      Kit ${index + 1}
-                    </strong>
-
-                    <label class="switch-row">
-
-                      <input
-                        type="checkbox"
-                        data-kit-active="${index}"
-                        ${
-                          kit.active !== false
-                            ? "checked"
-                            : ""
-                        }
-                      >
-
-                      Ativo
-
-                    </label>
-
-                  </div>
-
-                  <div class="enc-row">
-
-                    <label>
-                      Nome
-
-                      <input
-                        type="text"
-                        data-kit-name="${index}"
-                        value="${esc(
-                          kit.name
-                        )}"
-                      >
-
-                    </label>
-
-                    <label>
-                      Preço
-
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        data-kit-price="${index}"
-                        value="${Number(
-                          kit.price || 0
-                        )}"
-                      >
-
-                    </label>
-
-                  </div>
-
-                  <div class="enc-row">
-
-                    <label>
-                      Bolo incluso
-
-                      <input
-                        type="text"
-                        data-kit-cake="${index}"
-                        value="${esc(
-                          kit.cake
-                        )}"
-                      >
-
-                    </label>
-
-                    <label>
-                      Docinhos
-
-                      <input
-                        type="number"
-                        min="0"
-                        step="1"
-                        data-kit-docinhos="${index}"
-                        value="${Number(
-                          kit.docinhos || 0
-                        )}"
-                      >
-
-                    </label>
-
-                  </div>
-
-                  <label>
-                    Itens inclusos
-
-                    <textarea
-                      rows="4"
-                      data-kit-items="${index}"
-                      placeholder="Um item por linha"
-                    >${esc(
-                      (
-                        kit.items ||
-                        []
-                      ).join("\n")
-                    )}</textarea>
-
-                  </label>
-
-                  <div class="product-actions">
-
-                    <button
-                      class="btn danger"
-                      data-act="remove-kit"
-                      data-index="${index}"
-                    >
-                      Excluir kit
-                    </button>
-
-                  </div>
-
-                </div>
-              `
-            )
-            .join("")}
-
-        </div>
-
-      </div>
-    `;
-  }
-
-  /* =========================================================
-     PEDIDOS
-  ========================================================= */
-
-  function ordersView(
-    kind
-  ) {
-    const isReady =
-      kind === "ready";
-
-    const orders =
-      isReady
-        ? S.readyOrders
-        : S.customOrders;
-
-    return `
-      <div class="panel">
-
-        <div class="panel-head">
-
-          <div>
-
-            <h2>
-              ${
-                isReady
-                  ? "Pedidos — Pronta Entrega"
-                  : "Pedidos — Encomendas"
-              }
-            </h2>
-
-            <p class="muted">
-              ${
-                isReady
-                  ? "Pedidos recebidos pela área de pronta entrega."
-                  : "Pedidos recebidos pelo formulário de encomendas."
-              }
-            </p>
-
-          </div>
-
-          <button
-            class="btn soft"
-            data-act="refresh-orders"
-          >
-            ↻ Atualizar
-          </button>
-
-        </div>
-
-        ${
-          orders.length
-            ? `
-              <div class="orders-list">
-
-                ${orders
-                  .map(
-                    (
-                      order
-                    ) =>
-                      orderCard(
-                        order,
-                        isReady
-                          ? "ready"
-                          : "custom"
-                      )
-                  )
-                  .join("")}
-
-              </div>
-            `
-            : `
-              <div class="empty">
-                Nenhum pedido registrado.
-              </div>
-            `
-        }
-
-      </div>
-    `;
-  }
-
-  /* =========================================================
-     NORMALIZAR PEDIDO DE ENCOMENDA
-  ========================================================= */
-
-  function normalizeCustomOrder(
-    order
-  ) {
-    const data =
-      order?.data &&
-      typeof order.data === "object"
-        ? order.data
-        : {};
-
-    return {
-      id: order?.id,
-
-      status:
-        order?.status ||
-        "novo",
-
-      created_at:
-        order?.created_at ||
-        data.created_at ||
-        data.criado_em ||
-        null,
-
-      cliente:
-        data.customer ||
-        data.cliente ||
-        data.nome ||
-        order?.cliente ||
-        "",
-
-      whatsapp:
-        data.whatsapp ||
-        data.telefone ||
-        order?.whatsapp ||
-        "",
-
-      data_desejada:
-        data.date ||
-        data.data_desejada ||
-        data.data ||
-        "",
-
-      kit:
-        data.kit ||
-        null,
-
-      bolo:
-        data.cake ||
-        data.bolo ||
-        null,
-
-      massa:
-        data.mass ||
-        data.massa ||
-        null,
-
-      recheio:
-        data.filling ||
-        data.recheio ||
-        null,
-
-      topo:
-        data.topo ||
-        data.decoracao ||
-        data.decoration ||
-        null,
-
-      adicionais:
-        Array.isArray(
-          data.extras
-        )
-          ? data.extras
-          : Array.isArray(
-              data.adicionais
-            )
-            ? data.adicionais
-            : [],
-
-      personalizacao:
-        Array.isArray(
-          data.personalization
-        )
-          ? data.personalization
-          : Array.isArray(
-              data.personalizacao
-            )
-            ? data.personalizacao
-            : [],
-
-      personalizacao_text:
-        data.personalization_text ||
-        data.personalizacao_text ||
-        data.custom_text ||
-        "",
-
-      brigadeiros:
-        Array.isArray(
-          data.brigadeiros
-        )
-          ? data.brigadeiros
-          : [],
-
-      outros:
-        Array.isArray(
-          data.otherItems
-        )
-          ? data.otherItems
-          : Array.isArray(
-              data.outros
-            )
-            ? data.outros
-            : [],
-
-      observacoes:
-        data.notes ||
-        data.observacoes ||
-        "",
-
-      total_estimado:
-        data.estimatedTotal ??
-        data.total_estimado ??
-        "",
-
-      raw: data
-    };
-  }
-
-  /* =========================================================
-     NORMALIZAR PEDIDO PRONTA ENTREGA
-  ========================================================= */
-
-  function normalizeReadyOrder(
-    order
-  ) {
-    const data =
-      order?.data &&
-      typeof order.data === "object"
-        ? order.data
-        : {};
-
-    return {
-      id: order?.id,
-
-      status:
-        order?.status ||
-        "novo",
-
-      created_at:
-        order?.created_at ||
-        data.criado_em ||
-        null,
-
-      cliente:
-        data.cliente ||
-        data.customer ||
-        data.nome ||
-        "",
-
-      whatsapp:
-        data.whatsapp ||
-        data.telefone ||
-        "",
-
-      recebimento:
-        data.recebimento ||
-        data.receiving ||
-        data.entrega ||
-        "",
-
-      endereco:
-        data.endereco ||
-        data.address ||
-        "",
-
-      pagamento:
-        data.pagamento ||
-        data.payment ||
-        "",
-
-      observacoes:
-        data.observacoes ||
-        data.notes ||
-        "",
-
-      itens:
-        Array.isArray(
-          data.itens
-        )
-          ? data.itens
-          : Array.isArray(
-              data.items
-            )
-            ? data.items
-            : [],
-
-      total:
-        data.total ??
-        data.total_price ??
-        0,
-
-      raw: data
-    };
-  }
-
-  /* =========================================================
-     FORMATAR DATA
-  ========================================================= */
-
-  function formatDate(
-    value
-  ) {
-    if (!value) {
-      return "—";
-    }
-
+  try {
     const date =
       new Date(value);
 
@@ -2492,852 +1092,1832 @@
         date.getTime()
       )
     ) {
-      return esc(value);
+      return String(value);
     }
 
     return date.toLocaleString(
-      "pt-BR"
+      "pt-BR",
+      {
+        dateStyle: "short",
+        timeStyle: "short"
+      }
     );
+  } catch {
+    return String(value);
+  }
+}
+
+/* =========================================================
+   NORMALIZAR STATUS
+========================================================= */
+
+function normalizeStatus(value) {
+  const status =
+    String(
+      value || "novo"
+    )
+      .trim()
+      .toLowerCase();
+
+  return STATUS.includes(status)
+    ? status
+    : "novo";
+}
+
+/* =========================================================
+   NORMALIZAR PEDIDO DE ENCOMENDA
+========================================================= */
+
+function normalizeCustomOrder(
+  order
+) {
+  const source =
+    order?.data &&
+    typeof order.data === "object"
+      ? order.data
+      : order || {};
+
+  return {
+    id:
+      order?.id ||
+      source?.id ||
+      null,
+
+    status:
+      normalizeStatus(
+        order?.status ||
+        source?.status
+      ),
+
+    customer:
+      source.customer ||
+      source.cliente ||
+      source.nome ||
+      "",
+
+    whatsapp:
+      source.whatsapp ||
+      source.telefone ||
+      "",
+
+    date:
+      source.date ||
+      source.data_desejada ||
+      source.data ||
+      "",
+
+    kit:
+      source.kit ||
+      null,
+
+    cake:
+      source.cake ||
+      source.bolo ||
+      null,
+
+    mass:
+      source.mass ||
+      source.massa ||
+      null,
+
+    filling:
+      source.filling ||
+      source.recheio ||
+      null,
+
+    decoration:
+      source.topo ||
+      source.decoracao ||
+      source.decoration ||
+      null,
+
+    extras:
+      source.extras ||
+      source.adicionais ||
+      [],
+
+    personalization:
+      source.personalization ||
+      source.personalizacao ||
+      null,
+
+    personalization_text:
+      source.personalization_text ||
+      source.personalizacao_text ||
+      source.custom_text ||
+      "",
+
+    brigadeiros:
+      source.brigadeiros ||
+      [],
+
+    otherItems:
+      source.otherItems ||
+      source.outros ||
+      [],
+
+    notes:
+      source.notes ||
+      source.observacoes ||
+      "",
+
+    estimatedTotal:
+      source.estimatedTotal ??
+      source.total_estimado ??
+      source.total ??
+      0,
+
+    created_at:
+      order?.created_at ||
+      source?.criado_em ||
+      source?.created_at ||
+      null,
+
+    raw:
+      order
+  };
+}
+
+/* =========================================================
+   NORMALIZAR PEDIDO PRONTA ENTREGA
+========================================================= */
+
+function normalizeReadyOrder(
+  order
+) {
+  const source =
+    order?.data &&
+    typeof order.data === "object"
+      ? order.data
+      : order || {};
+
+  return {
+    id:
+      order?.id ||
+      source?.id ||
+      null,
+
+    status:
+      normalizeStatus(
+        order?.status ||
+        source?.status
+      ),
+
+    customer:
+      source.cliente ||
+      source.customer ||
+      source.nome ||
+      "",
+
+    whatsapp:
+      source.whatsapp ||
+      source.telefone ||
+      "",
+
+    receiving:
+      source.recebimento ||
+      source.delivery ||
+      source.entrega ||
+      "",
+
+    address:
+      source.endereco ||
+      source.address ||
+      "",
+
+    payment:
+      source.pagamento ||
+      source.payment ||
+      "",
+
+    observations:
+      source.observacoes ||
+      source.notes ||
+      "",
+
+    items:
+      Array.isArray(
+        source.itens
+      )
+        ? source.itens
+        : Array.isArray(
+            source.items
+          )
+          ? source.items
+          : [],
+
+    total:
+      Number(
+        source.total ||
+        0
+      ),
+
+    created_at:
+      order?.created_at ||
+      source?.criado_em ||
+      source?.created_at ||
+      null,
+
+    raw:
+      order
+  };
+}
+
+/* =========================================================
+   CARREGAR PEDIDOS PRONTA ENTREGA
+========================================================= */
+
+async function loadReadyOrders() {
+  if (!db) {
+    S.readyOrders = [];
+    return;
   }
 
-  /* =========================================================
-     FORMATAR DATA SIMPLES
-  ========================================================= */
-
-  function formatSimpleDate(
-    value
-  ) {
-    if (!value) {
-      return "—";
-    }
-
-    const date =
-      new Date(
-        `${value}T00:00:00`
+  try {
+    const {
+      data,
+      error
+    } = await db
+      .from("orders")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
       );
 
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-      return esc(value);
+    if (error) {
+      console.warn(
+        "Erro ao carregar pedidos de pronta entrega:",
+        error.message
+      );
+
+      S.readyOrders = [];
+
+      return;
     }
 
-    return date.toLocaleDateString(
-      "pt-BR"
+    S.readyOrders =
+      Array.isArray(data)
+        ? data.map(
+            normalizeReadyOrder
+          )
+        : [];
+  } catch (error) {
+    console.warn(
+      "Erro ao carregar pedidos:",
+      error
     );
+
+    S.readyOrders = [];
+  }
+}
+
+/* =========================================================
+   CARREGAR PEDIDOS DE ENCOMENDAS
+========================================================= */
+
+async function loadCustomOrders() {
+  if (!db) {
+    S.customOrders = [];
+    return;
   }
 
-  /* =========================================================
-     PEDIDO CARD
-  ========================================================= */
+  try {
+    const {
+      data,
+      error
+    } = await db
+      .from("custom_cakes")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
 
-  function orderCard(
-    order,
-    type
-  ) {
-    const custom =
-      type === "custom";
+    if (error) {
+      console.warn(
+        "Erro ao carregar encomendas:",
+        error.message
+      );
 
-    const data =
-      custom
-        ? normalizeCustomOrder(
-            order
+      S.customOrders = [];
+
+      return;
+    }
+
+    S.customOrders =
+      Array.isArray(data)
+        ? data.map(
+            normalizeCustomOrder
           )
-        : normalizeReadyOrder(
-            order
-          );
+        : [];
+  } catch (error) {
+    console.warn(
+      "Erro ao carregar encomendas:",
+      error
+    );
 
-    const status =
-      String(
-        data.status ||
-          "novo"
-      ).toLowerCase();
+    S.customOrders = [];
+  }
+}
 
-    return `
-      <article class="order-card">
+/* =========================================================
+   CARREGAR TUDO
+========================================================= */
 
-        <div class="order-head">
+async function loadAll() {
+  await Promise.all([
+    loadSite(),
+    loadEnc(),
+    loadProducts(),
+    loadReadyOrders(),
+    loadCustomOrders()
+  ]);
+}
 
-          <div>
+/* =========================================================
+   INICIALIZAÇÃO
+========================================================= */
 
-            <span class="order-type">
-              ${
-                custom
-                  ? "ENCOMENDA"
-                  : "PRONTA ENTREGA"
-              }
-            </span>
+async function initApp() {
+  await loadAll();
 
-            <h3>
-              ${esc(
-                data.cliente ||
-                "Cliente"
-              )}
-            </h3>
+  render();
 
-            <small>
-              Recebido:
-              ${formatDate(
-                data.created_at
-              )}
-            </small>
+  bindEvents();
+}
 
-          </div>
+/* =========================================================
+   FIM DA PARTE 2
+========================================================= */
+ /* =========================================================
+   NAVEGAÇÃO DO PAINEL
+========================================================= */
 
-          <span class="badge">
+function setView(view) {
+  if (!view) {
+    view = "dashboard";
+  }
 
+  S.view = view;
+
+  $$(".nav-item").forEach((item) => {
+    item.classList.toggle(
+      "active",
+      item.dataset.view === view
+    );
+  });
+
+  const title =
+    $("#page-title");
+
+  if (title) {
+    title.textContent =
+      TITLES[view] ||
+      "Painel Administrativo";
+  }
+
+  render();
+}
+
+/* =========================================================
+   ABRIR SITE
+========================================================= */
+
+function openSite() {
+  const url =
+    CFG.SITE_URL ||
+    "https://yansitesemarcas.github.io/martins-confeitaria/";
+
+  window.open(
+    url,
+    "_blank",
+    "noopener,noreferrer"
+  );
+}
+
+/* =========================================================
+   MODAL DE PRODUTO
+========================================================= */
+
+function openProductModal(
+  id = null
+) {
+  const modal =
+    $("#product-modal");
+
+  const form =
+    $("#pform");
+
+  if (!modal || !form) {
+    toast(
+      "Formulário de produto não encontrado.",
+      "error"
+    );
+
+    return;
+  }
+
+  S.editId = id;
+  S.image = undefined;
+
+  form.reset();
+
+  const product =
+    id
+      ? getProduct(id)
+      : null;
+
+  if (product) {
+    $("#f-name").value =
+      product.name || "";
+
+    $("#f-desc").value =
+      product.description || "";
+
+    $("#f-price").value =
+      product.price ?? "";
+
+    $("#f-disc").value =
+      product.discount ?? "";
+
+    $("#f-sort").value =
+      product.sort_order ?? 0;
+
+    $("#f-gram").value =
+      product.gramatura ?? "";
+
+    $("#f-serve").value =
+      product.serve_people ?? "";
+
+    $("#f-area").value =
+      productArea(product) ===
+      "encomendas"
+        ? "encomendas"
+        : "pronta";
+
+    $("#f-avail").checked =
+      product.active !== false;
+
+    $("#f-feat").checked =
+      product.featured === true;
+
+    $("#f-appt").checked =
+      product.appointment_required === true;
+
+    S.image =
+      product.image_url ??
+      product.image ??
+      null;
+
+    populateCategories(
+      product.category || ""
+    );
+
+    showImagePreview(
+      S.image
+    );
+  } else {
+    S.image = undefined;
+
+    $("#f-area").value =
+      "pronta";
+
+    $("#f-avail").checked =
+      true;
+
+    $("#f-feat").checked =
+      false;
+
+    $("#f-appt").checked =
+      false;
+
+    populateCategories();
+
+    hideImagePreview();
+  }
+
+  const title =
+    $("#product-modal-title");
+
+  if (title) {
+    title.textContent =
+      product
+        ? "Editar produto"
+        : "Novo produto";
+  }
+
+  modal.hidden = false;
+  modal.classList.add("show");
+
+  setTimeout(() => {
+    $("#f-name")?.focus();
+  }, 50);
+}
+
+/* =========================================================
+   FECHAR MODAL
+========================================================= */
+
+function closeModal() {
+  const modal =
+    $("#product-modal");
+
+  const form =
+    $("#pform");
+
+  if (modal) {
+    modal.classList.remove("show");
+    modal.hidden = true;
+  }
+
+  S.editId = null;
+  S.image = undefined;
+
+  if (form) {
+    form.reset();
+  }
+
+  hideImagePreview();
+
+  const file =
+    $("#f-image");
+
+  if (file) {
+    file.value = "";
+  }
+}
+
+/* =========================================================
+   PREVIEW DA IMAGEM
+========================================================= */
+
+function showImagePreview(
+  image
+) {
+  const preview =
+    $("#image-preview");
+
+  const remove =
+    $("#remove-image");
+
+  if (!preview) {
+    return;
+  }
+
+  if (!image) {
+    hideImagePreview();
+    return;
+  }
+
+  preview.src = image;
+  preview.hidden = false;
+
+  if (remove) {
+    remove.hidden = false;
+  }
+}
+
+/* =========================================================
+   ESCONDER PREVIEW
+========================================================= */
+
+function hideImagePreview() {
+  const preview =
+    $("#image-preview");
+
+  const remove =
+    $("#remove-image");
+
+  if (preview) {
+    preview.src = "";
+    preview.hidden = true;
+  }
+
+  if (remove) {
+    remove.hidden = true;
+  }
+}
+
+/* =========================================================
+   LER IMAGEM
+========================================================= */
+
+function handleImageChange(
+  event
+) {
+  const file =
+    event.target?.files?.[0];
+
+  if (!file) {
+    return;
+  }
+
+  if (
+    !file.type.startsWith(
+      "image/"
+    )
+  ) {
+    toast(
+      "Selecione uma imagem válida.",
+      "error"
+    );
+
+    event.target.value = "";
+
+    return;
+  }
+
+  const reader =
+    new FileReader();
+
+  reader.onload = () => {
+    S.image =
+      reader.result;
+
+    showImagePreview(
+      S.image
+    );
+  };
+
+  reader.onerror = () => {
+    toast(
+      "Não foi possível ler a imagem.",
+      "error"
+    );
+  };
+
+  reader.readAsDataURL(
+    file
+  );
+}
+
+/* =========================================================
+   REMOVER IMAGEM
+========================================================= */
+
+function removeImage() {
+  S.image = null;
+
+  hideImagePreview();
+
+  const file =
+    $("#f-image");
+
+  if (file) {
+    file.value = "";
+  }
+}
+
+/* =========================================================
+   SALVAR PRODUTO
+========================================================= */
+
+async function saveProduct(
+  event
+) {
+  event?.preventDefault();
+
+  if (!db) {
+    toast(
+      "Supabase não conectado. Verifique a configuração.",
+      "error"
+    );
+
+    return false;
+  }
+
+  const form =
+    $("#pform");
+
+  if (!form) {
+    toast(
+      "Formulário de produto não encontrado.",
+      "error"
+    );
+
+    return false;
+  }
+
+  const name =
+    $("#f-name")?.value?.trim() ||
+    "";
+
+  if (!name) {
+    toast(
+      "Digite o nome do produto.",
+      "error"
+    );
+
+    $("#f-name")?.focus();
+
+    return false;
+  }
+
+  const areaField =
+    $("#f-area")?.value ||
+    "pronta";
+
+  const storedArea =
+    areaField === "encomendas"
+      ? "encomendas"
+      : "cardapio";
+
+  const toNumber = (
+    selector,
+    fallback = 0
+  ) => {
+    const raw =
+      $(selector)?.value;
+
+    if (
+      raw === "" ||
+      raw == null
+    ) {
+      return fallback;
+    }
+
+    const value =
+      Number(raw);
+
+    return Number.isFinite(
+      value
+    )
+      ? value
+      : fallback;
+  };
+
+  const payload = {
+    name,
+
+    description:
+      $("#f-desc")?.value?.trim() ||
+      "",
+
+    price:
+      toNumber("#f-price"),
+
+    discount:
+      toNumber("#f-disc"),
+
+    sort_order:
+      Math.trunc(
+        toNumber("#f-sort")
+      ),
+
+    gramatura:
+      Math.trunc(
+        toNumber("#f-gram")
+      ),
+
+    serve_people:
+      Math.trunc(
+        toNumber("#f-serve")
+      ),
+
+    active:
+      $("#f-avail")?.checked !==
+      false,
+
+    featured:
+      $("#f-feat")?.checked ===
+      true,
+
+    appointment_required:
+      $("#f-appt")?.checked ===
+      true,
+
+    area:
+      storedArea,
+
+    category:
+      $("#f-cat")?.value?.trim() ||
+      null
+  };
+
+  /*
+   * S.image:
+   *
+   * undefined = não alterou a imagem
+   * string    = nova imagem
+   * null      = removeu a imagem
+   */
+
+  if (
+    S.image !== undefined
+  ) {
+    payload.image_url =
+      S.image;
+  }
+
+  const id =
+    S.editId;
+
+  const saveButton =
+    form.querySelector(
+      'button[type="submit"]'
+    );
+
+  if (saveButton) {
+    saveButton.disabled = true;
+
+    saveButton.dataset.oldText =
+      saveButton.textContent;
+
+    saveButton.textContent =
+      "Salvando...";
+  }
+
+  try {
+    let result;
+
+    if (id) {
+      result =
+        await db
+          .from("products")
+          .update(payload)
+          .eq("id", id);
+    } else {
+      result =
+        await db
+          .from("products")
+          .insert(payload);
+    }
+
+    if (result?.error) {
+      throw result.error;
+    }
+
+    toast(
+      id
+        ? "Produto atualizado com sucesso."
+        : "Produto criado com sucesso."
+    );
+
+    closeModal();
+
+    await loadProducts();
+
+    render();
+
+    return true;
+  } catch (error) {
+    console.error(
+      "Erro ao salvar produto:",
+      error
+    );
+
+    toast(
+      error?.message ||
+        error?.details ||
+        error?.hint ||
+        "Erro ao salvar produto.",
+      "error"
+    );
+
+    return false;
+  } finally {
+    if (saveButton) {
+      saveButton.disabled =
+        false;
+
+      saveButton.textContent =
+        saveButton.dataset.oldText ||
+        "Salvar";
+    }
+  }
+}
+
+/* =========================================================
+   EXCLUIR PRODUTO
+========================================================= */
+
+async function deleteProduct(
+  id
+) {
+  if (!db) {
+    toast(
+      "Supabase não conectado.",
+      "error"
+    );
+
+    return false;
+  }
+
+  const product =
+    getProduct(id);
+
+  if (!product) {
+    toast(
+      "Produto não encontrado.",
+      "error"
+    );
+
+    return false;
+  }
+
+  const confirmed =
+    window.confirm(
+      `Excluir o produto "${product.name}"?`
+    );
+
+  if (!confirmed) {
+    return false;
+  }
+
+  try {
+    const {
+      error
+    } = await db
+      .from("products")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      throw error;
+    }
+
+    toast(
+      "Produto excluído com sucesso."
+    );
+
+    await loadProducts();
+
+    render();
+
+    return true;
+  } catch (error) {
+    console.error(
+      "Erro ao excluir produto:",
+      error
+    );
+
+    toast(
+      error?.message ||
+        "Erro ao excluir produto.",
+      "error"
+    );
+
+    return false;
+  }
+}
+
+/* =========================================================
+   ATIVAR / DESATIVAR PRODUTO
+========================================================= */
+
+async function toggleProduct(
+  id
+) {
+  if (!db) {
+    toast(
+      "Supabase não conectado.",
+      "error"
+    );
+
+    return false;
+  }
+
+  const product =
+    getProduct(id);
+
+  if (!product) {
+    return false;
+  }
+
+  try {
+    const {
+      error
+    } = await db
+      .from("products")
+      .update({
+        active:
+          product.active === false
+      })
+      .eq("id", id);
+
+    if (error) {
+      throw error;
+    }
+
+    await loadProducts();
+
+    render();
+
+    return true;
+  } catch (error) {
+    console.error(
+      "Erro ao alterar produto:",
+      error
+    );
+
+    toast(
+      error?.message ||
+        "Erro ao alterar produto.",
+      "error"
+    );
+
+    return false;
+  }
+}
+
+/* =========================================================
+   CARD DO PRODUTO
+========================================================= */
+
+function productCard(
+  product
+) {
+  const area =
+    productArea(
+      product
+    );
+
+  const image =
+    product.image_url ||
+    product.image ||
+    "";
+
+  const active =
+    product.active !== false;
+
+  const price =
+    Number(
+      product.price || 0
+    );
+
+  const discount =
+    Number(
+      product.discount || 0
+    );
+
+  const finalPrice =
+    discount > 0
+      ? price -
+        price *
+          (discount / 100)
+      : price;
+
+  return `
+    <article
+      class="product-card ${
+        active
+          ? ""
+          : "is-inactive"
+      }"
+      data-product-id="${esc(
+        product.id
+      )}"
+    >
+
+      <div class="product-card-image">
+
+        ${
+          image
+            ? `
+              <img
+                src="${esc(image)}"
+                alt="${esc(
+                  product.name
+                )}"
+              >
+            `
+            : `
+              <div class="product-no-image">
+                Sem imagem
+              </div>
+            `
+        }
+
+        <span class="product-area-badge">
+          ${
+            area === "encomendas"
+              ? "Encomendas"
+              : "Pronta Entrega"
+          }
+        </span>
+
+      </div>
+
+      <div class="product-card-body">
+
+        <div class="product-card-top">
+
+          <h3>
             ${esc(
-              STATUS_LABEL[
-                status
-              ] ||
-                status
+              product.name
             )}
+          </h3>
 
+          <span
+            class="product-status ${
+              active
+                ? "active"
+                : "inactive"
+            }"
+          >
+            ${
+              active
+                ? "Ativo"
+                : "Inativo"
+            }
           </span>
 
         </div>
 
         ${
-          custom
-            ? customOrderDetails(
-                data
-              )
-            : readyOrderDetails(
-                data
-              )
+          product.category
+            ? `
+              <div class="product-category">
+                ${esc(
+                  product.category
+                )}
+              </div>
+            `
+            : ""
         }
 
-        <div class="order-actions">
+        ${
+          product.description
+            ? `
+              <p class="product-description">
+                ${esc(
+                  product.description
+                )}
+              </p>
+            `
+            : ""
+        }
 
-          <label>
-            Status
+        <div class="product-price">
 
-            <select
-              data-status-id="${esc(
-                order.id
-              )}"
-              data-status-type="${type}"
-            >
+          ${
+            discount > 0
+              ? `
+                <span class="old-price">
+                  ${brl(price)}
+                </span>
 
-              ${STATUS.map(
-                (
-                  item
-                ) => `
-                  <option
-                    value="${esc(
-                      item
-                    )}"
-                    ${
-                      item ===
-                      status
-                        ? "selected"
-                        : ""
-                    }
-                  >
-                    ${esc(
-                      STATUS_LABEL[
-                        item
-                      ]
-                    )}
-                  </option>
-                `
-              ).join("")}
+                <strong>
+                  ${brl(
+                    finalPrice
+                  )}
+                </strong>
 
-            </select>
+                <small>
+                  -${discount}%
+                </small>
+              `
+              : `
+                <strong>
+                  ${brl(price)}
+                </strong>
+              `
+          }
 
-          </label>
+        </div>
+
+        <div class="product-actions">
 
           <button
-            class="btn soft"
-            data-act="print-order"
+            type="button"
+            class="btn btn-primary"
+            data-action="edit-product"
             data-id="${esc(
-              order.id
+              product.id
             )}"
-            data-type="${type}"
           >
-            🖨 Imprimir
+            Editar
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-action="toggle-product"
+            data-id="${esc(
+              product.id
+            )}"
+          >
+            ${
+              active
+                ? "Desativar"
+                : "Ativar"
+            }
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-danger"
+            data-action="delete-product"
+            data-id="${esc(
+              product.id
+            )}"
+          >
+            Excluir
           </button>
 
         </div>
 
-      </article>
-    `;
-  }
-
-  /* =========================================================
-     DETALHES ENCOMENDA
-  ========================================================= */
-
-  function customOrderDetails(
-    data
-  ) {
-    return `
-      <div class="order-details">
-
-        ${detail(
-          "WhatsApp",
-          data.whatsapp
-        )}
-
-        ${detail(
-          "Data desejada",
-          formatSimpleDate(
-            data.data_desejada
-          )
-        )}
-
-        ${detail(
-          "Kit",
-          formatComplexValue(
-            data.kit
-          )
-        )}
-
-        ${detail(
-          "Bolo",
-          formatComplexValue(
-            data.bolo
-          )
-        )}
-
-        ${detail(
-          "Massa",
-          formatComplexValue(
-            data.massa
-          )
-        )}
-
-        ${detail(
-          "Recheio",
-          formatComplexValue(
-            data.recheio
-          )
-        )}
-
-        ${detail(
-          "Decoração",
-          formatComplexValue(
-            data.topo
-          )
-        )}
-
-        ${
-          data.adicionais.length
-            ? detail(
-                "Adicionais",
-                formatArray(
-                  data.adicionais
-                )
-              )
-            : ""
-        }
-
-        ${
-          data.personalizacao.length
-            ? detail(
-                "Personalização",
-                formatArray(
-                  data.personalizacao
-                )
-              )
-            : ""
-        }
-
-        ${
-          data.personalizacao_text
-            ? detail(
-                "Texto da personalização",
-                data.personalizacao_text
-              )
-            : ""
-        }
-
-        ${
-          data.brigadeiros.length
-            ? `
-              <div class="detail full">
-
-                <span>
-                  Brigadeiros
-                </span>
-
-                <strong>
-                  ${data.brigadeiros
-                    .map(
-                      (
-                        item
-                      ) =>
-                        formatBrigadeiro(
-                          item
-                        )
-                    )
-                    .join(
-                      "<br>"
-                    )}
-                </strong>
-
-              </div>
-            `
-            : ""
-        }
-
-        ${
-          data.outros.length
-            ? `
-              <div class="detail full">
-
-                <span>
-                  Outros itens
-                </span>
-
-                <strong>
-                  ${data.outros
-                    .map(
-                      (
-                        item
-                      ) =>
-                        formatOtherItem(
-                          item
-                        )
-                    )
-                    .join(
-                      "<br>"
-                    )}
-                </strong>
-
-              </div>
-            `
-            : ""
-        }
-
-        ${
-          data.observacoes
-            ? detail(
-                "Observações",
-                data.observacoes
-              )
-            : ""
-        }
-
-        ${
-          data.total_estimado !==
-            "" &&
-          data.total_estimado !==
-            null &&
-          data.total_estimado !==
-            undefined
-            ? detail(
-                "Total estimado",
-                formatMoneyValue(
-                  data.total_estimado
-                )
-              )
-            : ""
-        }
-
       </div>
-    `;
+
+    </article>
+  `;
+}
+
+/* =========================================================
+   RENDERIZAR PRODUTOS
+========================================================= */
+
+function renderProducts(
+  kind
+) {
+  const container =
+    $("#products-list");
+
+  if (!container) {
+    return;
   }
 
-  /* =========================================================
-     DETALHES PRONTA ENTREGA
-  ========================================================= */
-
-  function readyOrderDetails(
-    data
-  ) {
-    return `
-      <div class="order-details">
-
-        ${detail(
-          "WhatsApp",
-          data.whatsapp
-        )}
-
-        ${detail(
-          "Forma de recebimento",
-          data.recebimento
-        )}
-
-        ${data.endereco
-          ? detail(
-              "Endereço",
-              data.endereco
-            )
-          : ""}
-
-        ${detail(
-          "Pagamento",
-          data.pagamento
-        )}
-
-        ${
-          data.itens.length
-            ? `
-              <div class="detail full">
-
-                <span>
-                  Itens do pedido
-                </span>
-
-                <strong>
-                  ${data.itens
-                    .map(
-                      (
-                        item
-                      ) =>
-                        formatReadyItem(
-                          item
-                        )
-                    )
-                    .join(
-                      "<br>"
-                    )}
-                </strong>
-
-              </div>
-            `
-            : ""
-        }
-
-        ${
-          data.observacoes
-            ? detail(
-                "Observações",
-                data.observacoes
-              )
-            : ""
-        }
-
-        ${
-          data.total
-            ? detail(
-                "Total",
-                brl(
-                  data.total
-                )
-              )
-            : ""
-        }
-
-      </div>
-    `;
-  }
-
-  /* =========================================================
-     FORMATADORES
-  ========================================================= */
-
-  function formatComplexValue(
-    value
-  ) {
-    if (
-      value === null ||
-      value === undefined ||
-      value === ""
-    ) {
-      return "";
-    }
-
-    if (
-      typeof value ===
-      "string"
-    ) {
-      return value;
-    }
-
-    if (
-      typeof value ===
-      "number"
-    ) {
-      return String(value);
-    }
-
-    if (
-      Array.isArray(value)
-    ) {
-      return formatArray(
-        value
-      );
-    }
-
-    if (
-      typeof value ===
-      "object"
-    ) {
-      const preferred =
-        [
-          "name",
-          "nome",
-          "label",
-          "title",
-          "cake",
-          "bolo",
-          "type",
-          "tipo",
-          "value",
-          "valor"
-        ];
-
-      for (
-        const key of preferred
-      ) {
-        if (
-          value[key] !==
-            undefined &&
-          value[key] !==
-            null &&
-          value[key] !==
-            ""
-        ) {
-          return String(
-            value[key]
-          );
-        }
-      }
-
-      return JSON.stringify(
-        value
-      );
-    }
-
-    return String(value);
-  }
-
-  function formatArray(
-    value
-  ) {
-    if (
-      !Array.isArray(value)
-    ) {
-      return formatComplexValue(
-        value
-      );
-    }
-
-    return value
-      .map(
-        (
-          item
-        ) =>
-          formatComplexValue(
-            item
-          )
-      )
-      .filter(Boolean)
-      .join(", ");
-  }
-
-  function formatBrigadeiro(
-    item
-  ) {
-    if (
-      typeof item ===
-      "string"
-    ) {
-      return item;
-    }
-
-    if (
-      !item ||
-      typeof item !==
-        "object"
-    ) {
-      return "";
-    }
-
-    const type =
-      item.type ||
-      item.tipo ||
-      item.category ||
-      "";
-
-    const name =
-      item.flavor ||
-      item.sabor ||
-      item.name ||
-      item.nome ||
-      "";
-
-    const quantity =
-      item.quantity ??
-      item.quantidade ??
-      item.qty ??
-      "";
-
-    const parts = [];
-
-    if (type) {
-      parts.push(
-        type
-      );
-    }
-
-    if (name) {
-      parts.push(
-        name
-      );
-    }
-
-    if (
-      quantity !==
-        "" &&
-      quantity !==
-        null &&
-      quantity !==
-        undefined
-    ) {
-      parts.push(
-        `${quantity} un.`
-      );
-    }
-
-    return (
-      parts.join(
-        " — "
-      ) ||
-      JSON.stringify(
-        item
-      )
+  const products =
+    productsView(
+      kind
     );
-  }
 
-  function formatOtherItem(
-    item
-  ) {
-    if (
-      typeof item ===
-      "string"
-    ) {
-      return item;
-    }
-
-    if (
-      !item ||
-      typeof item !==
-        "object"
-    ) {
-      return "";
-    }
-
-    const name =
-      item.item ||
-      item.name ||
-      item.nome ||
-      "";
-
-    const quantity =
-      item.quantity ??
-      item.quantidade ??
-      item.qty ??
-      "";
-
-    if (
-      quantity !==
-        "" &&
-      quantity !==
-        null &&
-      quantity !==
-        undefined
-    ) {
-      return `${name} — ${quantity} un.`;
-    }
-
-    return (
-      name ||
-      JSON.stringify(
-        item
-      )
-    );
-  }
-
-  function formatReadyItem(
-    item
-  ) {
-    if (
-      typeof item ===
-      "string"
-    ) {
-      return item;
-    }
-
-    if (
-      !item ||
-      typeof item !==
-        "object"
-    ) {
-      return "";
-    }
-
-    const name =
-      item.name ||
-      item.nome ||
-      item.product_name ||
-      "Produto";
-
-    const quantity =
-      item.quantity ??
-      item.quantidade ??
-      1;
-
-    const unitPrice =
-      item.unit_price ??
-      item.preco_unitario ??
-      item.price ??
-      null;
-
-    const total =
-      item.total ??
-      item.subtotal ??
-      null;
-
-    let result =
-      `${name} — ${quantity} un.`;
-
-    if (
-      unitPrice !==
-        null &&
-      unitPrice !==
-        undefined
-    ) {
-      result +=
-        ` — ${brl(
-          unitPrice
-        )}/un.`;
-    }
-
-    if (
-      total !==
-        null &&
-      total !==
-        undefined
-    ) {
-      result +=
-        ` — ${brl(
-          total
-        )}`;
-    }
-
-    if (
-      item.appointment_required
-    ) {
-      result +=
-        " — Agendamento";
-    }
-
-    return result;
-  }
-
-  function formatMoneyValue(
-    value
-  ) {
-    if (
-      typeof value ===
-      "number"
-    ) {
-      return brl(value);
-    }
-
-    if (
-      typeof value ===
-      "string"
-    ) {
-      const normalized =
-        value
-          .replace(
-            /R\$\s*/gi,
-            ""
-          )
-          .replace(
-            /\./g,
-            ""
-          )
-          .replace(
-            ",",
-            "."
-          );
-
-      const number =
-        Number(
-          normalized
-        );
-
-      if (
-        Number.isFinite(
-          number
-        )
-      ) {
-        return brl(
-          number
-        );
-      }
-    }
-
-    return value;
-  }
-
-  /* =========================================================
-     DETAIL
-  ========================================================= */
-
-  function detail(
-    label,
-    value
-  ) {
-    if (
-      value === null ||
-      value === undefined ||
-      value === ""
-    ) {
-      return "";
-    }
-
-    return `
-      <div class="detail">
+  if (!products.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <strong>
+          Nenhum produto cadastrado
+        </strong>
 
         <span>
-          ${esc(label)}
+          Cadastre um produto para
+          começar.
+        </span>
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML =
+    products
+      .map(productCard)
+      .join("");
+}
+
+/* =========================================================
+   FIM DA PARTE 3
+========================================================= */
+ /* =========================================================
+   PEDIDOS — PRONTA ENTREGA
+========================================================= */
+
+function readyOrderCard(order) {
+  const status =
+    normalizeStatus(
+      order?.status
+    );
+
+  const customer =
+    order?.customer ||
+    "Cliente não informado";
+
+  const whatsapp =
+    order?.whatsapp ||
+    "";
+
+  const receiving =
+    order?.receiving ||
+    "Não informado";
+
+  const total =
+    Number(
+      order?.total || 0
+    );
+
+  const items =
+    Array.isArray(
+      order?.items
+    )
+      ? order.items
+      : [];
+
+  const itemCount =
+    items.reduce(
+      (sum, item) =>
+        sum +
+        Number(
+          item?.quantity || 1
+        ),
+      0
+    );
+
+  return `
+    <article
+      class="order-card"
+      data-order-id="${esc(
+        order?.id
+      )}"
+    >
+
+      <div class="order-card-header">
+
+        <div>
+
+          <span class="order-type">
+            Pronta Entrega
+          </span>
+
+          <h3>
+            ${esc(customer)}
+          </h3>
+
+        </div>
+
+        <select
+          class="order-status"
+          data-action="change-order-status"
+          data-type="ready"
+          data-id="${esc(
+            order?.id
+          )}"
+        >
+
+          ${STATUS.map(
+            (item) => `
+              <option
+                value="${esc(item)}"
+                ${
+                  item === status
+                    ? "selected"
+                    : ""
+                }
+              >
+                ${esc(
+                  STATUS_LABEL[item] ||
+                    item
+                )}
+              </option>
+            `
+          ).join("")}
+
+        </select>
+
+      </div>
+
+      <div class="order-card-info">
+
+        <div>
+          <strong>
+            Recebido:
+          </strong>
+
+          <span>
+            ${esc(
+              formatDate(
+                order?.created_at
+              )
+            )}
+          </span>
+        </div>
+
+        <div>
+          <strong>
+            Recebimento:
+          </strong>
+
+          <span>
+            ${esc(
+              receiving
+            )}
+          </span>
+        </div>
+
+        <div>
+          <strong>
+            WhatsApp:
+          </strong>
+
+          <span>
+            ${esc(
+              whatsapp || "—"
+            )}
+          </span>
+        </div>
+
+        <div>
+          <strong>
+            Itens:
+          </strong>
+
+          <span>
+            ${itemCount}
+          </span>
+        </div>
+
+        <div>
+          <strong>
+            Total:
+          </strong>
+
+          <span>
+            ${brl(total)}
+          </span>
+        </div>
+
+      </div>
+
+      <div class="order-card-actions">
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-action="view-ready-order"
+          data-id="${esc(
+            order?.id
+          )}"
+        >
+          Ver pedido
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-action="print-ready-order"
+          data-id="${esc(
+            order?.id
+          )}"
+        >
+          Imprimir
+        </button>
+
+      </div>
+
+    </article>
+  `;
+}
+
+/* =========================================================
+   DETALHES — PRONTA ENTREGA
+========================================================= */
+
+function readyOrderDetails(
+  order
+) {
+  const items =
+    Array.isArray(
+      order?.items
+    )
+      ? order.items
+      : [];
+
+  const itemsHtml =
+    items.length
+      ? `
+        <div class="order-detail-section">
+
+          <h4>
+            Itens do pedido
+          </h4>
+
+          <div class="order-items">
+
+            ${items
+              .map(
+                (item) => {
+                  const quantity =
+                    Number(
+                      item?.quantity || 1
+                    );
+
+                  const unitPrice =
+                    Number(
+                      item?.unit_price ||
+                      item?.price ||
+                      0
+                    );
+
+                  const itemTotal =
+                    Number(
+                      item?.total ??
+                      quantity *
+                        unitPrice
+                    );
+
+                  return `
+                    <div
+                      class="order-item"
+                    >
+
+                      <div>
+
+                        <strong>
+                          ${esc(
+                            item?.name ||
+                              "Produto"
+                          )}
+                        </strong>
+
+                        ${
+                          item?.appointment_required
+                            ? `
+                              <small>
+                                Requer agendamento
+                              </small>
+                            `
+                            : ""
+                        }
+
+                      </div>
+
+                      <div>
+
+                        <span>
+                          ${quantity} ×
+                          ${brl(
+                            unitPrice
+                          )}
+                        </span>
+
+                        <strong>
+                          ${brl(
+                            itemTotal
+                          )}
+                        </strong>
+
+                      </div>
+
+                    </div>
+                  `;
+                }
+              )
+              .join("")}
+
+          </div>
+
+        </div>
+      `
+      : `
+        <div class="order-detail-section">
+
+          <h4>
+            Itens do pedido
+          </h4>
+
+          <p>
+            Nenhum item informado.
+          </p>
+
+        </div>
+      `;
+
+  return `
+    <div class="order-details">
+
+      <div class="order-detail-section">
+
+        <h4>
+          Cliente
+        </h4>
+
+        <p>
+          <strong>
+            Nome:
+          </strong>
+
+          ${esc(
+            order?.customer ||
+              "Não informado"
+          )}
+        </p>
+
+        <p>
+          <strong>
+            WhatsApp:
+          </strong>
+
+          ${esc(
+            order?.whatsapp ||
+              "Não informado"
+          )}
+        </p>
+
+      </div>
+
+      <div class="order-detail-section">
+
+        <h4>
+          Recebimento
+        </h4>
+
+        <p>
+          <strong>
+            Forma:
+          </strong>
+
+          ${esc(
+            order?.receiving ||
+              "Não informado"
+          )}
+        </p>
+
+        <p>
+          <strong>
+            Endereço:
+          </strong>
+
+          ${esc(
+            order?.address ||
+              "Não informado"
+          )}
+        </p>
+
+        <p>
+          <strong>
+            Pagamento:
+          </strong>
+
+          ${esc(
+            order?.payment ||
+              "Não informado"
+          )}
+        </p>
+
+      </div>
+
+      ${itemsHtml}
+
+      <div class="order-detail-section">
+
+        <h4>
+          Observações
+        </h4>
+
+        <p>
+          ${esc(
+            order?.observations ||
+              "Nenhuma observação."
+          )}
+        </p>
+
+      </div>
+
+      <div class="order-detail-total">
+
+        <span>
+          Total do pedido
         </span>
 
         <strong>
-          ${esc(value)}
+          ${brl(
+            order?.total || 0
+          )}
         </strong>
 
       </div>
-    `;
+
+    </div>
+  `;
+}
+
+/* =========================================================
+   MODAL DE PEDIDO
+========================================================= */
+
+function showOrderDetails(
+  type,
+  id
+) {
+  let order = null;
+
+  if (
+    type === "ready"
+  ) {
+    order =
+      S.readyOrders.find(
+        (item) =>
+          String(item.id) ===
+          String(id)
+      );
+  } else {
+    order =
+      S.customOrders.find(
+        (item) =>
+          String(item.id) ===
+          String(id)
+      );
   }
 
-  /* =========================================================
-     ATUALIZAR STATUS
-  ========================================================= */
+  if (!order) {
+    toast(
+      "Pedido não encontrado.",
+      "error"
+    );
 
-  async function setStatus(
-    id,
-    type,
-    status
-  ) {
-    if (!db) {
-      toast(
-        "Supabase não conectado.",
-        "error"
-      );
+    return;
+  }
 
-      return;
-    }
+  const modal =
+    $("#order-modal");
 
-    const table =
-      type === "custom"
-        ? "custom_cakes"
-        : "orders";
+  const title =
+    $("#order-modal-title");
 
+  const body =
+    $("#order-modal-body");
+
+  if (!modal || !body) {
+    toast(
+      "Área de detalhes do pedido não encontrada.",
+      "error"
+    );
+
+    return;
+  }
+
+  if (title) {
+    title.textContent =
+      type === "ready"
+        ? "Pedido — Pronta Entrega"
+        : "Pedido — Encomenda";
+  }
+
+  body.innerHTML =
+    type === "ready"
+      ? readyOrderDetails(
+          order
+        )
+      : customOrderDetails(
+          order
+        );
+
+  modal.hidden = false;
+
+  modal.classList.add(
+    "show"
+  );
+}
+
+/* =========================================================
+   FECHAR MODAL DE PEDIDO
+========================================================= */
+
+function closeOrderModal() {
+  const modal =
+    $("#order-modal");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.remove(
+    "show"
+  );
+
+  modal.hidden = true;
+}
+
+/* =========================================================
+   ALTERAR STATUS DO PEDIDO
+========================================================= */
+
+async function updateOrderStatus(
+  type,
+  id,
+  status
+) {
+  if (!db) {
+    toast(
+      "Supabase não conectado.",
+      "error"
+    );
+
+    return false;
+  }
+
+  const normalized =
+    normalizeStatus(
+      status
+    );
+
+  const table =
+    type === "ready"
+      ? "orders"
+      : "custom_cakes";
+
+  try {
     const {
       error
     } = await db
       .from(table)
       .update({
-        status
+        status:
+          normalized
       })
       .eq(
         "id",
@@ -3345,3108 +2925,4330 @@
       );
 
     if (error) {
-      toast(
-        "Não foi possível atualizar o status.",
-        "error"
-      );
-
-      console.error(
-        error
-      );
-
-      return;
+      throw error;
     }
 
     toast(
       "Status atualizado."
     );
 
-    await loadOrders();
+    if (
+      type === "ready"
+    ) {
+      await loadReadyOrders();
+    } else {
+      await loadCustomOrders();
+    }
 
     render();
-  }
 
-  /* =========================================================
-     SALVAR PRODUTO
-  ========================================================= */
-
-  async function saveProduct(
-    event
-  ) {
-    event.preventDefault();
-
-    if (!db) {
-      toast(
-        "Supabase não conectado.",
-        "error"
-      );
-
-      return;
-    }
-
-    const name =
-      $("#f-name")
-        ?.value
-        .trim() ||
-      "";
-
-    if (!name) {
-      toast(
-        "Digite o nome do produto.",
-        "error"
-      );
-
-      $("#f-name")
-        ?.focus();
-
-      return;
-    }
-
-    const id =
-      S.editId;
-
-    const area =
-      $("#f-area")
-        ?.value ||
-      "pronta";
-
-    const payload = {
-      name,
-
-      description:
-        $("#f-desc")
-          ?.value
-          .trim() ||
-        "",
-
-      price:
-        Number(
-          $("#f-price")
-            ?.value ||
-            0
-        ),
-
-      discount:
-        Number(
-          $("#f-disc")
-            ?.value ||
-            0
-        ),
-
-      sort_order:
-        Number(
-          $("#f-sort")
-            ?.value ||
-            0
-        ),
-
-      gramatura:
-        Number(
-          $("#f-gram")
-            ?.value ||
-            0
-        ),
-
-      serve_people:
-        Number(
-          $("#f-serve")
-            ?.value ||
-            0
-        ),
-
-      active:
-        $("#f-avail")
-          ?.checked !==
-        false,
-
-      featured:
-        $("#f-feat")
-          ?.checked ===
-        true,
-
-      appointment_required:
-        $("#f-appt")
-          ?.checked ===
-        true,
-
-      area:
-        area ===
-        "encomendas"
-          ? "encomendas"
-          : "cardapio",
-
-      category:
-        $("#f-cat")
-          ?.value ||
-        null
-    };
-
-    /*
-     * Se S.image for:
-     * undefined = não alterou a imagem
-     * string = nova imagem
-     * null = removeu a imagem
-     */
-    if (
-      S.image !==
-      undefined
-    ) {
-      payload.image_url =
-        S.image;
-    }
-
-    try {
-      let result;
-
-      if (id) {
-        result =
-          await db
-            .from(
-              "products"
-            )
-            .update(
-              payload
-            )
-            .eq(
-              "id",
-              id
-            )
-            .select()
-            .maybeSingle();
-      } else {
-        result =
-          await db
-            .from(
-              "products"
-            )
-            .insert(
-              payload
-            )
-            .select()
-            .maybeSingle();
-      }
-
-      if (
-        result?.error
-      ) {
-        throw result.error;
-      }
-
-      if (
-        !result?.data &&
-        !id
-      ) {
-        console.warn(
-          "Produto inserido, mas o Supabase não retornou o registro."
-        );
-      }
-
-      toast(
-        id
-          ? "Produto atualizado com sucesso."
-          : "Produto criado com sucesso."
-      );
-
-      closeModal();
-
-      await loadProducts();
-
-      render();
-
-    } catch (
+    return true;
+  } catch (error) {
+    console.error(
+      "Erro ao atualizar status:",
       error
-    ) {
-      console.error(
-        "Erro ao salvar produto:",
-        error
-      );
-
-      toast(
-        error?.message ||
-          "Erro ao salvar produto.",
-        "error"
-      );
-    }
-  }
-
-  /* =========================================================
-     EXCLUIR PRODUTO
-  ========================================================= */
-
-  async function deleteProduct(
-    id
-  ) {
-    if (!db) {
-      toast(
-        "Supabase não conectado.",
-        "error"
-      );
-
-      return;
-    }
-
-    const product =
-      S.products.find(
-        (
-          item
-        ) =>
-          String(
-            item.id
-          ) ===
-          String(id)
-      );
-
-    if (!product) {
-      return;
-    }
-
-    const confirmed =
-      confirm(
-        `Excluir o produto "${product.name}"?`
-      );
-
-    if (!confirmed) {
-      return;
-    }
-
-    const {
-      error
-    } = await db
-      .from("products")
-      .delete()
-      .eq(
-        "id",
-        id
-      );
-
-    if (error) {
-      toast(
-        "Não foi possível excluir.",
-        "error"
-      );
-
-      console.error(
-        error
-      );
-
-      return;
-    }
+    );
 
     toast(
-      "Produto excluído."
+      error?.message ||
+        "Não foi possível atualizar o status.",
+      "error"
     );
 
-    await loadProducts();
-
-    render();
+    return false;
   }
+}
 
-  /* =========================================================
-     MODAL
-  ========================================================= */
+/* =========================================================
+   IMPRIMIR PEDIDO — PRONTA ENTREGA
+========================================================= */
 
-  function openProductModal(
-    id = null,
-    area = "pronta"
-  ) {
-    S.editId =
-      id;
+function printableReadyOrder(
+  order
+) {
+  const items =
+    Array.isArray(
+      order?.items
+    )
+      ? order.items
+      : [];
 
-    S.image =
-      undefined;
+  const itemsHtml =
+    items
+      .map(
+        (item) => {
+          const quantity =
+            Number(
+              item?.quantity || 1
+            );
 
-    const product =
-      id
-        ? S.products.find(
-            (
-              item
-            ) =>
-              String(
-                item.id
-              ) ===
-              String(id)
-          )
-        : null;
+          const unitPrice =
+            Number(
+              item?.unit_price ||
+              item?.price ||
+              0
+            );
 
-    const title =
-      $("#mtitle");
+          const total =
+            Number(
+              item?.total ??
+              quantity *
+                unitPrice
+            );
 
-    if (title) {
-      title.textContent =
-        product
-          ? "Editar produto"
-          : "Novo produto";
+          return `
+            <tr>
+
+              <td>
+                ${esc(
+                  item?.name ||
+                    "Produto"
+                )}
+              </td>
+
+              <td>
+                ${quantity}
+              </td>
+
+              <td>
+                ${brl(
+                  unitPrice
+                )}
+              </td>
+
+              <td>
+                ${brl(
+                  total
+                )}
+              </td>
+
+            </tr>
+          `;
+        }
+      )
+      .join("");
+
+  return `
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>
+    Pedido — Martins Confeitaria
+  </title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
     }
 
-    const areaField =
-      $("#f-area");
-
-    if (areaField) {
-      areaField.value =
-        product
-          ? productArea(
-              product
-            )
-          : area;
+    body {
+      margin: 0;
+      padding: 30px;
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+      color: #222;
+      background: #fff;
     }
 
-    $("#f-name").value =
-      product?.name ||
-      "";
+    .print-page {
+      max-width: 850px;
+      margin: 0 auto;
+    }
 
-    $("#f-price").value =
-      product?.price ??
-      "";
+    .header {
+      border-bottom:
+        3px solid #67b0cb;
+      padding-bottom: 18px;
+      margin-bottom: 25px;
+    }
 
-    $("#f-disc").value =
-      product?.discount ??
-      0;
+    .header h1 {
+      margin: 0 0 5px;
+      color: #2b7896;
+      font-size: 28px;
+    }
 
-    $("#f-sort").value =
-      product?.sort_order ??
-      0;
+    .header p {
+      margin: 0;
+      font-size: 13px;
+    }
 
-    $("#f-gram").value =
-      product?.gramatura ??
-      0;
+    .section {
+      margin-bottom: 24px;
+    }
 
-    $("#f-serve").value =
-      product?.serve_people ??
-      0;
+    .section h2 {
+      margin: 0 0 10px;
+      padding-bottom: 6px;
+      border-bottom:
+        1px solid #ddd;
+      color: #2b7896;
+      font-size: 18px;
+    }
 
-    $("#f-desc").value =
-      product?.description ||
-      "";
+    .info {
+      line-height: 1.7;
+      font-size: 14px;
+    }
 
-    $("#f-avail").checked =
-      product?.active !==
-      false;
+    table {
+      width: 100%;
+      border-collapse:
+        collapse;
+      margin-top: 10px;
+    }
 
-    $("#f-feat").checked =
-      product?.featured ===
-      true;
+    th,
+    td {
+      padding: 9px;
+      border:
+        1px solid #ddd;
+      text-align: left;
+      font-size: 13px;
+    }
 
-    $("#f-appt").checked =
-      product?.appointment_required ===
-      true;
+    th {
+      background: #67b0cb;
+      color: #fff;
+    }
 
-    S.image =
-      product?.image_url ||
-      product?.image ||
-      undefined;
+    .total {
+      margin-top: 18px;
+      padding: 14px;
+      background: #f3b7bb;
+      display: flex;
+      justify-content:
+        space-between;
+      font-size: 20px;
+      font-weight: bold;
+    }
 
-    const preview =
-      $("#prev");
+    .footer {
+      margin-top: 30px;
+      padding-top: 15px;
+      border-top:
+        1px solid #ddd;
+      font-size: 11px;
+      color: #666;
+    }
 
-    const removeButton =
-      $("#rmimg");
+    @media print {
 
-    if (
-      S.image &&
-      preview
-    ) {
-      preview.src =
-        S.image;
-
-      preview.classList.remove(
-        "hidden"
-      );
-
-      removeButton?.classList.remove(
-        "hidden"
-      );
-    } else {
-      if (preview) {
-        preview.src =
-          "";
-
-        preview.classList.add(
-          "hidden"
-        );
+      body {
+        padding: 0;
       }
 
-      removeButton?.classList.add(
-        "hidden"
-      );
+      .print-page {
+        max-width: none;
+      }
+
     }
 
-    populateCategories(
-      product?.category ||
-      ""
+  </style>
+
+</head>
+
+<body>
+
+  <div class="print-page">
+
+    <div class="header">
+
+      <h1>
+        Martins Confeitaria
+      </h1>
+
+      <p>
+        Pedido de Pronta Entrega
+      </p>
+
+      <p>
+        Recebido em:
+        ${esc(
+          formatDate(
+            order?.created_at
+          )
+        )}
+      </p>
+
+    </div>
+
+    <div class="section">
+
+      <h2>
+        Cliente
+      </h2>
+
+      <div class="info">
+
+        <strong>
+          Nome:
+        </strong>
+
+        ${esc(
+          order?.customer ||
+            "Não informado"
+        )}
+
+        <br>
+
+        <strong>
+          WhatsApp:
+        </strong>
+
+        ${esc(
+          order?.whatsapp ||
+            "Não informado"
+        )}
+
+      </div>
+
+    </div>
+
+    <div class="section">
+
+      <h2>
+        Recebimento
+      </h2>
+
+      <div class="info">
+
+        <strong>
+          Forma:
+        </strong>
+
+        ${esc(
+          order?.receiving ||
+            "Não informado"
+        )}
+
+        <br>
+
+        <strong>
+          Endereço:
+        </strong>
+
+        ${esc(
+          order?.address ||
+            "Não informado"
+        )}
+
+        <br>
+
+        <strong>
+          Pagamento:
+        </strong>
+
+        ${esc(
+          order?.payment ||
+            "Não informado"
+        )}
+
+      </div>
+
+    </div>
+
+    <div class="section">
+
+      <h2>
+        Itens
+      </h2>
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>
+              Produto
+            </th>
+
+            <th>
+              Qtd.
+            </th>
+
+            <th>
+              Unitário
+            </th>
+
+            <th>
+              Total
+            </th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          ${
+            itemsHtml ||
+            `
+              <tr>
+                <td colspan="4">
+                  Nenhum item informado.
+                </td>
+              </tr>
+            `
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+    <div class="section">
+
+      <h2>
+        Observações
+      </h2>
+
+      <div class="info">
+
+        ${esc(
+          order?.observations ||
+            "Nenhuma observação."
+        )}
+
+      </div>
+
+    </div>
+
+    <div class="total">
+
+      <span>
+        Total
+      </span>
+
+      <span>
+        ${brl(
+          order?.total || 0
+        )}
+      </span>
+
+    </div>
+
+    <div class="footer">
+
+      Martins Confeitaria
+      <br>
+      WhatsApp:
+      ${WHATSAPP}
+
+    </div>
+
+  </div>
+
+  <script>
+    window.onload = function () {
+      window.print();
+    };
+  </script>
+
+</body>
+
+</html>
+  `;
+}
+
+/* =========================================================
+   ABRIR IMPRESSÃO
+========================================================= */
+
+function printReadyOrder(
+  id
+) {
+  const order =
+    S.readyOrders.find(
+      (item) =>
+        String(item.id) ===
+        String(id)
     );
 
-    $("#modal")
-      ?.classList.remove(
-        "hidden"
-      );
+  if (!order) {
+    toast(
+      "Pedido não encontrado.",
+      "error"
+    );
+
+    return;
   }
 
-  /* =========================================================
-     FECHAR MODAL
-  ========================================================= */
+  const html =
+    printableReadyOrder(
+      order
+    );
 
-  function closeModal() {
-    $("#modal")
-      ?.classList.add(
-        "hidden"
-      );
+  const printWindow =
+    window.open(
+      "",
+      "_blank",
+      "width=900,height=800"
+    );
 
-    S.editId =
-      null;
+  if (!printWindow) {
+    toast(
+      "O navegador bloqueou a janela de impressão.",
+      "error"
+    );
 
-    S.image =
-      undefined;
-
-    $("#pform")
-      ?.reset();
-
-    $("#prev")
-      ?.classList.add(
-        "hidden"
-      );
-
-    $("#rmimg")
-      ?.classList.add(
-        "hidden"
-      );
-
-    if (
-      $("#prev")
-    ) {
-      $("#prev").src =
-        "";
-    }
-
-    if (
-      $("#f-photo")
-    ) {
-      $("#f-photo").value =
-        "";
-    }
+    return;
   }
 
-  /* =========================================================
-     CATEGORIAS
-  ========================================================= */
+  printWindow.document.open();
 
-  function getCategories() {
-    const categories =
-      S.site?.categories;
+  printWindow.document.write(
+    html
+  );
 
-    if (
-      Array.isArray(
-        categories
-      ) &&
-      categories.length
-    ) {
-      return categories;
-    }
+  printWindow.document.close();
+}
 
-    return [
-      "Bolos",
-      "Doces",
-      "Salgados",
-      "Brownies",
-      "Cupcakes",
-      "Outros"
-    ];
+/* =========================================================
+   RENDERIZAR PEDIDOS PRONTA ENTREGA
+========================================================= */
+
+function renderReadyOrders() {
+  const container =
+    $("#orders-list");
+
+  if (!container) {
+    return;
   }
 
-  function populateCategories(
-    selected = ""
-  ) {
-    const select =
-      $("#f-cat");
+  const orders =
+    Array.isArray(
+      S.readyOrders
+    )
+      ? S.readyOrders
+      : [];
 
-    if (!select) {
-      return;
-    }
+  if (!orders.length) {
+    container.innerHTML = `
+      <div class="empty-state">
 
-    const categories =
-      getCategories();
+        <strong>
+          Nenhum pedido de pronta entrega
+        </strong>
 
-    select.innerHTML =
-      `
-        <option value="">
-          Sem classificação
-        </option>
-      ` +
-      categories
-        .map(
-          (
-            category
-          ) =>
-            `
+        <span>
+          Os pedidos realizados
+          pelo cardápio aparecerão
+          aqui.
+        </span>
+
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML =
+    orders
+      .map(
+        readyOrderCard
+      )
+      .join("");
+}
+
+/* =========================================================
+   FIM DA PARTE 4
+========================================================= */
+ /* =========================================================
+   PEDIDOS — ENCOMENDAS
+========================================================= */
+
+function customOrderCard(order) {
+  const status =
+    normalizeStatus(
+      order?.status
+    );
+
+  const customer =
+    order?.customer ||
+    "Cliente não informado";
+
+  const whatsapp =
+    order?.whatsapp ||
+    "";
+
+  const date =
+    order?.date ||
+    "Não informada";
+
+  const total =
+    Number(
+      order?.estimatedTotal || 0
+    );
+
+  return `
+    <article
+      class="order-card"
+      data-order-id="${esc(
+        order?.id
+      )}"
+    >
+
+      <div class="order-card-header">
+
+        <div>
+
+          <span class="order-type">
+            Encomenda
+          </span>
+
+          <h3>
+            ${esc(customer)}
+          </h3>
+
+        </div>
+
+        <select
+          class="order-status"
+          data-action="change-order-status"
+          data-type="custom"
+          data-id="${esc(
+            order?.id
+          )}"
+        >
+
+          ${STATUS.map(
+            (item) => `
               <option
-                value="${esc(
-                  category
-                )}"
+                value="${esc(item)}"
                 ${
-                  category ===
-                  selected
+                  item === status
                     ? "selected"
                     : ""
                 }
               >
                 ${esc(
-                  category
+                  STATUS_LABEL[item] ||
+                    item
                 )}
               </option>
             `
-        )
-        .join("");
-  }
+          ).join("")}
 
-  /* =========================================================
-     IMAGEM
-  ========================================================= */
+        </select>
 
-  async function imageToDataURL(
-    file
-  ) {
-    if (!file) {
-      return null;
-    }
+      </div>
 
-    return new Promise(
-      (
-        resolve,
-        reject
-      ) => {
-        const reader =
-          new FileReader();
+      <div class="order-card-info">
 
-        reader.onload = () =>
-          resolve(
-            reader.result
-          );
+        <div>
 
-        reader.onerror =
-          reject;
+          <strong>
+            Recebido:
+          </strong>
 
-        reader.readAsDataURL(
-          file
-        );
-      }
-    );
-  }
-
-  /* =========================================================
-     LER FORMULÁRIO DE ENCOMENDAS
-  ========================================================= */
-
-  function readEncForm() {
-    const enc =
-      clone(
-        S.enc ||
-          DEFAULT_ENC
-      );
-
-    /* =======================================================
-       BOLOS
-    ======================================================= */
-
-    enc.cakes =
-      (
-        enc.cakes ||
-        []
-      ).map(
-        (
-          cake,
-          cakeIndex
-        ) => {
-          cake.active =
-            $(
-              `[data-enc-cake-active="${cakeIndex}"]`
-            )
-              ?.checked !==
-            false;
-
-          cake.options =
-            (
-              cake.options ||
-              []
-            ).map(
-              (
-                option,
-                optionIndex
-              ) =>
-                $(
-                  `[data-cake-name="${cakeIndex}"][data-option="${optionIndex}"]`
-                )
-                  ?.value ||
-                option
-            );
-
-          cake.prices =
-            (
-              cake.prices ||
-              []
-            ).map(
-              (
-                price,
-                optionIndex
-              ) =>
-                Number(
-                  $(
-                    `[data-cake-price="${cakeIndex}"][data-option="${optionIndex}"]`
-                  )
-                    ?.value ||
-                    price ||
-                    0
-                )
-            );
-
-          return cake;
-        }
-      );
-
-    /* =======================================================
-       LISTAS SIMPLES
-    ======================================================= */
-
-    [
-      "masses",
-      "fillings"
-    ].forEach(
-      (
-        key
-      ) => {
-        enc[key] =
-          $$(
-            `[data-simple-key="${key}"]`
-          )
-            .map(
-              (
-                input
-              ) =>
-                input.value
-                  .trim()
-            )
-            .filter(
-              Boolean
-            );
-      }
-    );
-
-    /* =======================================================
-       TOPOS
-    ======================================================= */
-
-    enc.topes =
-      $$(
-        `[data-simple-key="topes"]`
-      )
-        .map(
-          (
-            input
-          ) => {
-            const index =
-              Number(
-                input
-                  .dataset
-                  .simpleIndex
-              );
-
-            const priceInput =
-              $(
-                `[data-price-key="topes"][data-price-index="${index}"]`
-              );
-
-            return [
-              input.value
-                .trim(),
-
-              Number(
-                priceInput
-                  ?.value ||
-                  0
+          <span>
+            ${esc(
+              formatDate(
+                order?.created_at
               )
-            ];
-          }
-        )
-        .filter(
-          (
-            item
-          ) =>
-            item[0]
-        );
+            )}
+          </span>
 
-    /* =======================================================
-       ADICIONAIS
-       PERSONALIZAÇÕES
-    ======================================================= */
+        </div>
 
-    [
-      "extras",
-      "personalizations"
-    ].forEach(
-      (
-        key
-      ) => {
-        const names =
-          $$(
-            `[data-price-name="${key}"]`
-          );
+        <div>
 
-        enc[key] =
-          names
-            .map(
-              (
-                input
-              ) => {
-                const index =
-                  Number(
-                    input
-                      .dataset
-                      .priceIndex
-                  );
+          <strong>
+            Data desejada:
+          </strong>
 
-                const priceInput =
-                  $(
-                    `[data-price-value="${key}"][data-price-index="${index}"]`
-                  );
+          <span>
+            ${esc(date)}
+          </span>
 
-                return [
-                  input.value
-                    .trim(),
+        </div>
 
-                  Number(
-                    priceInput
-                      ?.value ||
-                      0
-                  )
-                ];
-              }
-            )
-            .filter(
-              (
-                item
-              ) =>
-                item[0]
-            );
-      }
-    );
+        <div>
 
-    /* =======================================================
-       BRIGADEIROS
-    ======================================================= */
+          <strong>
+            WhatsApp:
+          </strong>
 
-    enc.brigadeiros =
-      enc.brigadeiros ||
-      {};
+          <span>
+            ${esc(
+              whatsapp || "—"
+            )}
+          </span>
 
-    enc.brigadeiros.classica =
-      $$(
-        "[data-brig-classic]"
-      )
-        .map(
-          (
-            input
-          ) =>
-            input.value
-              .trim()
-        )
-        .filter(
-          Boolean
-        );
+        </div>
 
-    enc.brigadeiros.premium =
-      $$(
-        "[data-brig-premium]"
-      )
-        .map(
-          (
-            input
-          ) =>
-            input.value
-              .trim()
-        )
-        .filter(
-          Boolean
-        );
+        <div>
 
-    enc.brigadeiros.classicaPrices =
-      [
-        0,
-        1
-      ].map(
-        (
-          index
-        ) =>
-          Number(
-            $(
-              `[data-brig-price="classica"][data-brig-size="${index}"]`
-            )
-              ?.value ||
-            0
-          )
-      );
+          <strong>
+            Total estimado:
+          </strong>
 
-    enc.brigadeiros.premiumPrices =
-      [
-        0,
-        1
-      ].map(
-        (
-          index
-        ) =>
-          Number(
-            $(
-              `[data-brig-price="premium"][data-brig-size="${index}"]`
-            )
-              ?.value ||
-            0
-          )
-      );
+          <span>
+            ${brl(total)}
+          </span>
 
-    enc.brigadeiros.flavorLimit50 =
-      Number(
-        $(
-          `[data-brig-limit="50"]`
-        )
-          ?.value ||
-        2
-      );
+        </div>
 
-    enc.brigadeiros.flavorLimit100 =
-      Number(
-        $(
-          `[data-brig-limit="100"]`
-        )
-          ?.value ||
-        4
-      );
+      </div>
 
-    /* =======================================================
-       OUTROS ITENS
-    ======================================================= */
+      <div class="order-card-actions">
 
-    enc.otherItems =
-      (
-        enc.otherItems ||
-        []
-      ).map(
-        (
-          item,
-          index
-        ) => ({
-          ...item,
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-action="view-custom-order"
+          data-id="${esc(
+            order?.id
+          )}"
+        >
+          Ver encomenda
+        </button>
 
-          name:
-            $(
-              `[data-other-name="${index}"]`
-            )
-              ?.value
-              .trim() ||
-            item.name,
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-action="print-custom-order"
+          data-id="${esc(
+            order?.id
+          )}"
+        >
+          Imprimir
+        </button>
 
-          price:
-            Number(
-              $(
-                `[data-other-price="${index}"]`
-              )
-                ?.value ||
-                0
-            ),
+      </div>
 
-          active:
-            $(
-              `[data-other-active="${index}"]`
-            )
-              ?.checked !==
-            false
-        })
-      );
+    </article>
+  `;
+}
 
-    /* =======================================================
-       KITS
-    ======================================================= */
+/* =========================================================
+   DETALHES DA ENCOMENDA
+========================================================= */
 
-    enc.kits =
-      (
-        enc.kits ||
-        []
-      ).map(
-        (
-          kit,
-          index
-        ) => ({
-          ...kit,
+function customOrderDetails(
+  order
+) {
+  const brigadeiros =
+    Array.isArray(
+      order?.brigadeiros
+    )
+      ? order.brigadeiros
+      : [];
 
-          name:
-            $(
-              `[data-kit-name="${index}"]`
-            )
-              ?.value
-              .trim() ||
-            kit.name,
+  const otherItems =
+    Array.isArray(
+      order?.otherItems
+    )
+      ? order.otherItems
+      : [];
 
-          price:
-            Number(
-              $(
-                `[data-kit-price="${index}"]`
-              )
-                ?.value ||
-                0
-            ),
+  const extras =
+    Array.isArray(
+      order?.extras
+    )
+      ? order.extras
+      : [];
 
-          cake:
-            $(
-              `[data-kit-cake="${index}"]`
-            )
-              ?.value
-              .trim() ||
-            kit.cake,
-
-          docinhos:
-            Number(
-              $(
-                `[data-kit-docinhos="${index}"]`
-              )
-                ?.value ||
-                0
-            ),
-
-          items:
-            String(
-              $(
-                `[data-kit-items="${index}"]`
-              )
-                ?.value ||
-              ""
-            )
-              .split(
-                "\n"
-              )
-              .map(
-                (
-                  item
-                ) =>
-                  item.trim()
-              )
-              .filter(
-                Boolean
-              ),
-
-          active:
-            $(
-              `[data-kit-active="${index}"]`
-            )
-              ?.checked !==
-            false
-        })
-      );
-
-    return enc;
-  }
-
-  /* =========================================================
-     ADICIONAR ITEM DE CONFIGURAÇÃO
-  ========================================================= */
-
-  function addEncItem(
-    key
-  ) {
-    if (!S.enc) {
-      S.enc =
-        clone(
-          DEFAULT_ENC
-        );
+  const listHtml = (
+    items
+  ) => {
+    if (!items.length) {
+      return `
+        <span>
+          Nenhum item informado.
+        </span>
+      `;
     }
-
-    if (
-      !Array.isArray(
-        S.enc[key]
-      )
-    ) {
-      S.enc[key] =
-        [];
-    }
-
-    if (
-      key === "extras" ||
-      key ===
-        "personalizations" ||
-      key === "topes"
-    ) {
-      S.enc[key].push([
-        "Novo item",
-        0
-      ]);
-    } else {
-      S.enc[key].push(
-        "Novo item"
-      );
-    }
-
-    render();
-  }
-
-  /* =========================================================
-     REMOVER ITEM DE CONFIGURAÇÃO
-  ========================================================= */
-
-  function removeEncItem(
-    key,
-    index
-  ) {
-    if (
-      !S.enc ||
-      !Array.isArray(
-        S.enc[key]
-      )
-    ) {
-      return;
-    }
-
-    S.enc[key].splice(
-      Number(index),
-      1
-    );
-
-    render();
-  }
-
-  /* =========================================================
-     ADICIONAR BRIGADEIRO
-  ========================================================= */
-
-  function addBrigadeiro(
-    type
-  ) {
-    if (!S.enc) {
-      S.enc =
-        clone(
-          DEFAULT_ENC
-        );
-    }
-
-    S.enc.brigadeiros =
-      S.enc.brigadeiros ||
-      {};
-
-    S.enc.brigadeiros[type] =
-      S.enc.brigadeiros[type] ||
-      [];
-
-    S.enc.brigadeiros[type].push(
-      "Novo sabor"
-    );
-
-    render();
-  }
-
-  /* =========================================================
-     REMOVER BRIGADEIRO
-  ========================================================= */
-
-  function removeBrigadeiro(
-    type,
-    index
-  ) {
-    if (
-      !S.enc?.brigadeiros?.[
-        type
-      ]
-    ) {
-      return;
-    }
-
-    S.enc.brigadeiros[
-      type
-    ].splice(
-      Number(index),
-      1
-    );
-
-    render();
-  }
-
-  /* =========================================================
-     ADICIONAR OUTRO ITEM
-  ========================================================= */
-
-  function addOtherItem() {
-    if (!S.enc) {
-      S.enc =
-        clone(
-          DEFAULT_ENC
-        );
-    }
-
-    S.enc.otherItems =
-      S.enc.otherItems ||
-      [];
-
-    S.enc.otherItems.push({
-      name: "Novo item",
-      price: 0,
-      active: true
-    });
-
-    render();
-  }
-
-  /* =========================================================
-     REMOVER OUTRO ITEM
-  ========================================================= */
-
-  function removeOtherItem(
-    index
-  ) {
-    if (
-      !S.enc?.otherItems
-    ) {
-      return;
-    }
-
-    S.enc.otherItems.splice(
-      Number(index),
-      1
-    );
-
-    render();
-  }
-
-  /* =========================================================
-     ADICIONAR KIT
-  ========================================================= */
-
-  function addKit() {
-    if (!S.enc) {
-      S.enc =
-        clone(
-          DEFAULT_ENC
-        );
-    }
-
-    S.enc.kits =
-      S.enc.kits ||
-      [];
-
-    const number =
-      S.enc.kits.length +
-      1;
-
-    S.enc.kits.push({
-      id:
-        `k${Date.now()}`,
-
-      name:
-        `Kit Festa ${String(
-          number
-        ).padStart(
-          2,
-          "0"
-        )}`,
-
-      price: 0,
-
-      cake:
-        "Chantininho",
-
-      docinhos: 0,
-
-      items: [],
-
-      active: true
-    });
-
-    render();
-  }
-
-  /* =========================================================
-     REMOVER KIT
-  ========================================================= */
-
-  function removeKit(
-    index
-  ) {
-    if (
-      !S.enc?.kits
-    ) {
-      return;
-    }
-
-    const kit =
-      S.enc.kits[
-        Number(index)
-      ];
-
-    if (!kit) {
-      return;
-    }
-
-    if (
-      !confirm(
-        `Excluir "${kit.name}"?`
-      )
-    ) {
-      return;
-    }
-
-    S.enc.kits.splice(
-      Number(index),
-      1
-    );
-
-    render();
-  }
-
-  /* =========================================================
-     CONFIGURAÇÕES DO SITE
-  ========================================================= */
-
-  function settingsView() {
-    const site =
-      S.site || {};
-
-    const contact =
-      site.contact ||
-      {};
-
-    const hours =
-      Array.isArray(
-        site.hours
-      )
-        ? site.hours
-        : [];
-
-    const about =
-      site.about ||
-      {};
 
     return `
-      <div class="panel">
+      <ul class="order-detail-list">
 
-        <div class="panel-head">
+        ${items
+          .map(
+            (item) => `
+              <li>
+                ${esc(
+                  typeof item ===
+                    "string"
+                    ? item
+                    : item?.name ||
+                      item?.label ||
+                      JSON.stringify(
+                        item
+                      )
+                )}
+              </li>
+            `
+          )
+          .join("")}
+
+      </ul>
+    `;
+  };
+
+  return `
+    <div class="order-details">
+
+      <!-- CLIENTE -->
+
+      <div class="order-detail-section">
+
+        <h4>
+          Cliente
+        </h4>
+
+        <p>
+
+          <strong>
+            Nome:
+          </strong>
+
+          ${esc(
+            order?.customer ||
+              "Não informado"
+          )}
+
+        </p>
+
+        <p>
+
+          <strong>
+            WhatsApp:
+          </strong>
+
+          ${esc(
+            order?.whatsapp ||
+              "Não informado"
+          )}
+
+        </p>
+
+        <p>
+
+          <strong>
+            Data desejada:
+          </strong>
+
+          ${esc(
+            order?.date ||
+              "Não informada"
+          )}
+
+        </p>
+
+      </div>
+
+      <!-- KIT -->
+
+      <div class="order-detail-section">
+
+        <h4>
+          Kit
+        </h4>
+
+        <p>
+
+          ${esc(
+            typeof order?.kit ===
+              "string"
+              ? order.kit
+              : order?.kit?.name ||
+                order?.kit?.label ||
+                "Nenhum kit selecionado"
+          )}
+
+        </p>
+
+      </div>
+
+      <!-- BOLO -->
+
+      <div class="order-detail-section">
+
+        <h4>
+          Bolo
+        </h4>
+
+        <p>
+
+          <strong>
+            Tipo:
+          </strong>
+
+          ${esc(
+            typeof order?.cake ===
+              "string"
+              ? order.cake
+              : order?.cake?.name ||
+                order?.cake?.label ||
+                "Não informado"
+          )}
+
+        </p>
+
+      </div>
+
+      <!-- MASSA -->
+
+      <div class="order-detail-section">
+
+        <h4>
+          Massa
+        </h4>
+
+        <p>
+
+          ${esc(
+            typeof order?.mass ===
+              "string"
+              ? order.mass
+              : order?.mass?.name ||
+                order?.mass?.label ||
+                "Não informada"
+          )}
+
+        </p>
+
+      </div>
+
+      <!-- RECHEIO -->
+
+      <div class="order-detail-section">
+
+        <h4>
+          Recheio
+        </h4>
+
+        <p>
+
+          ${esc(
+            typeof order?.filling ===
+              "string"
+              ? order.filling
+              : order?.filling?.name ||
+                order?.filling?.label ||
+                "Não informado"
+          )}
+
+        </p>
+
+      </div>
+
+      <!-- DECORAÇÃO -->
+
+      <div class="order-detail-section">
+
+        <h4>
+          Topo / Decoração
+        </h4>
+
+        <p>
+
+          ${esc(
+            typeof order?.decoration ===
+              "string"
+              ? order.decoration
+              : order?.decoration?.name ||
+                order?.decoration?.label ||
+                "Não informado"
+          )}
+
+        </p>
+
+      </div>
+
+      <!-- ADICIONAIS -->
+
+      <div class="order-detail-section">
+
+        <h4>
+          Adicionais
+        </h4>
+
+        ${listHtml(
+          extras
+        )}
+
+      </div>
+
+      <!-- PERSONALIZAÇÃO -->
+
+      <div class="order-detail-section">
+
+        <h4>
+          Personalização
+        </h4>
+
+        <p>
+
+          ${esc(
+            typeof order?.personalization ===
+              "string"
+              ? order.personalization
+              : order?.personalization?.name ||
+                order?.personalization?.label ||
+                "Não informada"
+          )}
+
+        </p>
+
+        ${
+          order?.personalization_text
+            ? `
+              <p>
+
+                <strong>
+                  Texto:
+                </strong>
+
+                ${esc(
+                  order.personalization_text
+                )}
+
+              </p>
+            `
+            : ""
+        }
+
+      </div>
+
+      <!-- BRIGADEIROS -->
+
+      <div class="order-detail-section">
+
+        <h4>
+          Brigadeiros
+        </h4>
+
+        ${listHtml(
+          brigadeiros
+        )}
+
+      </div>
+
+      <!-- OUTROS ITENS -->
+
+      <div class="order-detail-section">
+
+        <h4>
+          Outros Itens
+        </h4>
+
+        ${listHtml(
+          otherItems
+        )}
+
+      </div>
+
+      <!-- OBSERVAÇÕES -->
+
+      <div class="order-detail-section">
+
+        <h4>
+          Observações
+        </h4>
+
+        <p>
+
+          ${esc(
+            order?.notes ||
+              "Nenhuma observação."
+          )}
+
+        </p>
+
+      </div>
+
+      <!-- TOTAL -->
+
+      <div class="order-detail-total">
+
+        <span>
+          Total estimado
+        </span>
+
+        <strong>
+          ${brl(
+            order?.estimatedTotal ||
+              0
+          )}
+        </strong>
+
+      </div>
+
+    </div>
+  `;
+}
+
+/* =========================================================
+   IMPRIMIR ENCOMENDA
+========================================================= */
+
+function printableCustomOrder(
+  order
+) {
+  const arrayOrEmpty = (
+    value
+  ) =>
+    Array.isArray(value)
+      ? value
+      : [];
+
+  const extras =
+    arrayOrEmpty(
+      order?.extras
+    );
+
+  const brigadeiros =
+    arrayOrEmpty(
+      order?.brigadeiros
+    );
+
+  const otherItems =
+    arrayOrEmpty(
+      order?.otherItems
+    );
+
+  const list = (
+    items
+  ) => {
+    if (!items.length) {
+      return "Nenhum item informado.";
+    }
+
+    return items
+      .map(
+        (item) =>
+          typeof item ===
+          "string"
+            ? item
+            : item?.name ||
+              item?.label ||
+              JSON.stringify(
+                item
+              )
+      )
+      .join(", ");
+  };
+
+  const value = (
+    item
+  ) =>
+    typeof item ===
+    "string"
+      ? item
+      : item?.name ||
+        item?.label ||
+        "Não informado";
+
+  return `
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>
+    Encomenda — Martins Confeitaria
+  </title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 30px;
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+      color: #222;
+      background: #fff;
+    }
+
+    .print-page {
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    .header {
+      border-bottom:
+        3px solid #67b0cb;
+      padding-bottom: 18px;
+      margin-bottom: 25px;
+    }
+
+    .header h1 {
+      margin: 0 0 5px;
+      color: #2b7896;
+      font-size: 28px;
+    }
+
+    .header p {
+      margin: 4px 0;
+      font-size: 13px;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .section h2 {
+      margin: 0 0 9px;
+      padding-bottom: 6px;
+      border-bottom:
+        1px solid #ddd;
+      color: #2b7896;
+      font-size: 17px;
+    }
+
+    .info {
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .total {
+      margin-top: 25px;
+      padding: 14px;
+      background: #f3b7bb;
+      display: flex;
+      justify-content:
+        space-between;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .footer {
+      margin-top: 30px;
+      padding-top: 15px;
+      border-top:
+        1px solid #ddd;
+      font-size: 11px;
+      color: #666;
+    }
+
+    @media print {
+
+      body {
+        padding: 0;
+      }
+
+      .print-page {
+        max-width: none;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="print-page">
+
+    <div class="header">
+
+      <h1>
+        Martins Confeitaria
+      </h1>
+
+      <p>
+        Encomenda de bolo personalizado
+      </p>
+
+      <p>
+        Recebido em:
+        ${esc(
+          formatDate(
+            order?.created_at
+          )
+        )}
+      </p>
+
+    </div>
+
+    <!-- CLIENTE -->
+
+    <div class="section">
+
+      <h2>
+        Cliente
+      </h2>
+
+      <div class="info">
+
+        <strong>
+          Nome:
+        </strong>
+
+        ${esc(
+          order?.customer ||
+            "Não informado"
+        )}
+
+        <br>
+
+        <strong>
+          WhatsApp:
+        </strong>
+
+        ${esc(
+          order?.whatsapp ||
+            "Não informado"
+        )}
+
+        <br>
+
+        <strong>
+          Data desejada:
+        </strong>
+
+        ${esc(
+          order?.date ||
+            "Não informada"
+        )}
+
+      </div>
+
+    </div>
+
+    <!-- KIT -->
+
+    <div class="section">
+
+      <h2>
+        Kit
+      </h2>
+
+      <div class="info">
+
+        ${esc(
+          value(
+            order?.kit
+          )
+        )}
+
+      </div>
+
+    </div>
+
+    <!-- BOLO -->
+
+    <div class="section">
+
+      <h2>
+        Bolo
+      </h2>
+
+      <div class="info">
+
+        <strong>
+          Tipo:
+        </strong>
+
+        ${esc(
+          value(
+            order?.cake
+          )
+        )}
+
+        <br>
+
+        <strong>
+          Massa:
+        </strong>
+
+        ${esc(
+          value(
+            order?.mass
+          )
+        )}
+
+        <br>
+
+        <strong>
+          Recheio:
+        </strong>
+
+        ${esc(
+          value(
+            order?.filling
+          )
+        )}
+
+      </div>
+
+    </div>
+
+    <!-- DECORAÇÃO -->
+
+    <div class="section">
+
+      <h2>
+        Decoração
+      </h2>
+
+      <div class="info">
+
+        ${esc(
+          value(
+            order?.decoration
+          )
+        )}
+
+      </div>
+
+    </div>
+
+    <!-- ADICIONAIS -->
+
+    <div class="section">
+
+      <h2>
+        Adicionais
+      </h2>
+
+      <div class="info">
+
+        ${esc(
+          list(
+            extras
+          )
+        )}
+
+      </div>
+
+    </div>
+
+    <!-- PERSONALIZAÇÃO -->
+
+    <div class="section">
+
+      <h2>
+        Personalização
+      </h2>
+
+      <div class="info">
+
+        <strong>
+          Tipo:
+        </strong>
+
+        ${esc(
+          value(
+            order?.personalization
+          )
+        )}
+
+        ${
+          order?.personalization_text
+            ? `
+              <br>
+
+              <strong>
+                Texto:
+              </strong>
+
+              ${esc(
+                order.personalization_text
+              )}
+            `
+            : ""
+        }
+
+      </div>
+
+    </div>
+
+    <!-- BRIGADEIROS -->
+
+    <div class="section">
+
+      <h2>
+        Brigadeiros
+      </h2>
+
+      <div class="info">
+
+        ${esc(
+          list(
+            brigadeiros
+          )
+        )}
+
+      </div>
+
+    </div>
+
+    <!-- OUTROS -->
+
+    <div class="section">
+
+      <h2>
+        Outros Itens
+      </h2>
+
+      <div class="info">
+
+        ${esc(
+          list(
+            otherItems
+          )
+        )}
+
+      </div>
+
+    </div>
+
+    <!-- OBSERVAÇÕES -->
+
+    <div class="section">
+
+      <h2>
+        Observações
+      </h2>
+
+      <div class="info">
+
+        ${esc(
+          order?.notes ||
+            "Nenhuma observação."
+        )}
+
+      </div>
+
+    </div>
+
+    <!-- TOTAL -->
+
+    <div class="total">
+
+      <span>
+        Total estimado
+      </span>
+
+      <span>
+        ${brl(
+          order?.estimatedTotal ||
+            0
+        )}
+      </span>
+
+    </div>
+
+    <div class="footer">
+
+      Martins Confeitaria
+      <br>
+
+      WhatsApp:
+      ${WHATSAPP}
+
+    </div>
+
+  </div>
+
+  <script>
+
+    window.onload =
+      function () {
+        window.print();
+      };
+
+  </script>
+
+</body>
+
+</html>
+  `;
+}
+
+/* =========================================================
+   ABRIR IMPRESSÃO — ENCOMENDA
+========================================================= */
+
+function printCustomOrder(
+  id
+) {
+  const order =
+    S.customOrders.find(
+      (item) =>
+        String(item.id) ===
+        String(id)
+    );
+
+  if (!order) {
+    toast(
+      "Encomenda não encontrada.",
+      "error"
+    );
+
+    return;
+  }
+
+  const html =
+    printableCustomOrder(
+      order
+    );
+
+  const printWindow =
+    window.open(
+      "",
+      "_blank",
+      "width=900,height=800"
+    );
+
+  if (!printWindow) {
+    toast(
+      "O navegador bloqueou a janela de impressão.",
+      "error"
+    );
+
+    return;
+  }
+
+  printWindow.document.open();
+
+  printWindow.document.write(
+    html
+  );
+
+  printWindow.document.close();
+}
+
+/* =========================================================
+   RENDERIZAR PEDIDOS — ENCOMENDAS
+========================================================= */
+
+function renderCustomOrders() {
+  const container =
+    $("#orders-list");
+
+  if (!container) {
+    return;
+  }
+
+  const orders =
+    Array.isArray(
+      S.customOrders
+    )
+      ? S.customOrders
+      : [];
+
+  if (!orders.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+
+        <strong>
+          Nenhuma encomenda cadastrada
+        </strong>
+
+        <span>
+          As encomendas realizadas
+          pelo formulário aparecerão
+          aqui.
+        </span>
+
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML =
+    orders
+      .map(
+        customOrderCard
+      )
+      .join("");
+}
+
+/* =========================================================
+   EXIBIR LISTA DE PEDIDOS
+========================================================= */
+
+function renderOrders(
+  type
+) {
+  if (
+    type === "custom"
+  ) {
+    renderCustomOrders();
+    return;
+  }
+
+  renderReadyOrders();
+}
+
+/* =========================================================
+   FIM DA PARTE 5
+========================================================= */
+ /* =========================================================
+   CONFIGURAÇÕES — ENCOMENDAS
+========================================================= */
+
+function ensureEnc() {
+  if (!S.enc) {
+    S.enc = mergeEnc(null);
+  }
+
+  return S.enc;
+}
+
+/* =========================================================
+   VALOR SEGURO
+========================================================= */
+
+function encValue(
+  value,
+  fallback = ""
+) {
+  if (
+    value === undefined ||
+    value === null
+  ) {
+    return fallback;
+  }
+
+  return value;
+}
+
+/* =========================================================
+   INPUT DE CONFIGURAÇÃO
+========================================================= */
+
+function encInput(
+  value,
+  type = "text"
+) {
+  return esc(
+    encValue(
+      value,
+      ""
+    )
+  );
+}
+
+/* =========================================================
+   RENDERIZAR CONFIGURAÇÕES
+========================================================= */
+
+function renderSettings() {
+  const container =
+    $("#settings-content");
+
+  if (!container) {
+    return;
+  }
+
+  const enc =
+    ensureEnc();
+
+  const cakes =
+    Array.isArray(
+      enc.cakes
+    )
+      ? enc.cakes
+      : [];
+
+  const masses =
+    Array.isArray(
+      enc.masses
+    )
+      ? enc.masses
+      : [];
+
+  const fillings =
+    Array.isArray(
+      enc.fillings
+    )
+      ? enc.fillings
+      : [];
+
+  const extras =
+    Array.isArray(
+      enc.extras
+    )
+      ? enc.extras
+      : [];
+
+  const topes =
+    Array.isArray(
+      enc.topes
+    )
+      ? enc.topes
+      : [];
+
+  const personalization =
+    Array.isArray(
+      enc.personalization
+    )
+      ? enc.personalization
+      : [];
+
+  const brigadeiroClassicos =
+    Array.isArray(
+      enc.brigadeiros?.classicos
+    )
+      ? enc.brigadeiros.classicos
+      : [];
+
+  const brigadeiroPremium =
+    Array.isArray(
+      enc.brigadeiros?.premium
+    )
+      ? enc.brigadeiros.premium
+      : [];
+
+  const otherItems =
+    Array.isArray(
+      enc.otherItems
+    )
+      ? enc.otherItems
+      : [];
+
+  const kits =
+    Array.isArray(
+      enc.kits
+    )
+      ? enc.kits
+      : [];
+
+  container.innerHTML = `
+
+    <div class="settings-panel">
+
+      <div class="settings-header">
+
+        <div>
+
+          <h2>
+            Configurações de Encomendas
+          </h2>
+
+          <p>
+            Gerencie as opções utilizadas
+            no formulário de encomendas.
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-action="save-enc"
+        >
+          Salvar alterações
+        </button>
+
+      </div>
+
+      <!-- ===============================================
+           BOLOS
+      ================================================ -->
+
+      <section class="settings-section">
+
+        <div class="settings-section-header">
 
           <div>
 
-            <h2>
-              Configurações
-            </h2>
+            <h3>
+              Bolos
+            </h3>
 
-            <p class="muted">
-              Informações exibidas no site.
+            <p>
+              Apenas Naked Cake e Chantininho.
             </p>
 
           </div>
-
-          <button
-            class="btn primary"
-            data-act="save-settings"
-          >
-            💾 Salvar alterações
-          </button>
 
         </div>
 
         <div class="settings-grid">
 
-          <div class="setting-card">
+          ${cakes
+            .map(
+              (
+                cake,
+                cakeIndex
+              ) => `
+                <div
+                  class="setting-card"
+                  data-cake-index="${cakeIndex}"
+                >
 
-            <h3>Contato</h3>
+                  <div class="setting-card-header">
 
-            <label>
-              WhatsApp
+                    <input
+                      type="text"
+                      class="field-input"
+                      data-enc="cake-name"
+                      data-index="${cakeIndex}"
+                      value="${encInput(
+                        cake?.name
+                      )}"
+                      placeholder="Nome do bolo"
+                    >
 
-              <input
-                id="set-whatsapp"
-                value="${esc(
-                  contact.whatsapp ||
-                  WHATSAPP
-                )}"
-              >
+                    <label
+                      class="switch-row"
+                    >
 
-            </label>
+                      <input
+                        type="checkbox"
+                        data-enc="cake-active"
+                        data-index="${cakeIndex}"
+                        ${
+                          cake?.active !== false
+                            ? "checked"
+                            : ""
+                        }
+                      >
 
-            <label>
-              Instagram
+                      <span>
+                        Ativo
+                      </span>
 
-              <input
-                id="set-instagram"
-                value="${esc(
-                  contact.instagram ||
-                  ""
-                )}"
-              >
+                    </label>
 
-            </label>
+                  </div>
 
-            <label>
-              Endereço
+                  <div class="setting-options">
 
-              <textarea
-                id="set-address"
-                rows="3"
-              >${esc(
-                contact.address ||
-                "Rua 1018, 65, Conjunto Ceará II, Fortaleza-CE 60532-690"
-              )}</textarea>
+                    ${
+                      Array.isArray(
+                        cake?.options
+                      )
+                        ? cake.options
+                            .map(
+                              (
+                                option,
+                                optionIndex
+                              ) => `
+                                <div
+                                  class="setting-option-row"
+                                >
 
-            </label>
+                                  <input
+                                    type="text"
+                                    class="field-input"
+                                    data-enc="cake-option"
+                                    data-cake="${cakeIndex}"
+                                    data-option="${optionIndex}"
+                                    value="${encInput(
+                                      option
+                                    )}"
+                                  >
 
-          </div>
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    class="field-input price-input"
+                                    data-enc="cake-price"
+                                    data-cake="${cakeIndex}"
+                                    data-option="${optionIndex}"
+                                    value="${encValue(
+                                      cake?.prices?.[
+                                        optionIndex
+                                      ],
+                                      0
+                                    )}"
+                                  >
 
-          <div class="setting-card">
+                                </div>
+                              `
+                            )
+                            .join("")
+                        : ""
+                    }
+
+                  </div>
+
+                </div>
+              `
+            )
+            .join("")}
+
+        </div>
+
+      </section>
+
+      <!-- ===============================================
+           MASSAS
+      ================================================ -->
+
+      <section class="settings-section">
+
+        <div class="settings-section-header">
+
+          <div>
 
             <h3>
-              Sobre a empresa
+              Massas
             </h3>
 
-            <label>
-              Título
-
-              <input
-                id="set-about-title"
-                value="${esc(
-                  about.title ||
-                  "Um pouco da nossa história"
-                )}"
-              >
-
-            </label>
-
-            <label>
-              Texto
-
-              <textarea
-                id="set-about-text"
-                rows="7"
-              >${esc(
-                about.text ||
-                ""
-              )}</textarea>
-
-            </label>
+            <p>
+              Opções de massa disponíveis.
+            </p>
 
           </div>
 
         </div>
 
-        <div class="setting-card">
+        <div class="settings-list">
 
-          <h3>Horários</h3>
+          ${masses
+            .map(
+              (
+                item,
+                index
+              ) => `
+                <div class="settings-list-row">
 
-          <div class="hours-admin">
+                  <input
+                    type="text"
+                    class="field-input"
+                    data-enc="mass"
+                    data-index="${index}"
+                    value="${encInput(
+                      item
+                    )}"
+                  >
 
-            ${renderHoursSettings(
-              hours
-            )}
+                </div>
+              `
+            )
+            .join("")}
+
+        </div>
+
+      </section>
+
+      <!-- ===============================================
+           RECHEIOS
+      ================================================ -->
+
+      <section class="settings-section">
+
+        <div class="settings-section-header">
+
+          <div>
+
+            <h3>
+              Recheios
+            </h3>
+
+            <p>
+              Opções de recheio disponíveis.
+            </p>
 
           </div>
 
         </div>
+
+        <div class="settings-list">
+
+          ${fillings
+            .map(
+              (
+                item,
+                index
+              ) => `
+                <div class="settings-list-row">
+
+                  <input
+                    type="text"
+                    class="field-input"
+                    data-enc="filling"
+                    data-index="${index}"
+                    value="${encInput(
+                      item
+                    )}"
+                  >
+
+                </div>
+              `
+            )
+            .join("")}
+
+        </div>
+
+      </section>
+
+      <!-- ===============================================
+           TOPOS / DECORAÇÕES
+      ================================================ -->
+
+      <section class="settings-section">
+
+        <div class="settings-section-header">
+
+          <div>
+
+            <h3>
+              Topos / Decorações
+            </h3>
+
+          </div>
+
+        </div>
+
+        <div class="settings-list">
+
+          ${topes
+            .map(
+              (
+                item,
+                index
+              ) => {
+
+                const name =
+                  Array.isArray(item)
+                    ? item[0]
+                    : item?.name ||
+                      "";
+
+                const price =
+                  Array.isArray(item)
+                    ? item[1]
+                    : item?.price ||
+                      0;
+
+                return `
+                  <div class="settings-list-row">
+
+                    <input
+                      type="text"
+                      class="field-input"
+                      data-enc="top-name"
+                      data-index="${index}"
+                      value="${encInput(
+                        name
+                      )}"
+                    >
+
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      class="field-input price-input"
+                      data-enc="top-price"
+                      data-index="${index}"
+                      value="${encValue(
+                        price,
+                        0
+                      )}"
+                    >
+
+                  </div>
+                `;
+              }
+            )
+            .join("")}
+
+        </div>
+
+      </section>
+
+      <!-- ===============================================
+           ADICIONAIS
+      ================================================ -->
+
+      <section class="settings-section">
+
+        <div class="settings-section-header">
+
+          <div>
+
+            <h3>
+              Adicionais
+            </h3>
+
+          </div>
+
+        </div>
+
+        <div class="settings-list">
+
+          ${extras
+            .map(
+              (
+                item,
+                index
+              ) => {
+
+                const name =
+                  Array.isArray(item)
+                    ? item[0]
+                    : item?.name ||
+                      "";
+
+                const price =
+                  Array.isArray(item)
+                    ? item[1]
+                    : item?.price ||
+                      0;
+
+                return `
+                  <div class="settings-list-row">
+
+                    <input
+                      type="text"
+                      class="field-input"
+                      data-enc="extra-name"
+                      data-index="${index}"
+                      value="${encInput(
+                        name
+                      )}"
+                    >
+
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      class="field-input price-input"
+                      data-enc="extra-price"
+                      data-index="${index}"
+                      value="${encValue(
+                        price,
+                        0
+                      )}"
+                    >
+
+                  </div>
+                `;
+              }
+            )
+            .join("")}
+
+        </div>
+
+      </section>
+
+      <!-- ===============================================
+           PERSONALIZAÇÃO
+      ================================================ -->
+
+      <section class="settings-section">
+
+        <div class="settings-section-header">
+
+          <div>
+
+            <h3>
+              Personalização
+            </h3>
+
+          </div>
+
+        </div>
+
+        <div class="settings-list">
+
+          ${personalization
+            .map(
+              (
+                item,
+                index
+              ) => {
+
+                const name =
+                  Array.isArray(item)
+                    ? item[0]
+                    : item?.name ||
+                      "";
+
+                const price =
+                  Array.isArray(item)
+                    ? item[1]
+                    : item?.price ||
+                      0;
+
+                return `
+                  <div class="settings-list-row">
+
+                    <input
+                      type="text"
+                      class="field-input"
+                      data-enc="personalization-name"
+                      data-index="${index}"
+                      value="${encInput(
+                        name
+                      )}"
+                    >
+
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      class="field-input price-input"
+                      data-enc="personalization-price"
+                      data-index="${index}"
+                      value="${encValue(
+                        price,
+                        0
+                      )}"
+                    >
+
+                  </div>
+                `;
+              }
+            )
+            .join("")}
+
+        </div>
+
+      </section>
+
+      <!-- ===============================================
+           BRIGADEIROS
+      ================================================ -->
+
+      <section class="settings-section">
+
+        <div class="settings-section-header">
+
+          <div>
+
+            <h3>
+              Brigadeiros
+            </h3>
+
+          </div>
+
+        </div>
+
+        <div class="settings-columns">
+
+          <div>
+
+            <h4>
+              Clássicos
+            </h4>
+
+            <div class="settings-list">
+
+              ${brigadeiroClassicos
+                .map(
+                  (
+                    item,
+                    index
+                  ) => `
+                    <div
+                      class="settings-list-row"
+                    >
+
+                      <input
+                        type="text"
+                        class="field-input"
+                        data-enc="brigadeiro-classico"
+                        data-index="${index}"
+                        value="${encInput(
+                          item
+                        )}"
+                      >
+
+                    </div>
+                  `
+                )
+                .join("")}
+
+            </div>
+
+          </div>
+
+          <div>
+
+            <h4>
+              Premium
+            </h4>
+
+            <div class="settings-list">
+
+              ${brigadeiroPremium
+                .map(
+                  (
+                    item,
+                    index
+                  ) => `
+                    <div
+                      class="settings-list-row"
+                    >
+
+                      <input
+                        type="text"
+                        class="field-input"
+                        data-enc="brigadeiro-premium"
+                        data-index="${index}"
+                        value="${encInput(
+                          item
+                        )}"
+                      >
+
+                    </div>
+                  `
+                )
+                .join("")}
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ===============================================
+           OUTROS ITENS
+      ================================================ -->
+
+      <section class="settings-section">
+
+        <div class="settings-section-header">
+
+          <div>
+
+            <h3>
+              Outros Itens
+            </h3>
+
+            <p>
+              Itens disponíveis para encomenda.
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="settings-list">
+
+          ${otherItems
+            .map(
+              (
+                item,
+                index
+              ) => `
+                <div
+                  class="settings-list-row"
+                >
+
+                  <input
+                    type="text"
+                    class="field-input"
+                    data-enc="other-name"
+                    data-index="${index}"
+                    value="${encInput(
+                      item?.name
+                    )}"
+                  >
+
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    class="field-input price-input"
+                    data-enc="other-price"
+                    data-index="${index}"
+                    value="${encValue(
+                      item?.price,
+                      0
+                    )}"
+                  >
+
+                  <label
+                    class="switch-row"
+                  >
+
+                    <input
+                      type="checkbox"
+                      data-enc="other-active"
+                      data-index="${index}"
+                      ${
+                        item?.active !== false
+                          ? "checked"
+                          : ""
+                      }
+                    >
+
+                    <span>
+                      Ativo
+                    </span>
+
+                  </label>
+
+                </div>
+              `
+            )
+            .join("")}
+
+        </div>
+
+      </section>
+
+      <!-- ===============================================
+           KITS
+      ================================================ -->
+
+      <section class="settings-section">
+
+        <div class="settings-section-header">
+
+          <div>
+
+            <h3>
+              Kits
+            </h3>
+
+            <p>
+              Kits disponíveis para encomendas.
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="settings-grid">
+
+          ${kits
+            .map(
+              (
+                kit,
+                index
+              ) => `
+                <div
+                  class="setting-card"
+                >
+
+                  <div
+                    class="setting-card-header"
+                  >
+
+                    <input
+                      type="text"
+                      class="field-input"
+                      data-enc="kit-name"
+                      data-index="${index}"
+                      value="${encInput(
+                        kit?.name
+                      )}"
+                      placeholder="Nome do kit"
+                    >
+
+                    <label
+                      class="switch-row"
+                    >
+
+                      <input
+                        type="checkbox"
+                        data-enc="kit-active"
+                        data-index="${index}"
+                        ${
+                          kit?.active !== false
+                            ? "checked"
+                            : ""
+                        }
+                      >
+
+                      <span>
+                        Ativo
+                      </span>
+
+                    </label>
+
+                  </div>
+
+                  <div
+                    class="settings-list"
+                  >
+
+                    <div
+                      class="settings-list-row"
+                    >
+
+                      <label>
+                        Preço
+                      </label>
+
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        class="field-input"
+                        data-enc="kit-price"
+                        data-index="${index}"
+                        value="${encValue(
+                          kit?.price,
+                          0
+                        )}"
+                      >
+
+                    </div>
+
+                    <div
+                      class="settings-list-row"
+                    >
+
+                      <label>
+                        Bolo
+                      </label>
+
+                      <input
+                        type="text"
+                        class="field-input"
+                        data-enc="kit-cake"
+                        data-index="${index}"
+                        value="${encInput(
+                          kit?.cake
+                        )}"
+                      >
+
+                    </div>
+
+                    <div
+                      class="settings-list-row"
+                    >
+
+                      <label>
+                        Quantidade de docinhos
+                      </label>
+
+                      <input
+                        type="number"
+                        min="0"
+                        class="field-input"
+                        data-enc="kit-docinhos"
+                        data-index="${index}"
+                        value="${encValue(
+                          kit?.docinhos,
+                          0
+                        )}"
+                      >
+
+                    </div>
+
+                    <div
+                      class="settings-list-row"
+                    >
+
+                      <label>
+                        Itens
+                      </label>
+
+                      <textarea
+                        class="field-input"
+                        rows="3"
+                        data-enc="kit-items"
+                        data-index="${index}"
+                      >${esc(
+                        Array.isArray(
+                          kit?.items
+                        )
+                          ? kit.items.join(
+                              "\n"
+                            )
+                          : ""
+                      )}</textarea>
+
+                    </div>
+
+                  </div>
+
+                </div>
+              `
+            )
+            .join("")}
+
+        </div>
+
+      </section>
+
+      <div class="settings-footer">
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-action="save-enc"
+        >
+          Salvar alterações
+        </button>
 
       </div>
-    `;
-  }
 
-  /* =========================================================
-     HORÁRIOS
-  ========================================================= */
+    </div>
+  `;
+}
 
-  function renderHoursSettings(
-    hours
-  ) {
-    const defaultDays = [
-      "Domingo",
-      "Segunda-feira",
-      "Terça-feira",
-      "Quarta-feira",
-      "Quinta-feira",
-      "Sexta-feira",
-      "Sábado"
-    ];
+/* =========================================================
+   LER ALTERAÇÕES DAS CONFIGURAÇÕES
+========================================================= */
 
-    return defaultDays
-      .map(
-        (
-          day,
-          index
-        ) => {
-          const current =
-            hours.find(
-              (
-                item
-              ) =>
-                Number(
-                  item.dayIndex ??
-                  item.index ??
-                  -1
-                ) ===
-                index
-            ) ||
-            hours[index] ||
-            {};
+function collectEncChanges() {
+  const enc =
+    ensureEnc();
 
-          return `
-            <div class="hours-row">
+  /* -------------------------------------------------------
+     BOLOS
+  ------------------------------------------------------- */
 
-              <strong>
-                ${day}
-              </strong>
+  $$(
+    '[data-enc="cake-name"]'
+  ).forEach((input) => {
 
-              <select
-                data-hours-status="${index}"
-              >
-
-                <option
-                  value="open"
-                  ${
-                    current.s ===
-                      "open" ||
-                    current.status ===
-                      "open"
-                      ? "selected"
-                      : ""
-                  }
-                >
-                  Aberto
-                </option>
-
-                <option
-                  value="closed"
-                  ${
-                    current.s ===
-                      "closed" ||
-                    current.status ===
-                      "closed"
-                      ? "selected"
-                      : ""
-                  }
-                >
-                  Fechado
-                </option>
-
-                <option
-                  value="tbd"
-                  ${
-                    current.s ===
-                      "tbd" ||
-                    current.status ===
-                      "tbd"
-                      ? "selected"
-                      : ""
-                  }
-                >
-                  A confirmar
-                </option>
-
-              </select>
-
-              <input
-                type="time"
-                data-hours-open="${index}"
-                value="${esc(
-                  current.o ||
-                  ""
-                )}"
-              >
-
-              <input
-                type="time"
-                data-hours-close="${index}"
-                value="${esc(
-                  current.c ||
-                  ""
-                )}"
-              >
-
-            </div>
-          `;
-        }
-      )
-      .join("");
-  }
-
-  /* =========================================================
-     SALVAR CONFIGURAÇÕES
-  ========================================================= */
-
-  async function saveSettings() {
-    const site =
-      clone(
-        S.site || {}
+    const index =
+      Number(
+        input.dataset.index
       );
 
-    site.contact =
-      site.contact ||
-      {};
-
-    site.about =
-      site.about ||
-      {};
-
-    site.contact.whatsapp =
-      $("#set-whatsapp")
-        ?.value
-        .trim() ||
-      WHATSAPP;
-
-    site.contact.instagram =
-      $("#set-instagram")
-        ?.value
-        .trim() ||
-      "";
-
-    site.contact.address =
-      $("#set-address")
-        ?.value
-        .trim() ||
-      "";
-
-    site.about.title =
-      $("#set-about-title")
-        ?.value
-        .trim() ||
-      "";
-
-    site.about.text =
-      $("#set-about-text")
-        ?.value
-        .trim() ||
-      "";
-
-    site.hours =
-      [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6
-      ].map(
-        (
-          index
-        ) => ({
-          dayIndex:
-            index,
-
-          s:
-            $(
-              `[data-hours-status="${index}"]`
-            )
-              ?.value ||
-            "closed",
-
-          o:
-            $(
-              `[data-hours-open="${index}"]`
-            )
-              ?.value ||
-            "",
-
-          c:
-            $(
-              `[data-hours-close="${index}"]`
-            )
-              ?.value ||
-            ""
-        })
-      );
-
-    try {
-      await saveSite(
-        site
-      );
-
-      toast(
-        "Configurações salvas."
-      );
-
-    } catch (
-      error
+    if (
+      enc.cakes?.[index]
     ) {
-      console.error(
-        error
-      );
-
-      toast(
-        error.message ||
-          "Erro ao salvar configurações.",
-        "error"
-      );
+      enc.cakes[index].name =
+        input.value.trim();
     }
-  }
 
-  /* =========================================================
-     IMPRESSÃO
-  ========================================================= */
+  });
 
-  function printOrder(
-    id,
-    type
-  ) {
-    const list =
-      type === "custom"
-        ? S.customOrders
-        : S.readyOrders;
+  $$(
+    '[data-enc="cake-active"]'
+  ).forEach((input) => {
 
-    const order =
-      list.find(
-        (
-          item
-        ) =>
-          String(
-            item.id
-          ) ===
-          String(id)
+    const index =
+      Number(
+        input.dataset.index
       );
 
-    if (!order) {
-      toast(
-        "Pedido não encontrado.",
-        "error"
+    if (
+      enc.cakes?.[index]
+    ) {
+      enc.cakes[index].active =
+        input.checked;
+    }
+
+  });
+
+  $$(
+    '[data-enc="cake-option"]'
+  ).forEach((input) => {
+
+    const cakeIndex =
+      Number(
+        input.dataset.cake
       );
 
+    const optionIndex =
+      Number(
+        input.dataset.option
+      );
+
+    if (
+      !enc.cakes?.[
+        cakeIndex
+      ]
+    ) {
       return;
     }
 
-    const custom =
-      type === "custom";
+    if (
+      !Array.isArray(
+        enc.cakes[
+          cakeIndex
+        ].options
+      )
+    ) {
+      enc.cakes[
+        cakeIndex
+      ].options = [];
+    }
 
-    const data =
-      custom
-        ? normalizeCustomOrder(
-            order
-          )
-        : normalizeReadyOrder(
-            order
-          );
+    enc.cakes[
+      cakeIndex
+    ].options[
+      optionIndex
+    ] =
+      input.value.trim();
 
-    const customer =
-      data.cliente ||
-      "Cliente";
+  });
 
-    const html =
-      custom
-        ? printableCustomOrder(
-            data
-          )
-        : printableReadyOrder(
-            data
-          );
+  $$(
+    '[data-enc="cake-price"]'
+  ).forEach((input) => {
 
-    const win =
-      window.open(
-        "",
-        "_blank",
-        "width=900,height=800"
+    const cakeIndex =
+      Number(
+        input.dataset.cake
       );
 
-    if (!win) {
-      toast(
-        "O navegador bloqueou a janela de impressão.",
-        "error"
+    const optionIndex =
+      Number(
+        input.dataset.option
       );
 
+    if (
+      !enc.cakes?.[
+        cakeIndex
+      ]
+    ) {
       return;
     }
 
-    win.document.write(`
-      <!DOCTYPE html>
-
-      <html lang="pt-BR">
-
-      <head>
-
-        <meta charset="UTF-8">
-
-        <title>
-          Pedido — Martins Confeitaria
-        </title>
-
-        <style>
-
-          * {
-            box-sizing: border-box;
-          }
-
-          body {
-            font-family:
-              Arial,
-              sans-serif;
-
-            margin: 0;
-
-            padding: 30px;
-
-            color: #222;
-
-            background: #fff;
-          }
-
-          h1 {
-            margin:
-              0 0 5px;
-          }
-
-          h2 {
-            margin-top:
-              30px;
-
-            border-bottom:
-              1px solid #ddd;
-
-            padding-bottom:
-              8px;
-          }
-
-          .head {
-            border-bottom:
-              2px solid #67b0cb;
-
-            padding-bottom:
-              15px;
-          }
-
-          .muted {
-            color: #777;
-          }
-
-          .row {
-            display:
-              flex;
-
-            gap:
-              20px;
-
-            padding:
-              8px 0;
-
-            border-bottom:
-              1px solid #eee;
-          }
-
-          .label {
-            width:
-              190px;
-
-            min-width:
-              190px;
-
-            font-weight:
-              bold;
-          }
-
-          .value {
-            flex:
-              1;
-
-            white-space:
-              pre-wrap;
-          }
-
-          .items {
-            margin-top:
-              15px;
-
-            border:
-              1px solid #ddd;
-
-            border-radius:
-              8px;
-
-            overflow:
-              hidden;
-          }
-
-          .item {
-            display:
-              flex;
-
-            justify-content:
-              space-between;
-
-            gap:
-              20px;
-
-            padding:
-              10px 12px;
-
-            border-bottom:
-              1px solid #eee;
-          }
-
-          .item:last-child {
-            border-bottom:
-              0;
-          }
-
-          .item-name {
-            flex:
-              1;
-          }
-
-          .item-price {
-            white-space:
-              nowrap;
-
-            font-weight:
-              bold;
-          }
-
-          .total {
-            margin-top:
-              25px;
-
-            padding:
-              15px;
-
-            background:
-              #f4f8fa;
-
-            font-size:
-              20px;
-
-            font-weight:
-              bold;
-
-            border-radius:
-              8px;
-          }
-
-          @media print {
-
-            body {
-              padding:
-                10px;
-            }
-
-          }
-
-        </style>
-
-      </head>
-
-      <body>
-
-        <div class="head">
-
-          <h1>
-            Martins Confeitaria
-          </h1>
-
-          <div class="muted">
-            ${
-              custom
-                ? "Pedido de Encomenda"
-                : "Pedido de Pronta Entrega"
-            }
-          </div>
-
-          <div class="muted">
-            Cliente:
-            ${esc(
-              customer
-            )}
-          </div>
-
-          <div class="muted">
-            Recebido:
-            ${formatDate(
-              data.created_at
-            )}
-          </div>
-
-        </div>
-
-        ${html}
-
-        <script>
-          window.onload = function() {
-            setTimeout(function() {
-              window.print();
-            }, 250);
-          };
-        <\/script>
-
-      </body>
-
-      </html>
-    `);
-
-    win.document.close();
-  }
-
-  /* =========================================================
-     IMPRESSÃO ENCOMENDA
-  ========================================================= */
-
-  function printableCustomOrder(
-    data
-  ) {
-    const rows = [];
-
-    function add(
-      label,
-      value
+    if (
+      !Array.isArray(
+        enc.cakes[
+          cakeIndex
+        ].prices
+      )
     ) {
-      if (
-        value !== null &&
-        value !==
-          undefined &&
-        value !== ""
-      ) {
-        rows.push(`
-          <div class="row">
-
-            <div class="label">
-              ${esc(label)}
-            </div>
-
-            <div class="value">
-              ${esc(value)}
-            </div>
-
-          </div>
-        `);
-      }
+      enc.cakes[
+        cakeIndex
+      ].prices = [];
     }
 
-    add(
-      "WhatsApp",
-      data.whatsapp
-    );
+    enc.cakes[
+      cakeIndex
+    ].prices[
+      optionIndex
+    ] =
+      Number(
+        input.value || 0
+      );
 
-    add(
-      "Data desejada",
-      formatSimpleDate(
-        data.data_desejada
-      )
-    );
+  });
 
-    add(
-      "Kit",
-      formatComplexValue(
-        data.kit
-      )
-    );
+  /* -------------------------------------------------------
+     MASSAS
+  ------------------------------------------------------- */
 
-    add(
-      "Bolo",
-      formatComplexValue(
-        data.bolo
-      )
-    );
+  $$(
+    '[data-enc="mass"]'
+  ).forEach((input) => {
 
-    add(
-      "Massa",
-      formatComplexValue(
-        data.massa
-      )
-    );
-
-    add(
-      "Recheio",
-      formatComplexValue(
-        data.recheio
-      )
-    );
-
-    add(
-      "Decoração",
-      formatComplexValue(
-        data.topo
-      )
-    );
-
-    add(
-      "Adicionais",
-      formatArray(
-        data.adicionais
-      )
-    );
-
-    add(
-      "Personalização",
-      formatArray(
-        data.personalizacao
-      )
-    );
-
-    add(
-      "Texto da personalização",
-      data.personalizacao_text
-    );
+    const index =
+      Number(
+        input.dataset.index
+      );
 
     if (
-      data.brigadeiros.length
+      Array.isArray(
+        enc.masses
+      )
     ) {
-      add(
-        "Brigadeiros",
-        data.brigadeiros
+      enc.masses[index] =
+        input.value.trim();
+    }
+
+  });
+
+  /* -------------------------------------------------------
+     RECHEIOS
+  ------------------------------------------------------- */
+
+  $$(
+    '[data-enc="filling"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      Array.isArray(
+        enc.fillings
+      )
+    ) {
+      enc.fillings[index] =
+        input.value.trim();
+    }
+
+  });
+
+  /* -------------------------------------------------------
+     TOPOS
+  ------------------------------------------------------- */
+
+  $$(
+    '[data-enc="top-name"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      !Array.isArray(
+        enc.topes
+      )
+    ) {
+      return;
+    }
+
+    if (
+      Array.isArray(
+        enc.topes[index]
+      )
+    ) {
+      enc.topes[index][0] =
+        input.value.trim();
+    } else {
+      enc.topes[index] =
+        {
+          name:
+            input.value.trim(),
+          price:
+            Number(
+              enc.topes[index]
+                ?.price || 0
+            )
+        };
+    }
+
+  });
+
+  $$(
+    '[data-enc="top-price"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      !Array.isArray(
+        enc.topes
+      )
+    ) {
+      return;
+    }
+
+    const price =
+      Number(
+        input.value || 0
+      );
+
+    if (
+      Array.isArray(
+        enc.topes[index]
+      )
+    ) {
+      enc.topes[index][1] =
+        price;
+    } else if (
+      enc.topes[index]
+    ) {
+      enc.topes[index].price =
+        price;
+    }
+
+  });
+
+  /* -------------------------------------------------------
+     ADICIONAIS
+  ------------------------------------------------------- */
+
+  $$(
+    '[data-enc="extra-name"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      !Array.isArray(
+        enc.extras
+      )
+    ) {
+      return;
+    }
+
+    if (
+      Array.isArray(
+        enc.extras[index]
+      )
+    ) {
+      enc.extras[index][0] =
+        input.value.trim();
+    } else {
+      enc.extras[index] =
+        {
+          name:
+            input.value.trim(),
+          price:
+            Number(
+              enc.extras[index]
+                ?.price || 0
+            )
+        };
+    }
+
+  });
+
+  $$(
+    '[data-enc="extra-price"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      !Array.isArray(
+        enc.extras
+      )
+    ) {
+      return;
+    }
+
+    const price =
+      Number(
+        input.value || 0
+      );
+
+    if (
+      Array.isArray(
+        enc.extras[index]
+      )
+    ) {
+      enc.extras[index][1] =
+        price;
+    } else if (
+      enc.extras[index]
+    ) {
+      enc.extras[index].price =
+        price;
+    }
+
+  });
+
+  /* -------------------------------------------------------
+     PERSONALIZAÇÃO
+  ------------------------------------------------------- */
+
+  $$(
+    '[data-enc="personalization-name"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      !Array.isArray(
+        enc.personalization
+      )
+    ) {
+      return;
+    }
+
+    if (
+      Array.isArray(
+        enc.personalization[index]
+      )
+    ) {
+      enc.personalization[
+        index
+      ][0] =
+        input.value.trim();
+    } else {
+      enc.personalization[
+        index
+      ] = {
+        name:
+          input.value.trim(),
+        price:
+          Number(
+            enc.personalization[
+              index
+            ]?.price || 0
+          )
+      };
+    }
+
+  });
+
+  $$(
+    '[data-enc="personalization-price"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      !Array.isArray(
+        enc.personalization
+      )
+    ) {
+      return;
+    }
+
+    const price =
+      Number(
+        input.value || 0
+      );
+
+    if (
+      Array.isArray(
+        enc.personalization[index]
+      )
+    ) {
+      enc.personalization[
+        index
+      ][1] =
+        price;
+    } else if (
+      enc.personalization[
+        index
+      ]
+    ) {
+      enc.personalization[
+        index
+      ].price =
+        price;
+    }
+
+  });
+
+  /* -------------------------------------------------------
+     BRIGADEIROS
+  ------------------------------------------------------- */
+
+  $$(
+    '[data-enc="brigadeiro-classico"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      !Array.isArray(
+        enc.brigadeiros.classicos
+      )
+    ) {
+      enc.brigadeiros.classicos =
+        [];
+    }
+
+    enc.brigadeiros
+      .classicos[index] =
+      input.value.trim();
+
+  });
+
+  $$(
+    '[data-enc="brigadeiro-premium"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      !Array.isArray(
+        enc.brigadeiros.premium
+      )
+    ) {
+      enc.brigadeiros.premium =
+        [];
+    }
+
+    enc.brigadeiros
+      .premium[index] =
+      input.value.trim();
+
+  });
+
+  /* -------------------------------------------------------
+     OUTROS ITENS
+  ------------------------------------------------------- */
+
+  $$(
+    '[data-enc="other-name"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      enc.otherItems?.[index]
+    ) {
+      enc.otherItems[
+        index
+      ].name =
+        input.value.trim();
+    }
+
+  });
+
+  $$(
+    '[data-enc="other-price"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      enc.otherItems?.[index]
+    ) {
+      enc.otherItems[
+        index
+      ].price =
+        Number(
+          input.value || 0
+        );
+    }
+
+  });
+
+  $$(
+    '[data-enc="other-active"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      enc.otherItems?.[index]
+    ) {
+      enc.otherItems[
+        index
+      ].active =
+        input.checked;
+    }
+
+  });
+
+  /* -------------------------------------------------------
+     KITS
+  ------------------------------------------------------- */
+
+  $$(
+    '[data-enc="kit-name"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      enc.kits?.[index]
+    ) {
+      enc.kits[index].name =
+        input.value.trim();
+    }
+
+  });
+
+  $$(
+    '[data-enc="kit-active"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      enc.kits?.[index]
+    ) {
+      enc.kits[index].active =
+        input.checked;
+    }
+
+  });
+
+  $$(
+    '[data-enc="kit-price"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      enc.kits?.[index]
+    ) {
+      enc.kits[index].price =
+        Number(
+          input.value || 0
+        );
+    }
+
+  });
+
+  $$(
+    '[data-enc="kit-cake"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      enc.kits?.[index]
+    ) {
+      enc.kits[index].cake =
+        input.value.trim();
+    }
+
+  });
+
+  $$(
+    '[data-enc="kit-docinhos"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      enc.kits?.[index]
+    ) {
+      enc.kits[index].docinhos =
+        Number(
+          input.value || 0
+        );
+    }
+
+  });
+
+  $$(
+    '[data-enc="kit-items"]'
+  ).forEach((input) => {
+
+    const index =
+      Number(
+        input.dataset.index
+      );
+
+    if (
+      enc.kits?.[index]
+    ) {
+      enc.kits[index].items =
+        input.value
+          .split("\n")
           .map(
-            formatBrigadeiro
+            (item) =>
+              item.trim()
           )
-          .filter(Boolean)
-          .join(
-            " | "
+          .filter(Boolean);
+    }
+
+  });
+
+  return enc;
+}
+
+/* =========================================================
+   SALVAR CONFIGURAÇÕES
+========================================================= */
+
+async function saveEncSettings() {
+  collectEncChanges();
+
+  const saved =
+    await saveEnc();
+
+  if (saved) {
+    renderSettings();
+  }
+
+  return saved;
+}
+
+/* =========================================================
+   RENDERIZAÇÃO DO DASHBOARD
+========================================================= */
+
+function renderDashboard() {
+  const container =
+    $("#dashboard-content");
+
+  if (!container) {
+    return;
+  }
+
+  const readyProducts =
+    productsView(
+      "ready"
+    );
+
+  const customProducts =
+    productsView(
+      "orders"
+    );
+
+  const readyOrders =
+    Array.isArray(
+      S.readyOrders
+    )
+      ? S.readyOrders
+      : [];
+
+  const customOrders =
+    Array.isArray(
+      S.customOrders
+    )
+      ? S.customOrders
+      : [];
+
+  const pendingReady =
+    readyOrders.filter(
+      (order) =>
+        ![
+          "concluído",
+          "cancelado"
+        ].includes(
+          normalizeStatus(
+            order.status
           )
+        )
+    ).length;
+
+  const pendingCustom =
+    customOrders.filter(
+      (order) =>
+        ![
+          "concluído",
+          "cancelado"
+        ].includes(
+          normalizeStatus(
+            order.status
+          )
+        )
+    ).length;
+
+  container.innerHTML = `
+
+    <div class="dashboard-grid">
+
+      <div class="dashboard-card">
+
+        <span>
+          Produtos — Pronta Entrega
+        </span>
+
+        <strong>
+          ${readyProducts.length}
+        </strong>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-view="prod-ready"
+        >
+          Ver produtos
+        </button>
+
+      </div>
+
+      <div class="dashboard-card">
+
+        <span>
+          Produtos — Encomendas
+        </span>
+
+        <strong>
+          ${customProducts.length}
+        </strong>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-view="prod-orders"
+        >
+          Ver produtos
+        </button>
+
+      </div>
+
+      <div class="dashboard-card">
+
+        <span>
+          Pedidos — Pronta Entrega
+        </span>
+
+        <strong>
+          ${pendingReady}
+        </strong>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-view="ord-ready"
+        >
+          Ver pedidos
+        </button>
+
+      </div>
+
+      <div class="dashboard-card">
+
+        <span>
+          Pedidos — Encomendas
+        </span>
+
+        <strong>
+          ${pendingCustom}
+        </strong>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-view="ord-orders"
+        >
+          Ver pedidos
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+}
+
+/* =========================================================
+   FIM DA PARTE 6
+========================================================= */
+ /* =========================================================
+   RENDERIZAÇÃO PRINCIPAL
+========================================================= */
+
+function render() {
+  const title =
+    $("#page-title");
+
+  if (title) {
+    title.textContent =
+      TITLES[S.view] ||
+      "Painel Administrativo";
+  }
+
+  /* -------------------------------------------------------
+     OCULTAR TODAS AS ÁREAS
+  ------------------------------------------------------- */
+
+  $$(".view").forEach(
+    (view) => {
+      view.classList.remove(
+        "active"
       );
     }
+  );
 
-    if (
-      data.outros.length
-    ) {
-      add(
-        "Outros itens",
-        data.outros
-          .map(
-            formatOtherItem
-          )
-          .filter(Boolean)
-          .join(
-            " | "
-          )
-      );
-    }
+  /* -------------------------------------------------------
+     DASHBOARD
+  ------------------------------------------------------- */
 
-    add(
-      "Observações",
-      data.observacoes
-    );
-
-    return `
-      <h2>
-        Detalhes da encomenda
-      </h2>
-
-      ${rows.join("")}
-
-      ${
-        data.total_estimado !==
-          "" &&
-        data.total_estimado !==
-          null &&
-        data.total_estimado !==
-          undefined
-          ? `
-            <div class="total">
-              Total estimado:
-              ${esc(
-                formatMoneyValue(
-                  data.total_estimado
-                )
-              )}
-            </div>
-          `
-          : ""
-      }
-    `;
-  }
-
-  /* =========================================================
-     IMPRESSÃO PRONTA ENTREGA
-  ========================================================= */
-
-  function printableReadyOrder(
-    data
+  if (
+    S.view ===
+    "dashboard"
   ) {
-    const rows = [];
-
-    function add(
-      label,
-      value
-    ) {
-      if (
-        value !== null &&
-        value !==
-          undefined &&
-        value !== ""
-      ) {
-        rows.push(`
-          <div class="row">
-
-            <div class="label">
-              ${esc(label)}
-            </div>
-
-            <div class="value">
-              ${esc(value)}
-            </div>
-
-          </div>
-        `);
-      }
-    }
-
-    add(
-      "WhatsApp",
-      data.whatsapp
-    );
-
-    add(
-      "Recebimento",
-      data.recebimento
-    );
-
-    add(
-      "Endereço",
-      data.endereco
-    );
-
-    add(
-      "Pagamento",
-      data.pagamento
-    );
-
-    if (
-      data.itens.length
-    ) {
-      const itemsHtml =
-        data.itens
-          .map(
-            (
-              item
-            ) => `
-              <div class="item">
-
-                <div class="item-name">
-                  ${esc(
-                    formatReadyItem(
-                      item
-                    )
-                  )}
-                </div>
-
-              </div>
-            `
-          )
-          .join("");
-
-      rows.push(`
-        <h2>
-          Itens do pedido
-        </h2>
-
-        <div class="items">
-          ${itemsHtml}
-        </div>
-      `);
-    }
-
-    add(
-      "Observações",
-      data.observacoes
-    );
-
-    return `
-      <h2>
-        Detalhes do pedido
-      </h2>
-
-      ${rows.join("")}
-
-      ${
-        data.total !==
-          null &&
-        data.total !==
-          undefined &&
-        data.total !==
-          ""
-          ? `
-            <div class="total">
-              Total:
-              ${esc(
-                brl(
-                  data.total
-                )
-              )}
-            </div>
-          `
-          : ""
-      }
-    `;
-  }
-
-  /* =========================================================
-     RENDER
-  ========================================================= */
-
-  function render() {
     const view =
-      $("#view");
+      $("#view-dashboard");
 
-    if (!view) {
-      return;
+    if (view) {
+      view.classList.add(
+        "active"
+      );
     }
 
-    const title =
-      TITLES[
-        S.view
-      ] ||
-      "Dashboard";
+    renderDashboard();
 
-    if (
-      $("#title")
-    ) {
-      $("#title")
-        .textContent =
-        title;
+    return;
+  }
+
+  /* -------------------------------------------------------
+     PRODUTOS — PRONTA ENTREGA
+  ------------------------------------------------------- */
+
+  if (
+    S.view ===
+    "prod-ready"
+  ) {
+    const view =
+      $("#view-products");
+
+    if (view) {
+      view.classList.add(
+        "active"
+      );
     }
 
-    $$(".nav").forEach(
-      (
-        button
-      ) => {
-        button.classList.toggle(
-          "active",
-          button.dataset.view ===
-            S.view
-        );
-      }
+    renderProducts(
+      "ready"
     );
 
-    if (
-      S.view ===
-      "dashboard"
-    ) {
-      view.innerHTML =
-        dashboardView();
-
-      return;
-    }
-
-    if (
-      S.view ===
-      "prod-ready"
-    ) {
-      view.innerHTML =
-        productsView(
-          "ready"
-        );
-
-      return;
-    }
-
-    if (
-      S.view ===
-      "prod-orders"
-    ) {
-      view.innerHTML =
-        productsView(
-          "orders"
-        );
-
-      return;
-    }
-
-    if (
-      S.view ===
-      "ord-ready"
-    ) {
-      view.innerHTML =
-        ordersView(
-          "ready"
-        );
-
-      return;
-    }
-
-    if (
-      S.view ===
-      "ord-orders"
-    ) {
-      view.innerHTML =
-        ordersView(
-          "custom"
-        );
-
-      return;
-    }
-
-    if (
-      S.view ===
-      "settings"
-    ) {
-      view.innerHTML =
-        settingsView();
-
-      return;
-    }
+    return;
   }
 
-  /* =========================================================
-     NAVEGAÇÃO
-  ========================================================= */
+  /* -------------------------------------------------------
+     PRODUTOS — ENCOMENDAS
+  ------------------------------------------------------- */
 
-  async function go(
-    view
+  if (
+    S.view ===
+    "prod-orders"
   ) {
-    S.view =
-      view ||
-      "dashboard";
+    const view =
+      $("#view-products");
 
-    if (
-      view ===
-      "prod-orders"
-    ) {
-      await loadEnc();
+    if (view) {
+      view.classList.add(
+        "active"
+      );
     }
 
-    if (
-      view ===
-      "ord-ready" ||
-      view ===
-      "ord-orders"
-    ) {
-      await loadOrders();
+    renderProducts(
+      "orders"
+    );
+
+    return;
+  }
+
+  /* -------------------------------------------------------
+     PEDIDOS — PRONTA ENTREGA
+  ------------------------------------------------------- */
+
+  if (
+    S.view ===
+    "ord-ready"
+  ) {
+    const view =
+      $("#view-orders");
+
+    if (view) {
+      view.classList.add(
+        "active"
+      );
     }
 
-    render();
+    renderOrders(
+      "ready"
+    );
 
-    $("#side")
-      ?.classList.remove(
-        "open"
-      );
-
-    $("#shade")
-      ?.classList.remove(
-        "show"
-      );
+    return;
   }
 
-  /* =========================================================
-     START
-  ========================================================= */
+  /* -------------------------------------------------------
+     PEDIDOS — ENCOMENDAS
+  ------------------------------------------------------- */
 
-  async function start() {
-    await Promise.all([
-      loadSite(),
-      loadProducts(),
-      loadEnc(),
-      loadOrders()
-    ]);
+  if (
+    S.view ===
+    "ord-orders"
+  ) {
+    const view =
+      $("#view-orders");
 
-    S.on = true;
-
-    $("#login")
-      ?.classList.add(
-        "hidden"
+    if (view) {
+      view.classList.add(
+        "active"
       );
+    }
 
-    $("#app")
-      ?.classList.remove(
-        "hidden"
-      );
+    renderOrders(
+      "orders"
+    );
 
-    render();
+    return;
   }
 
-  /* =========================================================
-     EVENTOS — CLIQUES
-  ========================================================= */
+  /* -------------------------------------------------------
+     CONFIGURAÇÕES
+  ------------------------------------------------------- */
+
+  if (
+    S.view ===
+    "settings"
+  ) {
+    const view =
+      $("#view-settings");
+
+    if (view) {
+      view.classList.add(
+        "active"
+      );
+    }
+
+    renderSettings();
+
+    return;
+  }
+}
+
+/* =========================================================
+   EVENTOS DO MENU
+========================================================= */
+
+function bindNavigation() {
 
   document.addEventListener(
     "click",
-    async (
-      event
-    ) => {
-      const target =
+    async (event) => {
+
+      const viewButton =
         event.target.closest(
-          "[data-act], [data-view], [data-close]"
+          "[data-view]"
         );
 
-      if (!target) {
+      if (
+        viewButton
+      ) {
+        event.preventDefault();
+
+        const view =
+          viewButton.dataset.view;
+
+        if (!view) {
+          return;
+        }
+
+        setView(view);
+
         return;
       }
 
-      /* =====================================================
-         NAVEGAÇÃO
-      ===================================================== */
+      /* ---------------------------------------------------
+         IR PARA O SITE
+      --------------------------------------------------- */
+
+      const siteButton =
+        event.target.closest(
+          "[data-action='open-site']"
+        );
 
       if (
-        target.dataset.view
+        siteButton
       ) {
-        await go(
-          target.dataset.view
+        event.preventDefault();
+
+        openSite();
+
+        return;
+      }
+
+      /* ---------------------------------------------------
+         NOVO PRODUTO
+      --------------------------------------------------- */
+
+      const newProductButton =
+        event.target.closest(
+          "[data-action='new-product']"
+        );
+
+      if (
+        newProductButton
+      ) {
+        event.preventDefault();
+
+        openProductModal(
+          null
         );
 
         return;
       }
 
-      /* =====================================================
-         FECHAR
-      ===================================================== */
+      /* ---------------------------------------------------
+         EDITAR PRODUTO
+      --------------------------------------------------- */
+
+      const editButton =
+        event.target.closest(
+          "[data-action='edit-product']"
+        );
 
       if (
-        target.hasAttribute(
-          "data-close"
-        )
+        editButton
       ) {
+        event.preventDefault();
+
+        const id =
+          editButton.dataset.id;
+
+        if (id) {
+          openProductModal(
+            id
+          );
+        }
+
+        return;
+      }
+
+      /* ---------------------------------------------------
+         EXCLUIR PRODUTO
+      --------------------------------------------------- */
+
+      const deleteButton =
+        event.target.closest(
+          "[data-action='delete-product']"
+        );
+
+      if (
+        deleteButton
+      ) {
+        event.preventDefault();
+
+        const id =
+          deleteButton.dataset.id;
+
+        if (id) {
+          await deleteProduct(
+            id
+          );
+        }
+
+        return;
+      }
+
+      /* ---------------------------------------------------
+         ATIVAR / DESATIVAR
+      --------------------------------------------------- */
+
+      const toggleButton =
+        event.target.closest(
+          "[data-action='toggle-product']"
+        );
+
+      if (
+        toggleButton
+      ) {
+        event.preventDefault();
+
+        const id =
+          toggleButton.dataset.id;
+
+        if (id) {
+          await toggleProduct(
+            id
+          );
+        }
+
+        return;
+      }
+
+      /* ---------------------------------------------------
+         FECHAR MODAL DE PRODUTO
+      --------------------------------------------------- */
+
+      const closeProductButton =
+        event.target.closest(
+          "[data-action='close-product-modal']"
+        );
+
+      if (
+        closeProductButton
+      ) {
+        event.preventDefault();
+
         closeModal();
 
         return;
       }
 
-      const action =
-        target.dataset.act;
+      /* ---------------------------------------------------
+         FECHAR MODAL DE PEDIDO
+      --------------------------------------------------- */
 
-      if (!action) {
-        return;
-      }
-
-      /* =====================================================
-         NOVO PRODUTO
-      ===================================================== */
-
-      if (
-        action ===
-        "new-product"
-      ) {
-        openProductModal(
-          null,
-          target.dataset.area ||
-            "pronta"
+      const closeOrderButton =
+        event.target.closest(
+          "[data-action='close-order-modal']"
         );
 
+      if (
+        closeOrderButton
+      ) {
+        event.preventDefault();
+
+        closeOrderModal();
+
         return;
       }
 
-      /* =====================================================
-         EDITAR PRODUTO
-      ===================================================== */
+      /* ---------------------------------------------------
+         SALVAR CONFIGURAÇÕES
+      --------------------------------------------------- */
 
-      if (
-        action ===
-        "edit-product"
-      ) {
-        openProductModal(
-          target.dataset.id
+      const saveEncButton =
+        event.target.closest(
+          "[data-action='save-enc']"
         );
 
-        return;
-      }
-
-      /* =====================================================
-         EXCLUIR PRODUTO
-      ===================================================== */
-
       if (
-        action ===
-        "delete-product"
+        saveEncButton
       ) {
-        await deleteProduct(
-          target.dataset.id
-        );
+        event.preventDefault();
 
-        return;
-      }
+        saveEncButton.disabled =
+          true;
 
-      /* =====================================================
-         SALVAR ENCOMENDAS
-      ===================================================== */
+        const originalText =
+          saveEncButton.textContent;
 
-      if (
-        action ===
-        "save-enc"
-      ) {
+        saveEncButton.textContent =
+          "Salvando...";
+
         try {
-          S.enc =
-            readEncForm();
+          await saveEncSettings();
+        } finally {
+          saveEncButton.disabled =
+            false;
 
-          await saveEnc();
+          saveEncButton.textContent =
+            originalText ||
+            "Salvar alterações";
+        }
 
-          toast(
-            "Configurações de encomendas salvas."
-          );
+        return;
+      }
 
-          render();
+      /* ---------------------------------------------------
+         FECHAR MODAL CLICANDO FORA
+      --------------------------------------------------- */
 
-        } catch (
-          error
+      if (
+        event.target.classList.contains(
+          "modal-overlay"
+        )
+      ) {
+        event.target.classList.remove(
+          "open"
+        );
+
+        event.target.classList.remove(
+          "active"
+        );
+      }
+
+      /* ---------------------------------------------------
+         IMPRIMIR PEDIDO
+      --------------------------------------------------- */
+
+      const printButton =
+        event.target.closest(
+          "[data-action='print-order']"
+        );
+
+      if (
+        printButton
+      ) {
+        event.preventDefault();
+
+        const type =
+          printButton.dataset.type;
+
+        const id =
+          printButton.dataset.id;
+
+        if (
+          type ===
+          "ready"
         ) {
-          console.error(
-            error
+          printReadyOrder(
+            id
           );
+        }
 
-          toast(
-            error.message ||
-              "Erro ao salvar encomendas.",
-            "error"
+        if (
+          type ===
+          "custom"
+        ) {
+          printCustomOrder(
+            id
           );
         }
 
         return;
       }
 
-      /* =====================================================
-         ADICIONAR CONFIGURAÇÃO
-      ===================================================== */
+      /* ---------------------------------------------------
+         ATUALIZAR STATUS
+      --------------------------------------------------- */
+
+      const statusButton =
+        event.target.closest(
+          "[data-action='update-status']"
+        );
 
       if (
-        action ===
-        "add-enc-item"
+        statusButton
       ) {
-        /*
-         * Antes de adicionar,
-         * preservamos tudo que o usuário
-         * acabou de digitar.
-         */
-        S.enc =
-          readEncForm();
+        event.preventDefault();
 
-        addEncItem(
-          target.dataset.key
+        const id =
+          statusButton.dataset.id;
+
+        const type =
+          statusButton.dataset.type;
+
+        const status =
+          statusButton.dataset.status;
+
+        if (
+          id &&
+          status
+        ) {
+          await updateOrderStatus(
+            id,
+            type,
+            status
+          );
+        }
+
+        return;
+      }
+
+    }
+  );
+}
+
+/* =========================================================
+   FORMULÁRIO DE PRODUTO
+========================================================= */
+
+function bindProductForm() {
+
+  document.addEventListener(
+    "submit",
+    async (event) => {
+
+      if (
+        event.target?.id !==
+        "pform"
+      ) {
+        return;
+      }
+
+      await saveProduct(
+        event
+      );
+
+    }
+  );
+
+}
+
+/* =========================================================
+   UPLOAD DE IMAGEM
+========================================================= */
+
+function bindImageUpload() {
+
+  document.addEventListener(
+    "change",
+    async (event) => {
+
+      if (
+        event.target?.id !==
+        "f-image"
+      ) {
+        return;
+      }
+
+      await handleImageChange(
+        event
+      );
+
+    }
+  );
+
+}
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+function bindLogin() {
+
+  const form =
+    $("#login-form");
+
+  if (!form) {
+    return;
+  }
+
+  form.addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
+
+      const email =
+        $("#login-email")
+          ?.value
+          ?.trim() ||
+        "";
+
+      const password =
+        $("#login-password")
+          ?.value ||
+        "";
+
+      if (
+        !email ||
+        !password
+      ) {
+        toast(
+          "Preencha e-mail e senha.",
+          "error"
         );
 
         return;
       }
 
-      /* =====================================================
-         REMOVER CONFIGURAÇÃO
-      ===================================================== */
-
-      if (
-        action ===
-        "remove-enc-item"
-      ) {
-        S.enc =
-          readEncForm();
-
-        removeEncItem(
-          target.dataset.key,
-          target.dataset.index
+      const button =
+        form.querySelector(
+          "button[type='submit']"
         );
 
-        return;
+      const oldText =
+        button?.textContent ||
+        "Entrar";
+
+      if (button) {
+        button.disabled =
+          true;
+
+        button.textContent =
+          "Entrando...";
       }
 
-      /* =====================================================
-         ADICIONAR BRIGADEIRO
-      ===================================================== */
+      try {
 
-      if (
-        action ===
-        "add-brig"
-      ) {
-        S.enc =
-          readEncForm();
-
-        addBrigadeiro(
-          target.dataset.type
+        await login(
+          email,
+          password
         );
 
-        return;
+      } finally {
+
+        if (button) {
+          button.disabled =
+            false;
+
+          button.textContent =
+            oldText;
+        }
+
       }
 
-      /* =====================================================
-         REMOVER BRIGADEIRO
-      ===================================================== */
+    }
+  );
 
-      if (
-        action ===
-        "remove-brig"
-      ) {
-        S.enc =
-          readEncForm();
+}
 
-        removeBrigadeiro(
-          target.dataset.type,
-          target.dataset.index
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+function bindLogout() {
+
+  document.addEventListener(
+    "click",
+    async (event) => {
+
+      const button =
+        event.target.closest(
+          "[data-action='logout']"
         );
 
+      if (!button) {
         return;
       }
 
-      /* =====================================================
-         ADICIONAR OUTRO ITEM
-      ===================================================== */
+      event.preventDefault();
 
-      if (
-        action ===
-        "add-other-item"
-      ) {
-        S.enc =
-          readEncForm();
+      await logout();
 
-        addOtherItem();
+    }
+  );
 
-        return;
-      }
+}
 
-      /* =====================================================
-         REMOVER OUTRO ITEM
-      ===================================================== */
+/* =========================================================
+   BOTÃO ATUALIZAR
+========================================================= */
 
-      if (
-        action ===
-        "remove-other-item"
-      ) {
-        S.enc =
-          readEncForm();
+function bindRefresh() {
 
-        removeOtherItem(
-          target.dataset.index
+  document.addEventListener(
+    "click",
+    async (event) => {
+
+      const button =
+        event.target.closest(
+          "[data-action='refresh']"
         );
 
+      if (!button) {
         return;
       }
 
-      /* =====================================================
-         ADICIONAR KIT
-      ===================================================== */
+      event.preventDefault();
 
-      if (
-        action ===
-        "add-kit"
-      ) {
-        S.enc =
-          readEncForm();
+      button.disabled =
+        true;
 
-        addKit();
+      try {
 
-        return;
-      }
-
-      /* =====================================================
-         REMOVER KIT
-      ===================================================== */
-
-      if (
-        action ===
-        "remove-kit"
-      ) {
-        S.enc =
-          readEncForm();
-
-        removeKit(
-          target.dataset.index
-        );
-
-        return;
-      }
-
-      /* =====================================================
-         ATUALIZAR PEDIDOS
-      ===================================================== */
-
-      if (
-        action ===
-        "refresh-orders"
-      ) {
-        await loadOrders();
+        await loadAll();
 
         render();
 
         toast(
-          "Pedidos atualizados."
+          "Dados atualizados."
         );
 
-        return;
-      }
+      } catch (error) {
 
-      /* =====================================================
-         IMPRIMIR
-      ===================================================== */
-
-      if (
-        action ===
-        "print-order"
-      ) {
-        printOrder(
-          target.dataset.id,
-          target.dataset.type
+        console.error(
+          "Erro ao atualizar:",
+          error
         );
 
-        return;
+        toast(
+          "Não foi possível atualizar os dados.",
+          "error"
+        );
+
+      } finally {
+
+        button.disabled =
+          false;
+
       }
 
-      /* =====================================================
-         SALVAR CONFIGURAÇÕES
-      ===================================================== */
-
-      if (
-        action ===
-        "save-settings"
-      ) {
-        await saveSettings();
-
-        return;
-      }
     }
   );
 
-  /* =========================================================
-     FORMULÁRIO DE LOGIN
-  ========================================================= */
+}
 
-  $("#loginForm")
-    ?.addEventListener(
-      "submit",
-      async (
-        event
-      ) => {
-        event.preventDefault();
+/* =========================================================
+   FECHAR MODAIS COM ESC
+========================================================= */
 
-        const email =
-          $("#email")
-            ?.value
-            .trim() ||
-          "";
-
-        const password =
-          $("#password")
-            ?.value ||
-          "";
-
-        const msg =
-          $("#loginMsg");
-
-        if (msg) {
-          msg.textContent =
-            "Entrando...";
-        }
-
-        try {
-          await login(
-            email,
-            password
-          );
-
-          if (msg) {
-            msg.textContent =
-              "";
-          }
-
-        } catch (
-          error
-        ) {
-          console.error(
-            error
-          );
-
-          if (msg) {
-            msg.textContent =
-              error.message ||
-              "E-mail ou senha inválidos.";
-          }
-        }
-      }
-    );
-
-  /* =========================================================
-     LOGOUT
-  ========================================================= */
-
-  $("#logout")
-    ?.addEventListener(
-      "click",
-      logout
-    );
-
-  /* =========================================================
-     ATUALIZAR PAINEL
-  ========================================================= */
-
-  $("#refresh")
-    ?.addEventListener(
-      "click",
-      async () => {
-        try {
-          await Promise.all([
-            loadSite(),
-            loadProducts(),
-            loadEnc(),
-            loadOrders()
-          ]);
-
-          render();
-
-          toast(
-            "Painel atualizado."
-          );
-
-        } catch (
-          error
-        ) {
-          console.error(
-            error
-          );
-
-          toast(
-            "Não foi possível atualizar o painel.",
-            "error"
-          );
-        }
-      }
-    );
-
-  /* =========================================================
-     UPLOAD DA FOTO
-  ========================================================= */
-
-  $("#f-photo")
-    ?.addEventListener(
-      "change",
-      async (
-        event
-      ) => {
-        const file =
-          event.target.files?.[0];
-
-        if (!file) {
-          return;
-        }
-
-        if (
-          !file.type.startsWith(
-            "image/"
-          )
-        ) {
-          toast(
-            "Selecione uma imagem válida.",
-            "error"
-          );
-
-          event.target.value =
-            "";
-
-          return;
-        }
-
-        try {
-          const data =
-            await imageToDataURL(
-              file
-            );
-
-          S.image =
-            data;
-
-          const preview =
-            $("#prev");
-
-          if (preview) {
-            preview.src =
-              data;
-
-            preview.classList.remove(
-              "hidden"
-            );
-          }
-
-          $("#rmimg")
-            ?.classList.remove(
-              "hidden"
-            );
-
-        } catch (
-          error
-        ) {
-          console.error(
-            error
-          );
-
-          toast(
-            "Não foi possível carregar a foto.",
-            "error"
-          );
-        }
-      }
-    );
-
-  /* =========================================================
-     REMOVER FOTO
-  ========================================================= */
-
-  $("#rmimg")
-    ?.addEventListener(
-      "click",
-      () => {
-        S.image =
-          null;
-
-        const preview =
-          $("#prev");
-
-        if (preview) {
-          preview.src =
-            "";
-
-          preview.classList.add(
-            "hidden"
-          );
-        }
-
-        $("#rmimg")
-          ?.classList.add(
-            "hidden"
-          );
-
-        const photo =
-          $("#f-photo");
-
-        if (photo) {
-          photo.value =
-            "";
-        }
-      }
-    );
-
-  /* =========================================================
-     FORM PRODUTO
-  ========================================================= */
-
-  $("#pform")
-    ?.addEventListener(
-      "submit",
-      saveProduct
-    );
-
-  /*
-   * Segurança extra:
-   * caso o formulário seja recriado ou o listener
-   * direto não esteja disponível, o submit continua
-   * sendo capturado aqui.
-   */
-  document.addEventListener(
-    "submit",
-    async (
-      event
-    ) => {
-      if (
-        event.target?.id ===
-        "pform"
-      ) {
-        event.preventDefault();
-
-        /*
-         * O listener direto normalmente já executa.
-         * Este bloco só existe para garantir que
-         * o formulário nunca fique sem tratamento.
-         */
-      }
-    }
-  );
-
-  /* =========================================================
-     MODAL CLICANDO FORA
-  ========================================================= */
-
-  $("#modal")
-    ?.addEventListener(
-      "click",
-      (
-        event
-      ) => {
-        if (
-          event.target ===
-          $("#modal")
-        ) {
-          closeModal();
-        }
-      }
-    );
-
-  /* =========================================================
-     STATUS DOS PEDIDOS
-  ========================================================= */
+function bindEscape() {
 
   document.addEventListener(
-    "change",
-    async (
-      event
-    ) => {
-      const element =
-        event.target.closest(
-          "[data-status-id]"
-        );
+    "keydown",
+    (event) => {
 
-      if (!element) {
+      if (
+        event.key !==
+        "Escape"
+      ) {
         return;
       }
 
-      await setStatus(
-        element.dataset.statusId,
-        element.dataset.statusType,
-        element.value
-      );
+      closeModal();
+
+      closeOrderModal();
+
     }
   );
 
-  /* =========================================================
-     MENU MOBILE
-  ========================================================= */
+}
 
-  $("#burger")
-    ?.addEventListener(
-      "click",
-      () => {
-        $("#side")
-          ?.classList.toggle(
-            "open"
-          );
+/* =========================================================
+   INICIALIZAÇÃO FINAL
+========================================================= */
 
-        $("#shade")
-          ?.classList.toggle(
-            "show"
-          );
-      }
-    );
+async function boot() {
 
-  $("#shade")
-    ?.addEventListener(
-      "click",
-      () => {
-        $("#side")
-          ?.classList.remove(
-            "open"
-          );
+  console.log(
+    "Martins Admin iniciando..."
+  );
 
-        $("#shade")
-          ?.classList.remove(
-            "show"
-          );
-      }
-    );
+  try {
 
-  /* =========================================================
-     INICIALIZAÇÃO
-  ========================================================= */
+    bindNavigation();
 
-  (async () => {
-    try {
-      const logged =
-        await checkSession();
+    bindProductForm();
 
-      if (logged) {
-        await start();
-      } else {
-        $("#login")
-          ?.classList.remove(
-            "hidden"
-          );
+    bindImageUpload();
 
-        $("#app")
-          ?.classList.add(
-            "hidden"
-          );
-      }
+    bindLogin();
 
-    } catch (
+    bindLogout();
+
+    bindRefresh();
+
+    bindEscape();
+
+    await checkSession();
+
+  } catch (error) {
+
+    console.error(
+      "Erro ao iniciar painel:",
       error
-    ) {
-      console.error(
-        "Erro ao iniciar painel:",
-        error
-      );
+    );
 
-      $("#login")
-        ?.classList.remove(
-          "hidden"
-        );
+    toast(
+      "Erro ao iniciar o painel administrativo.",
+      "error"
+    );
 
-      $("#app")
-        ?.classList.add(
-          "hidden"
-        );
-    }
-  })();
+  }
+
+}
+
+/* =========================================================
+   INICIAR QUANDO O DOCUMENTO ESTIVER PRONTO
+========================================================= */
+
+if (
+  document.readyState ===
+  "loading"
+) {
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    boot
+  );
+
+} else {
+
+  boot();
+
+}
+
+/* =========================================================
+   FIM DO ADMIN.JS
+========================================================= */
 
 })();
