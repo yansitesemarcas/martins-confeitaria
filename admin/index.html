@@ -8,94 +8,108 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Martins Confeitaria — Painel Administrativo</title>
+  <meta
+    name="theme-color"
+    content="#67b0cb"
+  >
 
   <meta
-    name="description"
-    content="Painel administrativo da Martins Confeitaria."
+    http-equiv="Cache-Control"
+    content="no-cache, no-store, must-revalidate"
   >
 
-  <!-- CSS PRINCIPAL DO PAINEL -->
+  <meta
+    http-equiv="Pragma"
+    content="no-cache"
+  >
+
+  <meta
+    http-equiv="Expires"
+    content="0"
+  >
+
+  <title>Martins Confeitaria — Painel Administrativo</title>
+
   <link
     rel="stylesheet"
-    href="./admin.css?v=20261005"
+    href="./admin.css?cb=20261006"
   >
+
+  <style>
+    /* Evita que o painel apareça rapidamente com conteúdo antigo
+       enquanto os arquivos principais carregam. */
+    html {
+      visibility: hidden;
+    }
+
+    html.loaded {
+      visibility: visible;
+    }
+  </style>
 </head>
 
 <body>
 
-  <!-- =====================================================
+  <!-- =========================================================
        LOGIN
-       ===================================================== -->
+       ========================================================= -->
 
-  <section id="loginScreen">
+  <section id="loginScreen" class="login-screen">
 
     <div class="login-card">
 
-      <div class="login-brand">
-
-        <div id="loginLogoWrap">
-          <div class="login-logo-fallback">
-            M
-          </div>
-        </div>
-
-        <h1>
-          Martins Confeitaria
-        </h1>
-
-        <p>
-          Painel administrativo
-        </p>
-
+      <div class="login-logo">
+        <div class="login-logo-mark">M</div>
       </div>
+
+      <h1>Martins Confeitaria</h1>
+
+      <p class="login-subtitle">
+        Painel Administrativo
+      </p>
 
       <form id="loginForm">
 
-        <div class="field">
-
+        <div class="form-group">
           <label for="loginEmail">
             E-mail
           </label>
 
           <input
-            id="loginEmail"
-            name="email"
             type="email"
+            id="loginEmail"
             autocomplete="username"
+            placeholder="Digite seu e-mail"
             required
           >
-
         </div>
 
-        <div class="field">
-
+        <div class="form-group">
           <label for="loginPassword">
             Senha
           </label>
 
           <input
-            id="loginPassword"
-            name="password"
             type="password"
+            id="loginPassword"
             autocomplete="current-password"
+            placeholder="Digite sua senha"
             required
           >
-
         </div>
 
         <button
-          class="btn btn-primary btn-full"
           type="submit"
+          class="btn btn-primary btn-full"
+          id="loginButton"
         >
           Entrar
         </button>
 
-        <p
-          id="loginMsg"
+        <div
+          id="loginMessage"
           class="login-message"
-          aria-live="polite"
-        ></p>
+        ></div>
 
       </form>
 
@@ -104,735 +118,473 @@
   </section>
 
 
-  <!-- =====================================================
-       APLICAÇÃO
-       ===================================================== -->
+  <!-- =========================================================
+       PAINEL
+       ========================================================= -->
 
-  <section
-    id="app"
-    class="hidden"
+  <div
+    id="adminApp"
+    class="admin-app"
+    style="display:none;"
   >
 
-    <div class="admin-layout">
+    <!-- =======================================================
+         SIDEBAR
+         ======================================================= -->
 
+    <aside class="sidebar">
 
-      <!-- =================================================
-           SIDEBAR
-           ================================================= -->
+      <div class="sidebar-header">
 
-      <aside class="sidebar">
+        <div class="brand">
 
-        <div class="sidebar-brand">
-
-          <div class="sidebar-logo">
+          <div
+            id="adminLogo"
+            class="brand-logo"
+          >
             M
           </div>
 
-          <div>
-            <strong>
-              Martins
-            </strong>
-
-            <span>
-              Confeitaria
-            </span>
+          <div class="brand-text">
+            <strong>Martins</strong>
+            <span>Confeitaria</span>
           </div>
 
         </div>
-
-
-        <nav class="sidebar-nav">
-
-          <button
-            type="button"
-            class="sidebar-item active"
-            data-tab="products"
-          >
-            <span class="sidebar-icon">
-              🍰
-            </span>
-
-            <span>
-              Produtos
-            </span>
-          </button>
-
-
-          <button
-            type="button"
-            class="sidebar-item"
-            data-tab="orders"
-          >
-            <span class="sidebar-icon">
-              📦
-            </span>
-
-            <span>
-              Pedidos
-            </span>
-          </button>
-
-
-          <button
-            type="button"
-            class="sidebar-item"
-            data-tab="cakes"
-          >
-            <span class="sidebar-icon">
-              🎂
-            </span>
-
-            <span>
-              Encomendas
-            </span>
-          </button>
-
-
-          <button
-            type="button"
-            class="sidebar-item"
-            data-tab="content"
-          >
-            <span class="sidebar-icon">
-              ✏️
-            </span>
-
-            <span>
-              Conteúdo
-            </span>
-          </button>
-
-
-          <button
-            type="button"
-            class="sidebar-item"
-            data-tab="hours"
-          >
-            <span class="sidebar-icon">
-              🕐
-            </span>
-
-            <span>
-              Horários
-            </span>
-          </button>
-
-
-          <button
-            type="button"
-            class="sidebar-item"
-            data-tab="rules"
-          >
-            <span class="sidebar-icon">
-              📋
-            </span>
-
-            <span>
-              Regras
-            </span>
-          </button>
-
-
-          <button
-            type="button"
-            class="sidebar-item"
-            data-tab="media"
-          >
-            <span class="sidebar-icon">
-              🖼️
-            </span>
-
-            <span>
-              Mídia
-            </span>
-          </button>
-
-        </nav>
-
-
-        <div class="sidebar-footer">
-
-          <button
-            type="button"
-            class="sidebar-item"
-            id="refreshBtn"
-          >
-            <span class="sidebar-icon">
-              ↻
-            </span>
-
-            <span>
-              Atualizar
-            </span>
-          </button>
-
-
-          <button
-            type="button"
-            class="sidebar-item"
-            id="logout"
-          >
-            <span class="sidebar-icon">
-              ⇥
-            </span>
-
-            <span>
-              Sair
-            </span>
-          </button>
-
-        </div>
-
-      </aside>
-
-
-      <!-- =================================================
-           CONTEÚDO PRINCIPAL
-           ================================================= -->
-
-      <main class="admin-main">
-
-
-        <!-- HEADER -->
-
-        <header class="admin-header">
-
-          <div>
-
-            <h1>
-              Painel administrativo
-            </h1>
-
-            <p>
-              Martins Confeitaria
-            </p>
-
-          </div>
-
-          <div class="admin-header-actions">
-
-            <button
-              type="button"
-              class="btn btn-secondary"
-              id="headerRefreshBtn"
-            >
-              Atualizar
-            </button>
-
-          </div>
-
-        </header>
-
-
-        <!-- =================================================
-             ESTATÍSTICAS
-             ================================================= -->
-
-        <section class="stats-grid">
-
-          <div class="stat-card">
-
-            <div class="stat-icon">
-              🍰
-            </div>
-
-            <div>
-
-              <span>
-                Produtos
-              </span>
-
-              <strong id="statProducts">
-                0
-              </strong>
-
-            </div>
-
-          </div>
-
-
-          <div class="stat-card">
-
-            <div class="stat-icon">
-              ✓
-            </div>
-
-            <div>
-
-              <span>
-                Disponíveis
-              </span>
-
-              <strong id="statAvailable">
-                0
-              </strong>
-
-            </div>
-
-          </div>
-
-
-          <div class="stat-card">
-
-            <div class="stat-icon">
-              📦
-            </div>
-
-            <div>
-
-              <span>
-                Encomendas
-              </span>
-
-              <strong id="statOrders">
-                0
-              </strong>
-
-            </div>
-
-          </div>
-
-
-          <div class="stat-card">
-
-            <div class="stat-icon">
-              🛍️
-            </div>
-
-            <div>
-
-              <span>
-                Delivery
-              </span>
-
-              <strong id="statCakes">
-                0
-              </strong>
-
-            </div>
-
-          </div>
-
-        </section>
-
-
-        <!-- =================================================
-             CONTEÚDO DINÂMICO DAS ABAS
-             ================================================= -->
-
-        <section
-          id="tabContent"
-          class="tab-content"
-        ></section>
-
-      </main>
-
-    </div>
-
-  </section>
-
-
-  <!-- =====================================================
-       MODAL DE PRODUTO
-       ===================================================== -->
-
-  <div
-    id="productModal"
-    class="modal hidden"
-  >
-
-    <div class="modal-card">
-
-      <div class="modal-header">
-
-        <div>
-
-          <h2 class="modal-title">
-            Novo produto
-          </h2>
-
-          <p>
-            Cadastre ou edite um produto.
-          </p>
-
-        </div>
-
-        <button
-          type="button"
-          class="modal-close"
-          data-close
-          aria-label="Fechar"
-        >
-          ×
-        </button>
 
       </div>
 
 
-      <form id="productForm">
+      <!-- =====================================================
+           MENU
+           ===================================================== -->
+
+      <nav class="sidebar-nav">
+
+        <button
+          type="button"
+          class="nav-item active"
+          data-tab="products"
+        >
+          <span class="nav-icon">🛍️</span>
+          <span>Produtos</span>
+        </button>
+
+        <button
+          type="button"
+          class="nav-item"
+          data-tab="orders"
+        >
+          <span class="nav-icon">📦</span>
+          <span>Pedidos</span>
+        </button>
+
+        <button
+          type="button"
+          class="nav-item"
+          data-tab="cakes"
+        >
+          <span class="nav-icon">🎂</span>
+          <span>Pedidos de Bolo</span>
+        </button>
+
+        <button
+          type="button"
+          class="nav-item"
+          data-tab="content"
+        >
+          <span class="nav-icon">📝</span>
+          <span>Conteúdo</span>
+        </button>
+
+        <button
+          type="button"
+          class="nav-item"
+          data-tab="hours"
+        >
+          <span class="nav-icon">🕐</span>
+          <span>Horários</span>
+        </button>
+
+        <button
+          type="button"
+          class="nav-item"
+          data-tab="rules"
+        >
+          <span class="nav-icon">⚙️</span>
+          <span>Regras</span>
+        </button>
+
+        <button
+          type="button"
+          class="nav-item"
+          data-tab="media"
+        >
+          <span class="nav-icon">🖼️</span>
+          <span>Mídia</span>
+        </button>
+
+      </nav>
+
+
+      <!-- =====================================================
+           RODAPÉ SIDEBAR
+           ===================================================== -->
+
+      <div class="sidebar-footer">
+
+        <button
+          type="button"
+          id="logoutButton"
+          class="logout-button"
+        >
+          <span>🚪</span>
+          <span>Sair</span>
+        </button>
+
+      </div>
+
+    </aside>
+
+
+    <!-- =======================================================
+         CONTEÚDO PRINCIPAL
+         ======================================================= -->
+
+    <main class="main-content">
+
+      <!-- =====================================================
+           HEADER
+           ===================================================== -->
 
-        <!-- FOTO -->
+      <header class="topbar">
 
-        <div class="field">
-
-          <label for="productPhoto">
-            Foto do produto
-          </label>
-
-          <input
-            id="productPhoto"
-            name="photo"
-            type="file"
-            accept="image/*"
-          >
-
-          <small>
-            A imagem será otimizada automaticamente.
-          </small>
-
-        </div>
-
-
-        <!-- NOME -->
-
-        <div class="field">
-
-          <label for="productName">
-            Nome do produto
-          </label>
-
-          <input
-            id="productName"
-            name="name"
-            type="text"
-            required
-            placeholder="Ex.: Bolo de Chocolate"
-          >
-
-        </div>
-
-
-        <!-- CLASSIFICAÇÃO -->
-
-        <div class="field">
-
-          <label for="productCategory">
-            Classificação
-          </label>
-
-          <div
-            class="classification-field"
-            style="
-              display:flex;
-              gap:8px;
-              align-items:center;
-            "
-          >
-
-            <select
-              id="productCategory"
-              name="category"
-              style="flex:1"
-            >
-
-              <option value="">
-                Selecione uma classificação
-              </option>
-
-            </select>
-
-            <button
-              type="button"
-              class="btn btn-secondary"
-              id="newClassificationBtn"
-            >
-              + Nova
-            </button>
-
-          </div>
-
-          <small>
-            Ex.: Bolo, Brownie, Sobremesa...
-          </small>
-
-        </div>
-
-
-        <!-- ÁREA -->
-
-        <div class="field">
-
-          <label for="productArea">
-            Área
-          </label>
-
-          <select
-            id="productArea"
-            name="area"
-          >
-
-            <option value="cardapio">
-              Delivery
-            </option>
-
-            <option value="encomendas">
-              Encomendas
-            </option>
-
-          </select>
-
-          <small>
-            Delivery e pronta entrega são a mesma área.
-          </small>
-
-        </div>
-
-
-        <!-- PREÇO -->
-
-        <div class="form-grid">
-
-          <div class="field">
-
-            <label for="productPrice">
-              Preço
-            </label>
-
-            <input
-              id="productPrice"
-              name="price"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0,00"
-            >
-
-          </div>
-
-
-          <div class="field">
-
-            <label for="productDiscount">
-              Desconto (%)
-            </label>
-
-            <input
-              id="productDiscount"
-              name="discount"
-              type="number"
-              step="0.01"
-              min="0"
-              max="100"
-              placeholder="0"
-            >
-
-          </div>
-
-        </div>
-
-
-        <!-- ORDEM -->
-
-        <div class="field">
-
-          <label for="productSort">
-            Ordem de exibição
-          </label>
-
-          <input
-            id="productSort"
-            name="sort"
-            type="number"
-            min="0"
-            step="1"
-            placeholder="0"
-          >
-
-        </div>
-
-
-        <!-- GRAMATURA / SERVE -->
-
-        <div class="form-grid">
-
-          <div class="field">
-
-            <label for="productGramatura">
-              Gramatura
-            </label>
-
-            <input
-              id="productGramatura"
-              name="gramatura"
-              type="text"
-              placeholder="Ex.: 500g"
-            >
-
-          </div>
-
-
-          <div class="field">
-
-            <label for="productServeAte">
-              Serve até
-            </label>
-
-            <input
-              id="productServeAte"
-              name="serve_ate"
-              type="text"
-              placeholder="Ex.: 10 pessoas"
-            >
-
-          </div>
-
-        </div>
-
-
-        <!-- DESCRIÇÃO -->
-
-        <div class="field">
-
-          <label for="productDescription">
-            Descrição
-          </label>
-
-          <textarea
-            id="productDescription"
-            name="description"
-            rows="5"
-            placeholder="Descrição do produto..."
-          ></textarea>
-
-        </div>
-
-
-        <!-- OPÇÕES -->
-
-        <div class="checkbox-grid">
-
-          <label class="checkbox-field">
-
-            <input
-              id="productAvailable"
-              name="available"
-              type="checkbox"
-              checked
-            >
-
-            <span>
-              Produto disponível
-            </span>
-
-          </label>
-
-
-          <label class="checkbox-field">
-
-            <input
-              id="productFeatured"
-              name="featured"
-              type="checkbox"
-            >
-
-            <span>
-              Produto em destaque
-            </span>
-
-          </label>
-
-
-          <label class="checkbox-field">
-
-            <input
-              id="productAppointment"
-              name="appointment_required"
-              type="checkbox"
-            >
-
-            <span>
-              Exige agendamento
-            </span>
-
-          </label>
-
-        </div>
-
-
-        <!-- AÇÕES -->
-
-        <div class="modal-actions">
+        <div class="topbar-left">
 
           <button
             type="button"
-            class="btn btn-secondary"
-            data-close
+            id="mobileMenuButton"
+            class="mobile-menu-button"
+            aria-label="Abrir menu"
           >
-            Cancelar
+            ☰
           </button>
 
+          <div>
+            <h1 id="pageTitle">
+              Produtos
+            </h1>
+
+            <p id="pageSubtitle">
+              Gerencie os produtos da Martins Confeitaria.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="topbar-right">
+
           <button
-            type="submit"
-            class="btn btn-primary"
+            type="button"
+            id="refreshButton"
+            class="btn btn-secondary"
           >
-            Salvar produto
+            ↻ Atualizar
           </button>
 
         </div>
 
-      </form>
+      </header>
+
+
+      <!-- =====================================================
+           DASHBOARD / ESTATÍSTICAS
+           ===================================================== -->
+
+      <section
+        id="statsSection"
+        class="stats-grid"
+      >
+
+        <div class="stat-card">
+
+          <div class="stat-icon">
+            🛍️
+          </div>
+
+          <div>
+            <span class="stat-label">
+              Produtos
+            </span>
+
+            <strong
+              id="statProducts"
+              class="stat-value"
+            >
+              0
+            </strong>
+          </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+          <div class="stat-icon">
+            ✅
+          </div>
+
+          <div>
+            <span class="stat-label">
+              Disponíveis
+            </span>
+
+            <strong
+              id="statAvailable"
+              class="stat-value"
+            >
+              0
+            </strong>
+          </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+          <div class="stat-icon">
+            📦
+          </div>
+
+          <div>
+            <span class="stat-label">
+              Pedidos
+            </span>
+
+            <strong
+              id="statOrders"
+              class="stat-value"
+            >
+              0
+            </strong>
+          </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+          <div class="stat-icon">
+            🎂
+          </div>
+
+          <div>
+            <span class="stat-label">
+              Encomendas
+            </span>
+
+            <strong
+              id="statCakes"
+              class="stat-value"
+            >
+              0
+            </strong>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================================
+           ÁREA DAS ABAS
+           ===================================================== -->
+
+      <section class="content-area">
+
+        <!-- PRODUTOS -->
+
+        <div
+          id="tab-products"
+          class="tab-content active"
+        ></div>
+
+
+        <!-- PEDIDOS -->
+
+        <div
+          id="tab-orders"
+          class="tab-content"
+          style="display:none;"
+        ></div>
+
+
+        <!-- PEDIDOS DE BOLO -->
+
+        <div
+          id="tab-cakes"
+          class="tab-content"
+          style="display:none;"
+        ></div>
+
+
+        <!-- CONTEÚDO -->
+
+        <div
+          id="tab-content"
+          class="tab-content"
+          style="display:none;"
+        ></div>
+
+
+        <!-- HORÁRIOS -->
+
+        <div
+          id="tab-hours"
+          class="tab-content"
+          style="display:none;"
+        ></div>
+
+
+        <!-- REGRAS -->
+
+        <div
+          id="tab-rules"
+          class="tab-content"
+          style="display:none;"
+        ></div>
+
+
+        <!-- MÍDIA -->
+
+        <div
+          id="tab-media"
+          class="tab-content"
+          style="display:none;"
+        ></div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- =========================================================
+       TOAST
+       ========================================================= -->
+
+  <div
+    id="toast"
+    class="toast"
+    aria-live="polite"
+  ></div>
+
+
+  <!-- =========================================================
+       MODAL
+       ========================================================= -->
+
+  <div
+    id="modal"
+    class="modal"
+    style="display:none;"
+  >
+
+    <div class="modal-overlay"></div>
+
+    <div class="modal-content">
+
+      <button
+        type="button"
+        id="modalClose"
+        class="modal-close"
+        aria-label="Fechar"
+      >
+        ×
+      </button>
+
+      <div id="modalBody"></div>
 
     </div>
 
   </div>
 
 
-  <!-- =====================================================
-       SUPABASE
-       ===================================================== -->
-
-  <script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-  ></script>
-
-
-  <!-- CONFIGURAÇÃO DO PROJETO -->
-
-  <script src="../config.js"></script>
-
-
-  <!-- PADRÕES DO SITE -->
-
-  <script src="../defaults.js"></script>
-
-
-  <!-- JAVASCRIPT DO ADMIN -->
-
-  <script
-    src="./admin.js?v=20261005"
-  ></script>
-
-
-  <!-- ATUALIZAÇÃO DO BOTÃO DO HEADER -->
+  <!-- =========================================================
+       SCRIPTS
+       ========================================================= -->
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const headerRefreshBtn =
-        document.getElementById("headerRefreshBtn");
+    /*
+     * Cache-busting automático.
+     *
+     * O navegador recebe uma URL diferente para os arquivos JS
+     * sempre que esta página é carregada.
+     *
+     * O timestamp impede que uma versão antiga do GitHub Pages
+     * fique presa no cache do celular.
+     */
 
-      const refreshBtn =
-        document.getElementById("refreshBtn");
+    (() => {
 
-      if (
-        headerRefreshBtn &&
-        refreshBtn
-      ) {
-        headerRefreshBtn.addEventListener(
-          "click",
-          () => refreshBtn.click()
-        );
-      }
-    });
+      const cacheBuster = Date.now();
+
+      const scripts = [
+
+        "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
+
+        "../config.js",
+
+        "../defaults.js",
+
+        "./admin.js"
+
+      ];
+
+      scripts.forEach(src => {
+
+        const script = document.createElement("script");
+
+        script.src =
+          src +
+          (src.includes("?") ? "&" : "?") +
+          "cb=" +
+          cacheBuster;
+
+        script.async = false;
+
+        document.body.appendChild(script);
+
+      });
+
+
+      /*
+       * Mostra o HTML depois que os scripts principais
+       * foram adicionados à página.
+       */
+
+      window.addEventListener(
+        "load",
+        () => {
+
+          document.documentElement.classList.add("loaded");
+
+        }
+      );
+
+      /*
+       * Segurança: se alguma coisa impedir o evento load,
+       * libera a página depois de alguns segundos.
+       */
+
+      setTimeout(() => {
+
+        document.documentElement.classList.add("loaded");
+
+      }, 5000);
+
+    })();
   </script>
 
 </body>
