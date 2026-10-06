@@ -1,32 +1,4269 @@
-Perfeito. **Agora sim temos a estrutura exata do `admin.html` que está no GitHub.** [GitHub](https://raw.githubusercontent.com/yansitesemarcas/martins-confeitaria/main/admin/index.html)
+/* =========================================================
+   MARTINS CONFEITARIA
+   PAINEL ADMINISTRATIVO
+   ADMIN.JS
+   ========================================================= */
 
-E tem uma informação importante: esse `admin.html` **já está preparado para o que você pediu**. Ele já possui:
+(() => {
+  "use strict";
 
-- `Produtos`
-- `Pedidos`
-- `Bolos personalizados`
-- `Conteúdos`
-- `Horários`
-- `Regras`
-- `Mídia`
-- classificação de produto para **Delivery / Pronta entrega / Encomendas**
-- formulário de produto com todos os IDs necessários
-- carregamento do `./admin.js?v=20261005` [GitHub](https://raw.githubusercontent.com/yansitesemarcas/martins-confeitaria/main/admin/index.html)
+  /* =========================================================
+     CONFIGURAÇÃO
+     ========================================================= */
 
-Então **não precisamos mexer no `admin.html`**.
+  const SUPABASE_URL =
+    window.MARTINS_CONFIG?.SUPABASE_URL ||
+    "https://grdyxoflbqilmgpzlrzm.supabase.co";
 
-O próximo passo correto é eu pegar **esse HTML como referência dos IDs** e reconstruir o `admin.js` em cima dele, preservando a estrutura.
+  const SUPABASE_ANON_KEY =
+    window.MARTINS_CONFIG?.SUPABASE_ANON_KEY ||
+    "sb_publishable_RwiMCpC1NAsRIaB1LH5mQw_L-pgOEqH";
 
-Vou fazer exatamente nas 7 partes que você pediu:
+  let db = null;
 
-1. recuperar a lógica original;
-2. manter os IDs atuais;
-3. separar **Produtos → Pronta Entrega / Encomendas**;
-4. separar **Pedidos → Pronta Entrega / Encomendas**;
-5. manter **Imprimir**;
-6. corrigir **Salvar alterações** das encomendas;
-7. corrigir **criação/edição de produtos no Supabase**.
+  const DEFAULTS =
+    window.MARTINS_DEFAULTS || {};
 
-E não vou reconstruir o painel inteiro nem alterar o `admin.html`.
+  /* =========================================================
+     ESTADO
+     ========================================================= */
 
-**Pode deixar esse `admin.html` como está.**
+  const state = {
+    settings: {},
+    products: [],
+    categories: [],
+    editingProductId: null,
+    activeTab: "products",
+    loading: false
+  };
+
+  /* =========================================================
+     ELEMENTOS
+     ========================================================= */
+
+  const $ = (selector) =>
+    document.querySelector(selector);
+
+  const $$ = (selector) =>
+    Array.from(document.querySelectorAll(selector));
+
+  const loginScreen = $("#loginScreen");
+  const app = $("#app");
+  const loginForm = $("#loginForm");
+  const loginMsg = $("#loginMsg");
+  const logoutBtn = $("#logout");
+  const refreshBtn = $("#refreshBtn");
+  const tabContent = $("#tabContent");
+  const productModal = $("#productModal");
+  const productForm = $("#productForm");
+
+  /* =========================================================
+     UTILITÁRIOS
+     ========================================================= */
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function money(value) {
+    const number = Number(value || 0);
+
+    return number.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+  }
+
+  function slugify(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/-+/g, "-");
+  }
+
+  function toast(message, type = "success") {
+    let box = $("#adminToast");
+
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "adminToast";
+
+      Object.assign(box.style, {
+        position: "fixed",
+        right: "20px",
+        bottom: "20px",
+        zIndex: "99999",
+        padding: "14px 18px",
+        borderRadius: "12px",
+        color: "#fff",
+        fontWeight: "700",
+        boxShadow: "0 8px 30px rgba(0,0,0,.18)",
+        maxWidth: "360px",
+        fontSize: "14px"
+      });
+
+      document.body.appendChild(box);
+    }
+
+    box.style.background =
+      type === "error"
+        ? "#c0392b"
+        : type === "warning"
+        ? "#d68910"
+        : "#2b7896";
+
+    box.textContent = message;
+    box.style.display = "block";
+
+    clearTimeout(box._timer);
+
+    box._timer = setTimeout(() => {
+      box.style.display = "none";
+    }, 3500);
+  }
+
+  function showLoginMessage(message, error = true) {
+    if (!loginMsg) return;
+
+    loginMsg.textContent = message;
+    loginMsg.style.color =
+      error ? "#c0392b" : "#2b7896";
+  }
+
+  function setLoading(
+    button,
+    loading,
+    originalText = "Salvar"
+  ) {
+    if (!button) return;
+
+    if (loading) {
+      button.dataset.originalText =
+        button.textContent || originalText;
+
+      button.disabled = true;
+      button.textContent = "Salvando...";
+    } else {
+      button.disabled = false;
+      button.textContent =
+        button.dataset.originalText ||
+        originalText;
+    }
+  }
+
+  /* =========================================================
+     LOGO
+     ========================================================= */
+
+  function loadAdminLogo() {
+    const wrap = $("#loginLogoWrap");
+
+    if (!wrap) return;
+
+    const possibleLogo =
+      DEFAULTS.logo ||
+      DEFAULTS.logo_url ||
+      state.settings.logo ||
+      state.settings.logo_url ||
+      state.settings.logoUrl ||
+      "";
+
+    if (possibleLogo) {
+      wrap.innerHTML = `
+        <img
+          src="${escapeHtml(possibleLogo)}"
+          alt="Martins Confeitaria"
+          class="login-logo"
+        >
+      `;
+    }
+  }
+
+  /* =========================================================
+     CLASSIFICAÇÕES
+     ========================================================= */
+
+  function defaultCategories() {
+    return Array.isArray(DEFAULTS.categories)
+      ? [...DEFAULTS.categories]
+      : [
+          "Bolos no Pote",
+          "Sobremesas",
+          "Copos da Felicidade",
+          "Bolos 8 fatias",
+          "Bolos 10 a 12 fatias",
+          "Afogadinhos Baby",
+          "Brownies",
+          "Kits"
+        ];
+  }
+
+  function normalizeCategories(categories) {
+    if (!Array.isArray(categories)) {
+      return defaultCategories();
+    }
+
+    return [
+      ...new Set(
+        categories
+          .map((item) =>
+            String(item || "").trim()
+          )
+          .filter(Boolean)
+      )
+    ];
+  }
+
+  async function saveCategories() {
+    if (!db) {
+      throw new Error(
+        "Supabase não está disponível."
+      );
+    }
+
+    const payload = {
+      ...state.settings,
+      categories: state.categories
+    };
+
+    const { error } = await db
+      .from("settings")
+      .upsert(
+        {
+          key: "site",
+          value: payload
+        },
+        {
+          onConflict: "key"
+        }
+      );
+
+    if (error) {
+      console.error(error);
+      throw error;
+    }
+
+    state.settings = payload;
+  }
+
+  async function createClassification() {
+    const name = window.prompt(
+      "Digite o nome da nova classificação:"
+    );
+
+    if (name === null) return;
+
+    const cleanName = name.trim();
+
+    if (!cleanName) {
+      toast(
+        "Digite um nome válido.",
+        "warning"
+      );
+      return;
+    }
+
+    const alreadyExists =
+      state.categories.some(
+        (category) =>
+          category.toLowerCase() ===
+          cleanName.toLowerCase()
+      );
+
+    if (alreadyExists) {
+      toast(
+        "Essa classificação já existe.",
+        "warning"
+      );
+      return;
+    }
+
+    state.categories.push(cleanName);
+
+    state.categories.sort((a, b) =>
+      a.localeCompare(b, "pt-BR")
+    );
+
+    try {
+      await saveCategories();
+      renderProductTab();
+
+      toast(
+        "Classificação criada com sucesso."
+      );
+    } catch (error) {
+      console.error(error);
+
+      state.categories =
+        state.categories.filter(
+          (category) =>
+            category !== cleanName
+        );
+
+      toast(
+        "Não foi possível salvar a classificação.",
+        "error"
+      );
+    }
+  }
+
+  /* =========================================================
+     ÁREAS DOS PRODUTOS
+     ========================================================= */
+
+  function normalizeArea(area, product = {}) {
+    const value = String(area || "")
+      .toLowerCase()
+      .trim();
+
+    if (
+      value === "encomendas" ||
+      value === "encomenda"
+    ) {
+      return "encomendas";
+    }
+
+    const name = String(product.name || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+
+    if (
+      name.includes("naked cake") ||
+      name.includes("chantininho")
+    ) {
+      return "encomendas";
+    }
+
+    if (
+      name.includes("oreo") ||
+      name.includes("kit kat") ||
+      name.includes("kitkat") ||
+      name.includes("nutella") ||
+      name.includes("kinder bueno")
+    ) {
+      return "encomendas";
+    }
+
+    if (
+      name.includes("brigadeiro classico") ||
+      name.includes("brigadeiros classicos") ||
+      name.includes("brigadeiro premium") ||
+      name.includes("brigadeiros premium")
+    ) {
+      return "encomendas";
+    }
+
+    return "cardapio";
+  }
+    async function deleteClassification(name) {
+    const used = state.products.some(
+      (product) =>
+        String(product.category || "").trim() ===
+        String(name).trim()
+    );
+
+    if (used) {
+      toast(
+        "Essa classificação está sendo usada por um produto.",
+        "warning"
+      );
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Excluir a classificação "${name}"?`
+    );
+
+    if (!confirmed) return;
+
+    const oldCategories = [
+      ...state.categories
+    ];
+
+    state.categories =
+      state.categories.filter(
+        (category) =>
+          category !== name
+      );
+
+    try {
+      await saveCategories();
+      renderProductTab();
+
+      toast("Classificação excluída.");
+    } catch (error) {
+      state.categories = oldCategories;
+
+      toast(
+        "Não foi possível excluir a classificação.",
+        "error"
+      );
+    }
+  }
+
+  /* =========================================================
+     NORMALIZAÇÃO DA ÁREA
+     ========================================================= */
+
+  function normalizeArea(area, product = {}) {
+    const value = String(area || "")
+      .toLowerCase()
+      .trim();
+
+    if (
+      value === "encomendas" ||
+      value === "encomenda"
+    ) {
+      return "encomendas";
+    }
+
+    const name = String(product.name || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+
+    if (
+      name.includes("naked cake") ||
+      name.includes("chantininho")
+    ) {
+      return "encomendas";
+    }
+
+    if (
+      name.includes("oreo") ||
+      name.includes("kit kat") ||
+      name.includes("kitkat") ||
+      name.includes("nutella") ||
+      name.includes("kinder bueno")
+    ) {
+      return "encomendas";
+    }
+
+    if (
+      name.includes("brigadeiro classico") ||
+      name.includes("brigadeiros classicos") ||
+      name.includes("brigadeiro premium") ||
+      name.includes("brigadeiros premium")
+    ) {
+      return "encomendas";
+    }
+
+    return "cardapio";
+  }
+
+  function areaLabel(area) {
+    return normalizeArea(area) === "encomendas"
+      ? "Encomendas"
+      : "Delivery";
+  }
+
+  function getProductImage(product) {
+    return (
+      product.image_url ||
+      product.image ||
+      product.photo_url ||
+      product.photo ||
+      product.imagem ||
+      product.foto ||
+      ""
+    );
+  }
+
+  /* =========================================================
+     CONFIGURAÇÕES
+     ========================================================= */
+
+  async function loadSettings() {
+    if (!db) {
+      throw new Error(
+        "Supabase não está disponível."
+      );
+    }
+
+    const { data, error } = await db
+      .from("settings")
+      .select("*")
+      .eq("key", "site")
+      .maybeSingle();
+
+    if (error) {
+      console.error(
+        "Erro settings:",
+        error
+      );
+
+      state.settings = {
+        ...DEFAULTS
+      };
+
+      state.categories =
+        defaultCategories();
+
+      loadAdminLogo();
+
+      return;
+    }
+
+    const value = data?.value || {};
+
+    state.settings = {
+      ...DEFAULTS,
+      ...value
+    };
+
+    state.categories =
+      normalizeCategories(
+        value.categories ||
+          DEFAULTS.categories
+      );
+
+    loadAdminLogo();
+  }
+
+  /* =========================================================
+     PRODUTOS
+     ========================================================= */
+
+  async function loadProducts() {
+    if (!db) {
+      throw new Error(
+        "Supabase não está disponível."
+      );
+    }
+
+    const { data, error } = await db
+      .from("products")
+      .select("*")
+      .order("sort", {
+        ascending: true,
+        nullsFirst: false
+      });
+
+    if (error) {
+      console.error(
+        "Erro produtos:",
+        error
+      );
+
+      throw error;
+    }
+
+    state.products =
+      Array.isArray(data)
+        ? data.map((product) => ({
+            ...product,
+            area: normalizeArea(
+              product.area,
+              product
+            )
+          }))
+        : [];
+  }
+
+  /* =========================================================
+     ESTATÍSTICAS
+     ========================================================= */
+
+  function updateStats() {
+    const total =
+      state.products.length;
+
+    const available =
+      state.products.filter(
+        (product) =>
+          product.available !== false
+      ).length;
+
+    const delivery =
+      state.products.filter(
+        (product) =>
+          normalizeArea(
+            product.area,
+            product
+          ) === "cardapio"
+      ).length;
+
+    const encomendas =
+      state.products.filter(
+        (product) =>
+          normalizeArea(
+            product.area,
+            product
+          ) === "encomendas"
+      ).length;
+
+    const statProducts =
+      $("#statProducts");
+
+    const statAvailable =
+      $("#statAvailable");
+
+    const statOrders =
+      $("#statOrders");
+
+    const statCakes =
+      $("#statCakes");
+
+    if (statProducts)
+      statProducts.textContent = total;
+
+    if (statAvailable)
+      statAvailable.textContent = available;
+
+    if (statOrders)
+      statOrders.textContent = encomendas;
+
+    if (statCakes)
+      statCakes.textContent = delivery;
+  }
+
+  /* =========================================================
+     CAMPOS
+     ========================================================= */
+
+  function getField(id) {
+    return document.getElementById(id);
+  }
+
+  function setField(id, value) {
+    const field = getField(id);
+
+    if (!field) return;
+
+    if (field.type === "checkbox") {
+      field.checked = Boolean(value);
+    } else {
+      field.value = value ?? "";
+    }
+  }
+    function getFieldValue(id) {
+    const field = getField(id);
+
+    if (!field) return "";
+
+    if (field.type === "checkbox") {
+      return field.checked;
+    }
+
+    return field.value;
+  }
+
+  function populateClassificationSelect(
+    selected = ""
+  ) {
+    const select =
+      getField("productCategory");
+
+    if (!select) return;
+
+    const categories =
+      normalizeCategories([
+        ...state.categories,
+        selected
+      ]);
+
+    select.innerHTML = `
+      <option value="">
+        Selecione uma classificação
+      </option>
+
+      ${categories
+        .map(
+          (category) => `
+            <option value="${escapeHtml(
+              category
+            )}">
+              ${escapeHtml(
+                category
+              )}
+            </option>
+          `
+        )
+        .join("")}
+    `;
+
+    select.value = selected || "";
+  }
+
+  function populateAreaSelect(
+    selected = "cardapio"
+  ) {
+    const select =
+      getField("productArea");
+
+    if (!select) return;
+
+    const normalized =
+      normalizeArea(selected);
+
+    select.innerHTML = `
+      <option value="cardapio">
+        Delivery
+      </option>
+
+      <option value="encomendas">
+        Encomendas
+      </option>
+    `;
+
+    select.value = normalized;
+  }
+
+  function ensureProductFormFields() {
+    if (!productForm) return;
+
+    if (!getField("productCategory")) {
+      const areaField =
+        getField("productArea")?.closest(
+          ".field"
+        ) ||
+        getField("productArea")?.parentElement;
+
+      if (areaField) {
+        const wrapper =
+          document.createElement("div");
+
+        wrapper.className = "field";
+
+        wrapper.innerHTML = `
+          <label for="productCategory">
+            Classificação
+          </label>
+
+          <div style="
+            display:flex;
+            gap:8px;
+            align-items:center;
+          ">
+
+            <select
+              id="productCategory"
+              name="category"
+              style="flex:1"
+            ></select>
+
+            <button
+              type="button"
+              class="btn btn-secondary"
+              id="newClassificationBtn"
+              style="white-space:nowrap"
+            >
+              + Nova
+            </button>
+
+          </div>
+
+          <small style="
+            display:block;
+            margin-top:6px;
+            opacity:.7;
+          ">
+            Ex.: Bolo, Brownie, Sobremesa...
+          </small>
+        `;
+
+        areaField.parentNode.insertBefore(
+          wrapper,
+          areaField
+        );
+      }
+    }
+
+    if (getField("productArea")) {
+      populateAreaSelect(
+        getFieldValue(
+          "productArea"
+        ) || "cardapio"
+      );
+    }
+
+    const newClassificationBtn =
+      $("#newClassificationBtn");
+
+    if (
+      newClassificationBtn &&
+      !newClassificationBtn.dataset.bound
+    ) {
+      newClassificationBtn.dataset.bound =
+        "true";
+
+      newClassificationBtn.addEventListener(
+        "click",
+        async () => {
+          await createClassification();
+        }
+      );
+    }
+
+    populateClassificationSelect(
+      getFieldValue(
+        "productCategory"
+      )
+    );
+  }
+
+  /* =========================================================
+     MODAL PRODUTO
+     ========================================================= */
+
+  function openProductModal(product = null) {
+    if (!productModal || !productForm) {
+      return;
+    }
+
+    /*
+      IMPORTANTE:
+      Quando editamos, guardamos o ID numérico existente.
+      Quando criamos, fica null.
+    */
+    state.editingProductId =
+      product?.id || null;
+
+    ensureProductFormFields();
+
+    productForm.reset();
+
+    setField(
+      "productName",
+      product?.name || ""
+    );
+
+    setField(
+      "productPrice",
+      product?.price ?? ""
+    );
+
+    setField(
+      "productDiscount",
+      product?.discount_percent ?? ""
+    );
+
+    setField(
+      "productSort",
+      product?.sort ?? ""
+    );
+
+    setField(
+      "productGramatura",
+      product?.gramatura ?? ""
+    );
+
+    setField(
+      "productServeAte",
+      product?.serve_ate ?? ""
+    );
+
+    setField(
+      "productDescription",
+      product?.description ?? ""
+    );
+
+    setField(
+      "productAvailable",
+      product
+        ? product.available !== false
+        : true
+    );
+
+    setField(
+      "productFeatured",
+      product?.featured ?? false
+    );
+
+    setField(
+      "productAppointment",
+      product?.appointment_required ?? false
+    );
+
+    populateClassificationSelect(
+      product?.category || ""
+    );
+
+    populateAreaSelect(
+      normalizeArea(
+        product?.area,
+        product || {}
+      )
+    );
+
+    const title =
+      productModal.querySelector(
+        ".modal-title, h2, h3"
+      );
+
+    if (title) {
+      title.textContent =
+        product
+          ? "Editar produto"
+          : "Novo produto";
+    }
+
+    productModal.classList.remove(
+      "hidden"
+    );
+
+    productModal.style.display =
+      "flex";
+  }
+
+  function closeProductModal() {
+    if (!productModal) return;
+
+    productModal.classList.add(
+      "hidden"
+    );
+
+    productModal.style.display = "";
+
+    state.editingProductId = null;
+  }
+
+  /* =========================================================
+     COMPRESSÃO DE IMAGEM
+     ========================================================= */
+
+  function compressImage(file) {
+    return new Promise(
+      (resolve, reject) => {
+        if (!file) {
+          resolve("");
+          return;
+        }
+
+        if (
+          !file.type.startsWith("image/")
+        ) {
+          reject(
+            new Error(
+              "O arquivo selecionado não é uma imagem."
+            )
+          );
+
+          return;
+        }
+
+        const reader =
+          new FileReader();
+
+        reader.onload = () => {
+          const img =
+            new Image();
+
+          img.onload = () => {
+            const maxSize = 1200;
+
+            let width =
+              img.width;
+
+            let height =
+              img.height;
+
+            if (
+              width > maxSize ||
+              height > maxSize
+            ) {
+              const ratio =
+                Math.min(
+                  maxSize / width,
+                  maxSize / height
+                );
+
+              width =
+                Math.round(
+                  width * ratio
+                );
+
+              height =
+                Math.round(
+                  height * ratio
+                );
+            }
+
+            const canvas =
+              document.createElement(
+                "canvas"
+              );
+
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx =
+              canvas.getContext(
+                "2d"
+              );
+
+            ctx.drawImage(
+              img,
+              0,
+              0,
+              width,
+              height
+            );
+
+            resolve(
+              canvas.toDataURL(
+                "image/jpeg",
+                0.82
+              )
+            );
+          };
+
+          img.onerror = () =>
+            reject(
+              new Error(
+                "Não foi possível carregar a imagem."
+              )
+            );
+
+          img.src =
+            reader.result;
+        };
+
+        reader.onerror = () =>
+          reject(
+            new Error(
+              "Não foi possível ler a imagem."
+            )
+          );
+
+        reader.readAsDataURL(file);
+      }
+    );
+  }
+    /* =========================================================
+     SALVAR PRODUTO
+     ========================================================= */
+
+  async function saveProduct(event) {
+    event.preventDefault();
+
+    if (!productForm) return;
+
+    if (!db) {
+      toast(
+        "Supabase não está disponível.",
+        "error"
+      );
+      return;
+    }
+
+    const submitButton =
+      productForm.querySelector(
+        'button[type="submit"]'
+      );
+
+    setLoading(
+      submitButton,
+      true,
+      "Salvar produto"
+    );
+
+    try {
+      /*
+        editingId:
+        - null = produto novo
+        - número = produto existente
+      */
+      const editingId =
+        state.editingProductId;
+
+      const name =
+        String(
+          getFieldValue(
+            "productName"
+          ) || ""
+        ).trim();
+
+      if (!name) {
+        throw new Error(
+          "Informe o nome do produto."
+        );
+      }
+
+      const category =
+        String(
+          getFieldValue(
+            "productCategory"
+          ) || ""
+        ).trim();
+
+      if (!category) {
+        throw new Error(
+          "Selecione uma classificação."
+        );
+      }
+
+      const area =
+        normalizeArea(
+          getFieldValue(
+            "productArea"
+          ),
+          {
+            name
+          }
+        );
+
+      const priceValue =
+        getFieldValue(
+          "productPrice"
+        );
+
+      const price =
+        priceValue === ""
+          ? 0
+          : Number(
+              String(priceValue).replace(
+                ",",
+                "."
+              )
+            );
+
+      if (Number.isNaN(price)) {
+        throw new Error(
+          "Informe um preço válido."
+        );
+      }
+
+      const discountValue =
+        getFieldValue(
+          "productDiscount"
+        );
+
+      const discount =
+        discountValue === ""
+          ? 0
+          : Number(
+              String(
+                discountValue
+              ).replace(
+                ",",
+                "."
+              )
+            );
+
+      const sortValue =
+        getFieldValue(
+          "productSort"
+        );
+
+      const sort =
+        sortValue === ""
+          ? 0
+          : Number(sortValue);
+
+      const file =
+        getField(
+          "productPhoto"
+        )?.files?.[0];
+
+      let imageUrl = "";
+
+      if (file) {
+        imageUrl =
+          await compressImage(file);
+      }
+
+      /*
+        Procura o produto original quando estamos editando.
+      */
+      const currentProduct =
+        state.products.find(
+          (product) =>
+            String(product.id) ===
+            String(editingId)
+        );
+
+      if (
+        !imageUrl &&
+        currentProduct
+      ) {
+        imageUrl =
+          getProductImage(
+            currentProduct
+          );
+      }
+
+      /*
+        ======================================================
+        CORREÇÃO PRINCIPAL
+        ======================================================
+
+        NÃO criamos mais um ID como:
+        "brigadeiro-1791250127782"
+
+        A coluna products.id é BIGINT.
+
+        Produto novo:
+        -> NÃO enviamos id.
+        -> Supabase gera o ID numérico.
+
+        Produto existente:
+        -> enviamos somente o ID numérico existente.
+      */
+
+      const payload = {
+        name,
+
+        price,
+
+        category,
+
+        area,
+
+        discount_percent:
+          Number.isFinite(discount)
+            ? discount
+            : 0,
+
+        sort:
+          Number.isFinite(sort)
+            ? sort
+            : 0,
+
+        gramatura:
+          getFieldValue(
+            "productGramatura"
+          ),
+
+        serve_ate:
+          getFieldValue(
+            "productServeAte"
+          ),
+
+        description:
+          getFieldValue(
+            "productDescription"
+          ),
+
+        available:
+          Boolean(
+            getFieldValue(
+              "productAvailable"
+            )
+          ),
+
+        featured:
+          Boolean(
+            getFieldValue(
+              "productFeatured"
+            )
+          ),
+
+        appointment_required:
+          Boolean(
+            getFieldValue(
+              "productAppointment"
+            )
+          ),
+
+        image_url:
+          imageUrl || null
+      };
+
+      let response;
+
+      if (editingId) {
+        response = await db
+          .from("products")
+          .update(payload)
+          .eq("id", editingId)
+          .select()
+          .single();
+      } else {
+        response = await db
+          .from("products")
+          .insert(payload)
+          .select()
+          .single();
+      }
+
+      if (response.error) {
+        console.error(
+          "Erro ao salvar produto:",
+          response.error
+        );
+
+        throw response.error;
+      }
+
+      const savedProduct =
+        response.data;
+
+      if (editingId) {
+        state.products =
+          state.products.map(
+            (product) =>
+              String(product.id) ===
+              String(editingId)
+                ? {
+                    ...savedProduct,
+                    area: normalizeArea(
+                      savedProduct.area,
+                      savedProduct
+                    )
+                  }
+                : product
+          );
+      } else {
+        state.products.push({
+          ...savedProduct,
+          area: normalizeArea(
+            savedProduct.area,
+            savedProduct
+          )
+        });
+      }
+
+      closeProductModal();
+
+      renderProductTab();
+
+      updateStats();
+
+      toast(
+        editingId
+          ? "Produto atualizado com sucesso."
+          : "Produto criado com sucesso."
+      );
+    } catch (error) {
+      console.error(error);
+
+      toast(
+        error?.message ||
+          "Não foi possível salvar o produto.",
+        "error"
+      );
+    } finally {
+      setLoading(
+        submitButton,
+        false,
+        "Salvar produto"
+      );
+    }
+  }
+    /* =========================================================
+     EXCLUIR PRODUTO
+     ========================================================= */
+
+  async function deleteProduct(id) {
+    if (!db) {
+      toast(
+        "Supabase não está disponível.",
+        "error"
+      );
+      return;
+    }
+
+    const product =
+      state.products.find(
+        (item) =>
+          String(item.id) ===
+          String(id)
+      );
+
+    if (!product) return;
+
+    const confirmed =
+      window.confirm(
+        `Excluir "${product.name}"?`
+      );
+
+    if (!confirmed) return;
+
+    try {
+      const numericId =
+        Number(id);
+
+      if (!Number.isInteger(numericId)) {
+        throw new Error(
+          "ID do produto inválido."
+        );
+      }
+
+      const { error } =
+        await db
+          .from("products")
+          .delete()
+          .eq(
+            "id",
+            numericId
+          );
+
+      if (error) throw error;
+
+      state.products =
+        state.products.filter(
+          (item) =>
+            String(item.id) !==
+            String(id)
+        );
+
+      updateStats();
+
+      renderProductTab();
+
+      toast(
+        "Produto excluído."
+      );
+
+    } catch (error) {
+      console.error(error);
+
+      toast(
+        "Não foi possível excluir o produto.",
+        "error"
+      );
+    }
+  }
+
+  /* =========================================================
+     DUPLICAR PRODUTO
+     ========================================================= */
+
+  async function duplicateProduct(id) {
+    if (!db) {
+      toast(
+        "Supabase não está disponível.",
+        "error"
+      );
+      return;
+    }
+
+    const original =
+      state.products.find(
+        (product) =>
+          String(product.id) ===
+          String(id)
+      );
+
+    if (!original) return;
+
+    /*
+      IMPORTANTE:
+      Não copiamos o ID original.
+
+      Também não criamos mais:
+      "nome-123456789"
+
+      O banco vai gerar um novo BIGINT.
+    */
+
+    const copy = {
+      ...original,
+
+      name:
+        `${original.name} — cópia`
+    };
+
+    /*
+      Remove completamente o ID.
+      Assim o PostgreSQL/Supabase usa
+      o valor padrão/sequence da coluna.
+    */
+    delete copy.id;
+
+    try {
+      const { data, error } =
+        await db
+          .from("products")
+          .insert(copy)
+          .select()
+          .single();
+
+      if (error) {
+        console.error(
+          "Erro ao duplicar produto:",
+          error
+        );
+
+        throw error;
+      }
+
+      if (!data) {
+        throw new Error(
+          "O Supabase não retornou o produto duplicado."
+        );
+      }
+
+      const normalizedProduct = {
+        ...data,
+
+        area: normalizeArea(
+          data.area,
+          data
+        )
+      };
+
+      state.products.push(
+        normalizedProduct
+      );
+
+      state.products.sort(
+        (a, b) =>
+          Number(a.sort || 0) -
+          Number(b.sort || 0)
+      );
+
+      updateStats();
+
+      renderProductTab();
+
+      toast(
+        "Produto duplicado com sucesso."
+      );
+
+    } catch (error) {
+      console.error(error);
+
+      toast(
+        error.message ||
+          "Não foi possível duplicar o produto.",
+        "error"
+      );
+    }
+  }
+
+  /* =========================================================
+     RENDER PRODUTOS
+     ========================================================= */
+
+  function renderProductTab() {
+    if (!tabContent) return;
+
+    ensureProductFormFields();
+
+    const deliveryProducts =
+      state.products.filter(
+        (product) =>
+          normalizeArea(
+            product.area,
+            product
+          ) === "cardapio"
+      );
+
+    const encomendaProducts =
+      state.products.filter(
+        (product) =>
+          normalizeArea(
+            product.area,
+            product
+          ) === "encomendas"
+      );
+
+    tabContent.innerHTML = `
+      <div class="content-header">
+        <div>
+          <h2>Produtos</h2>
+          <p>
+            Gerencie os produtos do site.
+          </p>
+        </div>
+
+        <button
+          class="btn btn-primary"
+          id="addProductBtn"
+          type="button"
+        >
+          + Novo produto
+        </button>
+      </div>
+
+      <div class="product-area-block">
+
+        <div class="section-heading">
+          <div>
+            <h3>Pronta Entrega</h3>
+            <p>
+              Produtos disponíveis para pronta entrega.
+            </p>
+          </div>
+
+          <span class="count-badge">
+            ${deliveryProducts.length}
+          </span>
+        </div>
+
+        <div
+          class="products-grid"
+          id="deliveryProductsGrid"
+        >
+          ${
+            deliveryProducts.length
+              ? deliveryProducts
+                  .map(
+                    renderProductCard
+                  )
+                  .join("")
+              : `
+                <div class="empty-state">
+                  Nenhum produto de pronta entrega.
+                </div>
+              `
+          }
+        </div>
+
+      </div>
+
+      <div class="product-area-block">
+
+        <div class="section-heading">
+          <div>
+            <h3>Encomendas</h3>
+            <p>
+              Produtos utilizados na área de encomendas.
+            </p>
+          </div>
+
+          <span class="count-badge">
+            ${encomendaProducts.length}
+          </span>
+        </div>
+
+        <div
+          class="products-grid"
+          id="encomendasProductsGrid"
+        >
+          ${
+            encomendaProducts.length
+              ? encomendaProducts
+                  .map(
+                    renderProductCard
+                  )
+                  .join("")
+              : `
+                <div class="empty-state">
+                  Nenhum produto de encomenda.
+                </div>
+              `
+          }
+        </div>
+
+      </div>
+    `;
+
+    const addProductBtn =
+      $("#addProductBtn");
+
+    if (addProductBtn) {
+      addProductBtn.addEventListener(
+        "click",
+        () => {
+          openProductModal();
+        }
+      );
+    }
+
+    $$(".edit-product-btn").forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          () => {
+            const id =
+              button.dataset.id;
+
+            const product =
+              state.products.find(
+                (item) =>
+                  String(item.id) ===
+                  String(id)
+              );
+
+            if (product) {
+              openProductModal(
+                product
+              );
+            }
+          }
+        );
+      }
+    );
+
+    $$(".delete-product-btn").forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          async () => {
+            await deleteProduct(
+              button.dataset.id
+            );
+          }
+        );
+      }
+    );
+
+    $$(".duplicate-product-btn").forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          async () => {
+            await duplicateProduct(
+              button.dataset.id
+            );
+          }
+        );
+      }
+    );
+
+    updateStats();
+  }
+    function renderProductCard(product) {
+    const image =
+      getProductImage(product);
+
+    const available =
+      product.available !== false;
+
+    const category =
+      product.category ||
+      "Sem classificação";
+
+    const area =
+      areaLabel(product.area);
+
+    return `
+      <article
+        class="admin-product-card"
+        data-product-id="${escapeHtml(
+          product.id
+        )}"
+      >
+
+        <div class="admin-product-image">
+
+          ${
+            image
+              ? `
+                <img
+                  src="${escapeHtml(
+                    image
+                  )}"
+                  alt="${escapeHtml(
+                    product.name
+                  )}"
+                >
+              `
+              : `
+                <div class="product-image-placeholder">
+                  🍰
+                </div>
+              `
+          }
+
+        </div>
+
+        <div class="admin-product-info">
+
+          <div style="
+            display:flex;
+            gap:6px;
+            flex-wrap:wrap;
+            margin-bottom:7px;
+          ">
+
+            <span class="product-area-choice">
+              ${escapeHtml(area)}
+            </span>
+
+            <span class="product-classification">
+              ${escapeHtml(category)}
+            </span>
+
+            ${
+              available
+                ? `
+                  <span class="status-badge status-active">
+                    Disponível
+                  </span>
+                `
+                : `
+                  <span class="status-badge status-inactive">
+                    Oculto
+                  </span>
+                `
+            }
+
+          </div>
+
+          <h4>
+            ${escapeHtml(
+              product.name
+            )}
+          </h4>
+
+          <strong>
+            ${money(product.price)}
+          </strong>
+
+          ${
+            product.description
+              ? `
+                <p>
+                  ${escapeHtml(
+                    product.description
+                  )}
+                </p>
+              `
+              : ""
+          }
+
+        </div>
+
+        <div class="admin-product-actions">
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-edit-product="${escapeHtml(
+              product.id
+            )}"
+          >
+            Editar
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-toggle-product="${escapeHtml(
+              product.id
+            )}"
+          >
+            ${
+              available
+                ? "Ocultar"
+                : "Ativar"
+            }
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-duplicate-product="${escapeHtml(
+              product.id
+            )}"
+          >
+            Duplicar
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-danger"
+            data-delete-product="${escapeHtml(
+              product.id
+            )}"
+          >
+            Excluir
+          </button>
+
+        </div>
+
+      </article>
+    `;
+  }
+
+  /* =========================================================
+     EVENTOS PRODUTOS
+     ========================================================= */
+
+  function bindProductTabEvents() {
+    const newProductBtn =
+      $("#newProductBtn");
+
+    if (newProductBtn) {
+      newProductBtn.addEventListener(
+        "click",
+        () => openProductModal()
+      );
+    }
+
+    const manageCategoriesBtn =
+      $("#manageCategoriesBtn");
+
+    const classificationManager =
+      $("#classificationManager");
+
+    if (
+      manageCategoriesBtn &&
+      classificationManager
+    ) {
+      manageCategoriesBtn.addEventListener(
+        "click",
+        () => {
+          classificationManager.style.display =
+            classificationManager.style.display ===
+            "none"
+              ? "block"
+              : "none";
+        }
+      );
+    }
+
+    const addClassificationBtn =
+      $("#addClassificationBtn");
+
+    if (addClassificationBtn) {
+      addClassificationBtn.addEventListener(
+        "click",
+        createClassification
+      );
+    }
+
+    $$("[data-delete-category]")
+      .forEach((button) => {
+        button.addEventListener(
+          "click",
+          () =>
+            deleteClassification(
+              button.dataset
+                .deleteCategory
+            )
+        );
+      });
+
+    $$("[data-edit-product]")
+      .forEach((button) => {
+        button.addEventListener(
+          "click",
+          () => {
+            const product =
+              state.products.find(
+                (item) =>
+                  String(item.id) ===
+                  String(
+                    button.dataset
+                      .editProduct
+                  )
+              );
+
+            if (product) {
+              openProductModal(
+                product
+              );
+            }
+          }
+        );
+      });
+
+    $$("[data-delete-product]")
+      .forEach((button) => {
+        button.addEventListener(
+          "click",
+          () =>
+            deleteProduct(
+              button.dataset
+                .deleteProduct
+            )
+        );
+      });
+
+    $$("[data-duplicate-product]")
+      .forEach((button) => {
+        button.addEventListener(
+          "click",
+          () =>
+            duplicateProduct(
+              button.dataset
+                .duplicateProduct
+            )
+        );
+      });
+
+    $$("[data-toggle-product]")
+      .forEach((button) => {
+        button.addEventListener(
+          "click",
+          () =>
+            toggleProductAvailability(
+              button.dataset
+                .toggleProduct
+            )
+        );
+      });
+  }
+
+  /* =========================================================
+     PEDIDOS NORMAIS
+     ========================================================= */
+
+  async function loadOrders() {
+    if (!db) return [];
+
+    const possibleTables = [
+      "orders"
+    ];
+
+    for (const table of possibleTables) {
+      try {
+        const { data, error } =
+          await db
+            .from(table)
+            .select("*")
+            .order(
+              "created_at",
+              {
+                ascending: false
+              }
+            );
+
+        if (!error) {
+          return Array.isArray(data)
+            ? data
+            : [];
+        }
+      } catch (error) {
+        console.error(
+          `Erro ao carregar ${table}:`,
+          error
+        );
+      }
+    }
+
+    return [];
+  }
+        "orders",
+      "pedidos"
+    ];
+
+    for (
+      const table of possibleTables
+    ) {
+      try {
+        const result =
+          await db
+            .from(table)
+            .select("*")
+            .order(
+              "created_at",
+              {
+                ascending: false
+              }
+            )
+            .limit(200);
+
+        if (!result.error) {
+          return result.data || [];
+        }
+      } catch (_) {}
+    }
+
+    return [];
+  }
+
+  async function renderOrdersTab() {
+    if (!tabContent) return;
+
+    tabContent.innerHTML = `
+      <div class="product-toolbar">
+
+        <div>
+
+          <h2>
+            Pedidos
+          </h2>
+
+          <p>
+            Pedidos recebidos pelo sistema.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div id="ordersContainer">
+
+        <div class="admin-empty">
+          Carregando pedidos...
+        </div>
+
+      </div>
+    `;
+
+    const orders =
+      await loadOrders();
+
+    const container =
+      $("#ordersContainer");
+
+    if (!container) return;
+
+    if (!orders.length) {
+      container.innerHTML = `
+        <div class="admin-empty">
+          Nenhum pedido encontrado.
+        </div>
+      `;
+
+      return;
+    }
+
+    container.innerHTML =
+      orders
+        .map(
+          (order) => `
+            <article
+              class="admin-order-card"
+            >
+
+              <strong>
+                Pedido #${escapeHtml(
+                  order.id || ""
+                )}
+              </strong>
+
+              <p>
+                ${escapeHtml(
+                  order.customer_name ||
+                    order.name ||
+                    "Cliente"
+                )}
+              </p>
+
+              <small>
+                ${escapeHtml(
+                  order.created_at ||
+                    ""
+                )}
+              </small>
+
+            </article>
+          `
+        )
+        .join("");
+  }
+
+  /* =========================================================
+     PEDIDOS DE BOLOS PERSONALIZADOS
+     ========================================================= */
+
+  async function renderCakesTab() {
+    if (!tabContent) return;
+
+    tabContent.innerHTML = `
+      <div class="product-toolbar">
+
+        <div>
+
+          <h2>
+            Pedidos de Bolo
+          </h2>
+
+          <p>
+            Pedidos de bolos personalizados enviados pelos clientes.
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="refreshCakeOrdersBtn"
+        >
+          Atualizar pedidos
+        </button>
+
+      </div>
+
+      <div id="cakeOrdersContainer">
+
+        <div class="admin-empty">
+          Carregando pedidos...
+        </div>
+
+      </div>
+    `;
+
+    const container =
+      $("#cakeOrdersContainer");
+
+    if (!container) return;
+
+    if (!db) {
+      container.innerHTML = `
+        <div class="admin-empty">
+          Não foi possível conectar ao Supabase.
+        </div>
+      `;
+
+      bindCakeOrdersRefresh();
+
+      return;
+    }
+
+    const possibleTables = [
+      "orders",
+      "pedidos"
+    ];
+
+    let orders = [];
+    let loaded = false;
+
+    for (
+      const table of possibleTables
+    ) {
+      try {
+        const result =
+          await db
+            .from(table)
+            .select("*")
+            .order(
+              "created_at",
+              {
+                ascending: false
+              }
+            )
+            .limit(200);
+
+        if (!result.error) {
+          orders =
+            Array.isArray(
+              result.data
+            )
+              ? result.data
+              : [];
+
+          loaded = true;
+          break;
+        }
+      } catch (error) {
+        console.warn(
+          `Não foi possível consultar a tabela ${table}.`,
+          error
+        );
+      }
+    }
+
+    if (!loaded) {
+      container.innerHTML = `
+        <div class="admin-empty">
+
+          <strong>
+            Não foi possível carregar os pedidos.
+          </strong>
+
+          <p style="margin-top:8px;">
+            Verifique se os pedidos estão sendo gravados
+            na tabela de pedidos do Supabase.
+          </p>
+
+        </div>
+      `;
+
+      bindCakeOrdersRefresh();
+
+      return;
+    }
+
+    const cakeOrders =
+      orders.filter((order) => {
+        const text =
+          JSON.stringify(order)
+            .normalize("NFD")
+            .replace(
+              /[\u0300-\u036f]/g,
+              ""
+            )
+            .toLowerCase();
+
+        return (
+          text.includes("bolo") ||
+          text.includes("naked") ||
+          text.includes("chantininho") ||
+          text.includes("encomenda") ||
+          text.includes("massa") ||
+          text.includes("recheio") ||
+          text.includes("personalizacao")
+        );
+      });
+
+    if (!cakeOrders.length) {
+      container.innerHTML = `
+        <div class="admin-empty">
+
+          <strong>
+            Nenhum pedido de bolo encontrado.
+          </strong>
+
+          <p style="margin-top:8px;">
+            Quando um cliente enviar um pedido de bolo personalizado,
+            ele aparecerá nesta área.
+          </p>
+
+        </div>
+      `;
+
+      bindCakeOrdersRefresh();
+
+      return;
+    }
+
+    container.innerHTML =
+      cakeOrders
+        .map(
+          (order, index) =>
+            renderCakeOrderCard(
+              order,
+              index
+            )
+        )
+        .join("");
+
+    bindCakeOrdersRefresh();
+  }
+
+  /* =========================================================
+     NORMALIZAR VALORES DOS PEDIDOS
+     ========================================================= */
+
+  function formatOrderValue(value) {
+    if (
+      value === undefined ||
+      value === null ||
+      value === ""
+    ) {
+            return "";
+    }
+
+    if (Array.isArray(value)) {
+      return value
+        .map((item) =>
+          formatOrderValue(item)
+        )
+        .filter(Boolean)
+        .join(", ");
+    }
+
+    if (
+      typeof value === "object"
+    ) {
+      return Object.entries(value)
+        .map(
+          ([key, item]) =>
+            `${formatOrderLabel(
+              key
+            )}: ${formatOrderValue(
+              item
+            )}`
+        )
+        .join(" | ");
+    }
+
+    return String(value);
+  }
+
+  function getOrderValue(
+    order,
+    ...keys
+  ) {
+    for (const key of keys) {
+      if (
+        order[key] !== undefined &&
+        order[key] !== null &&
+        String(
+          formatOrderValue(
+            order[key]
+          )
+        ).trim() !== ""
+      ) {
+        return order[key];
+      }
+    }
+
+    return "";
+  }
+
+  /* =========================================================
+     CARD DO PEDIDO
+     ========================================================= */
+
+  function renderCakeOrderCard(
+    order,
+    index
+  ) {
+    const customerName =
+      getOrderValue(
+        order,
+        "customer_name",
+        "client_name",
+        "cliente",
+        "nome",
+        "name"
+      ) || "Não informado";
+
+    const phone =
+      getOrderValue(
+        order,
+        "customer_phone",
+        "client_phone",
+        "telefone",
+        "phone",
+        "whatsapp"
+      ) || "Não informado";
+
+    const orderDate =
+      getOrderValue(
+        order,
+        "created_at",
+        "order_date",
+        "createdDate"
+      );
+
+    const requestedDate =
+      getOrderValue(
+        order,
+        "delivery_date",
+        "pickup_date",
+        "event_date",
+        "requested_date",
+        "data_entrega",
+        "data_retirada",
+        "data_evento",
+        "data"
+      );
+
+    const cakeType =
+      getOrderValue(
+        order,
+        "cake_type",
+        "tipo_bolo",
+        "bolo",
+        "tipo"
+      );
+
+    const size =
+      getOrderValue(
+        order,
+        "size",
+        "tamanho",
+        "cake_size",
+        "tamanho_bolo",
+        "pessoas",
+        "quantidade_pessoas"
+      );
+
+    const mass =
+      getOrderValue(
+        order,
+        "mass",
+        "massa",
+        "cake_mass",
+        "massa_bolo"
+      );
+
+    const filling =
+      getOrderValue(
+        order,
+        "filling",
+        "recheio",
+        "cake_filling",
+        "recheios"
+      );
+
+    const extras =
+      getOrderValue(
+        order,
+        "extras",
+        "adicionais",
+        "additional",
+        "adicionais_bolo"
+      );
+
+    const personalization =
+      getOrderValue(
+        order,
+        "personalization",
+        "personalizacao",
+        "personalisation",
+        "decoracao",
+        "decoração"
+      );
+
+    const brigadeiros =
+      getOrderValue(
+        order,
+        "brigadeiros",
+        "brigadeiro",
+        "brigadeiros_classicos",
+        "brigadeiros_premium"
+      );
+
+    const kits =
+      getOrderValue(
+        order,
+        "kits",
+        "kit",
+        "kit_bolo"
+      );
+
+    const otherItems =
+      getOrderValue(
+        order,
+        "other_items",
+        "outros_itens",
+        "outros",
+        "itens"
+      );
+
+    const notes =
+      getOrderValue(
+        order,
+        "notes",
+        "observations",
+        "observacoes",
+        "observações",
+        "obs"
+      );
+
+    const total =
+      getOrderValue(
+        order,
+        "total",
+        "total_price",
+        "valor_total",
+        "valor"
+      );
+
+    const orderId =
+      getOrderValue(
+        order,
+        "id",
+        "order_id",
+        "pedido_id"
+      ) || index + 1;
+
+    const knownKeys =
+      new Set([
+        "id",
+        "order_id",
+        "pedido_id",
+        "customer_name",
+        "client_name",
+        "cliente",
+        "nome",
+        "name",
+        "customer_phone",
+        "client_phone",
+        "telefone",
+        "phone",
+        "whatsapp",
+        "created_at",
+        "order_date",
+        "createdDate",
+        "delivery_date",
+        "pickup_date",
+        "event_date",
+        "requested_date",
+        "data_entrega",
+        "data_retirada",
+        "data_evento",
+        "data",
+        "cake_type",
+        "tipo_bolo",
+        "bolo",
+        "tipo",
+        "size",
+        "tamanho",
+        "cake_size",
+        "tamanho_bolo",
+        "pessoas",
+        "quantidade_pessoas",
+        "mass",
+        "massa",
+        "cake_mass",
+        "massa_bolo",
+        "filling",
+        "recheio",
+        "cake_filling",
+        "recheios",
+        "extras",
+        "adicionais",
+        "additional",
+        "adicionais_bolo",
+        "personalization",
+        "personalizacao",
+        "personalisation",
+        "decoracao",
+        "decoração",
+        "brigadeiros",
+        "brigadeiro",
+        "brigadeiros_classicos",
+        "brigadeiros_premium",
+        "kits",
+        "kit",
+        "kit_bolo",
+        "other_items",
+        "outros_itens",
+        "outros",
+        "itens",
+        "notes",
+        "observations",
+        "observacoes",
+        "observações",
+        "obs",
+        "total",
+        "total_price",
+        "valor_total",
+        "valor"
+      ]);
+
+    const extraFields =
+      Object.entries(order).filter(
+        ([key, value]) =>
+          !knownKeys.has(key) &&
+          value !== null &&
+          value !== undefined &&
+          String(
+            formatOrderValue(value)
+          ).trim() !== ""
+      );
+
+    return `
+      <article
+        class="admin-panel-box cake-order-card"
+        id="cake-order-${escapeHtml(
+          orderId
+        )}"
+      >
+                String(orderId)
+        )}"
+        style="
+          margin-bottom:18px;
+          page-break-inside:avoid;
+        "
+      >
+
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:flex-start;
+          gap:16px;
+          flex-wrap:wrap;
+          margin-bottom:18px;
+        ">
+
+          <div>
+
+            <span style="
+              display:inline-block;
+              font-size:12px;
+              font-weight:700;
+              color:#2b7896;
+              margin-bottom:5px;
+            ">
+              PEDIDO DE BOLO
+            </span>
+
+            <h3 style="margin:0;">
+              ${escapeHtml(
+                formatOrderValue(
+                  customerName
+                )
+              )}
+            </h3>
+
+            <p style="
+              margin:5px 0 0;
+              opacity:.7;
+            ">
+              Pedido #${escapeHtml(
+                String(orderId)
+              )}
+            </p>
+
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-primary print-cake-order"
+            data-print-order="${escapeHtml(
+              String(orderId)
+            )}"
+          >
+            🖨 Imprimir pedido
+          </button>
+
+        </div>
+
+        <div style="margin-bottom:20px;">
+
+          <h4>
+            Dados do cliente
+          </h4>
+
+          <div style="
+            display:grid;
+            grid-template-columns:
+              repeat(
+                auto-fit,
+                minmax(220px, 1fr)
+              );
+            gap:10px;
+          ">
+
+            ${renderOrderInfo(
+              "Cliente",
+              customerName
+            )}
+
+            ${renderOrderInfo(
+              "Telefone / WhatsApp",
+              phone
+            )}
+
+            ${renderOrderInfo(
+              "Data do pedido",
+              formatOrderDate(
+                orderDate
+              )
+            )}
+
+            ${renderOrderInfo(
+              "Data desejada",
+              formatOrderDate(
+                requestedDate
+              )
+            )}
+
+          </div>
+
+        </div>
+
+        <div style="margin-bottom:20px;">
+
+          <h4>
+            Informações do bolo
+          </h4>
+
+          <div style="
+            display:grid;
+            grid-template-columns:
+              repeat(
+                auto-fit,
+                minmax(220px, 1fr)
+              );
+            gap:10px;
+          ">
+
+            ${renderOrderInfo(
+              "Tipo de bolo",
+              cakeType
+            )}
+
+            ${renderOrderInfo(
+              "Tamanho / Pessoas",
+              size
+            )}
+
+            ${renderOrderInfo(
+              "Massa",
+              mass
+            )}
+
+            ${renderOrderInfo(
+              "Recheio",
+              filling
+            )}
+
+            ${renderOrderInfo(
+              "Adicionais",
+              extras
+            )}
+
+            ${renderOrderInfo(
+              "Personalização",
+              personalization
+            )}
+
+          </div>
+
+        </div>
+
+        <div style="margin-bottom:20px;">
+
+          <h4>
+            Itens solicitados
+          </h4>
+
+          <div style="
+            display:grid;
+            grid-template-columns:
+              repeat(
+                auto-fit,
+                minmax(220px, 1fr)
+              );
+            gap:10px;
+          ">
+
+            ${renderOrderInfo(
+              "Brigadeiros",
+              brigadeiros
+            )}
+
+            ${renderOrderInfo(
+              "Kits",
+              kits
+            )}
+
+            ${renderOrderInfo(
+              "Outros itens",
+              otherItems
+            )}
+
+          </div>
+
+        </div>
+
+        ${
+          notes
+            ? `
+              <div style="margin-bottom:20px;">
+
+                <h4>
+                  Observações
+                </h4>
+
+                <div style="
+                  padding:14px;
+                  border:1px solid #e1e8ec;
+                  border-radius:10px;
+                  background:#fff;
+                  white-space:pre-wrap;
+                ">
+                  ${escapeHtml(
+                    formatOrderValue(
+                      notes
+                    )
+                  )}
+                </div>
+
+              </div>
+            `
+            : ""
+        }
+
+        ${
+          extraFields.length
+            ? `
+              <div style="margin-bottom:20px;">
+
+                <h4>
+                  Outras informações do pedido
+                </h4>
+
+                <div style="
+                  display:grid;
+                  grid-template-columns:
+                    repeat(
+                      auto-fit,
+                      minmax(220px, 1fr)
+                    );
+                  gap:10px;
+                ">
+
+                  ${extraFields
+                    .map(
+                      ([key, value]) =>
+                        renderOrderInfo(
+                          formatOrderLabel(
+                            key
+                          ),
+                          value
+                        )
+                    )
+                    .join("")}
+
+                </div>
+
+              </div>
+            `
+            : ""
+        }
+
+        ${
+          total !== ""
+            ? `
+              <div style="
+                display:flex;
+                justify-content:flex-end;
+                padding-top:15px;
+                border-top:1px solid #e1e8ec;
+              ">
+
+                <strong style="
+                  font-size:18px;
+                  color:#2b7896;
+                ">
+                  Total:
+                  ${money(total)}
+                </strong>
+
+              </div>
+            `
+            : ""
+        }
+
+      </article>
+    `;
+  }
+
+  /* =========================================================
+     NOME DOS CAMPOS EXTRAS
+     ========================================================= */
+
+  function formatOrderLabel(key) {
+    const labels = {
+      customer_name:
+        "Nome do cliente",
+
+      client_name:
+        "Nome do cliente",
+
+      customer_phone:
+        "Telefone",
+
+      client_phone:
+        "Telefone",
+            cake_type:
+        "Tipo de bolo",
+
+      tipo_bolo:
+        "Tipo de bolo",
+
+      cake_size:
+        "Tamanho do bolo",
+
+      tamanho_bolo:
+        "Tamanho do bolo",
+
+      event_date:
+        "Data do evento",
+
+      delivery_date:
+        "Data de entrega",
+
+      pickup_date:
+        "Data de retirada",
+
+      massa:
+        "Massa",
+
+      recheio:
+        "Recheio",
+
+      adicionais:
+        "Adicionais",
+
+      personalizacao:
+        "Personalização",
+
+      observacoes:
+        "Observações",
+
+      total_price:
+        "Valor total",
+
+      valor_total:
+        "Valor total"
+    };
+
+    if (labels[key]) {
+      return labels[key];
+    }
+
+    return String(key || "")
+      .replace(/[_-]+/g, " ")
+      .replace(
+        /([a-z])([A-Z])/g,
+        "$1 $2"
+      )
+      .replace(/\s+/g, " ")
+      .trim()
+      .replace(
+        /^./,
+        (letter) =>
+          letter.toUpperCase()
+      );
+  }
+
+  /* =========================================================
+     INFORMAÇÕES DO PEDIDO
+     ========================================================= */
+
+  function renderOrderInfo(
+    label,
+    value
+  ) {
+    if (
+      value === undefined ||
+      value === null ||
+      String(
+        formatOrderValue(value)
+      ).trim() === ""
+    ) {
+      value = "Não informado";
+    }
+
+    return `
+      <div style="
+        padding:12px;
+        border:1px solid #e1e8ec;
+        border-radius:10px;
+        background:#fff;
+      ">
+
+        <small style="
+          display:block;
+          margin-bottom:4px;
+          color:#71808a;
+          font-weight:700;
+        ">
+          ${escapeHtml(label)}
+        </small>
+
+        <div style="
+          white-space:pre-wrap;
+        ">
+          ${escapeHtml(
+            formatOrderValue(value)
+          )}
+        </div>
+
+      </div>
+    `;
+  }
+
+  /* =========================================================
+     DATA
+     ========================================================= */
+
+  function formatOrderDate(value) {
+    if (!value) {
+      return "Não informado";
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return formatOrderValue(value);
+    }
+
+    return date.toLocaleString("pt-BR");
+  }
+
+  /* =========================================================
+     ATUALIZAR PEDIDOS
+     ========================================================= */
+
+  function bindCakeOrdersRefresh() {
+    const button =
+      $("#refreshCakeOrdersBtn");
+
+    if (
+      button &&
+      !button.dataset.bound
+    ) {
+      button.dataset.bound = "true";
+
+      button.addEventListener(
+        "click",
+        () => {
+          renderCakesTab();
+        }
+      );
+    }
+
+    bindPrintCakeOrders();
+  }
+
+  /* =========================================================
+     IMPRESSÃO
+     ========================================================= */
+
+  function bindPrintCakeOrders() {
+    $$(".print-cake-order").forEach(
+      (button) => {
+        if (button.dataset.bound) {
+          return;
+        }
+
+        button.dataset.bound = "true";
+
+        button.addEventListener(
+          "click",
+          () => {
+            const orderId =
+              button.dataset
+                .printOrder;
+
+            printCakeOrder(orderId);
+          }
+        );
+      }
+    );
+  }
+
+  function printCakeOrder(orderId) {
+    const original =
+      document.getElementById(
+        `cake-order-${orderId}`
+      );
+
+    if (!original) {
+      toast(
+        "Não foi possível localizar este pedido.",
+        "error"
+      );
+
+      return;
+    }
+
+    const printWindow =
+      window.open(
+        "",
+        "_blank",
+        "width=900,height=700"
+      );
+
+    if (!printWindow) {
+      toast(
+        "O navegador bloqueou a janela de impressão.",
+        "warning"
+      );
+
+      return;
+    }
+
+    printWindow.document.open();
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+
+      <html lang="pt-BR">
+
+      <head>
+
+        <meta charset="UTF-8">
+
+        <title>
+          Pedido de Bolo #${escapeHtml(
+            String(orderId)
+          )} — Martins Confeitaria
+        </title>
+
+        <style>
+
+          * {
+            box-sizing:border-box;
+          }
+
+          body {
+            margin:0;
+            padding:30px;
+            font-family:
+              Arial,
+              Helvetica,
+              sans-serif;
+            color:#263238;
+            background:#fff;
+          }
+
+          h3 {
+            font-size:24px;
+            margin:0;
+          }
+
+          h4 {
+            margin:
+              0 0 10px;
+          }
+
+          button {
+            display:none !important;
+          }
+
+          article {
+            border:none !important;
+            box-shadow:none !important;
+            margin:0 !important;
+            padding:0 !important;
+          }
+
+          @media print {
+
+            body {
+              padding:15mm;
+            }
+
+            .print-cake-order {
+              display:none !important;
+            }
+
+          }
+
+        </style>
+
+      </head>
+
+      <body>
+
+        ${original.outerHTML}
+
+        <script>
+          window.onload = function() {
+            window.print();
+          };
+        <\/script>
+
+      </body>
+
+      </html>
+    `);
+
+    printWindow.document.close();
+  }
+
+  /* =========================================================
+     CONTEÚDO
+     ========================================================= */
+
+  function renderContentTab() {
+    if (!tabContent) return;
+
+    const about =
+      state.settings.about ||
+      DEFAULTS.about ||
+      {};
+
+    tabContent.innerHTML = `
+      <div class="product-toolbar">
+
+        <div>
+
+          <h2>
+            Conteúdo
+          </h2>
+
+          <p>
+            Edite o conteúdo principal do site.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="admin-panel-box">
+
+        <div class="field">
+
+          <label for="adminAboutTitle">
+            Título da história
+          </label>
+
+          <input
+            id="adminAboutTitle"
+            value="${escapeHtml(
+              about.title || ""
+            )}"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label for="adminAboutQuote">
+            Frase
+          </label>
+
+          <input
+            id="adminAboutQuote"
+            value="${escapeHtml(
+              about.quote || ""
+            )}"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label for="adminAboutText">
+            História
+          </label>
+
+          <textarea
+            id="adminAboutText"
+            rows="14"
+          >${escapeHtml(
+            about.text || ""
+          )}</textarea>
+
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          id="saveContentBtn"
+        >
+          Salvar conteúdo
+        </button>
+
+      </div>
+    `;
+
+    $("#saveContentBtn")?.addEventListener(
+      "click",
+      async () => {
+        const button =
+          $("#saveContentBtn");
+
+        setLoading(
+          button,
+          true,
+          "Salvar conteúdo"
+        );
+
+        try {
+          state.settings.about = {
+            ...(state.settings.about || {}),
+
+            title:
+              $("#adminAboutTitle")
+                ?.value || "",
+
+            quote:
+              $("#adminAboutQuote")
+                ?.value || "",
+
+            text:
+              $("#adminAboutText")
+                ?.value || ""
+          };
+
+          await saveSettingObject();
+
+          toast(
+            "Conteúdo salvo com sucesso."
+          );
+        } catch (error) {
+          console.error(error);
+
+          toast(
+            "Não foi possível salvar o conteúdo.",
+            "error"
+          );
+        } finally {
+          setLoading(
+            button,
+            false,
+            "Salvar conteúdo"
+          );
+        }
+      }
+    );
+  }
+
+  /* =========================================================
+     SALVAR CONFIGURAÇÃO
+     ========================================================= */
+
+  async function saveSettingObject() {
+    if (!db) {
+      throw new Error(
+        "Supabase não está disponível."
+      );
+    }
+
+    const { error } =
+      await db
+        .from("settings")
+        .upsert(
+          {
+            key: "site",
+            value: state.settings
+          },
+          {
+            onConflict: "key"
+          }
+        );
+
+    if (error) throw error;
+  }
+
+  /* =========================================================
+     HORÁRIOS
+     ========================================================= */
+
+  function renderHoursTab() {
+    if (!tabContent) return;
+
+    const hours =
+      Array.isArray(
+        state.settings.hours
+      )
+        ? state.settings.hours
+        : Array.isArray(
+            DEFAULTS.hours
+          )
+        ? DEFAULTS.hours
+        : [];
+
+    const names = [
+      "Domingo",
+      "Segunda-feira",
+      "Terça-feira",
+      "Quarta-feira",
+      "Quinta-feira",
+      "Sexta-feira",
+      "Sábado"
+    ];
+
+    tabContent.innerHTML = `
+      <div class="product-toolbar">
+
+        <div>
+
+          <h2>
+            Horários
+          </h2>
+
+          <p>
+            Horários de funcionamento.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="admin-panel-box">
+
+        ${names
+          .map(
+            (name, index) => {
+              const item =
+                hours[index] || {
+                  s: "closed",
+                  o: "",
+                  c: ""
+                };
+
+              return `
+                <div class="hours-row">
+
+                  <strong>
+                    ${name}
+                  </strong>
+
+                  <select
+                    data-hours-status="${index}"
+                  >
+
+                    <option
+                      value="open"
+                      ${
+                        item.s ===
+                        "open"
+                          ? "selected"
+                          : ""
+                      }
+                    >
+                      Aberto
+                    </option>
+
+                    <option
+                      value="closed"
+                      ${
+                        item.s ===
+                        "closed"
+                          ? "selected"
+                          : ""
+                      }
+                    >
+                      Fechado
+                    </option>
+
+                    <option
+                      value="tbd"
+                      ${
+                        item.s ===
+                        "tbd"
+                          ? "selected"
+                          : ""
+                      }
+                    >
+                      A confirmar
+                    </option>
+
+                  </select>
+
+                  <input
+                    type="time"
+                    data-hours-open="${index}"
+                    value="${escapeHtml(
+                      item.o || ""
+                    )}"
+                  >
+
+                  <input
+                    type="time"
+                    data-hours-close="${index}"
+                    value="${escapeHtml(
+                      item.c || ""
+                    )}"
+                  >
+
+                </div>
+              `;
+            }
+          )
+          .join("")}
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          id="saveHoursBtn"
+        >
+          Salvar horários
+        </button>
+              </div>
+    `;
+
+    $("#saveHoursBtn")?.addEventListener(
+      "click",
+      async () => {
+        const button =
+          $("#saveHoursBtn");
+
+        setLoading(
+          button,
+          true,
+          "Salvar horários"
+        );
+
+        try {
+          const newHours =
+            names.map(
+              (_, index) => ({
+                s:
+                  $(
+                    `[data-hours-status="${index}"]`
+                  )?.value ||
+                  "closed",
+
+                o:
+                  $(
+                    `[data-hours-open="${index}"]`
+                  )?.value ||
+                  "",
+
+                c:
+                  $(
+                    `[data-hours-close="${index}"]`
+                  )?.value ||
+                  ""
+              })
+            );
+
+          state.settings.hours =
+            newHours;
+
+          await saveSettingObject();
+
+          toast(
+            "Horários salvos com sucesso."
+          );
+        } catch (error) {
+          console.error(error);
+
+          toast(
+            "Não foi possível salvar os horários.",
+            "error"
+          );
+        } finally {
+          setLoading(
+            button,
+            false,
+            "Salvar horários"
+          );
+        }
+      }
+    );
+  }
+
+  /* =========================================================
+     REGRAS
+     ========================================================= */
+
+  function renderRulesTab() {
+    if (!tabContent) return;
+
+    const rules =
+      state.settings.rules || {};
+
+    tabContent.innerHTML = `
+      <div class="product-toolbar">
+
+        <div>
+
+          <h2>
+            Regras
+          </h2>
+
+          <p>
+            Informações e regras das encomendas.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="admin-panel-box">
+
+        <div class="field">
+
+          <label>
+            Prazo / observações
+          </label>
+
+          <textarea
+            id="adminRulesText"
+            rows="10"
+          >${escapeHtml(
+            rules.text || ""
+          )}</textarea>
+
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          id="saveRulesBtn"
+        >
+          Salvar regras
+        </button>
+
+      </div>
+    `;
+
+    $("#saveRulesBtn")?.addEventListener(
+      "click",
+      async () => {
+        const button =
+          $("#saveRulesBtn");
+
+        setLoading(
+          button,
+          true,
+          "Salvar regras"
+        );
+
+        try {
+          state.settings.rules = {
+            ...(state.settings.rules ||
+              {}),
+
+            text:
+              $("#adminRulesText")
+                ?.value || ""
+          };
+
+          await saveSettingObject();
+
+          toast(
+            "Regras salvas com sucesso."
+          );
+        } catch (error) {
+          console.error(error);
+
+          toast(
+            "Não foi possível salvar as regras.",
+            "error"
+          );
+        } finally {
+          setLoading(
+            button,
+            false,
+            "Salvar regras"
+          );
+        }
+      }
+    );
+  }
+
+  /* =========================================================
+     MÍDIA
+     ========================================================= */
+
+  function renderMediaTab() {
+    if (!tabContent) return;
+
+    tabContent.innerHTML = `
+      <div class="product-toolbar">
+
+        <div>
+
+          <h2>
+            Mídia
+          </h2>
+
+          <p>
+            Imagens e materiais utilizados pelo site.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="admin-panel-box">
+
+        <p>
+          As imagens dos produtos podem ser adicionadas
+          diretamente pelo cadastro de cada produto.
+        </p>
+
+        <p style="opacity:.7;">
+          O sistema mantém a imagem atual quando nenhum
+          novo arquivo é selecionado.
+        </p>
+
+      </div>
+    `;
+  }
+
+  /* =========================================================
+     ABAS
+     ========================================================= */
+
+  async function activateTab(tab) {
+    state.activeTab = tab;
+
+    $$(".sidebar-item, [data-tab]")
+      .forEach((element) => {
+        if (
+          element.dataset.tab ===
+          tab
+        ) {
+          element.classList.add(
+            "active"
+          );
+        } else {
+          element.classList.remove(
+            "active"
+          );
+        }
+      });
+
+    updateCakesTabLabel();
+
+    if (tab === "products") {
+      renderProductTab();
+      return;
+    }
+
+    if (tab === "orders") {
+      await renderOrdersTab();
+      return;
+    }
+
+    if (tab === "cakes") {
+      await renderCakesTab();
+      return;
+    }
+
+    if (tab === "content") {
+      renderContentTab();
+      return;
+    }
+
+    if (tab === "hours") {
+      renderHoursTab();
+      return;
+    }
+
+    if (tab === "rules") {
+      renderRulesTab();
+      return;
+    }
+
+    if (tab === "media") {
+      renderMediaTab();
+      return;
+    }
+
+    renderProductTab();
+  }
+
+  function updateCakesTabLabel() {
+    $$('[data-tab="cakes"]')
+      .forEach((button) => {
+        const span =
+          button.querySelector(
+            "span"
+          );
+
+        if (span) {
+          span.textContent =
+            "Pedidos de Bolo";
+
+          return;
+        }
+
+        const textNodes =
+          Array.from(
+            button.childNodes
+          ).filter(
+            (node) =>
+              node.nodeType ===
+              Node.TEXT_NODE
+          );
+
+        if (textNodes.length) {
+          textNodes.forEach(
+            (node, index) => {
+              node.textContent =
+                index ===
+                textNodes.length - 1
+                  ? "Pedidos de Bolo"
+                                  : "";
+            }
+          );
+        } else {
+          button.appendChild(
+            document.createTextNode(
+              "Pedidos de Bolo"
+            )
+          );
+        }
+      });
+  }
+
+  function bindTabs() {
+    $$("[data-tab]")
+      .forEach((button) => {
+        if (button.dataset.tabBound) {
+          return;
+        }
+
+        button.dataset.tabBound =
+          "true";
+
+        button.addEventListener(
+          "click",
+          () => {
+            activateTab(
+              button.dataset.tab
+            );
+          }
+        );
+      });
+
+    updateCakesTabLabel();
+  }
+
+  /* =========================================================
+     LOGIN
+     ========================================================= */
+
+  async function handleLogin(event) {
+    event.preventDefault();
+
+    if (!loginForm) return;
+
+    if (!db) {
+      showLoginMessage(
+        "Erro: conexão com o Supabase não está disponível."
+      );
+      return;
+    }
+
+    const email =
+      $("#loginEmail")
+        ?.value
+        ?.trim();
+
+    const password =
+      $("#loginPassword")
+        ?.value || "";
+
+    if (!email || !password) {
+      showLoginMessage(
+        "Informe e-mail e senha."
+      );
+
+      return;
+    }
+
+    const submitButton =
+      loginForm.querySelector(
+        'button[type="submit"]'
+      );
+
+    setLoading(
+      submitButton,
+      true,
+      "Entrar"
+    );
+
+    showLoginMessage(
+      "Entrando...",
+      false
+    );
+
+    try {
+      const {
+        data,
+        error
+      } =
+        await db.auth.signInWithPassword({
+          email,
+          password
+        });
+
+      if (error) throw error;
+
+      if (!data?.session) {
+        throw new Error(
+          "Login realizado, mas a sessão não foi criada."
+        );
+      }
+
+      showLoginMessage(
+        "Login realizado.",
+        false
+      );
+
+      await showApp();
+
+    } catch (error) {
+      console.error(error);
+
+      showLoginMessage(
+        error.message ||
+          "Não foi possível entrar."
+      );
+
+    } finally {
+      setLoading(
+        submitButton,
+        false,
+        "Entrar"
+      );
+    }
+  }
+
+  async function handleLogout() {
+    if (db) {
+      try {
+        await db.auth.signOut();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    showLogin();
+  }
+
+  function showLogin() {
+    if (loginScreen) {
+      loginScreen.classList.remove(
+        "hidden"
+      );
+
+      loginScreen.style.display = "";
+    }
+
+    if (app) {
+      app.classList.add("hidden");
+      app.style.display = "";
+    }
+  }
+
+  async function showApp() {
+    if (loginScreen) {
+      loginScreen.classList.add(
+        "hidden"
+      );
+
+      loginScreen.style.display =
+        "none";
+    }
+
+    if (app) {
+      app.classList.remove("hidden");
+      app.style.display = "";
+    }
+
+    try {
+      await loadSettings();
+      await loadProducts();
+
+      updateStats();
+
+      bindTabs();
+
+      await activateTab(
+        state.activeTab ||
+          "products"
+      );
+
+    } catch (error) {
+      console.error(error);
+
+      toast(
+        "Não foi possível carregar o painel: " +
+          (error.message ||
+            "erro desconhecido"),
+        "error"
+      );
+    }
+  }
+
+  /* =========================================================
+     ATUALIZAR PAINEL
+     ========================================================= */
+
+  async function refreshAdmin() {
+    const oldText =
+      refreshBtn?.textContent ||
+      "Atualizar";
+
+    if (refreshBtn) {
+      refreshBtn.disabled = true;
+      refreshBtn.textContent =
+        "Atualizando...";
+    }
+
+    try {
+      await loadSettings();
+      await loadProducts();
+
+      updateStats();
+
+      await activateTab(
+        state.activeTab ||
+          "products"
+      );
+
+      toast(
+        "Painel atualizado."
+      );
+
+    } catch (error) {
+      console.error(error);
+
+      toast(
+        "Não foi possível atualizar o painel.",
+        "error"
+      );
+
+    } finally {
+      if (refreshBtn) {
+        refreshBtn.disabled = false;
+        refreshBtn.textContent =
+          oldText;
+      }
+    }
+  }
+
+  /* =========================================================
+     MODAL
+     ========================================================= */
+
+  function bindModalEvents() {
+    if (!productModal) return;
+
+    productModal.addEventListener(
+      "click",
+      (event) => {
+        if (
+          event.target ===
+          productModal
+        ) {
+          closeProductModal();
+        }
+      }
+    );
+
+    const closeButtons =
+      productModal.querySelectorAll(
+        "[data-close], .modal-close, .close-modal"
+      );
+
+    closeButtons.forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          closeProductModal
+        );
+      }
+    );
+  }
+
+  /* =========================================================
+     INICIALIZAÇÃO DO SUPABASE
+     ========================================================= */
+
+  function initializeSupabase() {
+    if (
+      !window.supabase ||
+      typeof window.supabase
+        .createClient !==
+        "function"
+    ) {
+      console.error(
+        "Supabase JS não foi carregado corretamente."
+      );
+
+      return false;
+    }
+
+    try {
+      db =
+        window.supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_ANON_KEY
+        );
+            return Boolean(db);
+
+    } catch (error) {
+      console.error(
+        "Erro ao criar cliente Supabase:",
+        error
+      );
+
+      db = null;
+
+      return false;
+    }
+  }
+
+  /* =========================================================
+     INICIALIZAÇÃO
+     ========================================================= */
+
+  async function init() {
+    console.log(
+      "Martins Admin — versão atualizada"
+    );
+
+    const supabaseReady =
+      initializeSupabase();
+
+    if (!supabaseReady) {
+      showLoginMessage(
+        "Erro: biblioteca do Supabase não foi carregada. Atualize a página e tente novamente."
+      );
+
+      showLogin();
+
+      return;
+    }
+
+    ensureProductFormFields();
+
+    if (loginForm) {
+      loginForm.addEventListener(
+        "submit",
+        handleLogin
+      );
+    }
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener(
+        "click",
+        handleLogout
+      );
+    }
+
+    if (refreshBtn) {
+      refreshBtn.addEventListener(
+        "click",
+        refreshAdmin
+      );
+    }
+
+    if (productForm) {
+      productForm.addEventListener(
+        "submit",
+        saveProduct
+      );
+    }
+
+    bindModalEvents();
+
+    try {
+      const {
+        data: {
+          session
+        } = {}
+      } =
+        await db.auth.getSession();
+
+      if (session) {
+        await showApp();
+      } else {
+        showLogin();
+      }
+
+    } catch (error) {
+      console.error(
+        "Erro ao verificar sessão:",
+        error
+      );
+
+      showLoginMessage(
+        "Não foi possível verificar a sessão. Atualize a página e tente novamente."
+      );
+
+      showLogin();
+    }
+
+    db.auth.onAuthStateChange(
+      async (
+        event,
+        session
+      ) => {
+        if (
+          event === "SIGNED_IN" &&
+          session
+        ) {
+          await showApp();
+        }
+
+        if (
+          event === "SIGNED_OUT"
+        ) {
+          showLogin();
+        }
+      }
+    );
+  }
+
+  /* =========================================================
+     INICIAR
+     ========================================================= */
+
+  if (
+    document.readyState ===
+    "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      init,
+      {
+        once: true
+      }
+    );
+  } else {
+    init();
+  }
+
+})();
