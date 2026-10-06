@@ -948,7 +948,7 @@
 
     if (discount) {
       discount.value =
-        product.discount ?? 0;
+        product.discount_percent ?? 0;
     }
 
     const sort =
@@ -1004,7 +1004,7 @@
 
     if (appointment) {
       appointment.checked =
-        product.appointment === true;
+        product.appointment_required === true;
     }
 
     const image =
@@ -1288,7 +1288,7 @@
         price:
           formData.price,
 
-        discount:
+        discount_percent:
           formData.discount,
 
         sort:
