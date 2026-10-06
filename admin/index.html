@@ -2,98 +2,69 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <meta
-    name="theme-color"
-    content="#67b0cb"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#67b0cb">
 
   <title>Martins Confeitaria — Painel Administrativo</title>
 
-  <link
-    rel="stylesheet"
-    href="./admin.css?v=20261005"
-  >
+  <link rel="stylesheet" href="./admin.css?v=20261005">
 </head>
 
 <body>
 
-  <!-- LOGIN -->
-  <section id="loginScreen" class="login-screen">
-
+  <!-- =========================================================
+       LOGIN
+  ========================================================== -->
+  <div id="loginScreen" class="login-screen">
     <div class="login-card">
 
       <div class="login-logo">
-        <div class="login-logo-mark">M</div>
+        <div class="logo-mark">M</div>
       </div>
 
       <h1>Martins Confeitaria</h1>
-
-      <p class="login-subtitle">
-        Painel Administrativo
-      </p>
+      <p>Painel Administrativo</p>
 
       <form id="loginForm">
 
         <div class="form-group">
-          <label for="loginEmail">
-            E-mail
-          </label>
-
+          <label for="loginEmail">E-mail</label>
           <input
             type="email"
             id="loginEmail"
-            autocomplete="username"
             placeholder="Digite seu e-mail"
+            autocomplete="email"
             required
           >
         </div>
 
         <div class="form-group">
-          <label for="loginPassword">
-            Senha
-          </label>
-
+          <label for="loginPassword">Senha</label>
           <input
             type="password"
             id="loginPassword"
-            autocomplete="current-password"
             placeholder="Digite sua senha"
+            autocomplete="current-password"
             required
           >
         </div>
 
-        <button
-          type="submit"
-          class="btn btn-primary btn-full"
-          id="loginButton"
-        >
+        <button type="submit" class="btn btn-primary btn-block">
           Entrar
         </button>
 
-        <div
-          id="loginMessage"
-          class="login-message"
-        ></div>
+        <div id="loginMessage" class="message"></div>
 
       </form>
 
     </div>
+  </div>
 
-  </section>
 
-
-  <!-- PAINEL -->
-  <div
-    id="adminApp"
-    class="admin-app"
-    style="display:none;"
-  >
+  <!-- =========================================================
+       APLICAÇÃO
+  ========================================================== -->
+  <div id="app" class="app hidden">
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
@@ -101,25 +72,17 @@
       <div class="sidebar-header">
 
         <div class="brand">
-
-          <div
-            id="adminLogo"
-            class="brand-logo"
-          >
-            M
-          </div>
+          <div class="brand-logo">M</div>
 
           <div class="brand-text">
             <strong>Martins</strong>
             <span>Confeitaria</span>
           </div>
-
         </div>
 
       </div>
 
 
-      <!-- MENU -->
       <nav class="sidebar-nav">
 
         <button
@@ -127,18 +90,10 @@
           class="nav-item active"
           data-tab="products"
         >
-          <span class="nav-icon">🛍️</span>
+          <span class="nav-icon">🧁</span>
           <span>Produtos</span>
         </button>
 
-        <button
-          type="button"
-          class="nav-item"
-          data-tab="orders"
-        >
-          <span class="nav-icon">📦</span>
-          <span>Pedidos</span>
-        </button>
 
         <button
           type="button"
@@ -149,54 +104,37 @@
           <span>Pedidos de Bolo</span>
         </button>
 
-        <button
-          type="button"
-          class="nav-item"
-          data-tab="content"
-        >
-          <span class="nav-icon">📝</span>
-          <span>Conteúdo</span>
-        </button>
 
         <button
           type="button"
           class="nav-item"
-          data-tab="hours"
+          data-tab="orders"
         >
-          <span class="nav-icon">🕐</span>
-          <span>Horários</span>
+          <span class="nav-icon">📦</span>
+          <span>Pedidos</span>
         </button>
+
 
         <button
           type="button"
           class="nav-item"
-          data-tab="rules"
+          data-tab="settings"
         >
           <span class="nav-icon">⚙️</span>
-          <span>Regras</span>
-        </button>
-
-        <button
-          type="button"
-          class="nav-item"
-          data-tab="media"
-        >
-          <span class="nav-icon">🖼️</span>
-          <span>Mídia</span>
+          <span>Configurações</span>
         </button>
 
       </nav>
 
 
-      <!-- RODAPÉ -->
       <div class="sidebar-footer">
 
         <button
           type="button"
-          id="logoutButton"
-          class="logout-button"
+          id="logoutBtn"
+          class="nav-item logout-btn"
         >
-          <span>🚪</span>
+          <span class="nav-icon">🚪</span>
           <span>Sair</span>
         </button>
 
@@ -212,249 +150,548 @@
       <header class="topbar">
 
         <div class="topbar-left">
-
           <button
             type="button"
-            id="mobileMenuButton"
-            class="mobile-menu-button"
+            id="menuToggle"
+            class="menu-toggle"
             aria-label="Abrir menu"
           >
             ☰
           </button>
 
           <div>
-
-            <h1 id="pageTitle">
-              Produtos
-            </h1>
-
+            <h1 id="pageTitle">Produtos</h1>
             <p id="pageSubtitle">
               Gerencie os produtos da Martins Confeitaria.
             </p>
-
           </div>
-
         </div>
 
 
         <div class="topbar-right">
 
-          <button
-            type="button"
-            id="refreshButton"
-            class="btn btn-secondary"
-          >
-            ↻ Atualizar
-          </button>
+          <div id="userInfo" class="user-info">
+            <span class="user-name">Administrador</span>
+          </div>
 
         </div>
 
       </header>
 
 
-      <!-- ESTATÍSTICAS -->
-      <section
-        id="statsSection"
-        class="stats-grid"
-      >
+      <!-- ÁREA DE CONTEÚDO -->
+      <section id="contentArea" class="content-area">
 
-        <div class="stat-card">
-
-          <div class="stat-icon">
-            🛍️
-          </div>
-
-          <div>
-
-            <span class="stat-label">
-              Produtos
-            </span>
-
-            <strong
-              id="statProducts"
-              class="stat-value"
-            >
-              0
-            </strong>
-
-          </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-          <div class="stat-icon">
-            ✅
-          </div>
-
-          <div>
-
-            <span class="stat-label">
-              Disponíveis
-            </span>
-
-            <strong
-              id="statAvailable"
-              class="stat-value"
-            >
-              0
-            </strong>
-
-          </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-          <div class="stat-icon">
-            📦
-          </div>
-
-          <div>
-
-            <span class="stat-label">
-              Pedidos
-            </span>
-
-            <strong
-              id="statOrders"
-              class="stat-value"
-            >
-              0
-            </strong>
-
-          </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-          <div class="stat-icon">
-            🎂
-          </div>
-
-          <div>
-
-            <span class="stat-label">
-              Encomendas
-            </span>
-
-            <strong
-              id="statCakes"
-              class="stat-value"
-            >
-              0
-            </strong>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- ABAS -->
-      <section class="content-area">
-
+        <!-- =====================================================
+             PRODUTOS
+        ====================================================== -->
         <div
           id="tab-products"
           class="tab-content active"
-        ></div>
+          data-tab-content="products"
+        >
+
+          <div class="section-header">
+
+            <div>
+              <h2>Produtos</h2>
+              <p>
+                Gerencie os produtos disponíveis no site.
+              </p>
+            </div>
+
+            <div class="section-actions">
+
+              <button
+                type="button"
+                id="refreshProductsBtn"
+                class="btn btn-secondary"
+              >
+                🔄 Atualizar
+              </button>
+
+              <button
+                type="button"
+                id="newProductBtn"
+                class="btn btn-primary"
+              >
+                + Novo produto
+              </button>
+
+            </div>
+
+          </div>
 
 
-        <div
-          id="tab-orders"
-          class="tab-content"
-          style="display:none;"
-        ></div>
+          <!-- FORMULÁRIO DE PRODUTO -->
+          <div
+            id="productFormContainer"
+            class="card hidden"
+          >
+
+            <div class="card-header">
+
+              <div>
+                <h3 id="productFormTitle">
+                  Novo produto
+                </h3>
+
+                <p>
+                  Preencha os dados do produto.
+                </p>
+              </div>
+
+            </div>
 
 
+            <form id="productForm">
+
+              <input
+                type="hidden"
+                id="productId"
+              >
+
+
+              <div class="form-grid">
+
+                <div class="form-group">
+
+                  <label for="productName">
+                    Nome do produto
+                  </label>
+
+                  <input
+                    type="text"
+                    id="productName"
+                    placeholder="Ex.: Brownie de Brigadeiro"
+                    required
+                  >
+
+                </div>
+
+
+                <div class="form-group">
+
+                  <label for="productPrice">
+                    Preço
+                  </label>
+
+                  <input
+                    type="number"
+                    id="productPrice"
+                    min="0"
+                    step="0.01"
+                    placeholder="0,00"
+                    required
+                  >
+
+                </div>
+
+
+                <div class="form-group">
+
+                  <label for="productArea">
+                    Área
+                  </label>
+
+                  <select id="productArea" required>
+
+                    <option value="">
+                      Selecione a área
+                    </option>
+
+                    <option value="delivery">
+                      Delivery
+                    </option>
+
+                    <option value="encomendas">
+                      Encomendas
+                    </option>
+
+                  </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                  <label for="productCategory">
+                    Classificação
+                  </label>
+
+                  <div class="inline-field">
+
+                    <select id="productCategory">
+
+                      <option value="">
+                        Selecione uma classificação
+                      </option>
+
+                    </select>
+
+                    <button
+                      type="button"
+                      id="newCategoryBtn"
+                      class="btn btn-secondary"
+                    >
+                      + Nova
+                    </button>
+
+                  </div>
+
+                </div>
+
+
+                <div class="form-group form-group-full">
+
+                  <label for="productDescription">
+                    Descrição
+                  </label>
+
+                  <textarea
+                    id="productDescription"
+                    rows="4"
+                    placeholder="Descrição do produto"
+                  ></textarea>
+
+                </div>
+
+
+                <div class="form-group form-group-full">
+
+                  <label for="productImage">
+                    Imagem
+                  </label>
+
+                  <input
+                    type="file"
+                    id="productImage"
+                    accept="image/*"
+                  >
+
+                  <div
+                    id="productImagePreview"
+                    class="image-preview"
+                  ></div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                  <label class="checkbox-label">
+
+                    <input
+                      type="checkbox"
+                      id="productAvailable"
+                      checked
+                    >
+
+                    <span>
+                      Produto disponível
+                    </span>
+
+                  </label>
+
+                </div>
+
+              </div>
+
+
+              <div class="form-actions">
+
+                <button
+                  type="button"
+                  id="cancelProductBtn"
+                  class="btn btn-secondary"
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                >
+                  Salvar produto
+                </button>
+
+              </div>
+
+            </form>
+
+          </div>
+
+
+          <!-- LISTA DE PRODUTOS -->
+
+          <div
+            id="productsList"
+            class="products-list"
+          >
+
+            <div class="loading-state">
+              Carregando produtos...
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             PEDIDOS DE BOLO
+        ====================================================== -->
         <div
           id="tab-cakes"
           class="tab-content"
-          style="display:none;"
-        ></div>
+          data-tab-content="cakes"
+        >
+
+          <div class="section-header">
+
+            <div>
+              <h2>Pedidos de Bolo</h2>
+
+              <p>
+                Consulte as encomendas de bolos recebidas.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              id="refreshCakesBtn"
+              class="btn btn-secondary"
+            >
+              🔄 Atualizar
+            </button>
+
+          </div>
 
 
+          <div
+            id="cakesList"
+            class="orders-list"
+          >
+
+            <div class="loading-state">
+              Carregando pedidos de bolo...
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             PEDIDOS
+        ====================================================== -->
         <div
-          id="tab-content"
+          id="tab-orders"
           class="tab-content"
-          style="display:none;"
-        ></div>
+          data-tab-content="orders"
+        >
+
+          <div class="section-header">
+
+            <div>
+              <h2>Pedidos</h2>
+
+              <p>
+                Consulte os pedidos realizados.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              id="refreshOrdersBtn"
+              class="btn btn-secondary"
+            >
+              🔄 Atualizar
+            </button>
+
+          </div>
 
 
+          <div
+            id="ordersList"
+            class="orders-list"
+          >
+
+            <div class="loading-state">
+              Carregando pedidos...
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             CONFIGURAÇÕES
+        ====================================================== -->
         <div
-          id="tab-hours"
+          id="tab-settings"
           class="tab-content"
-          style="display:none;"
-        ></div>
+          data-tab-content="settings"
+        >
+
+          <div class="section-header">
+
+            <div>
+              <h2>Configurações</h2>
+
+              <p>
+                Gerencie as configurações do sistema.
+              </p>
+            </div>
+
+          </div>
 
 
-        <div
-          id="tab-rules"
-          class="tab-content"
-          style="display:none;"
-        ></div>
+          <div class="settings-grid">
+
+            <div class="card">
+
+              <div class="card-header">
+
+                <h3>Classificações</h3>
+
+              </div>
+
+              <p>
+                Gerencie as classificações usadas nos produtos.
+              </p>
+
+              <div
+                id="categoriesSettings"
+                class="settings-list"
+              >
+                Carregando...
+              </div>
+
+            </div>
 
 
-        <div
-          id="tab-media"
-          class="tab-content"
-          style="display:none;"
-        ></div>
+            <div class="card">
+
+              <div class="card-header">
+
+                <h3>Informações</h3>
+
+              </div>
+
+              <div id="settingsInfo">
+                Carregando configurações...
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
 
       </section>
+
+
+      <!-- =====================================================
+           TOAST
+      ====================================================== -->
+      <div
+        id="toast"
+        class="toast hidden"
+        role="status"
+        aria-live="polite"
+      ></div>
 
     </main>
 
   </div>
 
 
-  <!-- TOAST -->
+  <!-- =========================================================
+       MODAL NOVA CLASSIFICAÇÃO
+  ========================================================== -->
   <div
-    id="toast"
-    class="toast"
-    aria-live="polite"
-  ></div>
-
-
-  <!-- MODAL -->
-  <div
-    id="modal"
-    class="modal"
-    style="display:none;"
+    id="categoryModal"
+    class="modal hidden"
   >
 
     <div class="modal-overlay"></div>
 
     <div class="modal-content">
 
-      <button
-        type="button"
-        id="modalClose"
-        class="modal-close"
-        aria-label="Fechar"
-      >
-        ×
-      </button>
+      <div class="modal-header">
 
-      <div id="modalBody"></div>
+        <h3>Nova classificação</h3>
+
+        <button
+          type="button"
+          id="closeCategoryModal"
+          class="modal-close"
+          aria-label="Fechar"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <form id="categoryForm">
+
+        <div class="form-group">
+
+          <label for="newCategoryName">
+            Nome da classificação
+          </label>
+
+          <input
+            type="text"
+            id="newCategoryName"
+            placeholder="Ex.: Brownies"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-actions">
+
+          <button
+            type="button"
+            id="cancelCategoryBtn"
+            class="btn btn-secondary"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+          >
+            Adicionar
+          </button>
+
+        </div>
+
+      </form>
 
     </div>
 
   </div>
 
 
-  <!-- SCRIPTS -->
+  <!-- =========================================================
+       SUPABASE
+  ========================================================== -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+  <!-- CONFIGURAÇÃO -->
   <script src="../config.js"></script>
 
+  <!-- PADRÕES -->
   <script src="../defaults.js"></script>
 
+  <!-- ADMIN -->
   <script src="./admin.js?v=20261005"></script>
 
 </body>
