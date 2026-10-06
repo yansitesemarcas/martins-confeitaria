@@ -19,10 +19,12 @@
     window.MARTINS_CONFIG?.SUPABASE_ANON_KEY ||
     "sb_publishable_RwiMCpC1NAsRIaB1LH5mQw_L-pgOEqH";
 
-  const db = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
+  /*
+    IMPORTANTE:
+    O cliente Supabase só é criado depois que verificamos
+    se a biblioteca realmente foi carregada.
+  */
+  let db = null;
 
   const DEFAULTS =
     window.MARTINS_DEFAULTS || {};
@@ -313,6 +315,12 @@
   }
 
   async function saveCategories() {
+    if (!db) {
+      throw new Error(
+        "Supabase não está disponível."
+      );
+    }
+
     const payload = {
       ...state.settings,
       categories:
@@ -498,27 +506,10 @@
         .trim();
 
     if (
-      value ===
-        "encomendas" ||
-      value ===
-        "encomenda"
+      value === "encomendas" ||
+      value === "encomenda"
     ) {
       return "encomendas";
-    }
-
-    if (
-      value ===
-        "pronta-entrega" ||
-      value ===
-        "pronta entrega" ||
-      value ===
-        "cardapio" ||
-      value ===
-        "delivery" ||
-      value ===
-        "pronta_entrega"
-    ) {
-      // Continua para verificar o nome.
     }
 
     const name =
@@ -545,21 +536,11 @@
     }
 
     if (
-      name.includes(
-        "oreo"
-      ) ||
-      name.includes(
-        "kit kat"
-      ) ||
-      name.includes(
-        "kitkat"
-      ) ||
-      name.includes(
-        "nutella"
-      ) ||
-      name.includes(
-        "kinder bueno"
-      )
+      name.includes("oreo") ||
+      name.includes("kit kat") ||
+      name.includes("kitkat") ||
+      name.includes("nutella") ||
+      name.includes("kinder bueno")
     ) {
       return "encomendas";
     }
@@ -577,15 +558,6 @@
       name.includes(
         "brigadeiros premium"
       )
-    ) {
-      return "encomendas";
-    }
-
-    if (
-      value ===
-        "encomendas" ||
-      value ===
-        "encomenda"
     ) {
       return "encomendas";
     }
@@ -622,6 +594,12 @@
      ========================================================= */
 
   async function loadSettings() {
+    if (!db) {
+      throw new Error(
+        "Supabase não está disponível."
+      );
+    }
+
     const {
       data,
       error
@@ -642,10 +620,14 @@
       );
 
       state.settings =
-        {};
+        {
+          ...DEFAULTS
+        };
 
       state.categories =
         defaultCategories();
+
+      loadAdminLogo();
 
       return;
     }
@@ -672,6 +654,12 @@
      ========================================================= */
 
   async function loadProducts() {
+    if (!db) {
+      throw new Error(
+        "Supabase não está disponível."
+      );
+    }
+
     const {
       data,
       error
@@ -1297,6 +1285,14 @@
     if (!productForm)
       return;
 
+    if (!db) {
+      toast(
+        "Supabase não está disponível.",
+        "error"
+      );
+      return;
+    }
+
     const submitButton =
       productForm.querySelector(
         'button[type="submit"]'
@@ -1608,6 +1604,14 @@
   async function deleteProduct(
     id
   ) {
+    if (!db) {
+      toast(
+        "Supabase não está disponível.",
+        "error"
+      );
+      return;
+    }
+
     const product =
       state.products.find(
         (item) =>
@@ -1672,6 +1676,14 @@
   async function duplicateProduct(
     id
   ) {
+    if (!db) {
+      toast(
+        "Supabase não está disponível.",
+        "error"
+      );
+      return;
+    }
+
     const original =
       state.products.find(
         (product) =>
@@ -1744,6 +1756,14 @@
   async function toggleProductAvailability(
     id
   ) {
+    if (!db) {
+      toast(
+        "Supabase não está disponível.",
+        "error"
+      );
+      return;
+    }
+
     const product =
       state.products.find(
         (item) =>
@@ -2326,6 +2346,9 @@
      ========================================================= */
 
   async function loadOrders() {
+    if (!db)
+      return [];
+
     const possibleTables =
       [
         "orders",
@@ -2456,12 +2479,6 @@
     if (!tabContent)
       return;
 
-    /*
-      A antiga área "Tipos de bolo" foi removida.
-      Esta aba agora representa somente os pedidos
-      realmente enviados pelos clientes.
-    */
-
     tabContent.innerHTML = `
       <div class="product-toolbar">
 
@@ -2501,6 +2518,18 @@
 
     if (!container)
       return;
+
+    if (!db) {
+      container.innerHTML = `
+        <div class="admin-empty">
+          Não foi possível conectar ao Supabase.
+        </div>
+      `;
+
+      bindCakeOrdersRefresh();
+
+      return;
+    }
 
     const possibleTables =
       [
@@ -2573,11 +2602,6 @@
 
       return;
     }
-
-    /*
-      Aceita pedidos que tenham campos claramente
-      relacionados a bolo/encomenda.
-    */
 
     const cakeOrders =
       orders.filter(
@@ -2701,7 +2725,9 @@
       )
         .map(
           ([key, item]) =>
-            `${key}: ${formatOrderValue(
+            `${formatOrderLabel(
+              key
+            )}: ${formatOrderValue(
               item
             )}`
         )
@@ -2901,11 +2927,6 @@
       ) ||
       index + 1;
 
-    /*
-      Campos adicionais que não estão nos campos
-      principais também serão exibidos.
-    */
-
     const knownKeys =
       new Set([
         "id",
@@ -3036,9 +3057,7 @@
               PEDIDO DE BOLO
             </span>
 
-            <h3 style="
-              margin:0;
-            ">
+            <h3 style="margin:0;">
               ${escapeHtml(
                 formatOrderValue(
                   customerName
@@ -3073,9 +3092,7 @@
 
         </div>
 
-        <div style="
-          margin-bottom:20px;
-        ">
+        <div style="margin-bottom:20px;">
 
           <h4>
             Dados do cliente
@@ -3119,9 +3136,7 @@
 
         </div>
 
-        <div style="
-          margin-bottom:20px;
-        ">
+        <div style="margin-bottom:20px;">
 
           <h4>
             Informações do bolo
@@ -3171,9 +3186,7 @@
 
         </div>
 
-        <div style="
-          margin-bottom:20px;
-        ">
+        <div style="margin-bottom:20px;">
 
           <h4>
             Itens solicitados
@@ -3211,9 +3224,7 @@
         ${
           notes
             ? `
-              <div style="
-                margin-bottom:20px;
-              ">
+              <div style="margin-bottom:20px;">
 
                 <h4>
                   Observações
@@ -3241,9 +3252,7 @@
         ${
           extraFields.length
             ? `
-              <div style="
-                margin-bottom:20px;
-              ">
+              <div style="margin-bottom:20px;">
 
                 <h4>
                   Outras informações do pedido
@@ -3839,6 +3848,12 @@
      ========================================================= */
 
   async function saveSettingObject() {
+    if (!db) {
+      throw new Error(
+        "Supabase não está disponível."
+      );
+    }
+
     const {
       error
     } =
@@ -4342,47 +4357,55 @@
 
   function updateCakesTabLabel() {
     $$(
-      "[data-tab]"
+      '[data-tab="cakes"]'
     ).forEach(
       (button) => {
 
-        if (
-          button.dataset
-            .tab ===
-          "cakes"
-        ) {
+        const span =
+          button.querySelector(
+            "span"
+          );
 
-          const textNodes =
-            Array.from(
-              button.childNodes
-            ).filter(
-              (node) =>
-                node.nodeType ===
-                Node.TEXT_NODE
-            );
-
-          if (
-            textNodes.length
-          ) {
-
-            textNodes[
-              textNodes.length -
-                1
-            ].textContent =
-              " Pedidos de Bolo";
-
-          } else {
-
-            button.appendChild(
-              document.createTextNode(
-                " Pedidos de Bolo"
-              )
-            );
-
-          }
-
+        if (span) {
+          span.textContent =
+            "Pedidos de Bolo";
+          return;
         }
 
+        /*
+          Caso o botão não tenha span,
+          remove textos antigos duplicados
+          e mantém somente um texto.
+        */
+        const textNodes =
+          Array.from(
+            button.childNodes
+          ).filter(
+            (node) =>
+              node.nodeType ===
+              Node.TEXT_NODE
+          );
+
+        if (
+          textNodes.length
+        ) {
+          textNodes.forEach(
+            (node, index) => {
+              node.textContent =
+                index ===
+                textNodes.length -
+                  1
+                  ? "Pedidos de Bolo"
+                  : "";
+            }
+          );
+        } else {
+          button.appendChild(
+            document.createTextNode(
+              "Pedidos de Bolo"
+            )
+          );
+        }
       }
     );
   }
@@ -4432,6 +4455,13 @@
 
     if (!loginForm)
       return;
+
+    if (!db) {
+      showLoginMessage(
+        "Erro: conexão com o Supabase não está disponível."
+      );
+      return;
+    }
 
     const email =
       $("#loginEmail")
@@ -4527,16 +4557,18 @@
   }
 
   async function handleLogout() {
-    try {
+    if (db) {
+      try {
 
-      await db.auth.signOut();
+        await db.auth.signOut();
 
-    } catch (error) {
+      } catch (error) {
 
-      console.error(
-        error
-      );
+        console.error(
+          error
+        );
 
+      }
     }
 
     showLogin();
@@ -4724,6 +4756,54 @@
   }
 
   /* =========================================================
+     INICIALIZAÇÃO DO SUPABASE
+     ========================================================= */
+
+  function initializeSupabase() {
+    /*
+      Esta função evita o erro:
+      Cannot read properties of undefined
+      (reading 'createClient')
+    */
+
+    if (
+      !window.supabase ||
+      typeof window.supabase.createClient !==
+        "function"
+    ) {
+      console.error(
+        "Supabase JS não foi carregado corretamente."
+      );
+
+      return false;
+    }
+
+    try {
+
+      db =
+        window.supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_ANON_KEY
+        );
+
+      return Boolean(
+        db
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Erro ao criar cliente Supabase:",
+        error
+      );
+
+      db = null;
+
+      return false;
+    }
+  }
+
+  /* =========================================================
      INICIALIZAÇÃO
      ========================================================= */
 
@@ -4733,17 +4813,26 @@
       "Martins Admin — versão atualizada"
     );
 
-    if (
-      !window.supabase
-    ) {
+    /*
+      PRIMEIRO:
+      verificar/criar o Supabase.
+      Somente depois inicializamos o restante.
+    */
 
-      console.error(
-        "Supabase JS não foi carregado."
-      );
+    const supabaseReady =
+      initializeSupabase();
+
+    if (!supabaseReady) {
 
       showLoginMessage(
-        "Erro: biblioteca do Supabase não carregada."
+        "Erro: biblioteca do Supabase não foi carregada. Atualize a página e tente novamente."
       );
+
+      /*
+        Mantém a tela de login visível
+        em vez de deixar o painel branco.
+      */
+      showLogin();
 
       return;
     }
@@ -4788,23 +4877,43 @@
 
     bindModalEvents();
 
-    const {
-      data: {
-        session
+    try {
+
+      const {
+        data: {
+          session
+        } = {}
+      } =
+        await db.auth.getSession();
+
+      if (session) {
+
+        await showApp();
+
+      } else {
+
+        showLogin();
+
       }
-    } =
-      await db.auth.getSession();
 
-    if (session) {
+    } catch (error) {
 
-      await showApp();
+      console.error(
+        "Erro ao verificar sessão:",
+        error
+      );
 
-    } else {
+      showLoginMessage(
+        "Não foi possível verificar a sessão. Atualize a página e tente novamente."
+      );
 
       showLogin();
 
     }
 
+    /*
+      Escuta alterações de autenticação.
+    */
     db.auth.onAuthStateChange(
       async (
         event,
@@ -4845,7 +4954,10 @@
 
     document.addEventListener(
       "DOMContentLoaded",
-      init
+      init,
+      {
+        once: true
+      }
     );
 
   } else {
