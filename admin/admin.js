@@ -1807,16 +1807,6 @@
     if (!tabContent)
       return;
 
-    const deliveryProducts =
-      state.products.filter(
-        (product) =>
-          normalizeArea(
-            product.area,
-            product
-          ) ===
-          "cardapio"
-      );
-
     const orderProducts =
       state.products.filter(
         (product) =>
@@ -1837,7 +1827,7 @@
           </h2>
 
           <p>
-            Gerencie os produtos do Delivery e das Encomendas.
+            Gerencie os produtos das Encomendas.
           </p>
 
         </div>
@@ -1903,12 +1893,6 @@
       </div>
 
       <div class="admin-products-area">
-
-        ${renderAreaSection(
-          "Delivery",
-          "cardapio",
-          deliveryProducts
-        )}
 
         ${renderAreaSection(
           "Encomendas",
@@ -2472,17 +2456,23 @@
     if (!tabContent)
       return;
 
+    /*
+      A antiga área "Tipos de bolo" foi removida.
+      Esta aba agora representa somente os pedidos
+      realmente enviados pelos clientes.
+    */
+
     tabContent.innerHTML = `
       <div class="product-toolbar">
 
         <div>
 
           <h2>
-            Pedidos de Bolos
+            Pedidos de Bolo
           </h2>
 
           <p>
-            Consulte os pedidos de bolos personalizados recebidos dos clientes.
+            Pedidos de bolos personalizados enviados pelos clientes.
           </p>
 
         </div>
@@ -2568,11 +2558,12 @@
         <div class="admin-empty">
 
           <strong>
-            Nenhum pedido disponível.
+            Não foi possível carregar os pedidos.
           </strong>
 
           <p style="margin-top:8px;">
-            Não foi possível carregar os pedidos recebidos.
+            Verifique se os pedidos estão sendo gravados
+            na tabela de pedidos do Supabase.
           </p>
 
         </div>
@@ -2582,6 +2573,11 @@
 
       return;
     }
+
+    /*
+      Aceita pedidos que tenham campos claramente
+      relacionados a bolo/encomenda.
+    */
 
     const cakeOrders =
       orders.filter(
@@ -2665,6 +2661,85 @@
   }
 
   /* =========================================================
+     NORMALIZAR VALORES DOS PEDIDOS
+     ========================================================= */
+
+  function formatOrderValue(
+    value
+  ) {
+    if (
+      value ===
+        undefined ||
+      value ===
+        null ||
+      value ===
+        ""
+    ) {
+      return "";
+    }
+
+    if (
+      Array.isArray(value)
+    ) {
+      return value
+        .map(
+          (item) =>
+            formatOrderValue(
+              item
+            )
+        )
+        .filter(Boolean)
+        .join(", ");
+    }
+
+    if (
+      typeof value ===
+      "object"
+    ) {
+      return Object.entries(
+        value
+      )
+        .map(
+          ([key, item]) =>
+            `${key}: ${formatOrderValue(
+              item
+            )}`
+        )
+        .join(" | ");
+    }
+
+    return String(
+      value
+    );
+  }
+
+  function getOrderValue(
+    order,
+    ...keys
+  ) {
+    for (
+      const key of keys
+    ) {
+      if (
+        order[key] !==
+          undefined &&
+        order[key] !==
+          null &&
+        String(
+          formatOrderValue(
+            order[key]
+          )
+        ).trim() !==
+          ""
+      ) {
+        return order[key];
+      }
+    }
+
+    return "";
+  }
+
+  /* =========================================================
      CARD DO PEDIDO
      ========================================================= */
 
@@ -2672,32 +2747,9 @@
     order,
     index
   ) {
-    const getValue = (
-      ...keys
-    ) => {
-
-      for (
-        const key of keys
-      ) {
-        if (
-          order[key] !==
-            undefined &&
-          order[key] !==
-            null &&
-          String(
-            order[key]
-          ).trim() !==
-            ""
-        ) {
-          return order[key];
-        }
-      }
-
-      return "";
-    };
-
     const customerName =
-      getValue(
+      getOrderValue(
+        order,
         "customer_name",
         "client_name",
         "cliente",
@@ -2707,7 +2759,8 @@
       "Não informado";
 
     const phone =
-      getValue(
+      getOrderValue(
+        order,
         "customer_phone",
         "client_phone",
         "telefone",
@@ -2717,25 +2770,29 @@
       "Não informado";
 
     const orderDate =
-      getValue(
+      getOrderValue(
+        order,
         "created_at",
-        "date",
-        "data"
+        "order_date",
+        "createdDate"
       );
 
     const requestedDate =
-      getValue(
+      getOrderValue(
+        order,
         "delivery_date",
         "pickup_date",
         "event_date",
         "requested_date",
         "data_entrega",
         "data_retirada",
-        "data_evento"
+        "data_evento",
+        "data"
       );
 
     const cakeType =
-      getValue(
+      getOrderValue(
+        order,
         "cake_type",
         "tipo_bolo",
         "bolo",
@@ -2743,15 +2800,19 @@
       );
 
     const size =
-      getValue(
+      getOrderValue(
+        order,
         "size",
         "tamanho",
         "cake_size",
-        "tamanho_bolo"
+        "tamanho_bolo",
+        "pessoas",
+        "quantidade_pessoas"
       );
 
     const mass =
-      getValue(
+      getOrderValue(
+        order,
         "mass",
         "massa",
         "cake_mass",
@@ -2759,7 +2820,8 @@
       );
 
     const filling =
-      getValue(
+      getOrderValue(
+        order,
         "filling",
         "recheio",
         "cake_filling",
@@ -2767,7 +2829,8 @@
       );
 
     const extras =
-      getValue(
+      getOrderValue(
+        order,
         "extras",
         "adicionais",
         "additional",
@@ -2775,7 +2838,8 @@
       );
 
     const personalization =
-      getValue(
+      getOrderValue(
+        order,
         "personalization",
         "personalizacao",
         "personalisation",
@@ -2784,7 +2848,8 @@
       );
 
     const brigadeiros =
-      getValue(
+      getOrderValue(
+        order,
         "brigadeiros",
         "brigadeiro",
         "brigadeiros_classicos",
@@ -2792,14 +2857,16 @@
       );
 
     const kits =
-      getValue(
+      getOrderValue(
+        order,
         "kits",
         "kit",
         "kit_bolo"
       );
 
     const otherItems =
-      getValue(
+      getOrderValue(
+        order,
         "other_items",
         "outros_itens",
         "outros",
@@ -2807,7 +2874,8 @@
       );
 
     const notes =
-      getValue(
+      getOrderValue(
+        order,
         "notes",
         "observations",
         "observacoes",
@@ -2816,7 +2884,8 @@
       );
 
     const total =
-      getValue(
+      getOrderValue(
+        order,
         "total",
         "total_price",
         "valor_total",
@@ -2824,12 +2893,113 @@
       );
 
     const orderId =
-      getValue(
+      getOrderValue(
+        order,
         "id",
         "order_id",
         "pedido_id"
       ) ||
       index + 1;
+
+    /*
+      Campos adicionais que não estão nos campos
+      principais também serão exibidos.
+    */
+
+    const knownKeys =
+      new Set([
+        "id",
+        "order_id",
+        "pedido_id",
+        "customer_name",
+        "client_name",
+        "cliente",
+        "nome",
+        "name",
+        "customer_phone",
+        "client_phone",
+        "telefone",
+        "phone",
+        "whatsapp",
+        "created_at",
+        "order_date",
+        "createdDate",
+        "delivery_date",
+        "pickup_date",
+        "event_date",
+        "requested_date",
+        "data_entrega",
+        "data_retirada",
+        "data_evento",
+        "data",
+        "cake_type",
+        "tipo_bolo",
+        "bolo",
+        "tipo",
+        "size",
+        "tamanho",
+        "cake_size",
+        "tamanho_bolo",
+        "pessoas",
+        "quantidade_pessoas",
+        "mass",
+        "massa",
+        "cake_mass",
+        "massa_bolo",
+        "filling",
+        "recheio",
+        "cake_filling",
+        "recheios",
+        "extras",
+        "adicionais",
+        "additional",
+        "adicionais_bolo",
+        "personalization",
+        "personalizacao",
+        "personalisation",
+        "decoracao",
+        "decoração",
+        "brigadeiros",
+        "brigadeiro",
+        "brigadeiros_classicos",
+        "brigadeiros_premium",
+        "kits",
+        "kit",
+        "kit_bolo",
+        "other_items",
+        "outros_itens",
+        "outros",
+        "itens",
+        "notes",
+        "observations",
+        "observacoes",
+        "observações",
+        "obs",
+        "total",
+        "total_price",
+        "valor_total",
+        "valor"
+      ]);
+
+    const extraFields =
+      Object.entries(
+        order
+      ).filter(
+        ([key, value]) =>
+          !knownKeys.has(
+            key
+          ) &&
+          value !==
+            null &&
+          value !==
+            undefined &&
+          String(
+            formatOrderValue(
+              value
+            )
+          ).trim() !==
+            ""
+      );
 
     return `
       <article
@@ -2870,7 +3040,7 @@
               margin:0;
             ">
               ${escapeHtml(
-                String(
+                formatOrderValue(
                   customerName
                 )
               )}
@@ -2973,7 +3143,7 @@
             )}
 
             ${renderOrderInfo(
-              "Tamanho",
+              "Tamanho / Pessoas",
               size
             )}
 
@@ -3057,10 +3227,50 @@
                   white-space:pre-wrap;
                 ">
                   ${escapeHtml(
-                    String(
+                    formatOrderValue(
                       notes
                     )
                   )}
+                </div>
+
+              </div>
+            `
+            : ""
+        }
+
+        ${
+          extraFields.length
+            ? `
+              <div style="
+                margin-bottom:20px;
+              ">
+
+                <h4>
+                  Outras informações do pedido
+                </h4>
+
+                <div style="
+                  display:grid;
+                  grid-template-columns:
+                    repeat(
+                      auto-fit,
+                      minmax(220px, 1fr)
+                    );
+                  gap:10px;
+                ">
+
+                  ${extraFields
+                    .map(
+                      ([key, value]) =>
+                        renderOrderInfo(
+                          formatOrderLabel(
+                            key
+                          ),
+                          value
+                        )
+                    )
+                    .join("")}
+
                 </div>
 
               </div>
@@ -3098,6 +3308,98 @@
   }
 
   /* =========================================================
+     NOME DOS CAMPOS EXTRAS
+     ========================================================= */
+
+  function formatOrderLabel(
+    key
+  ) {
+    const labels = {
+      customer_name:
+        "Nome do cliente",
+
+      client_name:
+        "Nome do cliente",
+
+      customer_phone:
+        "Telefone",
+
+      client_phone:
+        "Telefone",
+
+      cake_type:
+        "Tipo de bolo",
+
+      tipo_bolo:
+        "Tipo de bolo",
+
+      cake_size:
+        "Tamanho do bolo",
+
+      tamanho_bolo:
+        "Tamanho do bolo",
+
+      event_date:
+        "Data do evento",
+
+      delivery_date:
+        "Data de entrega",
+
+      pickup_date:
+        "Data de retirada",
+
+      massa:
+        "Massa",
+
+      recheio:
+        "Recheio",
+
+      adicionais:
+        "Adicionais",
+
+      personalizacao:
+        "Personalização",
+
+      observacoes:
+        "Observações",
+
+      total_price:
+        "Valor total",
+
+      valor_total:
+        "Valor total"
+    };
+
+    if (
+      labels[key]
+    ) {
+      return labels[key];
+    }
+
+    return String(
+      key || ""
+    )
+      .replace(
+        /[_-]+/g,
+        " "
+      )
+      .replace(
+        /([a-z])([A-Z])/g,
+        "$1 $2"
+      )
+      .replace(
+        /\s+/g,
+        " "
+      )
+      .trim()
+      .replace(
+        /^./,
+        (letter) =>
+          letter.toUpperCase()
+      );
+  }
+
+  /* =========================================================
      INFORMAÇÕES DO PEDIDO
      ========================================================= */
 
@@ -3111,7 +3413,9 @@
       value ===
         null ||
       String(
-        value
+        formatOrderValue(
+          value
+        )
       ).trim() ===
         ""
     ) {
@@ -3142,7 +3446,7 @@
           white-space:pre-wrap;
         ">
           ${escapeHtml(
-            String(
+            formatOrderValue(
               value
             )
           )}
@@ -3171,7 +3475,7 @@
         date.getTime()
       )
     ) {
-      return String(
+      return formatOrderValue(
         value
       );
     }
@@ -4065,13 +4369,13 @@
               textNodes.length -
                 1
             ].textContent =
-              " Pedidos de Bolos";
+              " Pedidos de Bolo";
 
           } else {
 
             button.appendChild(
               document.createTextNode(
-                " Pedidos de Bolos"
+                " Pedidos de Bolo"
               )
             );
 
