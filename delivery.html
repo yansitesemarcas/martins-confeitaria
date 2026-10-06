@@ -510,9 +510,14 @@
       await client
         .from('products')
         .select('*')
-        .eq(
+        .in(
           'area',
-          'pronta-entrega'
+          [
+            'pronta',
+            'pronta-entrega',
+            'ready',
+            'delivery'
+          ]
         )
         .order(
           'sort',
