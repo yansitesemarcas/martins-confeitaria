@@ -18,33 +18,175 @@
     href="style.css?v=20261006-01"
   >
 <style id="legacy-encomendas-visual">
-.custom-page{padding:130px 20px 70px!important;min-height:100vh!important;background:transparent!important}
-.custom-page{max-width:1100px!important;margin:0 auto!important}
+/* VISUAL ANTIGO DAS ENCOMENDAS — somente aparência */
+.custom-page{
+  max-width:1100px!important;
+  margin:0 auto!important;
+  padding:130px 20px 70px!important;
+  min-height:100vh!important;
+  background:#faf7f3!important;
+}
 .custom-page>.section-head{text-align:center;margin-bottom:40px}
-.custom-page>.section-head h1{margin:10px 0}
-.custom-page>.section-head p{max-width:700px;margin:0 auto}
+.custom-page>.section-head .eyebrow{color:#7a4934!important}
+.custom-page>.section-head h1{margin:10px 0;color:#4b2b20!important;font-family:Georgia,serif}
+.custom-page>.section-head p{max-width:700px;margin:0 auto;color:#806b60!important}
+
 .cake-builder{display:grid;gap:25px}
-.cake-builder .extras,.cake-builder .kit-section,.cake-builder .brigadeiro-section,.cake-builder .other-orders-section{background:rgba(255,255,255,.96)!important;border-radius:24px!important;padding:28px!important;box-shadow:0 15px 40px rgba(0,0,0,.08)!important}
-.cake-builder .extras legend{font-size:1.35rem;font-weight:800;padding:0 6px}
+.cake-builder .extras,
+.cake-builder .kit-section,
+.cake-builder .brigadeiro-section,
+.cake-builder .other-orders-section{
+  background:#fff!important;
+  border:1px solid #eadfd7!important;
+  border-radius:20px!important;
+  padding:28px!important;
+  box-shadow:0 8px 25px rgba(80,45,25,.06)!important;
+}
+.cake-builder .extras legend{
+  color:#4b2b20!important;
+  font-family:Georgia,serif;
+  font-size:1.35rem;
+  font-weight:800;
+  padding:0 6px;
+}
 .cake-builder .section-head{margin-bottom:25px}
-.cake-builder .section-head h2{margin:10px 0 8px}
-.cake-builder .section-head p{margin:0;opacity:.75}
-.cake-options,.kit-options,.brigadeiro-list,.other-order-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
-.extra-option{position:relative;display:flex;align-items:center;gap:12px;padding:18px;border:2px solid rgba(103,176,203,.25);border-radius:18px;cursor:pointer;transition:.25s ease;background:#fff}
-.extra-option:hover{transform:translateY(-2px);border-color:#67b0cb}
-.extra-option input{accent-color:#67b0cb}
-.extra-option:has(input:checked){border-color:#67b0cb;background:rgba(103,176,203,.10);box-shadow:0 8px 25px rgba(103,176,203,.15)}
+.cake-builder .section-head h2{margin:10px 0 8px;color:#4b2b20!important;font-family:Georgia,serif}
+.cake-builder .section-head p{margin:0;color:#806b60!important;opacity:1}
+
+.cake-kind h3{color:#4b2b20!important;font-family:Georgia,serif}
+
+.cake-options,.kit-options,.brigadeiro-list,.other-order-list{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:15px;
+}
+
+.extra-option{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:18px;
+  border:2px solid #eadfd7!important;
+  border-radius:16px!important;
+  cursor:pointer;
+  transition:.2s;
+  background:#fff!important;
+  color:#3a241b!important;
+}
+.extra-option:hover{transform:translateY(-2px);border-color:#9b6249!important}
+.extra-option input{accent-color:#6b3f2d}
+.extra-option:has(input:checked){
+  border-color:#6b3f2d!important;
+  background:#fcf5ef!important;
+  box-shadow:none!important;
+}
 .extra-option span{display:flex;flex-direction:column;gap:4px;flex:1}
-.extra-option small{opacity:.7}
-.extra-option strong{font-weight:800;color:#2b7896}
-.other-order-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
-.other-order-list>span{font-weight:700}
-.other-order-list input,.other-order-list textarea,.other-order-list select{width:100%;box-sizing:border-box;border:2px solid rgba(103,176,203,.25);border-radius:14px;padding:13px 15px;font-family:inherit;font-size:1rem;outline:none;transition:.2s ease;background:#fff}
-.other-order-list input:focus,.other-order-list textarea:focus,.other-order-list select:focus{border-color:#67b0cb;box-shadow:0 0 0 4px rgba(103,176,203,.10)}
-.cake-total{position:sticky;bottom:15px;z-index:10;background:#fff;border-radius:20px;padding:20px 25px;box-shadow:0 15px 40px rgba(0,0,0,.15);display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
-.cake-total span{font-size:1rem;opacity:.7}.cake-total strong{font-size:1.8rem;font-weight:900;color:#2b7896}
-.kit-fixed-cake,.kit-mode-note{background:rgba(103,176,203,.1);border:2px solid rgba(103,176,203,.25);border-radius:18px;padding:16px 18px}
-@media(max-width:760px){.custom-page{padding:110px 14px 50px}.cake-builder .extras,.cake-builder .kit-section,.cake-builder .brigadeiro-section,.cake-builder .other-orders-section{padding:20px;border-radius:18px}.cake-options,.kit-options,.brigadeiro-list,.other-order-list{grid-template-columns:1fr}.cake-total{align-items:flex-start;flex-direction:column}.cake-total strong{font-size:1.5rem}}
+.extra-option small{color:#806b60!important;opacity:1}
+.extra-option strong{font-weight:800;color:#6b3f2d!important}
+
+.other-order-list>span{font-weight:700;color:#4b2b20!important}
+.other-order-list input,
+.other-order-list textarea,
+.other-order-list select{
+  width:100%;
+  box-sizing:border-box;
+  border:1px solid #dccbc0!important;
+  border-radius:10px!important;
+  padding:13px 15px;
+  font-family:inherit;
+  font-size:1rem;
+  outline:none;
+  transition:.2s ease;
+  background:#fff!important;
+  color:#3a241b!important;
+}
+.other-order-list input:focus,
+.other-order-list textarea:focus,
+.other-order-list select:focus{
+  border-color:#8c5941!important;
+  box-shadow:none!important;
+}
+
+.kit-fixed-cake,.kit-mode-note{
+  background:#fcf5ef!important;
+  border:1px solid #dccbc0!important;
+  border-radius:15px!important;
+  padding:16px 18px;
+  color:#6d5b50!important;
+}
+.kit-fixed-cake strong{color:#4b2b20!important}
+
+.cake-total{
+  position:sticky;
+  bottom:15px;
+  z-index:10;
+  background:#4b2b20!important;
+  color:#fff!important;
+  border-radius:20px;
+  padding:20px 25px;
+  box-shadow:0 10px 35px rgba(50,25,15,.25)!important;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  flex-wrap:wrap;
+}
+.cake-total span{font-size:1rem;color:#fff!important;opacity:.9}
+.cake-total strong{font-size:1.8rem;font-weight:900;color:#fff!important}
+
+.submit-order{
+  background:#6b3f2d!important;
+  color:#fff!important;
+  border:0!important;
+  border-radius:12px!important;
+  padding:14px 20px!important;
+  font-weight:700!important;
+}
+.submit-order:hover{background:#512e21!important;transform:translateY(-1px)}
+
+.two-paths{max-width:1100px;margin:0 auto 28px;padding:0 20px}
+.two-paths-box{
+  background:#f4e8d8;
+  border:1px solid #d8c2a8;
+  border-radius:24px;
+  padding:26px;
+  box-shadow:0 15px 40px rgba(91,62,38,.10);
+}
+.two-paths-title{text-align:center;color:#5b3e26;margin:0 0 8px;font-weight:900}
+.two-paths-sub{text-align:center;color:#765b42;margin:0 0 20px}
+.two-paths-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.two-path{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  text-align:left;
+  text-decoration:none;
+  background:#fffaf4;
+  border:2px solid #d8c2a8;
+  border-radius:20px;
+  padding:20px;
+  color:#5b3e26;
+  transition:.2s;
+}
+.two-path:hover{transform:translateY(-2px);border-color:#9a6b45;box-shadow:0 10px 25px rgba(91,62,38,.12)}
+.two-path strong{font-size:1.15rem;margin-bottom:6px}
+.two-path span{font-size:.92rem;color:#765b42}
+.two-path.primary{background:#6f4a32;color:#fff;border-color:#6f4a32}
+.two-path.primary span{color:#f4e8d8}
+
+@media(max-width:760px){
+  .custom-page{padding:110px 14px 50px!important}
+  .cake-builder .extras,
+  .cake-builder .kit-section,
+  .cake-builder .brigadeiro-section,
+  .cake-builder .other-orders-section{padding:20px!important;border-radius:18px!important}
+  .cake-options,.kit-options,.brigadeiro-list,.other-order-list{grid-template-columns:1fr}
+  .cake-total{align-items:flex-start;flex-direction:column}
+  .cake-total strong{font-size:1.5rem}
+  .two-paths{padding:0 14px}
+  .two-paths-grid{grid-template-columns:1fr}
+}
 </style>
 <style id="two-paths-visual">
 .two-paths{max-width:1100px;margin:0 auto 28px;padding:0 20px}
