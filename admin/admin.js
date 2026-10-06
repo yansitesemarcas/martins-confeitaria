@@ -2,7 +2,7 @@
    MARTINS CONFEITARIA
    PAINEL ADMINISTRATIVO
    ADMIN.JS
-   Compatível com admin/index.html atual
+   VERSÃO CORRIGIDA
    ========================================================= */
 
 (() => {
@@ -57,9 +57,7 @@
 
   const $$ = (selector) =>
     Array.from(
-      document.querySelectorAll(
-        selector
-      )
+      document.querySelectorAll(selector)
     );
 
   const login =
@@ -115,29 +113,12 @@
      ========================================================= */
 
   function escapeHtml(value) {
-    return String(
-      value ?? ""
-    )
-      .replace(
-        /&/g,
-        "&amp;"
-      )
-      .replace(
-        /</g,
-        "&lt;"
-      )
-      .replace(
-        />/g,
-        "&gt;"
-      )
-      .replace(
-        /"/g,
-        "&quot;"
-      )
-      .replace(
-        /'/g,
-        "&#039;"
-      );
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 
   function money(value) {
@@ -153,12 +134,8 @@
     );
   }
 
-  function normalizeText(
-    value
-  ) {
-    return String(
-      value || ""
-    )
+  function normalizeText(value) {
+    return String(value || "")
       .normalize("NFD")
       .replace(
         /[\u0300-\u036f]/g,
@@ -169,21 +146,10 @@
   }
 
   function slugify(value) {
-    return normalizeText(
-      value
-    )
-      .replace(
-        /\s+/g,
-        "-"
-      )
-      .replace(
-        /[^a-z0-9-]/g,
-        ""
-      )
-      .replace(
-        /-+/g,
-        "-"
-      );
+    return normalizeText(value)
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/-+/g, "-");
   }
 
   function showToast(
@@ -198,8 +164,7 @@
     toastBox.textContent =
       message;
 
-    toastBox.className =
-      "";
+    toastBox.className = "";
 
     toastBox.classList.add(
       "show"
@@ -259,15 +224,12 @@
       button.dataset.originalText =
         button.textContent;
 
-      button.disabled =
-        true;
+      button.disabled = true;
 
       button.textContent =
-        text ||
-        "Salvando...";
+        text || "Salvando...";
     } else {
-      button.disabled =
-        false;
+      button.disabled = false;
 
       button.textContent =
         button.dataset
@@ -308,10 +270,8 @@
 
     if (
       value === "pronta" ||
-      value ===
-        "pronta-entrega" ||
-      value ===
-        "pronta entrega"
+      value === "pronta-entrega" ||
+      value === "pronta entrega"
     ) {
       return "pronta";
     }
@@ -328,45 +288,18 @@
         product.name
       );
 
-    /*
-     * Produtos conhecidos da área
-     * de encomendas.
-     */
-
     if (
-      name.includes(
-        "naked cake"
-      ) ||
-      name.includes(
-        "chantininho"
-      ) ||
-      name.includes(
-        "brigadeiro classico"
-      ) ||
-      name.includes(
-        "brigadeiros classicos"
-      ) ||
-      name.includes(
-        "brigadeiro premium"
-      ) ||
-      name.includes(
-        "brigadeiros premium"
-      ) ||
-      name.includes(
-        "oreo"
-      ) ||
-      name.includes(
-        "kit kat"
-      ) ||
-      name.includes(
-        "kitkat"
-      ) ||
-      name.includes(
-        "nutella"
-      ) ||
-      name.includes(
-        "kinder bueno"
-      )
+      name.includes("naked cake") ||
+      name.includes("chantininho") ||
+      name.includes("brigadeiro classico") ||
+      name.includes("brigadeiros classicos") ||
+      name.includes("brigadeiro premium") ||
+      name.includes("brigadeiros premium") ||
+      name.includes("oreo") ||
+      name.includes("kit kat") ||
+      name.includes("kitkat") ||
+      name.includes("nutella") ||
+      name.includes("kinder bueno")
     ) {
       return "encomendas";
     }
@@ -374,12 +307,9 @@
     return "pronta";
   }
 
-  function areaLabel(
-    area
-  ) {
-    return normalizeArea(
-      area
-    ) === "encomendas"
+  function areaLabel(area) {
+    return normalizeArea(area) ===
+      "encomendas"
       ? "Encomendas"
       : "Pronta Entrega";
   }
@@ -388,9 +318,7 @@
      IMAGEM
      ========================================================= */
 
-  function getProductImage(
-    product
-  ) {
+  function getProductImage(product) {
     return (
       product?.image_url ||
       product?.image ||
@@ -441,7 +369,7 @@
   }
 
   /* =========================================================
-     CONFIGURAÇÕES
+     CONFIGURAÇÕES — CARREGAR
      ========================================================= */
 
   async function loadSettings() {
@@ -457,10 +385,7 @@
     } = await db
       .from("settings")
       .select("*")
-      .eq(
-        "key",
-        "site"
-      )
+      .eq("key", "site")
       .maybeSingle();
 
     if (error) {
@@ -613,7 +538,8 @@
         ? data
         : [];
   }
-     /* =========================================================
+
+  /* =========================================================
      CLASSIFICAÇÕES / CATEGORIAS
      ========================================================= */
 
@@ -642,8 +568,7 @@
 
   function getCategories() {
     const categories =
-      state.settings
-        ?.categories;
+      state.settings?.categories;
 
     if (
       Array.isArray(
@@ -754,9 +679,7 @@
         "Digite o nome da nova classificação:"
       );
 
-    if (
-      name === null
-    ) {
+    if (name === null) {
       return;
     }
 
@@ -912,6 +835,7 @@
 
     if (preview) {
       preview.src = "";
+
       preview.classList.add(
         "hidden"
       );
@@ -1003,14 +927,12 @@
       $("#f-cat");
 
     renderCategoryOptions(
-      product.category ||
-        ""
+      product.category || ""
     );
 
     if (category) {
       category.value =
-        product.category ||
-        "";
+        product.category || "";
     }
 
     const price =
@@ -1018,8 +940,7 @@
 
     if (price) {
       price.value =
-        product.price ??
-        "";
+        product.price ?? "";
     }
 
     const discount =
@@ -1027,8 +948,7 @@
 
     if (discount) {
       discount.value =
-        product.discount ??
-        0;
+        product.discount ?? 0;
     }
 
     const sort =
@@ -1036,8 +956,7 @@
 
     if (sort) {
       sort.value =
-        product.sort ??
-        0;
+        product.sort ?? 0;
     }
 
     const gram =
@@ -1045,8 +964,7 @@
 
     if (gram) {
       gram.value =
-        product.gramatura ??
-        "";
+        product.gramatura ?? "";
     }
 
     const serve =
@@ -1054,8 +972,7 @@
 
     if (serve) {
       serve.value =
-        product.serve_ate ??
-        "";
+        product.serve_ate ?? "";
     }
 
     const description =
@@ -1063,8 +980,7 @@
 
     if (description) {
       description.value =
-        product.description ||
-        "";
+        product.description || "";
     }
 
     const available =
@@ -1072,8 +988,7 @@
 
     if (available) {
       available.checked =
-        product.available !==
-        false;
+        product.available !== false;
     }
 
     const featured =
@@ -1081,8 +996,7 @@
 
     if (featured) {
       featured.checked =
-        product.featured ===
-        true;
+        product.featured === true;
     }
 
     const appointment =
@@ -1090,8 +1004,7 @@
 
     if (appointment) {
       appointment.checked =
-        product.appointment ===
-        true;
+        product.appointment === true;
     }
 
     const image =
@@ -1123,6 +1036,12 @@
       }
     }
   }
+
+  /* =========================================================
+     IMPORTANTE:
+     NÃO existe mais "appointment" nos dados
+     enviados para a tabela products.
+     ========================================================= */
 
   function getProductFormData() {
     const area =
@@ -1191,11 +1110,6 @@
         ?.checked ??
       false;
 
-    const appointment =
-      $("#f-appt")
-        ?.checked ??
-      false;
-
     return {
       area,
       name,
@@ -1208,24 +1122,103 @@
         serveAte,
       description,
       available,
-      featured,
-      appointment
+      featured
     };
   }
      /* =========================================================
+     PRODUTOS — IMAGEM
+     ========================================================= */
+
+  async function uploadProductImage(file, productName) {
+    if (!db || !file) {
+      return null;
+    }
+
+    const extension =
+      String(file.name || "")
+        .split(".")
+        .pop()
+        .toLowerCase() || "jpg";
+
+    const safeName =
+      slugify(productName) ||
+      `produto-${Date.now()}`;
+
+    const path =
+      `products/${Date.now()}-${safeName}.${extension}`;
+
+    const {
+      error: uploadError
+    } = await db.storage
+      .from("images")
+      .upload(
+        path,
+        file,
+        {
+          upsert: true,
+          contentType:
+            file.type ||
+            "image/jpeg"
+        }
+      );
+
+    if (uploadError) {
+      console.error(
+        "Erro ao enviar imagem:",
+        uploadError
+      );
+
+      throw uploadError;
+    }
+
+    const {
+      data
+    } = db.storage
+      .from("images")
+      .getPublicUrl(path);
+
+    return (
+      data?.publicUrl ||
+      null
+    );
+  }
+
+  /* =========================================================
      PRODUTOS — SALVAR
      ========================================================= */
 
-  async function saveProduct(
-    event
-  ) {
-    event.preventDefault();
-
+  async function saveProduct() {
     if (!db) {
       showToast(
         "Supabase não está conectado.",
         "error"
       );
+
+      return;
+    }
+
+    const formData =
+      getProductFormData();
+
+    if (!formData.name) {
+      showToast(
+        "Informe o nome do produto.",
+        "warning"
+      );
+
+      $("#f-name")?.focus();
+
+      return;
+    }
+
+    if (!formData.category) {
+      showToast(
+        "Selecione uma classificação.",
+        "warning"
+      );
+
+      $("#f-cat")?.focus();
+
       return;
     }
 
@@ -1241,40 +1234,53 @@
     );
 
     try {
-      const formData =
-        getProductFormData();
+      let imageUrl = null;
 
-      if (!formData.name) {
-        throw new Error(
-          "Informe o nome do produto."
+      const imageInput =
+        $("#f-photo");
+
+      const file =
+        imageInput?.files?.[0] ||
+        null;
+
+      const existingProduct =
+        state.products.find(
+          (product) =>
+            String(product.id) ===
+            String(
+              state.editingProductId
+            )
         );
-      }
 
-      if (
-        !formData.category ||
-        formData.category ===
-          "__new__"
+      if (file) {
+        imageUrl =
+          await uploadProductImage(
+            file,
+            formData.name
+          );
+      } else if (
+        existingProduct
       ) {
-        throw new Error(
-          "Selecione uma classificação."
-        );
+        imageUrl =
+          getProductImage(
+            existingProduct
+          ) || null;
       }
 
       /*
-       * Upload da foto, caso uma nova
-       * imagem tenha sido selecionada.
+       * ATENÇÃO:
+       * "appointment" NÃO é enviado.
+       * A tabela products não possui essa coluna.
        */
 
-      const file =
-        $("#f-photo")
-          ?.files?.[0];
-
       const payload = {
+        area:
+          normalizeArea(
+            formData.area
+          ),
+
         name:
           formData.name,
-
-        area:
-          formData.area,
 
         category:
           formData.category,
@@ -1301,181 +1307,120 @@
           formData.available,
 
         featured:
-          formData.featured,
-
-        appointment:
-          formData.appointment
+          formData.featured
       };
 
-      if (file) {
-        if (
-          !file.type.startsWith(
-            "image/"
-          )
-        ) {
-          throw new Error(
-            "O arquivo selecionado não é uma imagem válida."
-          );
-        }
-
-        const extension =
-          file.name
-            .split(".")
-            .pop()
-            ?.toLowerCase() ||
-          "jpg";
-
-        const fileName =
-          `${Date.now()}-${slugify(
-            formData.name
-          )}.${extension}`;
-
-        const filePath =
-          `products/${fileName}`;
-
-        const {
-          error:
-            uploadError
-        } =
-          await db.storage
-            .from("images")
-            .upload(
-              filePath,
-              file,
-              {
-                upsert:
-                  true
-              }
-            );
-
-        if (uploadError) {
-          throw uploadError;
-        }
-
-        const {
-          data:
-            publicUrlData
-        } =
-          db.storage
-            .from("images")
-            .getPublicUrl(
-              filePath
-            );
-
+      if (imageUrl) {
         payload.image_url =
-          publicUrlData
-            ?.publicUrl ||
-          "";
+          imageUrl;
       }
 
+      let result;
+
+      if (
+        state.editingProductId
+      ) {
+        result =
+          await db
+            .from("products")
+            .update(payload)
+            .eq(
+              "id",
+              state.editingProductId
+            )
+            .select()
+            .single();
+      } else {
+        result =
+          await db
+            .from("products")
+            .insert(payload)
+            .select()
+            .single();
+      }
+
+      if (result.error) {
+        console.error(
+          "Erro ao salvar produto:",
+          result.error
+        );
+
+        throw result.error;
+      }
+
+      const savedProduct =
+        result.data;
+
       /*
-       * Edição
+       * Atualiza imediatamente o estado
+       * para a tela não precisar esperar
+       * outro carregamento.
        */
 
       if (
-        state.editingProductId !==
-          null &&
-        state.editingProductId !==
-          undefined &&
-        state.editingProductId !==
-          ""
+        state.editingProductId
       ) {
-        const numericId =
-          Number(
-            state.editingProductId
+        state.products =
+          state.products.map(
+            (product) =>
+              String(product.id) ===
+              String(
+                state.editingProductId
+              )
+                ? {
+                    ...product,
+                    ...savedProduct,
+                    area:
+                      normalizeArea(
+                        savedProduct.area,
+                        savedProduct
+                      )
+                  }
+                : product
           );
-
-        if (
-          !Number.isFinite(
-            numericId
-          )
-        ) {
-          throw new Error(
-            "ID do produto inválido."
-          );
-        }
-
-        const {
-          error
-        } = await db
-          .from("products")
-          .update(
-            payload
-          )
-          .eq(
-            "id",
-            numericId
-          );
-
-        if (error) {
-          throw error;
-        }
-
-        showToast(
-          "Produto atualizado com sucesso."
-        );
-
-      } else {
-        /*
-         * Novo produto
-         */
-
-        const {
-          data,
-          error
-        } = await db
-          .from("products")
-          .insert(
-            payload
-          )
-          .select()
-          .single();
-
-        if (error) {
-          throw error;
-        }
-
-        if (data) {
-          state.products.push(
-            {
-              ...data,
-              area:
-                normalizeArea(
-                  data.area,
-                  data
-                )
-            }
-          );
-        }
-
-        showToast(
-          "Produto criado com sucesso."
-        );
+      } else if (
+        savedProduct
+      ) {
+        state.products.push({
+          ...savedProduct,
+          area:
+            normalizeArea(
+              savedProduct.area,
+              savedProduct
+            )
+        });
       }
-
-      await loadProducts();
 
       closeProductModal();
 
       renderCurrentView();
 
+      showToast(
+        state.editingProductId
+          ? "Produto atualizado com sucesso."
+          : "Produto criado com sucesso."
+      );
+
+      state.editingProductId =
+        null;
     } catch (error) {
       console.error(
         "Erro ao salvar produto:",
         error
       );
 
-      showToast(
+      const message =
         error?.message ||
-          "Não foi possível salvar o produto.",
+        "Não foi possível salvar o produto.";
+
+      showToast(
+        message,
         "error"
       );
-
     } finally {
       setButtonLoading(
         submitButton,
-        false,
-        "Salvar alterações"
+        false
       );
     }
   }
@@ -1487,13 +1432,7 @@
   async function deleteProduct(
     product
   ) {
-    if (
-      !product ||
-      product.id ===
-        undefined ||
-      product.id ===
-        null
-    ) {
+    if (!product?.id) {
       return;
     }
 
@@ -1506,22 +1445,16 @@
       return;
     }
 
+    if (!db) {
+      showToast(
+        "Supabase não está conectado.",
+        "error"
+      );
+
+      return;
+    }
+
     try {
-      const numericId =
-        Number(
-          product.id
-        );
-
-      if (
-        !Number.isFinite(
-          numericId
-        )
-      ) {
-        throw new Error(
-          "ID do produto inválido."
-        );
-      }
-
       const {
         error
       } = await db
@@ -1529,7 +1462,7 @@
         .delete()
         .eq(
           "id",
-          numericId
+          product.id
         );
 
       if (error) {
@@ -1539,20 +1472,15 @@
       state.products =
         state.products.filter(
           (item) =>
-            String(
-              item.id
-            ) !==
-            String(
-              product.id
-            )
+            String(item.id) !==
+            String(product.id)
         );
+
+      renderCurrentView();
 
       showToast(
         "Produto excluído com sucesso."
       );
-
-      renderCurrentView();
-
     } catch (error) {
       console.error(
         "Erro ao excluir produto:",
@@ -1568,10 +1496,43 @@
   }
 
   /* =========================================================
-     PRODUTOS — CARD
+     PRODUTOS — REMOVER IMAGEM
      ========================================================= */
 
-  function renderProductCard(
+  function removeProductImage() {
+    const input =
+      $("#f-photo");
+
+    if (input) {
+      input.value = "";
+    }
+
+    const preview =
+      $("#prev");
+
+    if (preview) {
+      preview.src = "";
+
+      preview.classList.add(
+        "hidden"
+      );
+    }
+
+    const removeButton =
+      $("#rmimg");
+
+    if (removeButton) {
+      removeButton.classList.add(
+        "hidden"
+      );
+    }
+  }
+
+  /* =========================================================
+     PRODUTOS — VISUAL
+     ========================================================= */
+
+  function productCard(
     product
   ) {
     const image =
@@ -1579,31 +1540,32 @@
         product
       );
 
-    const available =
-      product.available !==
-        false &&
-      product.available !==
-        "false";
-
-    const price =
-      Number(
-        product.price ||
-          0
+    const area =
+      normalizeArea(
+        product.area,
+        product
       );
+
+    const active =
+      product.available !== false;
+
+    const featured =
+      product.featured === true;
 
     const discount =
       Number(
-        product.discount ||
-          0
+        product.discount || 0
       );
 
     const finalPrice =
       discount > 0
-        ? price -
-          price *
-            (discount /
-              100)
-        : price;
+        ? Number(
+            product.price || 0
+          ) *
+          (1 - discount / 100)
+        : Number(
+            product.price || 0
+          );
 
     return `
       <article
@@ -1613,8 +1575,7 @@
         )}"
       >
 
-        <div class="product-card-image">
-
+        <div class="product-image">
           ${
             image
               ? `
@@ -1623,68 +1584,77 @@
                     image
                   )}"
                   alt="${escapeHtml(
-                    product.name ||
-                      ""
+                    product.name
                   )}"
+                  loading="lazy"
                 >
               `
               : `
-                <div class="product-image-empty">
+                <div class="no-image">
                   Sem foto
                 </div>
               `
           }
-
         </div>
 
-        <div class="product-card-body">
+        <div class="product-info">
 
-          <div class="product-card-top">
-
+          <div class="product-top">
             <span class="badge">
               ${escapeHtml(
-                areaLabel(
-                  product.area
-                )
+                areaLabel(area)
               )}
             </span>
 
-            <span class="status ${
-              available
-                ? "active"
-                : "inactive"
-            }">
-              ${
-                available
-                  ? "Ativo"
-                  : "Inativo"
-              }
-            </span>
-
+            ${
+              featured
+                ? `
+                  <span class="badge highlight">
+                    Destaque
+                  </span>
+                `
+                : ""
+            }
           </div>
 
           <h3>
             ${escapeHtml(
-              product.name ||
-                ""
+              product.name
             )}
           </h3>
 
-          <p>
-            ${escapeHtml(
-              product.category ||
-                ""
-            )}
-          </p>
+          ${
+            product.category
+              ? `
+                <p class="muted">
+                  ${escapeHtml(
+                    product.category
+                  )}
+                </p>
+              `
+              : ""
+          }
 
-          <div class="product-card-price">
+          ${
+            product.description
+              ? `
+                <p class="description">
+                  ${escapeHtml(
+                    product.description
+                  )}
+                </p>
+              `
+              : ""
+          }
+
+          <div class="price-area">
 
             ${
               discount > 0
                 ? `
                   <span class="old-price">
                     ${money(
-                      price
+                      product.price
                     )}
                   </span>
                 `
@@ -1697,26 +1667,41 @@
               )}
             </strong>
 
+            ${
+              discount > 0
+                ? `
+                  <span class="discount">
+                    -${discount}%
+                  </span>
+                `
+                : ""
+            }
+
           </div>
 
-          ${
-            product.description
-              ? `
-                <div class="product-card-description">
-                  ${escapeHtml(
-                    product.description
-                  )}
-                </div>
-              `
-              : ""
-          }
+          <div class="product-status">
+            <span
+              class="${
+                active
+                  ? "status-ok"
+                  : "status-off"
+              }"
+            >
+              ${
+                active
+                  ? "Ativo"
+                  : "Indisponível"
+              }
+            </span>
+          </div>
 
           <div class="product-actions">
 
             <button
               type="button"
               class="btn soft"
-              data-edit-product="${escapeHtml(
+              data-action="edit-product"
+              data-id="${escapeHtml(
                 product.id
               )}"
             >
@@ -1726,7 +1711,8 @@
             <button
               type="button"
               class="btn danger"
-              data-delete-product="${escapeHtml(
+              data-action="delete-product"
+              data-id="${escapeHtml(
                 product.id
               )}"
             >
@@ -1741,189 +1727,215 @@
     `;
   }
 
-  /* =========================================================
-     PRODUTOS — LISTA
-     ========================================================= */
-
   function renderProductsView(
     area
   ) {
-    const isOrders =
-      area ===
-      "encomendas";
-
     const products =
-      isOrders
+      area === "encomendas"
         ? getOrderProducts()
         : getReadyProducts();
 
-    const heading =
-      isOrders
-        ? "Produtos — Encomendas"
-        : "Produtos — Pronta Entrega";
+    const label =
+      area === "encomendas"
+        ? "Produtos de Encomendas"
+        : "Produtos de Pronta Entrega";
 
     const description =
-      isOrders
-        ? "Produtos utilizados na área de encomendas."
+      area === "encomendas"
+        ? "Produtos utilizados para pedidos de encomenda."
         : "Produtos disponíveis para pronta entrega.";
 
-    const cards =
-      products.length
-        ? products
-            .map(
-              renderProductCard
-            )
-            .join("")
-        : `
-          <div class="empty">
-            Nenhum produto cadastrado nesta área.
-          </div>
-        `;
-
-    if (title) {
-      title.textContent =
-        heading;
-    }
-
-    if (!view) {
-      return;
-    }
-
-    view.innerHTML = `
-      <div class="toolbar">
+    return `
+      <div class="page-head">
 
         <div>
           <h2>
-            ${escapeHtml(
-              heading
-            )}
+            ${label}
           </h2>
 
           <p class="muted">
-            ${escapeHtml(
-              description
-            )}
+            ${description}
           </p>
         </div>
 
         <button
           type="button"
           class="btn primary"
-          id="newProduct"
+          data-action="new-product"
         >
           + Novo produto
         </button>
 
       </div>
 
-      <div class="products-grid">
-        ${cards}
-      </div>
-    `;
+      <div class="stats mini">
 
-    $("#newProduct")
-      ?.addEventListener(
-        "click",
-        () => {
-          openProductModal();
+        <div class="stat">
+          <strong>
+            ${products.length}
+          </strong>
+          <span>
+            ${area === "encomendas"
+              ? "Produtos de encomenda"
+              : "Produtos de pronta entrega"}
+          </span>
+        </div>
+
+        <div class="stat">
+          <strong>
+            ${
+              products.filter(
+                (product) =>
+                  product.available !==
+                  false
+              ).length
+            }
+          </strong>
+          <span>
+            Ativos
+          </span>
+        </div>
+
+      </div>
+
+      ${
+        products.length
+          ? `
+            <div class="products-grid">
+              ${products
+                .map(
+                  productCard
+                )
+                .join("")}
+            </div>
+          `
+          : `
+            <div class="empty">
+              <strong>
+                Nenhum produto encontrado.
+              </strong>
+
+              <p>
+                Clique em "Novo produto"
+                para cadastrar um item.
+              </p>
+            </div>
+          `
+      }
+    `;
+  }
+
+  /* =========================================================
+     MIGRAÇÃO DOS PRODUTOS EXISTENTES
+     ========================================================= */
+
+  async function migrateExistingProductsToOrders() {
+    if (!db) {
+      return;
+    }
+
+    /*
+     * Esta função NÃO é executada automaticamente.
+     *
+     * Ela serve para mover os produtos antigos
+     * que já estão cadastrados como produtos
+     * de encomenda.
+     *
+     * Os novos produtos continuam podendo ser
+     * cadastrados normalmente como:
+     * - Pronta Entrega
+     * - Encomendas
+     */
+
+    const knownOrderNames = [
+      "naked cake",
+      "chantininho",
+      "brigadeiro classico",
+      "brigadeiros classicos",
+      "brigadeiro premium",
+      "brigadeiros premium",
+      "oreo",
+      "kit kat",
+      "kitkat",
+      "nutella",
+      "kinder bueno"
+    ];
+
+    const productsToMove =
+      state.products.filter(
+        (product) => {
+          const name =
+            normalizeText(
+              product.name
+            );
+
+          return (
+            normalizeArea(
+              product.area,
+              product
+            ) === "pronta" &&
+            knownOrderNames.some(
+              (term) =>
+                name.includes(term)
+            )
+          );
         }
       );
 
-    $$(
-      "[data-edit-product]"
-    ).forEach(
-      (button) => {
-        button.addEventListener(
-          "click",
-          () => {
-            const id =
-              button.dataset
-                .editProduct;
+    if (
+      !productsToMove.length
+    ) {
+      return;
+    }
 
-            const product =
-              state.products.find(
-                (item) =>
-                  String(
-                    item.id
-                  ) ===
-                  String(id)
-              );
+    for (
+      const product of productsToMove
+    ) {
+      const {
+        error
+      } = await db
+        .from("products")
+        .update({
+          area: "encomendas"
+        })
+        .eq(
+          "id",
+          product.id
+        );
 
-            if (product) {
-              openProductModal(
-                product
-              );
-            }
-          }
+      if (error) {
+        console.error(
+          "Erro na migração do produto:",
+          product,
+          error
         );
       }
-    );
+    }
 
-    $$(
-      "[data-delete-product]"
-    ).forEach(
-      (button) => {
-        button.addEventListener(
-          "click",
-          () => {
-            const id =
-              button.dataset
-                .deleteProduct;
-
-            const product =
-              state.products.find(
-                (item) =>
-                  String(
-                    item.id
-                  ) ===
-                  String(id)
-              );
-
-            if (product) {
-              deleteProduct(
-                product
-              );
-            }
-          }
-        );
-      }
-    );
+    await loadProducts();
   }
      /* =========================================================
      DASHBOARD
      ========================================================= */
 
   function renderDashboard() {
-    if (title) {
-      title.textContent =
-        "Dashboard";
-    }
-
-    if (!view) {
-      return;
-    }
-
     const readyProducts =
       getReadyProducts();
 
     const orderProducts =
       getOrderProducts();
 
-    const readyOrders =
-      state.orders.filter(
-        (order) =>
-          detectOrderArea(
-            order
-          ) === "pronta"
-      );
+    const totalProducts =
+      state.products.length;
 
-    const customOrders =
-      state.orders.filter(
-        (order) =>
-          detectOrderArea(
-            order
-          ) === "encomendas"
-      );
+    const activeProducts =
+      state.products.filter(
+        (product) =>
+          product.available !== false
+      ).length;
+
+    const totalOrders =
+      state.orders.length;
 
     const pendingOrders =
       state.orders.filter(
@@ -1934,124 +1946,234 @@
             );
 
           return (
-            status ===
-              "pendente" ||
-            status ===
-              "novo" ||
-            status ===
-              "aguardando"
+            status === "pendente" ||
+            status === "novo" ||
+            !status
           );
         }
-      );
+      ).length;
 
-    view.innerHTML = `
-      <div class="toolbar">
+    return `
+      <div class="page-head">
 
         <div>
-          <h2>Dashboard</h2>
+          <h2>
+            Dashboard
+          </h2>
+
           <p class="muted">
-            Visão geral da administração da Martins Confeitaria.
+            Visão geral do painel administrativo.
           </p>
         </div>
 
+        <button
+          type="button"
+          class="btn soft"
+          data-action="reload-all"
+        >
+          ↻ Recarregar dados
+        </button>
+
       </div>
 
-      <div class="stats-grid">
+      <div class="stats">
 
-        <div class="stat-card">
-          <span>Produtos</span>
+        <div class="stat">
           <strong>
-            ${state.products.length}
+            ${totalProducts}
           </strong>
-          <small>
-            Todos os produtos
-          </small>
+
+          <span>
+            Produtos
+          </span>
         </div>
 
-        <div class="stat-card">
-          <span>Pronta Entrega</span>
+        <div class="stat">
           <strong>
             ${readyProducts.length}
           </strong>
-          <small>
-            Produtos disponíveis
-          </small>
+
+          <span>
+            Pronta Entrega
+          </span>
         </div>
 
-        <div class="stat-card">
-          <span>Encomendas</span>
+        <div class="stat">
           <strong>
             ${orderProducts.length}
           </strong>
-          <small>
-            Produtos para encomenda
-          </small>
+
+          <span>
+            Encomendas
+          </span>
         </div>
 
-        <div class="stat-card">
-          <span>Pedidos</span>
+        <div class="stat">
           <strong>
-            ${state.orders.length}
+            ${activeProducts}
           </strong>
-          <small>
-            Total recebido
-          </small>
+
+          <span>
+            Produtos ativos
+          </span>
         </div>
 
-        <div class="stat-card">
-          <span>Pronta Entrega</span>
+        <div class="stat">
           <strong>
-            ${readyOrders.length}
+            ${totalOrders}
           </strong>
-          <small>
+
+          <span>
             Pedidos
-          </small>
+          </span>
         </div>
 
-        <div class="stat-card">
-          <span>Encomendas</span>
+        <div class="stat">
           <strong>
-            ${customOrders.length}
+            ${pendingOrders}
           </strong>
-          <small>
-            Pedidos
-          </small>
-        </div>
 
-        <div class="stat-card">
-          <span>Pendentes</span>
-          <strong>
-            ${pendingOrders.length}
-          </strong>
-          <small>
-            Aguardando atendimento
-          </small>
+          <span>
+            Pendentes
+          </span>
         </div>
 
       </div>
 
-      <div class="dashboard-sections">
+      <div class="dashboard-grid">
 
         <section class="panel">
 
           <div class="panel-head">
             <div>
               <h3>
-                Últimos pedidos
+                Pronta Entrega
               </h3>
 
               <p class="muted">
-                Pedidos recebidos recentemente.
+                Produtos disponíveis para venda imediata.
               </p>
             </div>
+
+            <button
+              type="button"
+              class="btn soft"
+              data-action="go-view"
+              data-view="prod-ready"
+            >
+              Ver produtos
+            </button>
           </div>
 
           ${
-            state.orders.length
-              ? renderRecentOrders()
+            readyProducts.length
+              ? `
+                <div class="dashboard-list">
+                  ${readyProducts
+                    .slice(0, 5)
+                    .map(
+                      (product) => `
+                        <div class="list-row">
+
+                          <div>
+                            <strong>
+                              ${escapeHtml(
+                                product.name
+                              )}
+                            </strong>
+
+                            <small>
+                              ${escapeHtml(
+                                product.category ||
+                                  "Sem classificação"
+                              )}
+                            </small>
+                          </div>
+
+                          <strong>
+                            ${money(
+                              product.price
+                            )}
+                          </strong>
+
+                        </div>
+                      `
+                    )
+                    .join("")}
+                </div>
+              `
               : `
-                <div class="empty">
-                  Nenhum pedido recebido.
+                <div class="empty small">
+                  Nenhum produto de pronta entrega.
+                </div>
+              `
+          }
+
+        </section>
+
+        <section class="panel">
+
+          <div class="panel-head">
+            <div>
+              <h3>
+                Encomendas
+              </h3>
+
+              <p class="muted">
+                Produtos utilizados para pedidos personalizados.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              class="btn soft"
+              data-action="go-view"
+              data-view="prod-orders"
+            >
+              Ver produtos
+            </button>
+          </div>
+
+          ${
+            orderProducts.length
+              ? `
+                <div class="dashboard-list">
+                  ${orderProducts
+                    .slice(0, 5)
+                    .map(
+                      (product) => `
+                        <div class="list-row">
+
+                          <div>
+                            <strong>
+                              ${escapeHtml(
+                                product.name
+                              )}
+                            </strong>
+
+                            <small>
+                              ${escapeHtml(
+                                product.category ||
+                                  "Sem classificação"
+                              )}
+                            </small>
+                          </div>
+
+                          <strong>
+                            ${money(
+                              product.price
+                            )}
+                          </strong>
+
+                        </div>
+                      `
+                    )
+                    .join("")}
+                </div>
+              `
+              : `
+                <div class="empty small">
+                  Nenhum produto de encomenda.
                 </div>
               `
           }
@@ -2059,105 +2181,98 @@
         </section>
 
       </div>
-    `;
-  }
 
-  function renderRecentOrders() {
-    const orders =
-      state.orders.slice(
-        0,
-        8
-      );
+      <section class="panel">
 
-    return `
-      <div class="table-wrap">
+        <div class="panel-head">
 
-        <table>
+          <div>
+            <h3>
+              Pedidos recentes
+            </h3>
 
-          <thead>
-            <tr>
-              <th>Cliente</th>
-              <th>Tipo</th>
-              <th>Total</th>
-              <th>Status</th>
-              <th>Data</th>
-            </tr>
-          </thead>
+            <p class="muted">
+              Últimos pedidos recebidos pelo site.
+            </p>
+          </div>
 
-          <tbody>
+          <button
+            type="button"
+            class="btn soft"
+            data-action="go-view"
+            data-view="ord-ready"
+          >
+            Ver pedidos
+          </button>
 
-            ${orders
-              .map(
-                (order) => `
-                  <tr>
+        </div>
 
-                    <td>
-                      ${escapeHtml(
-                        getOrderCustomer(
-                          order
-                        )
-                      )}
-                    </td>
+        ${
+          state.orders.length
+            ? `
+              <div class="dashboard-list">
 
-                    <td>
-                      ${escapeHtml(
-                        areaLabel(
-                          detectOrderArea(
-                            order
-                          )
-                        )
-                      )}
-                    </td>
+                ${state.orders
+                  .slice(0, 8)
+                  .map(
+                    order => `
+                      <div class="list-row">
 
-                    <td>
-                      ${money(
-                        getOrderTotal(
-                          order
-                        )
-                      )}
-                    </td>
+                        <div>
+                          <strong>
+                            ${escapeHtml(
+                              getOrderCustomerName(
+                                order
+                              )
+                            )}
+                          </strong>
 
-                    <td>
-                      <span class="status ${
-                        getOrderStatusClass(
-                          order
-                        )
-                      }">
-                        ${escapeHtml(
-                          getOrderStatusLabel(
-                            order
-                          )
-                        )}
-                      </span>
-                    </td>
+                          <small>
+                            ${escapeHtml(
+                              getOrderDisplayTitle(
+                                order
+                              )
+                            )}
+                          </small>
+                        </div>
 
-                    <td>
-                      ${formatDate(
-                        order.created_at ||
-                          order.createdAt
-                      )}
-                    </td>
+                        <span class="badge">
+                          ${escapeHtml(
+                            getOrderStatusLabel(
+                              order.status
+                            )
+                          )}
+                        </span>
 
-                  </tr>
-                `
-              )
-              .join("")}
+                      </div>
+                    `
+                  )
+                  .join("")}
 
-          </tbody>
+              </div>
+            `
+            : `
+              <div class="empty small">
+                Nenhum pedido recebido.
+              </div>
+            `
+        }
 
-        </table>
-
-      </div>
+      </section>
     `;
   }
 
   /* =========================================================
-     PEDIDOS — IDENTIFICAÇÃO
+     PEDIDOS — UTILITÁRIOS
      ========================================================= */
 
-  function getOrderCustomer(
+  function getOrderCustomerName(
     order
   ) {
+    if (!order) {
+      return "Cliente";
+    }
+
     return (
       order.customer_name ||
       order.customer ||
@@ -2169,131 +2284,132 @@
     );
   }
 
-  function getOrderPhone(
+  function getOrderCustomerPhone(
     order
   ) {
+    if (!order) {
+      return "";
+    }
+
     return (
       order.customer_phone ||
       order.phone ||
       order.telefone ||
       order.whatsapp ||
-      order.celular ||
+      order.customer_whatsapp ||
       ""
     );
   }
 
-  function getOrderTotal(
+  function getOrderDisplayTitle(
     order
   ) {
-    const possibleValues = [
-      order.total,
-      order.total_price,
-      order.valor_total,
-      order.amount,
-      order.price
-    ];
-
-    for (
-      const value of
-        possibleValues
-    ) {
-      if (
-        value !==
-          undefined &&
-        value !==
-          null &&
-        value !== ""
-      ) {
-        const number =
-          Number(
-            value
-          );
-
-        if (
-          Number.isFinite(
-            number
-          )
-        ) {
-          return number;
-        }
-      }
+    if (!order) {
+      return "Pedido";
     }
 
-    return 0;
+    return (
+      order.product_name ||
+      order.title ||
+      order.item_name ||
+      order.name ||
+      order.tipo ||
+      order.type ||
+      "Pedido"
+    );
+  }
+
+  function getOrderDate(
+    order
+  ) {
+    const value =
+      order?.created_at ||
+      order?.date ||
+      order?.data ||
+      order?.createdAt;
+
+    if (!value) {
+      return "";
+    }
+
+    const date =
+      new Date(value);
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return String(value);
+    }
+
+    return date.toLocaleString(
+      "pt-BR",
+      {
+        dateStyle: "short",
+        timeStyle: "short"
+      }
+    );
   }
 
   function getOrderStatusLabel(
-    order
+    status
   ) {
-    const status =
+    const value =
       normalizeText(
-        order?.status ||
-          ""
+        status
       );
 
-    if (
-      status ===
-      "concluido"
-    ) {
-      return "Concluído";
-    }
+    const labels = {
+      pendente: "Pendente",
+      novo: "Novo",
+      confirmado: "Confirmado",
+      confirmado: "Confirmado",
+      preparando: "Em preparo",
+      pronto: "Pronto",
+      concluido: "Concluído",
+      concluido: "Concluído",
+      entregue: "Entregue",
+      cancelado: "Cancelado",
+      canceled: "Cancelado"
+    };
 
-    if (
-      status ===
-      "cancelado"
-    ) {
-      return "Cancelado";
-    }
-
-    if (
-      status ===
-      "em preparo"
-    ) {
-      return "Em preparo";
-    }
-
-    if (
-      status ===
-      "preparando"
-    ) {
-      return "Preparando";
-    }
-
-    if (
-      status ===
-      "aguardando"
-    ) {
-      return "Aguardando";
-    }
-
-    return "Pendente";
+    return (
+      labels[value] ||
+      status ||
+      "Pendente"
+    );
   }
 
   function getOrderStatusClass(
-    order
+    status
   ) {
-    const status =
+    const value =
       normalizeText(
-        order?.status ||
-          ""
+        status
       );
 
     if (
-      status ===
-      "concluido"
+      value === "cancelado" ||
+      value === "canceled"
     ) {
-      return "active";
+      return "status-off";
     }
 
     if (
-      status ===
-      "cancelado"
+      value === "concluido" ||
+      value === "entregue" ||
+      value === "pronto"
     ) {
-      return "inactive";
+      return "status-ok";
     }
 
-    return "";
+    return "status-pending";
   }
+
+  /* =========================================================
+     PEDIDOS — CLASSIFICAÇÃO
+     ========================================================= */
 
   function detectOrderArea(
     order
@@ -2305,16 +2421,15 @@
     const directValues = [
       order.area,
       order.type,
-      order.order_type,
-      order.orderType,
       order.tipo,
-      order.kind,
-      order.category
+      order.category,
+      order.categoria,
+      order.order_type,
+      order.orderType
     ];
 
     for (
-      const value of
-        directValues
+      const value of directValues
     ) {
       const normalized =
         normalizeText(
@@ -2326,7 +2441,7 @@
           "encomend"
         ) ||
         normalized.includes(
-          "personalizado"
+          "personaliz"
         ) ||
         normalized.includes(
           "custom"
@@ -2347,33 +2462,33 @@
       }
     }
 
-    /*
-     * Alguns pedidos podem guardar
-     * os produtos dentro de JSON.
-     */
-
     const raw =
-      JSON.stringify(
-        order
+      normalizeText(
+        JSON.stringify(
+          order
+        )
       );
 
-    const normalizedRaw =
-      normalizeText(
-        raw
-      );
+    const orderTerms = [
+      "naked cake",
+      "chantininho",
+      "brigadeiro",
+      "personalizado",
+      "encomenda",
+      "custom cake",
+      "massa",
+      "recheio",
+      "kit"
+    ];
 
     if (
-      normalizedRaw.includes(
-        "encomenda"
-      ) ||
-      normalizedRaw.includes(
-        "naked cake"
-      ) ||
-      normalizedRaw.includes(
-        "chantininho"
-      ) ||
-      normalizedRaw.includes(
-        "brigadeiro premium"
+      orderTerms.some(
+        term =>
+          raw.includes(
+            normalizeText(
+              term
+            )
+          )
       )
     ) {
       return "encomendas";
@@ -2382,385 +2497,165 @@
     return "pronta";
   }
 
-  function formatDate(
-    value
+  function getOrdersByArea(
+    area
   ) {
-    if (!value) {
-      return "—";
-    }
-
-    const date =
-      new Date(
-        value
-      );
-
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-      return String(
-        value
-      );
-    }
-
-    return date.toLocaleString(
-      "pt-BR",
-      {
-        dateStyle:
-          "short",
-        timeStyle:
-          "short"
-      }
+    return state.orders.filter(
+      order =>
+        detectOrderArea(
+          order
+        ) === area
     );
   }
 
   /* =========================================================
-     PEDIDOS — RENDERIZAÇÃO
+     PEDIDOS — DETALHES
      ========================================================= */
 
-  function renderOrdersView(
-    area
+  function getOrderItemsText(
+    order
   ) {
-    const isCustom =
-      area ===
-      "encomendas";
-
-    const orders =
-      state.orders.filter(
-        (order) =>
-          detectOrderArea(
-            order
-          ) === area
-      );
-
-    const heading =
-      isCustom
-        ? "Pedidos — Encomendas"
-        : "Pedidos — Pronta Entrega";
-
-    if (title) {
-      title.textContent =
-        heading;
+    if (!order) {
+      return "";
     }
 
-    if (!view) {
-      return;
-    }
+    const candidates = [
+      order.items,
+      order.products,
+      order.cart,
+      order.itens,
+      order.products_data,
+      order.order_items
+    ];
 
-    view.innerHTML = `
-      <div class="toolbar">
+    for (
+      const value of candidates
+    ) {
+      if (
+        value === null ||
+        value === undefined
+      ) {
+        continue;
+      }
 
-        <div>
-          <h2>
-            ${escapeHtml(
-              heading
-            )}
-          </h2>
+      if (
+        Array.isArray(value)
+      ) {
+        return value
+          .map(
+            item => {
+              if (
+                typeof item ===
+                "string"
+              ) {
+                return item;
+              }
 
-          <p class="muted">
-            ${
-              isCustom
-                ? "Pedidos de bolos e produtos feitos sob encomenda."
-                : "Pedidos dos produtos disponíveis para pronta entrega."
+              return (
+                item?.name ||
+                item?.product_name ||
+                item?.nome ||
+                "Item"
+              );
             }
-          </p>
-        </div>
-
-        <button
-          type="button"
-          class="btn soft"
-          id="printOrders"
-        >
-          🖨️ Imprimir
-        </button>
-
-      </div>
-
-      ${
-        orders.length
-          ? renderOrdersTable(
-              orders,
-              isCustom
-            )
-          : `
-            <div class="empty">
-              Nenhum pedido encontrado nesta área.
-            </div>
-          `
+          )
+          .filter(Boolean)
+          .join(", ");
       }
-    `;
 
-    $("#printOrders")
-      ?.addEventListener(
-        "click",
-        () => {
-          printOrders(
-            orders,
-            heading
-          );
-        }
-      );
-
-    $$(
-      "[data-order-status]"
-    ).forEach(
-      (select) => {
-        select.addEventListener(
-          "change",
-          async () => {
-            const id =
-              select.dataset
-                .orderStatus;
-
-            const status =
-              select.value;
-
-            await updateOrderStatus(
-              id,
-              status
+      if (
+        typeof value ===
+        "string"
+      ) {
+        try {
+          const parsed =
+            JSON.parse(
+              value
             );
+
+          if (
+            Array.isArray(
+              parsed
+            )
+          ) {
+            return parsed
+              .map(
+                item =>
+                  item?.name ||
+                  item?.product_name ||
+                  item?.nome ||
+                  String(
+                    item
+                  )
+              )
+              .join(", ");
           }
-        );
+        } catch {
+          return value;
+        }
       }
+    }
+
+    return (
+      order.description ||
+      order.message ||
+      order.observations ||
+      order.observacao ||
+      ""
     );
   }
 
-  function renderOrdersTable(
-    orders,
-    isCustom
-  ) {
-    return `
-      <div class="panel">
-
-        <div class="table-wrap">
-
-          <table>
-
-            <thead>
-              <tr>
-                <th>Cliente</th>
-                <th>Contato</th>
-                <th>Pedido</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Data</th>
-              </tr>
-            </thead>
-
-            <tbody>
-
-              ${orders
-                .map(
-                  (order) => `
-                    <tr>
-
-                      <td>
-                        <strong>
-                          ${escapeHtml(
-                            getOrderCustomer(
-                              order
-                            )
-                          )}
-                        </strong>
-                      </td>
-
-                      <td>
-                        ${escapeHtml(
-                          getOrderPhone(
-                            order
-                          ) ||
-                            "—"
-                        )}
-                      </td>
-
-                      <td>
-                        ${renderOrderItems(
-                          order
-                        )}
-                      </td>
-
-                      <td>
-                        <strong>
-                          ${money(
-                            getOrderTotal(
-                              order
-                            )
-                          )}
-                        </strong>
-                      </td>
-
-                      <td>
-
-                        <select
-                          class="order-status"
-                          data-order-status="${escapeHtml(
-                            order.id
-                          )}"
-                        >
-
-                          ${renderStatusOptions(
-                            order.status
-                          )}
-
-                        </select>
-
-                      </td>
-
-                      <td>
-                        ${formatDate(
-                          order.created_at ||
-                            order.createdAt
-                        )}
-                      </td>
-
-                    </tr>
-                  `
-                )
-                .join("")}
-
-            </tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-    `;
-  }
-
-  function renderStatusOptions(
-    current
-  ) {
-    const normalized =
-      normalizeText(
-        current ||
-          "pendente"
-      );
-
-    const options = [
-      [
-        "pendente",
-        "Pendente"
-      ],
-      [
-        "em_preparo",
-        "Em preparo"
-      ],
-      [
-        "concluido",
-        "Concluído"
-      ],
-      [
-        "cancelado",
-        "Cancelado"
-      ]
-    ];
-
-    return options
-      .map(
-        ([value, label]) => `
-          <option
-            value="${value}"
-            ${
-              normalizeText(
-                normalized
-              ) ===
-              normalizeText(
-                value
-              )
-                ? "selected"
-                : ""
-            }
-          >
-            ${label}
-          </option>
-        `
-      )
-      .join("");
-  }
-
-  function renderOrderItems(
+  function getOrderTotal(
     order
   ) {
-    const possible =
-      order.items ||
-      order.products ||
-      order.produtos ||
-      order.order_items;
-
-    if (
-      Array.isArray(
-        possible
-      )
-    ) {
-      return possible
-        .map(
-          (item) => {
-            const name =
-              item.name ||
-              item.nome ||
-              item.product_name ||
-              "Produto";
-
-            const quantity =
-              item.quantity ||
-              item.quantidade ||
-              1;
-
-            return `
-              <div>
-                ${escapeHtml(
-                  name
-                )}
-                × ${escapeHtml(
-                  quantity
-                )}
-              </div>
-            `;
-          }
-        )
-        .join("");
+    if (!order) {
+      return null;
     }
 
-    if (
-      typeof possible ===
-      "string"
+    const candidates = [
+      order.total,
+      order.total_price,
+      order.amount,
+      order.valor_total,
+      order.price
+    ];
+
+    for (
+      const value of candidates
     ) {
-      return escapeHtml(
-        possible
-      );
+      if (
+        value !== null &&
+        value !== undefined &&
+        value !== ""
+      ) {
+        const number =
+          Number(value);
+
+        if (
+          !Number.isNaN(
+            number
+          )
+        ) {
+          return number;
+        }
+      }
     }
 
-    return "—";
+    return null;
   }
-     /* =========================================================
-     PEDIDOS — ATUALIZAR STATUS
+
+  /* =========================================================
+     PEDIDOS — STATUS
      ========================================================= */
 
   async function updateOrderStatus(
-    orderId,
+    order,
     status
   ) {
-    if (!db) {
-      showToast(
-        "Supabase não está conectado.",
-        "error"
-      );
-      return;
-    }
-
     if (
-      orderId ===
-        undefined ||
-      orderId ===
-        null ||
-      orderId === ""
+      !db ||
+      !order?.id
     ) {
-      showToast(
-        "Pedido inválido.",
-        "error"
-      );
       return;
     }
 
@@ -2774,122 +2669,601 @@
         })
         .eq(
           "id",
-          orderId
+          order.id
         );
 
       if (error) {
         throw error;
       }
 
-      const order =
-        state.orders.find(
-          (item) =>
-            String(
-              item.id
-            ) ===
-            String(
-              orderId
-            )
+      state.orders =
+        state.orders.map(
+          item =>
+            String(item.id) ===
+            String(order.id)
+              ? {
+                  ...item,
+                  status
+                }
+              : item
         );
-
-      if (order) {
-        order.status =
-          status;
-      }
 
       showToast(
         "Status do pedido atualizado."
       );
 
+      renderCurrentView();
     } catch (error) {
       console.error(
-        "Erro ao atualizar pedido:",
+        "Erro ao atualizar status:",
         error
       );
 
       showToast(
         error?.message ||
-          "Não foi possível atualizar o pedido.",
+          "Não foi possível atualizar o status.",
         "error"
       );
     }
   }
+     /* =========================================================
+     PEDIDOS — RENDERIZAÇÃO
+     ========================================================= */
+
+  function orderCard(order) {
+    const area =
+      detectOrderArea(order);
+
+    const status =
+      order.status ||
+      "pendente";
+
+    const items =
+      getOrderItemsText(order);
+
+    const total =
+      getOrderTotal(order);
+
+    const customer =
+      getOrderCustomerName(order);
+
+    const phone =
+      getOrderCustomerPhone(order);
+
+    return `
+      <article
+        class="order-card"
+        data-order-id="${escapeHtml(
+          order.id
+        )}"
+      >
+
+        <div class="order-head">
+
+          <div>
+            <span class="badge">
+              ${escapeHtml(
+                areaLabel(area)
+              )}
+            </span>
+
+            <h3>
+              ${escapeHtml(
+                customer
+              )}
+            </h3>
+
+            <small class="muted">
+              ${escapeHtml(
+                getOrderDate(order)
+              )}
+            </small>
+          </div>
+
+          <span
+            class="${getOrderStatusClass(
+              status
+            )}"
+          >
+            ${escapeHtml(
+              getOrderStatusLabel(
+                status
+              )
+            )}
+          </span>
+
+        </div>
+
+        <div class="order-body">
+
+          ${
+            phone
+              ? `
+                <p>
+                  <strong>WhatsApp:</strong>
+                  ${escapeHtml(
+                    phone
+                  )}
+                </p>
+              `
+              : ""
+          }
+
+          ${
+            getOrderDisplayTitle(
+              order
+            )
+              ? `
+                <p>
+                  <strong>Pedido:</strong>
+                  ${escapeHtml(
+                    getOrderDisplayTitle(
+                      order
+                    )
+                  )}
+                </p>
+              `
+              : ""
+          }
+
+          ${
+            items
+              ? `
+                <p>
+                  <strong>Itens:</strong>
+                  ${escapeHtml(
+                    items
+                  )}
+                </p>
+              `
+              : ""
+          }
+
+          ${
+            order.observations ||
+            order.observacao ||
+            order.description
+              ? `
+                <p>
+                  <strong>Observações:</strong>
+                  ${escapeHtml(
+                    order.observations ||
+                      order.observacao ||
+                      order.description
+                  )}
+                </p>
+              `
+              : ""
+          }
+
+          ${
+            total !== null
+              ? `
+                <p>
+                  <strong>Total:</strong>
+                  ${money(total)}
+                </p>
+              `
+              : ""
+          }
+
+        </div>
+
+        <div class="order-actions">
+
+          <label>
+            Status
+
+            <select
+              data-action="order-status"
+              data-id="${escapeHtml(
+                order.id
+              )}"
+            >
+              <option
+                value="pendente"
+                ${
+                  normalizeText(
+                    status
+                  ) ===
+                  "pendente"
+                    ? "selected"
+                    : ""
+                }
+              >
+                Pendente
+              </option>
+
+              <option
+                value="confirmado"
+                ${
+                  normalizeText(
+                    status
+                  ) ===
+                  "confirmado"
+                    ? "selected"
+                    : ""
+                }
+              >
+                Confirmado
+              </option>
+
+              <option
+                value="preparando"
+                ${
+                  normalizeText(
+                    status
+                  ) ===
+                  "preparando"
+                    ? "selected"
+                    : ""
+                }
+              >
+                Em preparo
+              </option>
+
+              <option
+                value="pronto"
+                ${
+                  normalizeText(
+                    status
+                  ) ===
+                  "pronto"
+                    ? "selected"
+                    : ""
+                }
+              >
+                Pronto
+              </option>
+
+              <option
+                value="concluido"
+                ${
+                  normalizeText(
+                    status
+                  ) ===
+                  "concluido"
+                    ? "selected"
+                    : ""
+                }
+              >
+                Concluído
+              </option>
+
+              <option
+                value="entregue"
+                ${
+                  normalizeText(
+                    status
+                  ) ===
+                  "entregue"
+                    ? "selected"
+                    : ""
+                }
+              >
+                Entregue
+              </option>
+
+              <option
+                value="cancelado"
+                ${
+                  normalizeText(
+                    status
+                  ) ===
+                  "cancelado"
+                    ? "selected"
+                    : ""
+                }
+              >
+                Cancelado
+              </option>
+            </select>
+          </label>
+
+        </div>
+
+      </article>
+    `;
+  }
+
+  function renderOrdersView(
+    area
+  ) {
+    const orders =
+      getOrdersByArea(area);
+
+    const isOrders =
+      area ===
+      "encomendas";
+
+    const heading =
+      isOrders
+        ? "Pedidos de Encomendas"
+        : "Pedidos de Pronta Entrega";
+
+    const description =
+      isOrders
+        ? "Pedidos feitos através da área de encomendas."
+        : "Pedidos de produtos disponíveis para pronta entrega.";
+
+    return `
+      <div class="page-head">
+
+        <div>
+          <h2>
+            ${heading}
+          </h2>
+
+          <p class="muted">
+            ${description}
+          </p>
+        </div>
+
+        <div class="row">
+
+          <button
+            type="button"
+            class="btn soft"
+            data-action="print-orders"
+            data-area="${escapeHtml(
+              area
+            )}"
+          >
+            🖨️ Imprimir
+          </button>
+
+          <button
+            type="button"
+            class="btn soft"
+            data-action="reload-all"
+          >
+            ↻ Atualizar
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="stats mini">
+
+        <div class="stat">
+          <strong>
+            ${orders.length}
+          </strong>
+
+          <span>
+            ${
+              isOrders
+                ? "Pedidos de encomenda"
+                : "Pedidos de pronta entrega"
+            }
+          </span>
+        </div>
+
+        <div class="stat">
+          <strong>
+            ${
+              orders.filter(
+                order => {
+                  const status =
+                    normalizeText(
+                      order.status
+                    );
+
+                  return (
+                    !status ||
+                    status ===
+                      "pendente" ||
+                    status ===
+                      "novo"
+                  );
+                }
+              ).length
+            }
+          </strong>
+
+          <span>
+            Pendentes
+          </span>
+        </div>
+
+        <div class="stat">
+          <strong>
+            ${
+              orders.filter(
+                order =>
+                  normalizeText(
+                    order.status
+                  ) ===
+                  "concluido"
+              ).length
+            }
+          </strong>
+
+          <span>
+            Concluídos
+          </span>
+        </div>
+
+      </div>
+
+      ${
+        orders.length
+          ? `
+            <div class="orders-list">
+
+              ${orders
+                .map(
+                  order =>
+                    orderCard(
+                      order
+                    )
+                )
+                .join("")}
+
+            </div>
+          `
+          : `
+            <div class="empty">
+
+              <strong>
+                Nenhum pedido encontrado.
+              </strong>
+
+              <p>
+                Ainda não existem pedidos
+                nesta categoria.
+              </p>
+
+            </div>
+          `
+      }
+    `;
+  }
 
   /* =========================================================
-     IMPRESSÃO DE PEDIDOS
+     IMPRESSÃO DOS PEDIDOS
      ========================================================= */
 
   function printOrders(
-    orders,
-    heading
+    area
   ) {
-    if (
-      !Array.isArray(
-        orders
-      ) ||
-      !orders.length
-    ) {
+    const orders =
+      getOrdersByArea(area);
+
+    if (!orders.length) {
       showToast(
         "Não há pedidos para imprimir.",
         "warning"
       );
+
       return;
     }
+
+    const titleText =
+      area ===
+      "encomendas"
+        ? "Pedidos de Encomendas"
+        : "Pedidos de Pronta Entrega";
 
     const rows =
       orders
         .map(
-          (order) => `
-            <tr>
+          order => {
+            const total =
+              getOrderTotal(
+                order
+              );
 
-              <td>
-                ${escapeHtml(
-                  getOrderCustomer(
+            return `
+              <div class="print-order">
+
+                <div class="print-order-head">
+
+                  <div>
+                    <h2>
+                      ${escapeHtml(
+                        getOrderCustomerName(
+                          order
+                        )
+                      )}
+                    </h2>
+
+                    <p>
+                      ${escapeHtml(
+                        getOrderDate(
+                          order
+                        )
+                      )}
+                    </p>
+                  </div>
+
+                  <strong>
+                    ${escapeHtml(
+                      getOrderStatusLabel(
+                        order.status
+                      )
+                    )}
+                  </strong>
+
+                </div>
+
+                <p>
+                  <strong>Pedido:</strong>
+                  ${escapeHtml(
+                    getOrderDisplayTitle(
+                      order
+                    )
+                  )}
+                </p>
+
+                ${
+                  getOrderCustomerPhone(
                     order
                   )
-                )}
-              </td>
+                    ? `
+                      <p>
+                        <strong>WhatsApp:</strong>
+                        ${escapeHtml(
+                          getOrderCustomerPhone(
+                            order
+                          )
+                        )}
+                      </p>
+                    `
+                    : ""
+                }
 
-              <td>
-                ${escapeHtml(
-                  getOrderPhone(
-                    order
-                  ) ||
-                    "—"
-                )}
-              </td>
-
-              <td>
-                ${renderOrderItems(
-                  order
-                )}
-              </td>
-
-              <td>
-                ${money(
-                  getOrderTotal(
+                ${
+                  getOrderItemsText(
                     order
                   )
-                )}
-              </td>
+                    ? `
+                      <p>
+                        <strong>Itens:</strong>
+                        ${escapeHtml(
+                          getOrderItemsText(
+                            order
+                          )
+                        )}
+                      </p>
+                    `
+                    : ""
+                }
 
-              <td>
-                ${escapeHtml(
-                  getOrderStatusLabel(
-                    order
-                  )
-                )}
-              </td>
+                ${
+                  order.observations ||
+                  order.observacao ||
+                  order.description
+                    ? `
+                      <p>
+                        <strong>Observações:</strong>
+                        ${escapeHtml(
+                          order.observations ||
+                            order.observacao ||
+                            order.description
+                        )}
+                      </p>
+                    `
+                    : ""
+                }
 
-              <td>
-                ${formatDate(
-                  order.created_at ||
-                    order.createdAt
-                )}
-              </td>
+                ${
+                  total !== null
+                    ? `
+                      <p>
+                        <strong>Total:</strong>
+                        ${money(
+                          total
+                        )}
+                      </p>
+                    `
+                    : ""
+                }
 
-            </tr>
-          `
+              </div>
+            `;
+          }
         )
         .join("");
 
@@ -2897,178 +3271,198 @@
       window.open(
         "",
         "_blank",
-        "width=1200,height=800"
+        "width=900,height=700"
       );
 
     if (!printWindow) {
       showToast(
         "O navegador bloqueou a janela de impressão.",
-        "warning"
+        "error"
       );
+
       return;
     }
 
-    printWindow.document.write(
-      `
-        <!DOCTYPE html>
+    printWindow.document.write(`
+      <!DOCTYPE html>
 
-        <html lang="pt-BR">
+      <html lang="pt-BR">
 
-        <head>
+      <head>
 
-          <meta charset="UTF-8">
+        <meta charset="UTF-8">
 
-          <title>
-            ${escapeHtml(
-              heading
-            )}
-          </title>
+        <title>
+          ${escapeHtml(
+            titleText
+          )}
+        </title>
 
-          <style>
+        <style>
 
-            * {
-              box-sizing: border-box;
-            }
+          * {
+            box-sizing: border-box;
+          }
+
+          body {
+            margin: 0;
+            padding: 32px;
+            font-family:
+              Arial,
+              Helvetica,
+              sans-serif;
+            color: #222;
+            background: #fff;
+          }
+
+          h1 {
+            margin: 0 0 6px;
+            font-size: 26px;
+          }
+
+          .subtitle {
+            margin: 0 0 24px;
+            color: #666;
+          }
+
+          .print-order {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 18px;
+            page-break-inside: avoid;
+          }
+
+          .print-order-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+          }
+
+          .print-order h2 {
+            margin: 0 0 4px;
+            font-size: 19px;
+          }
+
+          .print-order p {
+            margin: 7px 0;
+            line-height: 1.5;
+          }
+
+          @media print {
 
             body {
-              margin: 0;
-              padding: 30px;
-              font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
-              color: #222;
-              background: #fff;
+              padding: 15px;
             }
 
-            h1 {
-              margin: 0 0 8px;
-              font-size: 25px;
+            .print-order {
+              border-color: #bbb;
             }
 
-            .date {
-              margin-bottom: 24px;
-              color: #666;
-              font-size: 13px;
-            }
+          }
 
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              font-size: 13px;
-            }
+        </style>
 
-            th,
-            td {
-              padding: 10px;
-              border: 1px solid #ddd;
-              text-align: left;
-              vertical-align: top;
-            }
+      </head>
 
-            th {
-              background: #f3f3f3;
-              font-weight: 700;
-            }
+      <body>
 
-            .total {
-              font-weight: 700;
-            }
+        <h1>
+          Martins Confeitaria
+        </h1>
 
-            @media print {
+        <p class="subtitle">
+          ${escapeHtml(
+            titleText
+          )}
+        </p>
 
-              body {
-                padding: 10px;
-              }
+        ${rows}
 
-              button {
-                display: none;
-              }
+        <script>
+          window.onload = function() {
+            window.print();
+          };
+        <\/script>
 
-            }
+      </body>
 
-          </style>
-
-        </head>
-
-        <body>
-
-          <h1>
-            Martins Confeitaria
-          </h1>
-
-          <div class="date">
-            ${escapeHtml(
-              heading
-            )}
-            —
-            Impresso em
-            ${escapeHtml(
-              formatDate(
-                new Date()
-              )
-            )}
-          </div>
-
-          <table>
-
-            <thead>
-
-              <tr>
-                <th>Cliente</th>
-                <th>Contato</th>
-                <th>Pedido</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Data</th>
-              </tr>
-
-            </thead>
-
-            <tbody>
-              ${rows}
-            </tbody>
-
-          </table>
-
-          <script>
-            window.onload = function () {
-              window.print();
-            };
-          <\/script>
-
-        </body>
-
-        </html>
-      `
-    );
+      </html>
+    `);
 
     printWindow.document.close();
   }
 
   /* =========================================================
-     ENCOMENDAS PERSONALIZADAS
+     BOLOS PERSONALIZADOS
      ========================================================= */
 
+  function getCustomCakeCustomer(
+    cake
+  ) {
+    return (
+      cake?.customer_name ||
+      cake?.name ||
+      cake?.cliente ||
+      "Cliente"
+    );
+  }
+
+  function getCustomCakeSummary(
+    cake
+  ) {
+    if (!cake) {
+      return "";
+    }
+
+    const parts = [];
+
+    const fields = [
+      ["Massa", cake.massa],
+      ["Recheio", cake.recheio],
+      ["Tamanho", cake.tamanho],
+      ["Tema", cake.tema],
+      ["Adicionais", cake.adicionais],
+      ["Data", cake.data],
+      ["Observações", cake.observacoes]
+    ];
+
+    fields.forEach(
+      ([label, value]) => {
+        if (
+          value !== null &&
+          value !== undefined &&
+          String(value).trim()
+        ) {
+          parts.push(
+            `<strong>${escapeHtml(
+              label
+            )}:</strong> ${escapeHtml(
+              value
+            )}`
+          );
+        }
+      }
+    );
+
+    return parts.join(
+      "<br>"
+    );
+  }
+
   function renderCustomCakeOrders() {
-    const orders =
+    const cakes =
       state.customCakes;
 
-    if (title) {
-      title.textContent =
-        "Encomendas";
-    }
-
-    if (!view) {
-      return;
-    }
-
-    view.innerHTML = `
-      <div class="toolbar">
+    return `
+      <div class="page-head">
 
         <div>
           <h2>
-            Encomendas personalizadas
+            Encomendas Personalizadas
           </h2>
 
           <p class="muted">
@@ -3079,7 +3473,7 @@
         <button
           type="button"
           class="btn soft"
-          id="printCustomCakes"
+          data-action="print-custom-cakes"
         >
           🖨️ Imprimir
         </button>
@@ -3087,109 +3481,75 @@
       </div>
 
       ${
-        orders.length
+        cakes.length
           ? `
-            <div class="panel">
+            <div class="orders-list">
 
-              <div class="table-wrap">
+              ${cakes
+                .map(
+                  cake => `
+                    <article class="order-card">
 
-                <table>
+                      <div class="order-head">
 
-                  <thead>
-                    <tr>
-                      <th>Cliente</th>
-                      <th>Bolo</th>
-                      <th>Data</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
+                        <div>
+                          <h3>
+                            ${escapeHtml(
+                              getCustomCakeCustomer(
+                                cake
+                              )
+                            )}
+                          </h3>
 
-                  <tbody>
+                          <small class="muted">
+                            ${escapeHtml(
+                              getOrderDate(
+                                cake
+                              )
+                            )}
+                          </small>
+                        </div>
 
-                    ${orders
-                      .map(
-                        (
-                          order
-                        ) => `
-                          <tr>
+                      </div>
 
-                            <td>
-                              ${escapeHtml(
-                                order.customer_name ||
-                                  order.name ||
-                                  order.cliente ||
-                                  "Cliente"
-                              )}
-                            </td>
+                      <div class="order-body">
 
-                            <td>
-                              ${escapeHtml(
-                                order.cake_type ||
-                                  order.cake ||
-                                  order.tipo ||
-                                  "—"
-                              )}
-                            </td>
+                        ${getCustomCakeSummary(
+                          cake
+                        )}
 
-                            <td>
-                              ${formatDate(
-                                order.created_at ||
-                                  order.createdAt
-                              )}
-                            </td>
+                      </div>
 
-                            <td>
-                              ${escapeHtml(
-                                order.status ||
-                                  "Pendente"
-                              )}
-                            </td>
-
-                          </tr>
-                        `
-                      )
-                      .join("")}
-
-                  </tbody>
-
-                </table>
-
-              </div>
+                    </article>
+                  `
+                )
+                .join("")}
 
             </div>
           `
           : `
             <div class="empty">
-              Nenhuma encomenda personalizada encontrada.
+
+              <strong>
+                Nenhuma encomenda personalizada.
+              </strong>
+
             </div>
           `
       }
     `;
-
-    $("#printCustomCakes")
-      ?.addEventListener(
-        "click",
-        () => {
-          printCustomCakes(
-            orders
-          );
-        }
-      );
   }
 
-  function printCustomCakes(
-    orders
-  ) {
-    if (
-      !Array.isArray(
-        orders
-      ) ||
-      !orders.length
-    ) {
+  function printCustomCakes() {
+    const cakes =
+      state.customCakes;
+
+    if (!cakes.length) {
       showToast(
-        "Não há encomendas para imprimir.",
+        "Não há encomendas personalizadas para imprimir.",
         "warning"
       );
+
       return;
     }
 
@@ -3197,216 +3557,146 @@
       window.open(
         "",
         "_blank",
-        "width=1100,height=800"
+        "width=900,height=700"
       );
 
     if (!printWindow) {
       showToast(
         "O navegador bloqueou a janela de impressão.",
-        "warning"
+        "error"
       );
+
       return;
     }
 
-    const rows =
-      orders
+    const content =
+      cakes
         .map(
-          (order) => `
-            <tr>
+          cake => `
+            <div class="cake">
 
-              <td>
+              <h2>
                 ${escapeHtml(
-                  order.customer_name ||
-                    order.name ||
-                    order.cliente ||
-                    "Cliente"
+                  getCustomCakeCustomer(
+                    cake
+                  )
                 )}
-              </td>
+              </h2>
 
-              <td>
-                ${escapeHtml(
-                  order.cake_type ||
-                    order.cake ||
-                    order.tipo ||
-                    "—"
+              <p>
+                ${getCustomCakeSummary(
+                  cake
                 )}
-              </td>
+              </p>
 
-              <td>
-                ${escapeHtml(
-                  order.filling ||
-                    order.recheio ||
-                    "—"
-                )}
-              </td>
-
-              <td>
-                ${escapeHtml(
-                  order.size ||
-                    order.tamanho ||
-                    "—"
-                )}
-              </td>
-
-              <td>
-                ${formatDate(
-                  order.created_at ||
-                    order.createdAt
-                )}
-              </td>
-
-            </tr>
+            </div>
           `
         )
         .join("");
 
-    printWindow.document.write(
-      `
-        <!DOCTYPE html>
+    printWindow.document.write(`
+      <!DOCTYPE html>
 
-        <html lang="pt-BR">
+      <html lang="pt-BR">
 
-        <head>
+      <head>
 
-          <meta charset="UTF-8">
+        <meta charset="UTF-8">
 
-          <title>
-            Encomendas — Martins Confeitaria
-          </title>
+        <title>
+          Encomendas Personalizadas
+        </title>
 
-          <style>
+        <style>
 
-            body {
-              font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
-              padding: 30px;
-              color: #222;
-            }
+          body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+            color: #222;
+          }
 
-            h1 {
-              margin-bottom: 5px;
-            }
+          h1 {
+            margin-bottom: 25px;
+          }
 
-            p {
-              color: #666;
-              margin-top: 0;
-              margin-bottom: 25px;
-            }
+          .cake {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 15px;
+            page-break-inside: avoid;
+          }
 
-            table {
-              width: 100%;
-              border-collapse: collapse;
-            }
+          .cake h2 {
+            margin-top: 0;
+          }
 
-            th,
-            td {
-              border: 1px solid #ddd;
-              padding: 9px;
-              text-align: left;
-              vertical-align: top;
-            }
+          .cake p {
+            line-height: 1.6;
+          }
 
-            th {
-              background: #f4f4f4;
-            }
+        </style>
 
-            @media print {
-              body {
-                padding: 10px;
-              }
-            }
+      </head>
 
-          </style>
+      <body>
 
-        </head>
+        <h1>
+          Martins Confeitaria —
+          Encomendas Personalizadas
+        </h1>
 
-        <body>
+        ${content}
 
-          <h1>
-            Martins Confeitaria
-          </h1>
+        <script>
+          window.onload = function() {
+            window.print();
+          };
+        <\/script>
 
-          <p>
-            Encomendas personalizadas
-          </p>
+      </body>
 
-          <table>
-
-            <thead>
-
-              <tr>
-                <th>Cliente</th>
-                <th>Bolo</th>
-                <th>Recheio</th>
-                <th>Tamanho</th>
-                <th>Data</th>
-              </tr>
-
-            </thead>
-
-            <tbody>
-              ${rows}
-            </tbody>
-
-          </table>
-
-          <script>
-            window.onload = function () {
-              window.print();
-            };
-          <\/script>
-
-        </body>
-
-        </html>
-      `
-    );
+      </html>
+    `);
 
     printWindow.document.close();
   }
-
-  /* =========================================================
-     CONFIGURAÇÕES — FORMATAÇÃO
+     /* =========================================================
+     CONFIGURAÇÕES DO SITE
      ========================================================= */
 
-  function getSetting(
-    key,
-    fallback = ""
-  ) {
-    if (
-      state.settings &&
-      Object.prototype.hasOwnProperty.call(
-        state.settings,
-        key
-      )
-    ) {
-      return (
-        state.settings[key] ??
-        fallback
-      );
-    }
-
-    return fallback;
-  }
-
   function renderSettings() {
-    if (title) {
-      title.textContent =
-        "Configurações";
-    }
-
-    if (!view) {
-      return;
-    }
-
     const settings =
-      state.settings ||
-      {};
+      state.settings || {};
 
-    view.innerHTML = `
-      <div class="toolbar">
+    const instagram =
+      settings.instagram ||
+      settings.instagram_url ||
+      "";
+
+    const whatsapp =
+      settings.whatsapp ||
+      settings.phone ||
+      settings.telefone ||
+      "";
+
+    const address =
+      settings.address ||
+      settings.endereco ||
+      "";
+
+    const maps =
+      settings.maps ||
+      settings.maps_url ||
+      "";
+
+    const hours =
+      settings.hours ||
+      settings.horarios ||
+      "";
+
+    return `
+      <div class="page-head">
 
         <div>
           <h2>
@@ -3414,105 +3704,149 @@
           </h2>
 
           <p class="muted">
-            Altere as informações utilizadas pelo site.
+            Altere as informações exibidas no site.
           </p>
         </div>
 
         <button
           type="button"
           class="btn primary"
-          id="saveSettings"
+          data-action="save-settings"
         >
           Salvar alterações
         </button>
 
       </div>
 
-      <div class="panel">
+      <section class="panel">
 
-        <form
-          id="settingsForm"
-          class="settings-form"
-        >
+        <div class="panel-head">
+          <div>
+            <h3>
+              Informações do site
+            </h3>
 
-          <div class="settings-grid">
+            <p class="muted">
+              Essas informações são armazenadas no Supabase.
+            </p>
+          </div>
+        </div>
 
-            <label>
-              Nome da empresa
+        <div class="settings-grid">
 
-              <input
-                id="s-name"
-                value="${escapeHtml(
-                  settings.name ||
-                    settings.business_name ||
-                    "Martins Confeitaria"
-                )}"
-              >
-            </label>
+          <label>
+            Instagram
 
-            <label>
-              WhatsApp
+            <input
+              id="s-instagram"
+              type="text"
+              value="${escapeHtml(
+                instagram
+              )}"
+              placeholder="@martins_confeitariaartesanal"
+            >
+          </label>
 
-              <input
-                id="s-whatsapp"
-                value="${escapeHtml(
-                  settings.whatsapp ||
-                    "5585981563070"
-                )}"
-              >
-            </label>
+          <label>
+            WhatsApp
 
-            <label class="full">
-              Endereço
+            <input
+              id="s-whatsapp"
+              type="text"
+              value="${escapeHtml(
+                whatsapp
+              )}"
+              placeholder="5585981563070"
+            >
+          </label>
 
-              <input
-                id="s-address"
-                value="${escapeHtml(
-                  settings.address ||
-                    "Rua 1018, 65, Conjunto Ceará II, Fortaleza-CE 60532-690"
-                )}"
-              >
-            </label>
+          <label class="full">
+            Endereço
 
-            <label class="full">
-              Instagram
+            <input
+              id="s-address"
+              type="text"
+              value="${escapeHtml(
+                address
+              )}"
+              placeholder="Rua 1018, 65, Conjunto Ceará II, Fortaleza-CE"
+            >
+          </label>
 
-              <input
-                id="s-instagram"
-                value="${escapeHtml(
-                  settings.instagram ||
-                    "@martins_confeitariaartesanal"
-                )}"
-              </label>
+          <label class="full">
+            Link do Google Maps
 
-            <label class="full">
-              Mensagem do WhatsApp
+            <input
+              id="s-maps"
+              type="url"
+              value="${escapeHtml(
+                maps
+              )}"
+              placeholder="https://maps.google.com/..."
+            >
+          </label>
 
-              <textarea
-                id="s-message"
-                rows="4"
-              >${escapeHtml(
-                settings.whatsapp_message ||
-                  ""
-              )}</textarea>
-            </label>
+          <label class="full">
+            Horários de funcionamento
 
+            <textarea
+              id="s-hours"
+              rows="7"
+              placeholder="Quinta: 11h às 23h&#10;Sexta: 11h às 18h30&#10;..."
+            >${escapeHtml(
+              hours
+            )}</textarea>
+          </label>
+
+        </div>
+
+      </section>
+
+      <section class="panel">
+
+        <div class="panel-head">
+
+          <div>
+            <h3>
+              Classificações
+            </h3>
+
+            <p class="muted">
+              Categorias utilizadas nos produtos.
+            </p>
           </div>
 
-        </form>
+          <button
+            type="button"
+            class="btn soft"
+            data-action="new-category"
+          >
+            + Nova classificação
+          </button>
 
-      </div>
+        </div>
+
+        <div class="category-list">
+
+          ${
+            getCategories()
+              .map(
+                category => `
+                  <span class="badge">
+                    ${escapeHtml(
+                      category
+                    )}
+                  </span>
+                `
+              )
+              .join("")
+          }
+
+        </div>
+
+      </section>
     `;
-
-    $("#saveSettings")
-      ?.addEventListener(
-        "click",
-        saveSettings
-      );
   }
-     /* =========================================================
-     CONFIGURAÇÕES — SALVAR
-     ========================================================= */
 
   async function saveSettings() {
     if (!db) {
@@ -3520,11 +3854,14 @@
         "Supabase não está conectado.",
         "error"
       );
+
       return;
     }
 
     const button =
-      $("#saveSettings");
+      document.querySelector(
+        '[data-action="save-settings"]'
+      );
 
     setButtonLoading(
       button,
@@ -3533,44 +3870,52 @@
     );
 
     try {
-      const current =
-        state.settings || {};
-
       const next = {
-        ...current,
-
-        name:
-          $("#s-name")
-            ?.value
-            ?.trim() ||
-          "Martins Confeitaria",
-
-        whatsapp:
-          $("#s-whatsapp")
-            ?.value
-            ?.trim() ||
-          "5585981563070",
-
-        address:
-          $("#s-address")
-            ?.value
-            ?.trim() ||
-          "",
-
-        instagram:
-          $("#s-instagram")
-            ?.value
-            ?.trim() ||
-          "",
-
-        whatsapp_message:
-          $("#s-message")
-            ?.value
-            ?.trim() ||
-          ""
+        ...(state.settings || {})
       };
 
+      const instagram =
+        $("#s-instagram")?.value
+          ?.trim() || "";
+
+      const whatsapp =
+        $("#s-whatsapp")?.value
+          ?.trim() || "";
+
+      const address =
+        $("#s-address")?.value
+          ?.trim() || "";
+
+      const maps =
+        $("#s-maps")?.value
+          ?.trim() || "";
+
+      const hours =
+        $("#s-hours")?.value
+          ?.trim() || "";
+
+      /*
+       * Mantém os demais dados existentes
+       * dentro do objeto settings.
+       */
+
+      next.instagram =
+        instagram;
+
+      next.whatsapp =
+        whatsapp;
+
+      next.address =
+        address;
+
+      next.maps =
+        maps;
+
+      next.hours =
+        hours;
+
       const {
+        data,
         error
       } = await db
         .from("settings")
@@ -3580,22 +3925,25 @@
             value: next
           },
           {
-            onConflict:
-              "key"
+            onConflict: "key"
           }
-        );
+        )
+        .select()
+        .single();
 
       if (error) {
         throw error;
       }
 
       state.settings =
+        data?.value ||
         next;
 
       showToast(
-        "Alterações salvas com sucesso."
+        "Configurações salvas com sucesso."
       );
 
+      renderCurrentView();
     } catch (error) {
       console.error(
         "Erro ao salvar configurações:",
@@ -3604,16 +3952,60 @@
 
       showToast(
         error?.message ||
-          "Não foi possível salvar as alterações.",
+          "Não foi possível salvar as configurações.",
         "error"
       );
-
     } finally {
       setButtonLoading(
         button,
-        false,
-        "Salvar alterações"
+        false
       );
+    }
+  }
+
+  /* =========================================================
+     RECARREGAR DADOS
+     ========================================================= */
+
+  async function reloadAll(
+    rerender = true
+  ) {
+    if (!db) {
+      return;
+    }
+
+    if (state.loading) {
+      return;
+    }
+
+    state.loading =
+      true;
+
+    try {
+      await Promise.all([
+        loadSettings(),
+        loadProducts(),
+        loadOrders(),
+        loadCustomCakes()
+      ]);
+
+      if (rerender) {
+        renderCurrentView();
+      }
+    } catch (error) {
+      console.error(
+        "Erro ao carregar dados:",
+        error
+      );
+
+      showToast(
+        error?.message ||
+          "Não foi possível carregar os dados.",
+        "error"
+      );
+    } finally {
+      state.loading =
+        false;
     }
   }
 
@@ -3644,10 +4036,8 @@
   function setActiveNav(
     viewName
   ) {
-    $$(
-      "[data-view]"
-    ).forEach(
-      (button) => {
+    $$(".nav").forEach(
+      button => {
         button.classList.toggle(
           "active",
           button.dataset.view ===
@@ -3658,82 +4048,85 @@
   }
 
   function renderCurrentView() {
+    if (!view) {
+      return;
+    }
+
     const current =
       state.activeView ||
       "dashboard";
+
+    if (title) {
+      title.textContent =
+        viewTitles[current] ||
+        "Dashboard";
+    }
 
     setActiveNav(
       current
     );
 
-    if (current ===
-      "dashboard"
-    ) {
-      renderDashboard();
-      return;
+    switch (current) {
+      case "prod-ready":
+        view.innerHTML =
+          renderProductsView(
+            "pronta"
+          );
+        break;
+
+      case "prod-orders":
+        view.innerHTML =
+          renderProductsView(
+            "encomendas"
+          );
+        break;
+
+      case "ord-ready":
+        view.innerHTML =
+          renderOrdersView(
+            "pronta"
+          );
+        break;
+
+      case "ord-orders":
+        view.innerHTML =
+          renderOrdersView(
+            "encomendas"
+          );
+        break;
+
+      case "settings":
+        view.innerHTML =
+          renderSettings();
+        break;
+
+      case "dashboard":
+      default:
+        state.activeView =
+          "dashboard";
+
+        view.innerHTML =
+          renderDashboard();
+        break;
     }
-
-    if (
-      current ===
-      "prod-ready"
-    ) {
-      renderProductsView(
-        "pronta"
-      );
-      return;
-    }
-
-    if (
-      current ===
-      "prod-orders"
-    ) {
-      renderProductsView(
-        "encomendas"
-      );
-      return;
-    }
-
-    if (
-      current ===
-      "ord-ready"
-    ) {
-      renderOrdersView(
-        "pronta"
-      );
-      return;
-    }
-
-    if (
-      current ===
-      "ord-orders"
-    ) {
-      renderOrdersView(
-        "encomendas"
-      );
-      return;
-    }
-
-    if (
-      current ===
-      "settings"
-    ) {
-      renderSettings();
-      return;
-    }
-
-    state.activeView =
-      "dashboard";
-
-    renderDashboard();
   }
 
   function navigate(
     viewName
   ) {
+    const allowed = [
+      "dashboard",
+      "prod-ready",
+      "prod-orders",
+      "ord-ready",
+      "ord-orders",
+      "settings"
+    ];
+
     if (
-      !viewTitles[
+      !allowed.includes(
         viewName
-      ]
+      )
     ) {
       viewName =
         "dashboard";
@@ -3742,272 +4135,9 @@
     state.activeView =
       viewName;
 
-    if (title) {
-      title.textContent =
-        viewTitles[
-          viewName
-        ];
-    }
-
     renderCurrentView();
 
     closeMobileMenu();
-  }
-
-  /* =========================================================
-     MENU LATERAL
-     ========================================================= */
-
-  function bindNavigation() {
-    $$(
-      "[data-view]"
-    ).forEach(
-      (button) => {
-        button.addEventListener(
-          "click",
-          () => {
-            navigate(
-              button.dataset.view
-            );
-          }
-        );
-      }
-    );
-  }
-
-  function toggleMobileMenu() {
-    if (!side) {
-      return;
-    }
-
-    const isOpen =
-      side.classList.contains(
-        "open"
-      );
-
-    if (isOpen) {
-      closeMobileMenu();
-      return;
-    }
-
-    document.body.classList.add(
-      "menu-open"
-    );
-
-    side.classList.add(
-      "open"
-    );
-
-    if (shade) {
-      shade.classList.add(
-        "show"
-      );
-    }
-  }
-
-  /* =========================================================
-     MODAL DE PRODUTO
-     ========================================================= */
-
-  function bindProductModal() {
-    if (
-      productForm
-    ) {
-      productForm.addEventListener(
-        "submit",
-        saveProduct
-      );
-    }
-
-    $$(
-      "[data-close]"
-    ).forEach(
-      (button) => {
-        button.addEventListener(
-          "click",
-          closeProductModal
-        );
-      }
-    );
-
-    modal?.addEventListener(
-      "click",
-      (event) => {
-        if (
-          event.target ===
-          modal
-        ) {
-          closeProductModal();
-        }
-      }
-    );
-
-    $("#f-cat")
-      ?.addEventListener(
-        "change",
-        async (event) => {
-          if (
-            event.target.value ===
-            "__new__"
-          ) {
-            await createCategory();
-
-            if (
-              event.target.value ===
-              "__new__"
-            ) {
-              renderCategoryOptions();
-            }
-          }
-        }
-      );
-
-    $("#rmimg")
-      ?.addEventListener(
-        "click",
-        () => {
-          const preview =
-            $("#prev");
-
-          const photo =
-            $("#f-photo");
-
-          if (preview) {
-            preview.src =
-              "";
-            preview.classList.add(
-              "hidden"
-            );
-          }
-
-          if (photo) {
-            photo.value =
-              "";
-          }
-
-          const remove =
-            $("#rmimg");
-
-          if (remove) {
-            remove.classList.add(
-              "hidden"
-            );
-          }
-        }
-      );
-
-    $("#f-photo")
-      ?.addEventListener(
-        "change",
-        () => {
-          const file =
-            $("#f-photo")
-              ?.files?.[0];
-
-          const preview =
-            $("#prev");
-
-          const remove =
-            $("#rmimg");
-
-          if (
-            !file ||
-            !preview
-          ) {
-            return;
-          }
-
-          if (
-            !file.type.startsWith(
-              "image/"
-            )
-          ) {
-            showToast(
-              "Selecione uma imagem válida.",
-              "warning"
-            );
-
-            $("#f-photo").value =
-              "";
-
-            return;
-          }
-
-          const url =
-            URL.createObjectURL(
-              file
-            );
-
-          preview.src =
-            url;
-
-          preview.classList.remove(
-            "hidden"
-          );
-
-          if (remove) {
-            remove.classList.remove(
-              "hidden"
-            );
-          }
-        }
-      );
-  }
-
-  /* =========================================================
-     ATUALIZAÇÃO DOS DADOS
-     ========================================================= */
-
-  async function refreshData(
-    showMessage = true
-  ) {
-    if (!db) {
-      return;
-    }
-
-    if (
-      state.loading
-    ) {
-      return;
-    }
-
-    state.loading =
-      true;
-
-    try {
-      await Promise.all([
-        loadSettings(),
-        loadProducts(),
-        loadOrders(),
-        loadCustomCakes()
-      ]);
-
-      renderCurrentView();
-
-      if (
-        showMessage
-      ) {
-        showToast(
-          "Dados atualizados."
-        );
-      }
-
-    } catch (error) {
-      console.error(
-        "Erro ao atualizar dados:",
-        error
-      );
-
-      showToast(
-        error?.message ||
-          "Não foi possível atualizar os dados.",
-        "error"
-      );
-
-    } finally {
-      state.loading =
-        false;
-    }
   }
 
   /* =========================================================
@@ -4015,45 +4145,103 @@
      ========================================================= */
 
   async function loginUser(
+    email,
+    password
+  ) {
+    if (!db) {
+      throw new Error(
+        "Supabase não está conectado."
+      );
+    }
+
+    const {
+      data,
+      error
+    } = await db.auth
+      .signInWithPassword({
+        email,
+        password
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    state.session =
+      data?.session ||
+      null;
+
+    state.user =
+      data?.user ||
+      null;
+
+    return data;
+  }
+
+  function showApp() {
+    if (login) {
+      login.classList.add(
+        "hidden"
+      );
+    }
+
+    if (app) {
+      app.classList.remove(
+        "hidden"
+      );
+    }
+  }
+
+  function showLogin() {
+    if (app) {
+      app.classList.add(
+        "hidden"
+      );
+    }
+
+    if (login) {
+      login.classList.remove(
+        "hidden"
+      );
+    }
+  }
+
+  async function handleLogin(
     event
   ) {
     event.preventDefault();
 
-    if (!db) {
-      setLoginMessage(
-        "Não foi possível conectar ao Supabase."
-      );
-      return;
-    }
-
     const email =
-      loginEmail
-        ?.value
-        ?.trim() ||
-      "";
+      loginEmail?.value
+        ?.trim() || "";
 
     const password =
-      loginPassword
-        ?.value ||
+      loginPassword?.value ||
       "";
 
-    if (
-      !email ||
-      !password
-    ) {
+    if (!email) {
       setLoginMessage(
-        "Informe e-mail e senha."
+        "Digite seu e-mail."
       );
+
       return;
     }
 
-    const submitButton =
+    if (!password) {
+      setLoginMessage(
+        "Digite sua senha."
+      );
+
+      return;
+    }
+
+    const button =
       loginForm?.querySelector(
         'button[type="submit"]'
       );
 
     setButtonLoading(
-      submitButton,
+      button,
       true,
       "Entrando..."
     );
@@ -4064,139 +4252,43 @@
     );
 
     try {
-      const {
-        data,
-        error
-      } =
-        await db.auth.signInWithPassword(
-          {
-            email,
-            password
-          }
-        );
+      await loginUser(
+        email,
+        password
+      );
 
-      if (error) {
-        throw error;
-      }
+      setLoginMessage(
+        "Login realizado.",
+        false
+      );
 
-      state.session =
-        data?.session ||
-        null;
-
-      state.user =
-        data?.user ||
-        null;
-
-      if (
-        !state.session
-      ) {
-        throw new Error(
-          "Não foi possível iniciar a sessão."
-        );
-      }
-
-      await enterApp();
-
+      await startAuthenticatedApp();
     } catch (error) {
       console.error(
         "Erro no login:",
         error
       );
 
-      let message =
-        "Não foi possível entrar.";
-
-      if (
-        error?.message
-      ) {
-        message =
-          error.message;
-      }
-
-      if (
-        normalizeText(
-          message
-        ).includes(
-          "invalid login credentials"
-        )
-      ) {
-        message =
-          "E-mail ou senha incorretos.";
-      }
-
       setLoginMessage(
-        message
+        error?.message ||
+          "E-mail ou senha incorretos."
       );
-
     } finally {
       setButtonLoading(
-        submitButton,
-        false,
-        "Entrar"
-      );
-    }
-  }
-     /* =========================================================
-     ENTRAR NO PAINEL
-     ========================================================= */
-
-  async function enterApp() {
-    if (!login || !app) {
-      return;
-    }
-
-    login.classList.add(
-      "hidden"
-    );
-
-    app.classList.remove(
-      "hidden"
-    );
-
-    setLoginMessage(
-      "",
-      false
-    );
-
-    try {
-      await refreshData(
+        button,
         false
       );
-    } catch (error) {
-      console.error(
-        "Erro ao carregar painel:",
-        error
-      );
     }
-
-    navigate(
-      state.activeView ||
-        "dashboard"
-    );
   }
-
-  /* =========================================================
-     SAIR
-     ========================================================= */
 
   async function logout() {
     try {
       if (db) {
-        const {
-          error
-        } =
-          await db.auth.signOut();
-
-        if (error) {
-          console.error(
-            "Erro ao sair:",
-            error
-          );
-        }
+        await db.auth.signOut();
       }
     } catch (error) {
       console.error(
-        "Erro no logout:",
+        "Erro ao sair:",
         error
       );
     }
@@ -4219,39 +4311,467 @@
     state.customCakes =
       [];
 
-    state.activeView =
-      "dashboard";
-
-    if (app) {
-      app.classList.add(
-        "hidden"
-      );
-    }
-
-    if (login) {
-      login.classList.remove(
-        "hidden"
-      );
-    }
+    showLogin();
 
     if (loginForm) {
       loginForm.reset();
     }
 
     setLoginMessage(
-      "",
-      false
+      ""
     );
-
-    closeMobileMenu();
   }
 
   /* =========================================================
-     RECUPERAR SESSÃO EXISTENTE
+     INICIALIZAÇÃO DA ÁREA AUTENTICADA
+     ========================================================= */
+
+  async function startAuthenticatedApp() {
+    showApp();
+
+    try {
+      await reloadAll(
+        false
+      );
+
+      renderCategoryOptions();
+
+      renderCurrentView();
+    } catch (error) {
+      console.error(
+        "Erro ao iniciar painel:",
+        error
+      );
+
+      showToast(
+        error?.message ||
+          "Erro ao carregar o painel.",
+        "error"
+      );
+    }
+  }
+     /* =========================================================
+     EVENTOS — NAVEGAÇÃO
+     ========================================================= */
+
+  function bindNavigation() {
+    $$(".nav").forEach(
+      button => {
+        button.addEventListener(
+          "click",
+          () => {
+            navigate(
+              button.dataset.view
+            );
+          }
+        );
+      }
+    );
+  }
+
+  /* =========================================================
+     EVENTOS — MODAL
+     ========================================================= */
+
+  function bindModal() {
+    if (!modal) {
+      return;
+    }
+
+    $$("[data-close]").forEach(
+      button => {
+        button.addEventListener(
+          "click",
+          closeProductModal
+        );
+      }
+    );
+
+    modal.addEventListener(
+      "click",
+      event => {
+        if (
+          event.target ===
+          modal
+        ) {
+          closeProductModal();
+        }
+      }
+    );
+
+    document.addEventListener(
+      "keydown",
+      event => {
+        if (
+          event.key ===
+          "Escape"
+        ) {
+          closeProductModal();
+        }
+      }
+    );
+  }
+
+  /* =========================================================
+     EVENTOS — FORMULÁRIO DE PRODUTO
+     ========================================================= */
+
+  function bindProductForm() {
+    if (!productForm) {
+      return;
+    }
+
+    productForm.addEventListener(
+      "submit",
+      event => {
+        event.preventDefault();
+
+        saveProduct();
+      }
+    );
+
+    const category =
+      $("#f-cat");
+
+    if (category) {
+      category.addEventListener(
+        "change",
+        () => {
+          if (
+            category.value ===
+            "__new__"
+          ) {
+            category.value =
+              "";
+
+            createCategory();
+          }
+        }
+      );
+    }
+
+    const photo =
+      $("#f-photo");
+
+    if (photo) {
+      photo.addEventListener(
+        "change",
+        () => {
+          const file =
+            photo.files?.[0];
+
+          const preview =
+            $("#prev");
+
+          const removeButton =
+            $("#rmimg");
+
+          if (
+            !file ||
+            !preview
+          ) {
+            return;
+          }
+
+          const url =
+            URL.createObjectURL(
+              file
+            );
+
+          preview.src =
+            url;
+
+          preview.classList.remove(
+            "hidden"
+          );
+
+          if (removeButton) {
+            removeButton.classList.remove(
+              "hidden"
+            );
+          }
+        }
+      );
+    }
+
+    const removeImage =
+      $("#rmimg");
+
+    if (removeImage) {
+      removeImage.addEventListener(
+        "click",
+        removeProductImage
+      );
+    }
+  }
+
+  /* =========================================================
+     EVENTOS — CLIQUES DINÂMICOS
+     ========================================================= */
+
+  function bindDynamicEvents() {
+    document.addEventListener(
+      "click",
+      event => {
+        const target =
+          event.target.closest(
+            "[data-action]"
+          );
+
+        if (!target) {
+          return;
+        }
+
+        const action =
+          target.dataset.action;
+
+        if (
+          action ===
+          "new-product"
+        ) {
+          openProductModal();
+
+          return;
+        }
+
+        if (
+          action ===
+          "edit-product"
+        ) {
+          const id =
+            target.dataset.id;
+
+          const product =
+            state.products.find(
+              item =>
+                String(
+                  item.id
+                ) ===
+                String(id)
+            );
+
+          if (product) {
+            openProductModal(
+              product
+            );
+          }
+
+          return;
+        }
+
+        if (
+          action ===
+          "delete-product"
+        ) {
+          const id =
+            target.dataset.id;
+
+          const product =
+            state.products.find(
+              item =>
+                String(
+                  item.id
+                ) ===
+                String(id)
+            );
+
+          if (product) {
+            deleteProduct(
+              product
+            );
+          }
+
+          return;
+        }
+
+        if (
+          action ===
+          "go-view"
+        ) {
+          navigate(
+            target.dataset.view
+          );
+
+          return;
+        }
+
+        if (
+          action ===
+          "reload-all"
+        ) {
+          reloadAll();
+
+          return;
+        }
+
+        if (
+          action ===
+          "print-orders"
+        ) {
+          printOrders(
+            target.dataset.area ||
+              "pronta"
+          );
+
+          return;
+        }
+
+        if (
+          action ===
+          "print-custom-cakes"
+        ) {
+          printCustomCakes();
+
+          return;
+        }
+
+        if (
+          action ===
+          "new-category"
+        ) {
+          createCategory();
+
+          return;
+        }
+
+        if (
+          action ===
+          "save-settings"
+        ) {
+          saveSettings();
+
+          return;
+        }
+      }
+    );
+
+    document.addEventListener(
+      "change",
+      event => {
+        const target =
+          event.target.closest(
+            '[data-action="order-status"]'
+          );
+
+        if (!target) {
+          return;
+        }
+
+        const id =
+          target.dataset.id;
+
+        const order =
+          state.orders.find(
+            item =>
+              String(
+                item.id
+              ) ===
+              String(id)
+          );
+
+        if (!order) {
+          return;
+        }
+
+        updateOrderStatus(
+          order,
+          target.value
+        );
+      }
+    );
+  }
+
+  /* =========================================================
+     MENU MOBILE
+     ========================================================= */
+
+  function openMobileMenu() {
+    if (side) {
+      side.classList.add(
+        "open"
+      );
+    }
+
+    if (shade) {
+      shade.classList.add(
+        "show"
+      );
+    }
+
+    document.body.classList.add(
+      "menu-open"
+    );
+  }
+
+  function bindMobileMenu() {
+    if (burger) {
+      burger.addEventListener(
+        "click",
+        () => {
+          const open =
+            side?.classList.contains(
+              "open"
+            );
+
+          if (open) {
+            closeMobileMenu();
+          } else {
+            openMobileMenu();
+          }
+        }
+      );
+    }
+
+    if (shade) {
+      shade.addEventListener(
+        "click",
+        closeMobileMenu
+      );
+    }
+  }
+
+  /* =========================================================
+     ATUALIZAR
+     ========================================================= */
+
+  function bindRefresh() {
+    if (!refreshBtn) {
+      return;
+    }
+
+    refreshBtn.addEventListener(
+      "click",
+      async () => {
+        const original =
+          refreshBtn.textContent;
+
+        refreshBtn.disabled =
+          true;
+
+        refreshBtn.textContent =
+          "↻ Atualizando...";
+
+        try {
+          await reloadAll();
+        } finally {
+          refreshBtn.disabled =
+            false;
+
+          refreshBtn.textContent =
+            original;
+        }
+      }
+    );
+  }
+
+  /* =========================================================
+     AUTENTICAÇÃO — SESSÃO
      ========================================================= */
 
   async function restoreSession() {
     if (!db) {
+      showLogin();
+
       return;
     }
 
@@ -4259,45 +4779,38 @@
       const {
         data,
         error
-      } =
-        await db.auth.getSession();
+      } = await db.auth
+        .getSession();
 
       if (error) {
-        console.error(
-          "Erro ao recuperar sessão:",
-          error
-        );
-        return;
+        throw error;
       }
 
       const session =
         data?.session ||
         null;
 
-      if (!session) {
-        return;
-      }
-
       state.session =
         session;
 
       state.user =
-        session.user ||
+        session?.user ||
         null;
 
-      await enterApp();
-
+      if (session) {
+        await startAuthenticatedApp();
+      } else {
+        showLogin();
+      }
     } catch (error) {
       console.error(
         "Erro ao restaurar sessão:",
         error
       );
+
+      showLogin();
     }
   }
-
-  /* =========================================================
-     OBSERVADOR DE AUTENTICAÇÃO
-     ========================================================= */
 
   function bindAuthListener() {
     if (!db) {
@@ -4305,7 +4818,7 @@
     }
 
     db.auth.onAuthStateChange(
-      (
+      async (
         event,
         session
       ) => {
@@ -4319,53 +4832,58 @@
 
         if (
           event ===
-            "SIGNED_OUT" ||
-          !session
+            "SIGNED_IN" &&
+          session
         ) {
-          if (app) {
-            app.classList.add(
-              "hidden"
-            );
-          }
-
-          if (login) {
-            login.classList.remove(
-              "hidden"
-            );
-          }
-
-          closeMobileMenu();
+          await startAuthenticatedApp();
 
           return;
         }
 
         if (
           event ===
-            "SIGNED_IN" &&
-          session
+          "SIGNED_OUT"
         ) {
-          if (
-            app &&
-            app.classList.contains(
-              "hidden"
-            )
-          ) {
-            enterApp();
-          }
+          showLogin();
         }
       }
     );
   }
 
   /* =========================================================
-     EVENTOS GERAIS
+     INICIALIZAÇÃO
      ========================================================= */
 
-  function bindGeneralEvents() {
+  async function init() {
+    const connected =
+      initSupabase();
+
+    if (!connected) {
+      showLogin();
+
+      setLoginMessage(
+        "Não foi possível conectar ao Supabase."
+      );
+
+      return;
+    }
+
+    bindNavigation();
+
+    bindModal();
+
+    bindProductForm();
+
+    bindDynamicEvents();
+
+    bindMobileMenu();
+
+    bindRefresh();
+
     if (loginForm) {
       loginForm.addEventListener(
         "submit",
-        loginUser
+        handleLogin
       );
     }
 
@@ -4376,154 +4894,15 @@
       );
     }
 
-    if (refreshBtn) {
-      refreshBtn.addEventListener(
-        "click",
-        () => {
-          refreshData(
-            true
-          );
-        }
-      );
-    }
-
-    if (burger) {
-      burger.addEventListener(
-        "click",
-        toggleMobileMenu
-      );
-    }
-
-    if (shade) {
-      shade.addEventListener(
-        "click",
-        closeMobileMenu
-      );
-    }
-
-    document.addEventListener(
-      "keydown",
-      (event) => {
-        if (
-          event.key ===
-          "Escape"
-        ) {
-          closeProductModal();
-          closeMobileMenu();
-        }
-      }
-    );
-  }
-
-  /* =========================================================
-     VERIFICAÇÃO DOS ELEMENTOS
-     ========================================================= */
-
-  function checkRequiredElements() {
-    const required = [
-      [
-        "login",
-        login
-      ],
-      [
-        "loginForm",
-        loginForm
-      ],
-      [
-        "email",
-        loginEmail
-      ],
-      [
-        "password",
-        loginPassword
-      ],
-      [
-        "app",
-        app
-      ],
-      [
-        "view",
-        view
-      ],
-      [
-        "modal",
-        modal
-      ],
-      [
-        "pform",
-        productForm
-      ]
-    ];
-
-    const missing =
-      required.filter(
-        ([name, element]) =>
-          !element
-      );
-
-    if (
-      missing.length
-    ) {
-      console.warn(
-        "Elementos não encontrados no admin:",
-        missing.map(
-          ([name]) =>
-            name
-        )
-      );
-    }
-  }
-
-  /* =========================================================
-     INICIALIZAÇÃO
-     ========================================================= */
-
-  async function init() {
-    checkRequiredElements();
-
-    const connected =
-      initSupabase();
-
-    if (!connected) {
-      setLoginMessage(
-        "Não foi possível carregar o sistema."
-      );
-      return;
-    }
-
-    bindNavigation();
-
-    bindProductModal();
-
-    bindGeneralEvents();
-
     bindAuthListener();
 
-    renderCategoryOptions();
-
-    /*
-     * Começa sempre mostrando
-     * o login até que o Supabase
-     * confirme uma sessão existente.
-     */
-
-    if (app) {
-      app.classList.add(
-        "hidden"
-      );
-    }
-
-    if (login) {
-      login.classList.remove(
-        "hidden"
-      );
-    }
+    showLogin();
 
     await restoreSession();
   }
 
   /* =========================================================
-     INICIAR QUANDO O DOCUMENTO ESTIVER PRONTO
+     INICIAR
      ========================================================= */
 
   if (
@@ -4532,13 +4911,13 @@
   ) {
     document.addEventListener(
       "DOMContentLoaded",
-      init
+      init,
+      {
+        once: true
+      }
     );
   } else {
     init();
   }
-     /* =========================================================
-     FIM DO PAINEL ADMINISTRATIVO
-     ========================================================= */
 
 })();
