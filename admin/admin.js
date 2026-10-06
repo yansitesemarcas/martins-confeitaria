@@ -23,7 +23,8 @@
 
   const WHATSAPP = "5585981563070";
 
-  const $ = (selector) => document.querySelector(selector);
+  const $ = (selector) =>
+    document.querySelector(selector);
 
   const $$ = (selector) =>
     [...document.querySelectorAll(selector)];
@@ -489,7 +490,10 @@
      TOAST
   ========================================================= */
 
-  function toast(message, type = "ok") {
+  function toast(
+    message,
+    type = "ok"
+  ) {
     const el = $("#toast");
 
     if (!el) {
@@ -498,7 +502,6 @@
     }
 
     el.className = type;
-
     el.textContent = message;
 
     el.classList.add("show");
@@ -532,7 +535,10 @@
     return !!data?.session;
   }
 
-  async function login(email, password) {
+  async function login(
+    email,
+    password
+  ) {
     if (!db) {
       throw new Error(
         "Supabase não foi configurado."
@@ -552,9 +558,13 @@
 
     S.on = true;
 
-    $("#login")?.classList.add("hidden");
+    $("#login")?.classList.add(
+      "hidden"
+    );
 
-    $("#app")?.classList.remove("hidden");
+    $("#app")?.classList.remove(
+      "hidden"
+    );
 
     await start();
   }
@@ -570,9 +580,13 @@
 
     S.on = false;
 
-    $("#app")?.classList.add("hidden");
+    $("#app")?.classList.add(
+      "hidden"
+    );
 
-    $("#login")?.classList.remove("hidden");
+    $("#login")?.classList.remove(
+      "hidden"
+    );
   }
 
   /* =========================================================
@@ -615,7 +629,9 @@
      SAVE SITE
   ========================================================= */
 
-  async function saveSite(patch) {
+  async function saveSite(
+    patch
+  ) {
     if (!db) {
       throw new Error(
         "Supabase não conectado."
@@ -652,7 +668,10 @@
 
   async function loadEnc() {
     if (!db) {
-      S.enc = clone(DEFAULT_ENC);
+      S.enc = clone(
+        DEFAULT_ENC
+      );
+
       return;
     }
 
@@ -671,12 +690,17 @@
         error.message
       );
 
-      S.enc = clone(DEFAULT_ENC);
+      S.enc = clone(
+        DEFAULT_ENC
+      );
 
       return;
     }
 
-    S.enc = mergeEnc(data?.value);
+    S.enc =
+      mergeEnc(
+        data?.value
+      );
   }
 
   /* =========================================================
@@ -743,7 +767,10 @@
       return;
     }
 
-    S.products = data || [];
+    S.products =
+      Array.isArray(data)
+        ? data
+        : [];
   }
 
   /* =========================================================
@@ -752,7 +779,6 @@
 
   async function loadOrders() {
     S.readyOrders = [];
-
     S.customOrders = [];
 
     if (!db) {
@@ -780,7 +806,10 @@
           error.message
         );
       } else {
-        S.readyOrders = data || [];
+        S.readyOrders =
+          Array.isArray(data)
+            ? data
+            : [];
       }
     } catch (error) {
       console.warn(error);
@@ -807,7 +836,10 @@
           error.message
         );
       } else {
-        S.customOrders = data || [];
+        S.customOrders =
+          Array.isArray(data)
+            ? data
+            : [];
       }
     } catch (error) {
       console.warn(error);
@@ -818,7 +850,9 @@
      ÁREA DO PRODUTO
   ========================================================= */
 
-  function productArea(product) {
+  function productArea(
+    product
+  ) {
     const area =
       String(
         product?.area ||
@@ -849,13 +883,15 @@
     const readyProducts =
       S.products.filter(
         (p) =>
-          productArea(p) === "pronta"
+          productArea(p) ===
+          "pronta"
       );
 
     const orderProducts =
       S.products.filter(
         (p) =>
-          productArea(p) === "encomendas"
+          productArea(p) ===
+          "encomendas"
       );
 
     const readyOrders =
@@ -871,8 +907,10 @@
       ].filter(
         (o) =>
           String(
-            o?.status || "novo"
-          ).toLowerCase() === "novo"
+            o?.status ||
+              "novo"
+          ).toLowerCase() ===
+          "novo"
       ).length;
 
     return `
@@ -907,12 +945,15 @@
       <div class="panel">
 
         <div class="panel-head">
+
           <div>
             <h2>Resumo</h2>
+
             <p class="muted">
               Visão geral do painel da Martins Confeitaria.
             </p>
           </div>
+
         </div>
 
         <div class="dashboard-actions">
@@ -955,7 +996,9 @@
      PRODUTOS
   ========================================================= */
 
-  function productsView(kind) {
+  function productsView(
+    kind
+  ) {
     const isReady =
       kind === "ready";
 
@@ -963,9 +1006,11 @@
       S.products.filter(
         (product) =>
           productArea(product) ===
-          (isReady
-            ? "pronta"
-            : "encomendas")
+          (
+            isReady
+              ? "pronta"
+              : "encomendas"
+          )
       );
 
     return `
@@ -974,6 +1019,7 @@
         <div class="panel-head">
 
           <div>
+
             <h2>
               ${
                 isReady
@@ -986,9 +1032,10 @@
               ${
                 isReady
                   ? "Produtos disponíveis para venda imediata."
-                  : "Produtos e configurações utilizados na página de encomendas."
+                  : "Produtos utilizados na área de encomendas."
               }
             </p>
+
           </div>
 
           <button
@@ -1012,8 +1059,7 @@
 
                 ${products
                   .map(
-                    (product) =>
-                      productCard(product)
+                    productCard
                   )
                   .join("")}
 
@@ -1040,7 +1086,9 @@
      CARD DE PRODUTO
   ========================================================= */
 
-  function productCard(product) {
+  function productCard(
+    product
+  ) {
     const image =
       product.image_url ||
       product.image ||
@@ -1049,6 +1097,9 @@
     const active =
       product.active !== false;
 
+    const area =
+      productArea(product);
+
     return `
       <article class="product-card">
 
@@ -1056,10 +1107,15 @@
           image
             ? `
               <div class="product-image">
+
                 <img
                   src="${esc(image)}"
-                  alt="${esc(product.name)}"
+                  alt="${esc(
+                    product.name ||
+                    "Produto"
+                  )}"
                 >
+
               </div>
             `
             : `
@@ -1074,7 +1130,10 @@
           <div class="product-top">
 
             <h3>
-              ${esc(product.name || "Produto")}
+              ${esc(
+                product.name ||
+                "Produto"
+              )}
             </h3>
 
             <span class="badge ${
@@ -1082,31 +1141,61 @@
                 ? "ok"
                 : "off"
             }">
+
               ${
                 active
                   ? "Ativo"
                   : "Inativo"
               }
+
             </span>
 
           </div>
+
+          <small class="muted">
+            Área:
+            ${
+              area === "pronta"
+                ? "Pronta Entrega"
+                : "Encomendas"
+            }
+          </small>
+
+          ${
+            product.category
+              ? `
+                <small class="muted">
+                  Classificação:
+                  ${esc(
+                    product.category
+                  )}
+                </small>
+              `
+              : ""
+          }
 
           ${
             product.description
               ? `
                 <p class="muted">
-                  ${esc(product.description)}
+                  ${esc(
+                    product.description
+                  )}
                 </p>
               `
               : ""
           }
 
           <strong class="product-price">
-            ${brl(product.price)}
+            ${brl(
+              product.price
+            )}
           </strong>
 
           ${
-            Number(product.discount || 0) > 0
+            Number(
+              product.discount || 0
+            ) > 0
               ? `
                 <small>
                   Desconto:
@@ -1123,7 +1212,9 @@
             <button
               class="btn soft"
               data-act="edit-product"
-              data-id="${esc(product.id)}"
+              data-id="${esc(
+                product.id
+              )}"
             >
               Editar
             </button>
@@ -1131,7 +1222,9 @@
             <button
               class="btn danger"
               data-act="delete-product"
-              data-id="${esc(product.id)}"
+              data-id="${esc(
+                product.id
+              )}"
             >
               Excluir
             </button>
@@ -1150,7 +1243,8 @@
 
   function encomendasConfigView() {
     const enc =
-      S.enc || clone(DEFAULT_ENC);
+      S.enc ||
+      clone(DEFAULT_ENC);
 
     return `
       <div class="panel enc-config">
@@ -1158,6 +1252,7 @@
         <div class="panel-head">
 
           <div>
+
             <h2>
               Configuração das Encomendas
             </h2>
@@ -1166,6 +1261,7 @@
               Tudo abaixo alimenta a página
               <strong>encomendas.html</strong>.
             </p>
+
           </div>
 
           <button
@@ -1229,27 +1325,36 @@
      BOLOS
   ========================================================= */
 
-  function renderCakeConfig(enc) {
+  function renderCakeConfig(
+    enc
+  ) {
     return `
       <div class="enc-section">
 
         <div class="enc-section-head">
 
           <div>
+
             <h3>Bolos</h3>
 
             <p class="muted">
               Tipos, tamanhos e preços.
             </p>
+
           </div>
 
         </div>
 
         <div class="enc-list">
 
-          ${enc.cakes
+          ${(
+            enc.cakes || []
+          )
             .map(
-              (cake, index) => `
+              (
+                cake,
+                index
+              ) => `
                 <div
                   class="enc-card"
                   data-cake-index="${index}"
@@ -1259,11 +1364,14 @@
 
                     <div>
                       <strong>
-                        ${esc(cake.name)}
+                        ${esc(
+                          cake.name
+                        )}
                       </strong>
                     </div>
 
                     <label class="switch-row">
+
                       <input
                         type="checkbox"
                         data-enc-cake-active="${index}"
@@ -1273,23 +1381,33 @@
                             : ""
                         }
                       >
+
                       Ativo
+
                     </label>
 
                   </div>
 
                   <div class="enc-options">
 
-                    ${cake.options
+                    ${(
+                      cake.options ||
+                      []
+                    )
                       .map(
-                        (option, optionIndex) => `
+                        (
+                          option,
+                          optionIndex
+                        ) => `
                           <div class="enc-row">
 
                             <input
                               type="text"
                               data-cake-name="${index}"
                               data-option="${optionIndex}"
-                              value="${esc(option)}"
+                              value="${esc(
+                                option
+                              )}"
                             >
 
                             <input
@@ -1336,7 +1454,10 @@
       <div class="enc-section">
 
         <div class="enc-section-head">
-          <h3>${esc(title)}</h3>
+
+          <h3>
+            ${esc(title)}
+          </h3>
 
           <button
             class="btn soft"
@@ -1345,13 +1466,17 @@
           >
             + Adicionar
           </button>
+
         </div>
 
         <div class="enc-list">
 
           ${(items || [])
             .map(
-              (item, index) => `
+              (
+                item,
+                index
+              ) => `
                 <div class="enc-row">
 
                   <input
@@ -1366,7 +1491,9 @@
                   >
 
                   ${
-                    Array.isArray(item)
+                    Array.isArray(
+                      item
+                    )
                       ? `
                         <input
                           type="number"
@@ -1416,7 +1543,9 @@
 
         <div class="enc-section-head">
 
-          <h3>${esc(title)}</h3>
+          <h3>
+            ${esc(title)}
+          </h3>
 
           <button
             class="btn soft"
@@ -1432,14 +1561,19 @@
 
           ${(items || [])
             .map(
-              (item, index) => `
+              (
+                item,
+                index
+              ) => `
                 <div class="enc-row">
 
                   <input
                     type="text"
                     data-simple-key="${key}"
                     data-simple-index="${index}"
-                    value="${esc(item)}"
+                    value="${esc(
+                      item
+                    )}"
                   >
 
                   <button
@@ -1476,7 +1610,9 @@
 
         <div class="enc-section-head">
 
-          <h3>${esc(title)}</h3>
+          <h3>
+            ${esc(title)}
+          </h3>
 
           <button
             class="btn soft"
@@ -1492,14 +1628,19 @@
 
           ${(items || [])
             .map(
-              (item, index) => `
+              (
+                item,
+                index
+              ) => `
                 <div class="enc-row">
 
                   <input
                     type="text"
                     data-price-name="${key}"
                     data-price-index="${index}"
-                    value="${esc(item?.[0])}"
+                    value="${esc(
+                      item?.[0]
+                    )}"
                   >
 
                   <input
@@ -1550,12 +1691,14 @@
         <div class="enc-section-head">
 
           <div>
+
             <h3>Brigadeiros</h3>
 
             <p class="muted">
               Sabores e valores das caixas de
               50 e 100 unidades.
             </p>
+
           </div>
 
         </div>
@@ -1568,13 +1711,18 @@
 
             ${(b.classica || [])
               .map(
-                (name, index) => `
+                (
+                  name,
+                  index
+                ) => `
                   <div class="enc-row">
 
                     <input
                       type="text"
                       data-brig-classic="${index}"
-                      value="${esc(name)}"
+                      value="${esc(
+                        name
+                      )}"
                     >
 
                     <button
@@ -1611,13 +1759,18 @@
 
             ${(b.premium || [])
               .map(
-                (name, index) => `
+                (
+                  name,
+                  index
+                ) => `
                   <div class="enc-row">
 
                     <input
                       type="text"
                       data-brig-premium="${index}"
-                      value="${esc(name)}"
+                      value="${esc(
+                        name
+                      )}"
                     >
 
                     <button
@@ -1654,6 +1807,7 @@
 
             <label>
               Clássicos — 50 unidades
+
               <input
                 type="number"
                 min="0"
@@ -1664,10 +1818,12 @@
                   b.classicaPrices?.[0] || 0
                 )}"
               >
+
             </label>
 
             <label>
               Clássicos — 100 unidades
+
               <input
                 type="number"
                 min="0"
@@ -1678,6 +1834,7 @@
                   b.classicaPrices?.[1] || 0
                 )}"
               >
+
             </label>
 
           </div>
@@ -1686,6 +1843,7 @@
 
             <label>
               Premium — 50 unidades
+
               <input
                 type="number"
                 min="0"
@@ -1696,10 +1854,12 @@
                   b.premiumPrices?.[0] || 0
                 )}"
               >
+
             </label>
 
             <label>
               Premium — 100 unidades
+
               <input
                 type="number"
                 min="0"
@@ -1710,6 +1870,7 @@
                   b.premiumPrices?.[1] || 0
                 )}"
               >
+
             </label>
 
           </div>
@@ -1724,6 +1885,7 @@
 
             <label>
               Limite para 50 unidades
+
               <input
                 type="number"
                 min="1"
@@ -1733,10 +1895,12 @@
                   b.flavorLimit50 || 2
                 )}"
               >
+
             </label>
 
             <label>
               Limite para 100 unidades
+
               <input
                 type="number"
                 min="1"
@@ -1746,6 +1910,7 @@
                   b.flavorLimit100 || 4
                 )}"
               >
+
             </label>
 
           </div>
@@ -1769,12 +1934,14 @@
         <div class="enc-section-head">
 
           <div>
+
             <h3>Outros itens</h3>
 
             <p class="muted">
-              Estes são os itens mostrados em
+              Itens mostrados em
               “Outros itens” na encomenda.
             </p>
+
           </div>
 
           <button
@@ -1790,13 +1957,18 @@
 
           ${(items || [])
             .map(
-              (item, index) => `
+              (
+                item,
+                index
+              ) => `
                 <div class="enc-row">
 
                   <input
                     type="text"
                     data-other-name="${index}"
-                    value="${esc(item.name)}"
+                    value="${esc(
+                      item.name
+                    )}"
                   >
 
                   <input
@@ -1810,6 +1982,7 @@
                   >
 
                   <label class="switch-row">
+
                     <input
                       type="checkbox"
                       data-other-active="${index}"
@@ -1819,7 +1992,9 @@
                           : ""
                       }
                     >
+
                     Ativo
+
                   </label>
 
                   <button
@@ -1854,12 +2029,14 @@
         <div class="enc-section-head">
 
           <div>
+
             <h3>Kits</h3>
 
             <p class="muted">
               Os kits possuem bolo e docinhos
               inclusos conforme definido abaixo.
             </p>
+
           </div>
 
           <button
@@ -1875,7 +2052,10 @@
 
           ${(kits || [])
             .map(
-              (kit, index) => `
+              (
+                kit,
+                index
+              ) => `
                 <div class="enc-card">
 
                   <div class="enc-card-head">
@@ -1885,6 +2065,7 @@
                     </strong>
 
                     <label class="switch-row">
+
                       <input
                         type="checkbox"
                         data-kit-active="${index}"
@@ -1894,7 +2075,9 @@
                             : ""
                         }
                       >
+
                       Ativo
+
                     </label>
 
                   </div>
@@ -1903,6 +2086,7 @@
 
                     <label>
                       Nome
+
                       <input
                         type="text"
                         data-kit-name="${index}"
@@ -1910,10 +2094,12 @@
                           kit.name
                         )}"
                       >
+
                     </label>
 
                     <label>
                       Preço
+
                       <input
                         type="number"
                         min="0"
@@ -1923,6 +2109,7 @@
                           kit.price || 0
                         )}"
                       >
+
                     </label>
 
                   </div>
@@ -1931,6 +2118,7 @@
 
                     <label>
                       Bolo incluso
+
                       <input
                         type="text"
                         data-kit-cake="${index}"
@@ -1938,10 +2126,12 @@
                           kit.cake
                         )}"
                       >
+
                     </label>
 
                     <label>
                       Docinhos
+
                       <input
                         type="number"
                         min="0"
@@ -1951,21 +2141,25 @@
                           kit.docinhos || 0
                         )}"
                       >
+
                     </label>
 
                   </div>
 
                   <label>
                     Itens inclusos
+
                     <textarea
                       rows="4"
                       data-kit-items="${index}"
                       placeholder="Um item por linha"
                     >${esc(
-                      (kit.items || []).join(
-                        "\n"
-                      )
+                      (
+                        kit.items ||
+                        []
+                      ).join("\n")
                     )}</textarea>
+
                   </label>
 
                   <div class="product-actions">
@@ -1995,7 +2189,9 @@
      PEDIDOS
   ========================================================= */
 
-  function ordersView(kind) {
+  function ordersView(
+    kind
+  ) {
     const isReady =
       kind === "ready";
 
@@ -2010,6 +2206,7 @@
         <div class="panel-head">
 
           <div>
+
             <h2>
               ${
                 isReady
@@ -2025,6 +2222,7 @@
                   : "Pedidos recebidos pelo formulário de encomendas."
               }
             </p>
+
           </div>
 
           <button
@@ -2043,7 +2241,9 @@
 
                 ${orders
                   .map(
-                    (order) =>
+                    (
+                      order
+                    ) =>
                       orderCard(
                         order,
                         isReady
@@ -2070,7 +2270,9 @@
      NORMALIZAR PEDIDO DE ENCOMENDA
   ========================================================= */
 
-  function normalizeCustomOrder(order) {
+  function normalizeCustomOrder(
+    order
+  ) {
     const data =
       order?.data &&
       typeof order.data === "object"
@@ -2078,29 +2280,33 @@
         : {};
 
     return {
-      id: order.id,
+      id: order?.id,
 
       status:
-        order.status ||
+        order?.status ||
         "novo",
 
       created_at:
-        order.created_at ||
+        order?.created_at ||
+        data.created_at ||
+        data.criado_em ||
         null,
 
       cliente:
+        data.customer ||
         data.cliente ||
         data.nome ||
-        order.cliente ||
+        order?.cliente ||
         "",
 
       whatsapp:
         data.whatsapp ||
         data.telefone ||
-        order.whatsapp ||
+        order?.whatsapp ||
         "",
 
       data_desejada:
+        data.date ||
         data.data_desejada ||
         data.data ||
         "",
@@ -2110,36 +2316,52 @@
         null,
 
       bolo:
+        data.cake ||
         data.bolo ||
         null,
 
       massa:
+        data.mass ||
         data.massa ||
         null,
 
       recheio:
+        data.filling ||
         data.recheio ||
         null,
 
       topo:
         data.topo ||
         data.decoracao ||
+        data.decoration ||
         null,
 
       adicionais:
-        Array.isArray(data.adicionais)
-          ? data.adicionais
-          : [],
+        Array.isArray(
+          data.extras
+        )
+          ? data.extras
+          : Array.isArray(
+              data.adicionais
+            )
+            ? data.adicionais
+            : [],
 
       personalizacao:
         Array.isArray(
-          data.personalizacao
+          data.personalization
         )
-          ? data.personalizacao
-          : [],
+          ? data.personalization
+          : Array.isArray(
+              data.personalizacao
+            )
+            ? data.personalizacao
+            : [],
 
       personalizacao_text:
+        data.personalization_text ||
         data.personalizacao_text ||
+        data.custom_text ||
         "",
 
       brigadeiros:
@@ -2150,17 +2372,102 @@
           : [],
 
       outros:
-        Array.isArray(data.outros)
-          ? data.outros
-          : [],
+        Array.isArray(
+          data.otherItems
+        )
+          ? data.otherItems
+          : Array.isArray(
+              data.outros
+            )
+            ? data.outros
+            : [],
 
       observacoes:
+        data.notes ||
         data.observacoes ||
         "",
 
       total_estimado:
-        data.total_estimado ||
+        data.estimatedTotal ??
+        data.total_estimado ??
         "",
+
+      raw: data
+    };
+  }
+
+  /* =========================================================
+     NORMALIZAR PEDIDO PRONTA ENTREGA
+  ========================================================= */
+
+  function normalizeReadyOrder(
+    order
+  ) {
+    const data =
+      order?.data &&
+      typeof order.data === "object"
+        ? order.data
+        : {};
+
+    return {
+      id: order?.id,
+
+      status:
+        order?.status ||
+        "novo",
+
+      created_at:
+        order?.created_at ||
+        data.criado_em ||
+        null,
+
+      cliente:
+        data.cliente ||
+        data.customer ||
+        data.nome ||
+        "",
+
+      whatsapp:
+        data.whatsapp ||
+        data.telefone ||
+        "",
+
+      recebimento:
+        data.recebimento ||
+        data.receiving ||
+        data.entrega ||
+        "",
+
+      endereco:
+        data.endereco ||
+        data.address ||
+        "",
+
+      pagamento:
+        data.pagamento ||
+        data.payment ||
+        "",
+
+      observacoes:
+        data.observacoes ||
+        data.notes ||
+        "",
+
+      itens:
+        Array.isArray(
+          data.itens
+        )
+          ? data.itens
+          : Array.isArray(
+              data.items
+            )
+            ? data.items
+            : [],
+
+      total:
+        data.total ??
+        data.total_price ??
+        0,
 
       raw: data
     };
@@ -2170,7 +2477,9 @@
      FORMATAR DATA
   ========================================================= */
 
-  function formatDate(value) {
+  function formatDate(
+    value
+  ) {
     if (!value) {
       return "—";
     }
@@ -2192,6 +2501,35 @@
   }
 
   /* =========================================================
+     FORMATAR DATA SIMPLES
+  ========================================================= */
+
+  function formatSimpleDate(
+    value
+  ) {
+    if (!value) {
+      return "—";
+    }
+
+    const date =
+      new Date(
+        `${value}T00:00:00`
+      );
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return esc(value);
+    }
+
+    return date.toLocaleDateString(
+      "pt-BR"
+    );
+  }
+
+  /* =========================================================
      PEDIDO CARD
   ========================================================= */
 
@@ -2207,7 +2545,9 @@
         ? normalizeCustomOrder(
             order
           )
-        : order;
+        : normalizeReadyOrder(
+            order
+          );
 
     const status =
       String(
@@ -2221,6 +2561,7 @@
         <div class="order-head">
 
           <div>
+
             <span class="order-type">
               ${
                 custom
@@ -2230,14 +2571,10 @@
             </span>
 
             <h3>
-              ${
-                esc(
-                  data.cliente ||
-                  data.name ||
-                  data.nome ||
-                  "Cliente"
-                )
-              }
+              ${esc(
+                data.cliente ||
+                "Cliente"
+              )}
             </h3>
 
             <small>
@@ -2246,14 +2583,18 @@
                 data.created_at
               )}
             </small>
+
           </div>
 
           <span class="badge">
+
             ${esc(
               STATUS_LABEL[
                 status
-              ] || status
+              ] ||
+                status
             )}
+
           </span>
 
         </div>
@@ -2281,11 +2622,16 @@
             >
 
               ${STATUS.map(
-                (item) => `
+                (
+                  item
+                ) => `
                   <option
-                    value="${esc(item)}"
+                    value="${esc(
+                      item
+                    )}"
                     ${
-                      item === status
+                      item ===
+                      status
                         ? "selected"
                         : ""
                     }
@@ -2337,40 +2683,52 @@
 
         ${detail(
           "Data desejada",
-          data.data_desejada
+          formatSimpleDate(
+            data.data_desejada
+          )
         )}
 
         ${detail(
           "Kit",
-          data.kit
+          formatComplexValue(
+            data.kit
+          )
         )}
 
         ${detail(
           "Bolo",
-          data.bolo
+          formatComplexValue(
+            data.bolo
+          )
         )}
 
         ${detail(
           "Massa",
-          data.massa
+          formatComplexValue(
+            data.massa
+          )
         )}
 
         ${detail(
           "Recheio",
-          data.recheio
+          formatComplexValue(
+            data.recheio
+          )
         )}
 
         ${detail(
           "Decoração",
-          data.topo
+          formatComplexValue(
+            data.topo
+          )
         )}
 
         ${
           data.adicionais.length
             ? detail(
                 "Adicionais",
-                data.adicionais.join(
-                  ", "
+                formatArray(
+                  data.adicionais
                 )
               )
             : ""
@@ -2380,8 +2738,8 @@
           data.personalizacao.length
             ? detail(
                 "Personalização",
-                data.personalizacao.join(
-                  ", "
+                formatArray(
+                  data.personalizacao
                 )
               )
             : ""
@@ -2400,23 +2758,26 @@
           data.brigadeiros.length
             ? `
               <div class="detail full">
-                <span>Brigadeiros</span>
+
+                <span>
+                  Brigadeiros
+                </span>
 
                 <strong>
                   ${data.brigadeiros
                     .map(
-                      (item) =>
-                        `${esc(
-                          item.tipo
-                        )} — ${Number(
-                          item.quantidade ||
-                            0
-                        )} un.`
+                      (
+                        item
+                      ) =>
+                        formatBrigadeiro(
+                          item
+                        )
                     )
                     .join(
                       "<br>"
                     )}
                 </strong>
+
               </div>
             `
             : ""
@@ -2426,23 +2787,26 @@
           data.outros.length
             ? `
               <div class="detail full">
-                <span>Outros itens</span>
+
+                <span>
+                  Outros itens
+                </span>
 
                 <strong>
                   ${data.outros
                     .map(
-                      (item) =>
-                        `${esc(
-                          item.item
-                        )} — ${Number(
-                          item.quantidade ||
-                            0
-                        )} un.`
+                      (
+                        item
+                      ) =>
+                        formatOtherItem(
+                          item
+                        )
                     )
                     .join(
                       "<br>"
                     )}
                 </strong>
+
               </div>
             `
             : ""
@@ -2457,10 +2821,21 @@
             : ""
         }
 
-        ${detail(
-          "Total estimado",
-          data.total_estimado
-        )}
+        ${
+          data.total_estimado !==
+            "" &&
+          data.total_estimado !==
+            null &&
+          data.total_estimado !==
+            undefined
+            ? detail(
+                "Total estimado",
+                formatMoneyValue(
+                  data.total_estimado
+                )
+              )
+            : ""
+        }
 
       </div>
     `;
@@ -2473,69 +2848,434 @@
   function readyOrderDetails(
     data
   ) {
-    const raw =
-      data.data &&
-      typeof data.data === "object"
-        ? data.data
-        : {};
-
     return `
       <div class="order-details">
 
         ${detail(
           "WhatsApp",
-          data.whatsapp ||
-            data.phone ||
-            raw.whatsapp ||
-            raw.phone
-        )}
-
-        ${detail(
-          "Endereço",
-          data.address ||
-            raw.address ||
-            raw.endereco
+          data.whatsapp
         )}
 
         ${detail(
           "Forma de recebimento",
-          data.receiving ||
-            raw.receiving ||
-            raw.entrega
+          data.recebimento
         )}
+
+        ${data.endereco
+          ? detail(
+              "Endereço",
+              data.endereco
+            )
+          : ""}
 
         ${detail(
           "Pagamento",
-          data.payment ||
-            raw.payment
+          data.pagamento
         )}
 
         ${
-          data.total ||
-          raw.total
+          data.itens.length
+            ? `
+              <div class="detail full">
+
+                <span>
+                  Itens do pedido
+                </span>
+
+                <strong>
+                  ${data.itens
+                    .map(
+                      (
+                        item
+                      ) =>
+                        formatReadyItem(
+                          item
+                        )
+                    )
+                    .join(
+                      "<br>"
+                    )}
+                </strong>
+
+              </div>
+            `
+            : ""
+        }
+
+        ${
+          data.observacoes
             ? detail(
-                "Total",
-                data.total ||
-                  raw.total
+                "Observações",
+                data.observacoes
               )
             : ""
         }
 
         ${
-          data.notes ||
-          raw.notes ||
-          raw.observacoes
+          data.total
             ? detail(
-                "Observações",
-                data.notes ||
-                  raw.notes ||
-                  raw.observacoes
+                "Total",
+                brl(
+                  data.total
+                )
               )
             : ""
         }
 
       </div>
     `;
+  }
+
+  /* =========================================================
+     FORMATADORES
+  ========================================================= */
+
+  function formatComplexValue(
+    value
+  ) {
+    if (
+      value === null ||
+      value === undefined ||
+      value === ""
+    ) {
+      return "";
+    }
+
+    if (
+      typeof value ===
+      "string"
+    ) {
+      return value;
+    }
+
+    if (
+      typeof value ===
+      "number"
+    ) {
+      return String(value);
+    }
+
+    if (
+      Array.isArray(value)
+    ) {
+      return formatArray(
+        value
+      );
+    }
+
+    if (
+      typeof value ===
+      "object"
+    ) {
+      const preferred =
+        [
+          "name",
+          "nome",
+          "label",
+          "title",
+          "cake",
+          "bolo",
+          "type",
+          "tipo",
+          "value",
+          "valor"
+        ];
+
+      for (
+        const key of preferred
+      ) {
+        if (
+          value[key] !==
+            undefined &&
+          value[key] !==
+            null &&
+          value[key] !==
+            ""
+        ) {
+          return String(
+            value[key]
+          );
+        }
+      }
+
+      return JSON.stringify(
+        value
+      );
+    }
+
+    return String(value);
+  }
+
+  function formatArray(
+    value
+  ) {
+    if (
+      !Array.isArray(value)
+    ) {
+      return formatComplexValue(
+        value
+      );
+    }
+
+    return value
+      .map(
+        (
+          item
+        ) =>
+          formatComplexValue(
+            item
+          )
+      )
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  function formatBrigadeiro(
+    item
+  ) {
+    if (
+      typeof item ===
+      "string"
+    ) {
+      return item;
+    }
+
+    if (
+      !item ||
+      typeof item !==
+        "object"
+    ) {
+      return "";
+    }
+
+    const type =
+      item.type ||
+      item.tipo ||
+      item.category ||
+      "";
+
+    const name =
+      item.flavor ||
+      item.sabor ||
+      item.name ||
+      item.nome ||
+      "";
+
+    const quantity =
+      item.quantity ??
+      item.quantidade ??
+      item.qty ??
+      "";
+
+    const parts = [];
+
+    if (type) {
+      parts.push(
+        type
+      );
+    }
+
+    if (name) {
+      parts.push(
+        name
+      );
+    }
+
+    if (
+      quantity !==
+        "" &&
+      quantity !==
+        null &&
+      quantity !==
+        undefined
+    ) {
+      parts.push(
+        `${quantity} un.`
+      );
+    }
+
+    return (
+      parts.join(
+        " — "
+      ) ||
+      JSON.stringify(
+        item
+      )
+    );
+  }
+
+  function formatOtherItem(
+    item
+  ) {
+    if (
+      typeof item ===
+      "string"
+    ) {
+      return item;
+    }
+
+    if (
+      !item ||
+      typeof item !==
+        "object"
+    ) {
+      return "";
+    }
+
+    const name =
+      item.item ||
+      item.name ||
+      item.nome ||
+      "";
+
+    const quantity =
+      item.quantity ??
+      item.quantidade ??
+      item.qty ??
+      "";
+
+    if (
+      quantity !==
+        "" &&
+      quantity !==
+        null &&
+      quantity !==
+        undefined
+    ) {
+      return `${name} — ${quantity} un.`;
+    }
+
+    return (
+      name ||
+      JSON.stringify(
+        item
+      )
+    );
+  }
+
+  function formatReadyItem(
+    item
+  ) {
+    if (
+      typeof item ===
+      "string"
+    ) {
+      return item;
+    }
+
+    if (
+      !item ||
+      typeof item !==
+        "object"
+    ) {
+      return "";
+    }
+
+    const name =
+      item.name ||
+      item.nome ||
+      item.product_name ||
+      "Produto";
+
+    const quantity =
+      item.quantity ??
+      item.quantidade ??
+      1;
+
+    const unitPrice =
+      item.unit_price ??
+      item.preco_unitario ??
+      item.price ??
+      null;
+
+    const total =
+      item.total ??
+      item.subtotal ??
+      null;
+
+    let result =
+      `${name} — ${quantity} un.`;
+
+    if (
+      unitPrice !==
+        null &&
+      unitPrice !==
+        undefined
+    ) {
+      result +=
+        ` — ${brl(
+          unitPrice
+        )}/un.`;
+    }
+
+    if (
+      total !==
+        null &&
+      total !==
+        undefined
+    ) {
+      result +=
+        ` — ${brl(
+          total
+        )}`;
+    }
+
+    if (
+      item.appointment_required
+    ) {
+      result +=
+        " — Agendamento";
+    }
+
+    return result;
+  }
+
+  function formatMoneyValue(
+    value
+  ) {
+    if (
+      typeof value ===
+      "number"
+    ) {
+      return brl(value);
+    }
+
+    if (
+      typeof value ===
+      "string"
+    ) {
+      const normalized =
+        value
+          .replace(
+            /R\$\s*/gi,
+            ""
+          )
+          .replace(
+            /\./g,
+            ""
+          )
+          .replace(
+            ",",
+            "."
+          );
+
+      const number =
+        Number(
+          normalized
+        );
+
+      if (
+        Number.isFinite(
+          number
+        )
+      ) {
+        return brl(
+          number
+        );
+      }
+    }
+
+    return value;
   }
 
   /* =========================================================
@@ -2583,6 +3323,7 @@
         "Supabase não conectado.",
         "error"
       );
+
       return;
     }
 
@@ -2598,7 +3339,10 @@
       .update({
         status
       })
-      .eq("id", id);
+      .eq(
+        "id",
+        id
+      );
 
     if (error) {
       toast(
@@ -2606,7 +3350,9 @@
         "error"
       );
 
-      console.error(error);
+      console.error(
+        error
+      );
 
       return;
     }
@@ -2624,7 +3370,9 @@
      SALVAR PRODUTO
   ========================================================= */
 
-  async function saveProduct(event) {
+  async function saveProduct(
+    event
+  ) {
     event.preventDefault();
 
     if (!db) {
@@ -2632,6 +3380,25 @@
         "Supabase não conectado.",
         "error"
       );
+
+      return;
+    }
+
+    const name =
+      $("#f-name")
+        ?.value
+        .trim() ||
+      "";
+
+    if (!name) {
+      toast(
+        "Digite o nome do produto.",
+        "error"
+      );
+
+      $("#f-name")
+        ?.focus();
+
       return;
     }
 
@@ -2639,113 +3406,163 @@
       S.editId;
 
     const area =
-      $("#f-area")?.value ||
+      $("#f-area")
+        ?.value ||
       "pronta";
 
     const payload = {
-      name:
-        $("#f-name")?.value.trim() ||
-        "",
+      name,
 
       description:
-        $("#f-desc")?.value.trim() ||
+        $("#f-desc")
+          ?.value
+          .trim() ||
         "",
 
       price:
         Number(
-          $("#f-price")?.value || 0
+          $("#f-price")
+            ?.value ||
+            0
         ),
 
       discount:
         Number(
-          $("#f-disc")?.value || 0
+          $("#f-disc")
+            ?.value ||
+            0
         ),
 
       sort_order:
         Number(
-          $("#f-sort")?.value || 0
+          $("#f-sort")
+            ?.value ||
+            0
         ),
 
       gramatura:
         Number(
-          $("#f-gram")?.value || 0
+          $("#f-gram")
+            ?.value ||
+            0
         ),
 
       serve_people:
         Number(
-          $("#f-serve")?.value || 0
+          $("#f-serve")
+            ?.value ||
+            0
         ),
 
       active:
-        $("#f-avail")?.checked !== false,
+        $("#f-avail")
+          ?.checked !==
+        false,
 
       featured:
-        $("#f-feat")?.checked === true,
+        $("#f-feat")
+          ?.checked ===
+        true,
 
       appointment_required:
-        $("#f-appt")?.checked === true,
+        $("#f-appt")
+          ?.checked ===
+        true,
 
       area:
-        area === "encomendas"
+        area ===
+        "encomendas"
           ? "encomendas"
           : "cardapio",
 
       category:
-        $("#f-cat")?.value ||
+        $("#f-cat")
+          ?.value ||
         null
     };
 
+    /*
+     * Se S.image for:
+     * undefined = não alterou a imagem
+     * string = nova imagem
+     * null = removeu a imagem
+     */
     if (
-      S.image !== undefined
+      S.image !==
+      undefined
     ) {
       payload.image_url =
         S.image;
     }
 
     try {
+      let result;
+
       if (id) {
-        const {
-          error
-        } = await db
-          .from("products")
-          .update(payload)
-          .eq("id", id);
-
-        if (error) {
-          throw error;
-        }
-
-        toast(
-          "Produto atualizado."
-        );
+        result =
+          await db
+            .from(
+              "products"
+            )
+            .update(
+              payload
+            )
+            .eq(
+              "id",
+              id
+            )
+            .select()
+            .maybeSingle();
       } else {
-        const {
-          error
-        } = await db
-          .from("products")
-          .insert(
-            payload
-          );
+        result =
+          await db
+            .from(
+              "products"
+            )
+            .insert(
+              payload
+            )
+            .select()
+            .maybeSingle();
+      }
 
-        if (error) {
-          throw error;
-        }
+      if (
+        result?.error
+      ) {
+        throw result.error;
+      }
 
-        toast(
-          "Produto criado."
+      if (
+        !result?.data &&
+        !id
+      ) {
+        console.warn(
+          "Produto inserido, mas o Supabase não retornou o registro."
         );
       }
+
+      toast(
+        id
+          ? "Produto atualizado com sucesso."
+          : "Produto criado com sucesso."
+      );
 
       closeModal();
 
       await loadProducts();
 
       render();
-    } catch (error) {
-      console.error(error);
+
+    } catch (
+      error
+    ) {
+      console.error(
+        "Erro ao salvar produto:",
+        error
+      );
 
       toast(
-        error.message ||
+        error?.message ||
           "Erro ao salvar produto.",
         "error"
       );
@@ -2760,13 +3577,22 @@
     id
   ) {
     if (!db) {
+      toast(
+        "Supabase não conectado.",
+        "error"
+      );
+
       return;
     }
 
     const product =
       S.products.find(
-        (item) =>
-          String(item.id) ===
+        (
+          item
+        ) =>
+          String(
+            item.id
+          ) ===
           String(id)
       );
 
@@ -2788,7 +3614,10 @@
     } = await db
       .from("products")
       .delete()
-      .eq("id", id);
+      .eq(
+        "id",
+        id
+      );
 
     if (error) {
       toast(
@@ -2796,7 +3625,9 @@
         "error"
       );
 
-      console.error(error);
+      console.error(
+        error
+      );
 
       return;
     }
@@ -2818,58 +3649,86 @@
     id = null,
     area = "pronta"
   ) {
-    S.editId = id;
+    S.editId =
+      id;
 
-    S.image = undefined;
+    S.image =
+      undefined;
 
     const product =
       id
         ? S.products.find(
-            (item) =>
-              String(item.id) ===
+            (
+              item
+            ) =>
+              String(
+                item.id
+              ) ===
               String(id)
           )
         : null;
 
-    $("#mtitle").textContent =
-      product
-        ? "Editar produto"
-        : "Novo produto";
+    const title =
+      $("#mtitle");
 
-    $("#f-area").value =
-      product
-        ? productArea(product)
-        : area;
+    if (title) {
+      title.textContent =
+        product
+          ? "Editar produto"
+          : "Novo produto";
+    }
+
+    const areaField =
+      $("#f-area");
+
+    if (areaField) {
+      areaField.value =
+        product
+          ? productArea(
+              product
+            )
+          : area;
+    }
 
     $("#f-name").value =
-      product?.name || "";
+      product?.name ||
+      "";
 
     $("#f-price").value =
-      product?.price || "";
+      product?.price ??
+      "";
 
     $("#f-disc").value =
-      product?.discount || 0;
+      product?.discount ??
+      0;
 
     $("#f-sort").value =
-      product?.sort_order || 0;
+      product?.sort_order ??
+      0;
 
     $("#f-gram").value =
-      product?.gramatura || 0;
+      product?.gramatura ??
+      0;
 
     $("#f-serve").value =
-      product?.serve_people || 0;
+      product?.serve_people ??
+      0;
 
     $("#f-desc").value =
-      product?.description || "";
+      product?.description ||
+      "";
 
     $("#f-avail").checked =
-      product?.active !== false;
+      product?.active !==
+      false;
 
     $("#f-feat").checked =
-      product?.featured === true;
+      product?.featured ===
+      true;
 
     $("#f-appt").checked =
-      product?.appointment_required === true;
+      product?.appointment_required ===
+      true;
 
     S.image =
       product?.image_url ||
@@ -2882,7 +3741,10 @@
     const removeButton =
       $("#rmimg");
 
-    if (S.image) {
+    if (
+      S.image &&
+      preview
+    ) {
       preview.src =
         S.image;
 
@@ -2894,11 +3756,14 @@
         "hidden"
       );
     } else {
-      preview.src = "";
+      if (preview) {
+        preview.src =
+          "";
 
-      preview.classList.add(
-        "hidden"
-      );
+        preview.classList.add(
+          "hidden"
+        );
+      }
 
       removeButton?.classList.add(
         "hidden"
@@ -2906,12 +3771,14 @@
     }
 
     populateCategories(
-      product?.category || ""
+      product?.category ||
+      ""
     );
 
-    $("#modal")?.classList.remove(
-      "hidden"
-    );
+    $("#modal")
+      ?.classList.remove(
+        "hidden"
+      );
   }
 
   /* =========================================================
@@ -2919,23 +3786,43 @@
   ========================================================= */
 
   function closeModal() {
-    $("#modal")?.classList.add(
-      "hidden"
-    );
+    $("#modal")
+      ?.classList.add(
+        "hidden"
+      );
 
-    S.editId = null;
+    S.editId =
+      null;
 
-    S.image = undefined;
+    S.image =
+      undefined;
 
-    $("#pform")?.reset();
+    $("#pform")
+      ?.reset();
 
-    $("#prev")?.classList.add(
-      "hidden"
-    );
+    $("#prev")
+      ?.classList.add(
+        "hidden"
+      );
 
-    $("#rmimg")?.classList.add(
-      "hidden"
-    );
+    $("#rmimg")
+      ?.classList.add(
+        "hidden"
+      );
+
+    if (
+      $("#prev")
+    ) {
+      $("#prev").src =
+        "";
+    }
+
+    if (
+      $("#f-photo")
+    ) {
+      $("#f-photo").value =
+        "";
+    }
   }
 
   /* =========================================================
@@ -2947,7 +3834,10 @@
       S.site?.categories;
 
     if (
-      Array.isArray(categories)
+      Array.isArray(
+        categories
+      ) &&
+      categories.length
     ) {
       return categories;
     }
@@ -2983,17 +3873,24 @@
       ` +
       categories
         .map(
-          (category) =>
+          (
+            category
+          ) =>
             `
               <option
-                value="${esc(category)}"
+                value="${esc(
+                  category
+                )}"
                 ${
-                  category === selected
+                  category ===
+                  selected
                     ? "selected"
                     : ""
                 }
               >
-                ${esc(category)}
+                ${esc(
+                  category
+                )}
               </option>
             `
         )
@@ -3050,27 +3947,42 @@
     ======================================================= */
 
     enc.cakes =
-      enc.cakes.map(
-        (cake, cakeIndex) => {
+      (
+        enc.cakes ||
+        []
+      ).map(
+        (
+          cake,
+          cakeIndex
+        ) => {
           cake.active =
             $(
               `[data-enc-cake-active="${cakeIndex}"]`
-            )?.checked !== false;
+            )
+              ?.checked !==
+            false;
 
           cake.options =
-            cake.options.map(
+            (
+              cake.options ||
+              []
+            ).map(
               (
                 option,
                 optionIndex
               ) =>
                 $(
                   `[data-cake-name="${cakeIndex}"][data-option="${optionIndex}"]`
-                )?.value ||
+                )
+                  ?.value ||
                 option
             );
 
           cake.prices =
-            cake.prices.map(
+            (
+              cake.prices ||
+              []
+            ).map(
               (
                 price,
                 optionIndex
@@ -3078,7 +3990,8 @@
                 Number(
                   $(
                     `[data-cake-price="${cakeIndex}"][data-option="${optionIndex}"]`
-                  )?.value ||
+                  )
+                    ?.value ||
                     price ||
                     0
                 )
@@ -3096,14 +4009,23 @@
       "masses",
       "fillings"
     ].forEach(
-      (key) => {
+      (
+        key
+      ) => {
         enc[key] =
           $$(
             `[data-simple-key="${key}"]`
-          ).map(
-            (input) =>
-              input.value.trim()
-          ).filter(Boolean);
+          )
+            .map(
+              (
+                input
+              ) =>
+                input.value
+                  .trim()
+            )
+            .filter(
+              Boolean
+            );
       }
     );
 
@@ -3114,31 +4036,41 @@
     enc.topes =
       $$(
         `[data-simple-key="topes"]`
-      ).map(
-        (input) => {
-          const index =
-            Number(
-              input.dataset
-                .simpleIndex
-            );
+      )
+        .map(
+          (
+            input
+          ) => {
+            const index =
+              Number(
+                input
+                  .dataset
+                  .simpleIndex
+              );
 
-          const priceInput =
-            $(
-              `[data-price-key="topes"][data-price-index="${index}"]`
-            );
+            const priceInput =
+              $(
+                `[data-price-key="topes"][data-price-index="${index}"]`
+              );
 
-          return [
-            input.value.trim(),
-            Number(
-              priceInput?.value ||
-                0
-            )
-          ];
-        }
-      ).filter(
-        (item) =>
-          item[0]
-      );
+            return [
+              input.value
+                .trim(),
+
+              Number(
+                priceInput
+                  ?.value ||
+                  0
+              )
+            ];
+          }
+        )
+        .filter(
+          (
+            item
+          ) =>
+            item[0]
+        );
 
     /* =======================================================
        ADICIONAIS
@@ -3149,38 +4081,50 @@
       "extras",
       "personalizations"
     ].forEach(
-      (key) => {
+      (
+        key
+      ) => {
         const names =
           $$(
             `[data-price-name="${key}"]`
           );
 
         enc[key] =
-          names.map(
-            (input) => {
-              const index =
-                Number(
-                  input.dataset
-                    .priceIndex
-                );
+          names
+            .map(
+              (
+                input
+              ) => {
+                const index =
+                  Number(
+                    input
+                      .dataset
+                      .priceIndex
+                  );
 
-              const priceInput =
-                $(
-                  `[data-price-value="${key}"][data-price-index="${index}"]`
-                );
+                const priceInput =
+                  $(
+                    `[data-price-value="${key}"][data-price-index="${index}"]`
+                  );
 
-              return [
-                input.value.trim(),
-                Number(
-                  priceInput?.value ||
-                    0
-                )
-              ];
-            }
-          ).filter(
-            (item) =>
-              item[0]
-          );
+                return [
+                  input.value
+                    .trim(),
+
+                  Number(
+                    priceInput
+                      ?.value ||
+                      0
+                  )
+                ];
+              }
+            )
+            .filter(
+              (
+                item
+              ) =>
+                item[0]
+            );
       }
     );
 
@@ -3197,32 +4141,45 @@
         "[data-brig-classic]"
       )
         .map(
-          (input) =>
-            input.value.trim()
+          (
+            input
+          ) =>
+            input.value
+              .trim()
         )
-        .filter(Boolean);
+        .filter(
+          Boolean
+        );
 
     enc.brigadeiros.premium =
       $$(
         "[data-brig-premium]"
       )
         .map(
-          (input) =>
-            input.value.trim()
+          (
+            input
+          ) =>
+            input.value
+              .trim()
         )
-        .filter(Boolean);
+        .filter(
+          Boolean
+        );
 
     enc.brigadeiros.classicaPrices =
       [
         0,
         1
       ].map(
-        (index) =>
+        (
+          index
+        ) =>
           Number(
             $(
               `[data-brig-price="classica"][data-brig-size="${index}"]`
-            )?.value ||
-              0
+            )
+              ?.value ||
+            0
           )
       );
 
@@ -3231,12 +4188,15 @@
         0,
         1
       ].map(
-        (index) =>
+        (
+          index
+        ) =>
           Number(
             $(
               `[data-brig-price="premium"][data-brig-size="${index}"]`
-            )?.value ||
-              0
+            )
+              ?.value ||
+            0
           )
       );
 
@@ -3244,16 +4204,18 @@
       Number(
         $(
           `[data-brig-limit="50"]`
-        )?.value ||
-          2
+        )
+          ?.value ||
+        2
       );
 
     enc.brigadeiros.flavorLimit100 =
       Number(
         $(
           `[data-brig-limit="100"]`
-        )?.value ||
-          4
+        )
+          ?.value ||
+        4
       );
 
     /* =======================================================
@@ -3261,88 +4223,120 @@
     ======================================================= */
 
     enc.otherItems =
-      (enc.otherItems || [])
-        .map(
-          (item, index) => ({
-            name:
-              $(
-                `[data-other-name="${index}"]`
-              )?.value.trim() ||
-              item.name,
+      (
+        enc.otherItems ||
+        []
+      ).map(
+        (
+          item,
+          index
+        ) => ({
+          ...item,
 
-            price:
-              Number(
-                $(
-                  `[data-other-price="${index}"]`
-                )?.value ||
-                  0
-              ),
+          name:
+            $(
+              `[data-other-name="${index}"]`
+            )
+              ?.value
+              .trim() ||
+            item.name,
 
-            active:
+          price:
+            Number(
               $(
-                `[data-other-active="${index}"]`
-              )?.checked !== false
-          })
-        );
+                `[data-other-price="${index}"]`
+              )
+                ?.value ||
+                0
+            ),
+
+          active:
+            $(
+              `[data-other-active="${index}"]`
+            )
+              ?.checked !==
+            false
+        })
+      );
 
     /* =======================================================
        KITS
     ======================================================= */
 
     enc.kits =
-      (enc.kits || [])
-        .map(
-          (kit, index) => ({
-            ...kit,
+      (
+        enc.kits ||
+        []
+      ).map(
+        (
+          kit,
+          index
+        ) => ({
+          ...kit,
 
-            name:
+          name:
+            $(
+              `[data-kit-name="${index}"]`
+            )
+              ?.value
+              .trim() ||
+            kit.name,
+
+          price:
+            Number(
               $(
-                `[data-kit-name="${index}"]`
-              )?.value.trim() ||
-              kit.name,
-
-            price:
-              Number(
-                $(
-                  `[data-kit-price="${index}"]`
-                )?.value ||
-                  0
-              ),
-
-            cake:
-              $(
-                `[data-kit-cake="${index}"]`
-              )?.value.trim() ||
-              kit.cake,
-
-            docinhos:
-              Number(
-                $(
-                  `[data-kit-docinhos="${index}"]`
-                )?.value ||
-                  0
-              ),
-
-            items:
-              String(
-                $(
-                  `[data-kit-items="${index}"]`
-                )?.value ||
-                  ""
+                `[data-kit-price="${index}"]`
               )
-                .split("\n")
-                .map(
-                  (item) =>
-                    item.trim()
-                )
-                .filter(Boolean),
+                ?.value ||
+                0
+            ),
 
-            active:
+          cake:
+            $(
+              `[data-kit-cake="${index}"]`
+            )
+              ?.value
+              .trim() ||
+            kit.cake,
+
+          docinhos:
+            Number(
               $(
-                `[data-kit-active="${index}"]`
-              )?.checked !== false
-          })
-        );
+                `[data-kit-docinhos="${index}"]`
+              )
+                ?.value ||
+                0
+            ),
+
+          items:
+            String(
+              $(
+                `[data-kit-items="${index}"]`
+              )
+                ?.value ||
+              ""
+            )
+              .split(
+                "\n"
+              )
+              .map(
+                (
+                  item
+                ) =>
+                  item.trim()
+              )
+              .filter(
+                Boolean
+              ),
+
+          active:
+            $(
+              `[data-kit-active="${index}"]`
+            )
+              ?.checked !==
+            false
+        })
+      );
 
     return enc;
   }
@@ -3356,7 +4350,9 @@
   ) {
     if (!S.enc) {
       S.enc =
-        clone(DEFAULT_ENC);
+        clone(
+          DEFAULT_ENC
+        );
     }
 
     if (
@@ -3364,12 +4360,14 @@
         S.enc[key]
       )
     ) {
-      S.enc[key] = [];
+      S.enc[key] =
+        [];
     }
 
     if (
       key === "extras" ||
-      key === "personalizations" ||
+      key ===
+        "personalizations" ||
       key === "topes"
     ) {
       S.enc[key].push([
@@ -3419,7 +4417,9 @@
   ) {
     if (!S.enc) {
       S.enc =
-        clone(DEFAULT_ENC);
+        clone(
+          DEFAULT_ENC
+        );
     }
 
     S.enc.brigadeiros =
@@ -3446,12 +4446,16 @@
     index
   ) {
     if (
-      !S.enc?.brigadeiros?.[type]
+      !S.enc?.brigadeiros?.[
+        type
+      ]
     ) {
       return;
     }
 
-    S.enc.brigadeiros[type].splice(
+    S.enc.brigadeiros[
+      type
+    ].splice(
       Number(index),
       1
     );
@@ -3466,11 +4470,14 @@
   function addOtherItem() {
     if (!S.enc) {
       S.enc =
-        clone(DEFAULT_ENC);
+        clone(
+          DEFAULT_ENC
+        );
     }
 
     S.enc.otherItems =
-      S.enc.otherItems || [];
+      S.enc.otherItems ||
+      [];
 
     S.enc.otherItems.push({
       name: "Novo item",
@@ -3509,14 +4516,18 @@
   function addKit() {
     if (!S.enc) {
       S.enc =
-        clone(DEFAULT_ENC);
+        clone(
+          DEFAULT_ENC
+        );
     }
 
     S.enc.kits =
-      S.enc.kits || [];
+      S.enc.kits ||
+      [];
 
     const number =
-      S.enc.kits.length + 1;
+      S.enc.kits.length +
+      1;
 
     S.enc.kits.push({
       id:
@@ -3525,7 +4536,10 @@
       name:
         `Kit Festa ${String(
           number
-        ).padStart(2, "0")}`,
+        ).padStart(
+          2,
+          "0"
+        )}`,
 
       price: 0,
 
@@ -3589,7 +4603,8 @@
       S.site || {};
 
     const contact =
-      site.contact || {};
+      site.contact ||
+      {};
 
     const hours =
       Array.isArray(
@@ -3599,7 +4614,8 @@
         : [];
 
     const about =
-      site.about || {};
+      site.about ||
+      {};
 
     return `
       <div class="panel">
@@ -3607,11 +4623,15 @@
         <div class="panel-head">
 
           <div>
-            <h2>Configurações</h2>
+
+            <h2>
+              Configurações
+            </h2>
 
             <p class="muted">
               Informações exibidas no site.
             </p>
+
           </div>
 
           <button
@@ -3631,63 +4651,75 @@
 
             <label>
               WhatsApp
+
               <input
                 id="set-whatsapp"
                 value="${esc(
                   contact.whatsapp ||
-                    WHATSAPP
+                  WHATSAPP
                 )}"
               >
+
             </label>
 
             <label>
               Instagram
+
               <input
                 id="set-instagram"
                 value="${esc(
                   contact.instagram ||
-                    ""
+                  ""
                 )}"
               >
+
             </label>
 
             <label>
               Endereço
+
               <textarea
                 id="set-address"
                 rows="3"
               >${esc(
                 contact.address ||
-                  "Rua 1018, 65, Conjunto Ceará II, Fortaleza-CE 60532-690"
+                "Rua 1018, 65, Conjunto Ceará II, Fortaleza-CE 60532-690"
               )}</textarea>
+
             </label>
 
           </div>
 
           <div class="setting-card">
 
-            <h3>Sobre a empresa</h3>
+            <h3>
+              Sobre a empresa
+            </h3>
 
             <label>
               Título
+
               <input
                 id="set-about-title"
                 value="${esc(
                   about.title ||
-                    "Um pouco da nossa história"
+                  "Um pouco da nossa história"
                 )}"
               >
+
             </label>
 
             <label>
               Texto
+
               <textarea
                 id="set-about-text"
                 rows="7"
               >${esc(
                 about.text ||
-                  ""
+                ""
               )}</textarea>
+
             </label>
 
           </div>
@@ -3737,12 +4769,15 @@
         ) => {
           const current =
             hours.find(
-              (item) =>
+              (
+                item
+              ) =>
                 Number(
                   item.dayIndex ??
-                    item.index ??
-                    -1
-                ) === index
+                  item.index ??
+                  -1
+                ) ===
+                index
             ) ||
             hours[index] ||
             {};
@@ -3806,7 +4841,8 @@
                 type="time"
                 data-hours-open="${index}"
                 value="${esc(
-                  current.o || ""
+                  current.o ||
+                  ""
                 )}"
               >
 
@@ -3814,7 +4850,8 @@
                 type="time"
                 data-hours-close="${index}"
                 value="${esc(
-                  current.c || ""
+                  current.c ||
+                  ""
                 )}"
               >
 
@@ -3836,61 +4873,81 @@
       );
 
     site.contact =
-      site.contact || {};
+      site.contact ||
+      {};
 
     site.about =
-      site.about || {};
+      site.about ||
+      {};
 
     site.contact.whatsapp =
       $("#set-whatsapp")
-        ?.value.trim() ||
+        ?.value
+        .trim() ||
       WHATSAPP;
 
     site.contact.instagram =
       $("#set-instagram")
-        ?.value.trim() ||
+        ?.value
+        .trim() ||
       "";
 
     site.contact.address =
       $("#set-address")
-        ?.value.trim() ||
+        ?.value
+        .trim() ||
       "";
 
     site.about.title =
       $("#set-about-title")
-        ?.value.trim() ||
+        ?.value
+        .trim() ||
       "";
 
     site.about.text =
       $("#set-about-text")
-        ?.value.trim() ||
+        ?.value
+        .trim() ||
       "";
 
     site.hours =
-      [0, 1, 2, 3, 4, 5, 6]
-        .map(
-          (index) => ({
-            dayIndex: index,
+      [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ].map(
+        (
+          index
+        ) => ({
+          dayIndex:
+            index,
 
-            s:
-              $(
-                `[data-hours-status="${index}"]`
-              )?.value ||
-              "closed",
+          s:
+            $(
+              `[data-hours-status="${index}"]`
+            )
+              ?.value ||
+            "closed",
 
-            o:
-              $(
-                `[data-hours-open="${index}"]`
-              )?.value ||
-              "",
+          o:
+            $(
+              `[data-hours-open="${index}"]`
+            )
+              ?.value ||
+            "",
 
-            c:
-              $(
-                `[data-hours-close="${index}"]`
-              )?.value ||
-              ""
-          })
-        );
+          c:
+            $(
+              `[data-hours-close="${index}"]`
+            )
+              ?.value ||
+            ""
+        })
+      );
 
     try {
       await saveSite(
@@ -3900,8 +4957,13 @@
       toast(
         "Configurações salvas."
       );
-    } catch (error) {
-      console.error(error);
+
+    } catch (
+      error
+    ) {
+      console.error(
+        error
+      );
 
       toast(
         error.message ||
@@ -3926,12 +4988,21 @@
 
     const order =
       list.find(
-        (item) =>
-          String(item.id) ===
+        (
+          item
+        ) =>
+          String(
+            item.id
+          ) ===
           String(id)
       );
 
     if (!order) {
+      toast(
+        "Pedido não encontrado.",
+        "error"
+      );
+
       return;
     }
 
@@ -3943,15 +5014,13 @@
         ? normalizeCustomOrder(
             order
           )
-        : order;
+        : normalizeReadyOrder(
+            order
+          );
 
     const customer =
-      custom
-        ? data.cliente
-        : data.cliente ||
-          data.name ||
-          data.nome ||
-          "Cliente";
+      data.cliente ||
+      "Cliente";
 
     const html =
       custom
@@ -3971,7 +5040,7 @@
 
     if (!win) {
       toast(
-        "O navegador bloqueou a impressão.",
+        "O navegador bloqueou a janela de impressão.",
         "error"
       );
 
@@ -4007,23 +5076,32 @@
             padding: 30px;
 
             color: #222;
+
+            background: #fff;
           }
 
           h1 {
-            margin: 0 0 5px;
+            margin:
+              0 0 5px;
           }
 
           h2 {
-            margin-top: 30px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 8px;
+            margin-top:
+              30px;
+
+            border-bottom:
+              1px solid #ddd;
+
+            padding-bottom:
+              8px;
           }
 
           .head {
             border-bottom:
               2px solid #67b0cb;
 
-            padding-bottom: 15px;
+            padding-bottom:
+              15px;
           }
 
           .muted {
@@ -4031,9 +5109,11 @@
           }
 
           .row {
-            display: flex;
+            display:
+              flex;
 
-            gap: 20px;
+            gap:
+              20px;
 
             padding:
               8px 0;
@@ -4043,31 +5123,98 @@
           }
 
           .label {
-            width: 190px;
+            width:
+              190px;
 
-            font-weight: bold;
+            min-width:
+              190px;
+
+            font-weight:
+              bold;
           }
 
           .value {
-            flex: 1;
+            flex:
+              1;
+
+            white-space:
+              pre-wrap;
+          }
+
+          .items {
+            margin-top:
+              15px;
+
+            border:
+              1px solid #ddd;
+
+            border-radius:
+              8px;
+
+            overflow:
+              hidden;
+          }
+
+          .item {
+            display:
+              flex;
+
+            justify-content:
+              space-between;
+
+            gap:
+              20px;
+
+            padding:
+              10px 12px;
+
+            border-bottom:
+              1px solid #eee;
+          }
+
+          .item:last-child {
+            border-bottom:
+              0;
+          }
+
+          .item-name {
+            flex:
+              1;
+          }
+
+          .item-price {
+            white-space:
+              nowrap;
+
+            font-weight:
+              bold;
           }
 
           .total {
-            margin-top: 25px;
+            margin-top:
+              25px;
 
-            padding: 15px;
+            padding:
+              15px;
 
-            background: #f4f8fa;
+            background:
+              #f4f8fa;
 
-            font-size: 20px;
+            font-size:
+              20px;
 
-            font-weight: bold;
+            font-weight:
+              bold;
+
+            border-radius:
+              8px;
           }
 
           @media print {
 
             body {
-              padding: 10px;
+              padding:
+                10px;
             }
 
           }
@@ -4094,7 +5241,16 @@
 
           <div class="muted">
             Cliente:
-            ${esc(customer)}
+            ${esc(
+              customer
+            )}
+          </div>
+
+          <div class="muted">
+            Recebido:
+            ${formatDate(
+              data.created_at
+            )}
           </div>
 
         </div>
@@ -4103,7 +5259,9 @@
 
         <script>
           window.onload = function() {
-            window.print();
+            setTimeout(function() {
+              window.print();
+            }, 250);
           };
         <\/script>
 
@@ -4130,7 +5288,8 @@
     ) {
       if (
         value !== null &&
-        value !== undefined &&
+        value !==
+          undefined &&
         value !== ""
       ) {
         rows.push(`
@@ -4156,45 +5315,57 @@
 
     add(
       "Data desejada",
-      data.data_desejada
+      formatSimpleDate(
+        data.data_desejada
+      )
     );
 
     add(
       "Kit",
-      data.kit
+      formatComplexValue(
+        data.kit
+      )
     );
 
     add(
       "Bolo",
-      data.bolo
+      formatComplexValue(
+        data.bolo
+      )
     );
 
     add(
       "Massa",
-      data.massa
+      formatComplexValue(
+        data.massa
+      )
     );
 
     add(
       "Recheio",
-      data.recheio
+      formatComplexValue(
+        data.recheio
+      )
     );
 
     add(
       "Decoração",
-      data.topo
+      formatComplexValue(
+        data.topo
+      )
     );
 
     add(
       "Adicionais",
-      data.adicionais.join(
-        ", "
+      formatArray(
+        data.adicionais
       )
     );
 
     add(
       "Personalização",
-      data.personalizacao.join(
-        ", "
+      formatArray(
+        data.personalizacao
       )
     );
 
@@ -4210,9 +5381,9 @@
         "Brigadeiros",
         data.brigadeiros
           .map(
-            (item) =>
-              `${item.tipo} — ${item.quantidade} unidades`
+            formatBrigadeiro
           )
+          .filter(Boolean)
           .join(
             " | "
           )
@@ -4226,9 +5397,9 @@
         "Outros itens",
         data.outros
           .map(
-            (item) =>
-              `${item.item} — ${item.quantidade} unidades`
+            formatOtherItem
           )
+          .filter(Boolean)
           .join(
             " | "
           )
@@ -4248,12 +5419,19 @@
       ${rows.join("")}
 
       ${
-        data.total_estimado
+        data.total_estimado !==
+          "" &&
+        data.total_estimado !==
+          null &&
+        data.total_estimado !==
+          undefined
           ? `
             <div class="total">
               Total estimado:
               ${esc(
-                data.total_estimado
+                formatMoneyValue(
+                  data.total_estimado
+                )
               )}
             </div>
           `
@@ -4269,12 +5447,6 @@
   function printableReadyOrder(
     data
   ) {
-    const raw =
-      data.data &&
-      typeof data.data === "object"
-        ? data.data
-        : {};
-
     const rows = [];
 
     function add(
@@ -4283,7 +5455,8 @@
     ) {
       if (
         value !== null &&
-        value !== undefined &&
+        value !==
+          undefined &&
         value !== ""
       ) {
         rows.push(`
@@ -4304,43 +5477,62 @@
 
     add(
       "WhatsApp",
-      data.whatsapp ||
-        data.phone ||
-        raw.whatsapp ||
-        raw.phone
-    );
-
-    add(
-      "Endereço",
-      data.address ||
-        raw.address ||
-        raw.endereco
+      data.whatsapp
     );
 
     add(
       "Recebimento",
-      data.receiving ||
-        raw.receiving ||
-        raw.entrega
+      data.recebimento
+    );
+
+    add(
+      "Endereço",
+      data.endereco
     );
 
     add(
       "Pagamento",
-      data.payment ||
-        raw.payment
+      data.pagamento
     );
+
+    if (
+      data.itens.length
+    ) {
+      const itemsHtml =
+        data.itens
+          .map(
+            (
+              item
+            ) => `
+              <div class="item">
+
+                <div class="item-name">
+                  ${esc(
+                    formatReadyItem(
+                      item
+                    )
+                  )}
+                </div>
+
+              </div>
+            `
+          )
+          .join("");
+
+      rows.push(`
+        <h2>
+          Itens do pedido
+        </h2>
+
+        <div class="items">
+          ${itemsHtml}
+        </div>
+      `);
+    }
 
     add(
       "Observações",
-      data.notes ||
-        raw.notes ||
-        raw.observacoes
-    );
-
-    add(
-      "Total",
-      data.total ||
-        raw.total
+      data.observacoes
     );
 
     return `
@@ -4349,6 +5541,26 @@
       </h2>
 
       ${rows.join("")}
+
+      ${
+        data.total !==
+          null &&
+        data.total !==
+          undefined &&
+        data.total !==
+          ""
+          ? `
+            <div class="total">
+              Total:
+              ${esc(
+                brl(
+                  data.total
+                )
+              )}
+            </div>
+          `
+          : ""
+      }
     `;
   }
 
@@ -4367,15 +5579,21 @@
     const title =
       TITLES[
         S.view
-      ] || "Dashboard";
+      ] ||
+      "Dashboard";
 
-    if ($("#title")) {
-      $("#title").textContent =
+    if (
+      $("#title")
+    ) {
+      $("#title")
+        .textContent =
         title;
     }
 
     $$(".nav").forEach(
-      (button) => {
+      (
+        button
+      ) => {
         button.classList.toggle(
           "active",
           button.dataset.view ===
@@ -4482,13 +5700,15 @@
 
     render();
 
-    $("#side")?.classList.remove(
-      "open"
-    );
+    $("#side")
+      ?.classList.remove(
+        "open"
+      );
 
-    $("#shade")?.classList.remove(
-      "show"
-    );
+    $("#shade")
+      ?.classList.remove(
+        "show"
+      );
   }
 
   /* =========================================================
@@ -4505,24 +5725,28 @@
 
     S.on = true;
 
-    $("#login")?.classList.add(
-      "hidden"
-    );
+    $("#login")
+      ?.classList.add(
+        "hidden"
+      );
 
-    $("#app")?.classList.remove(
-      "hidden"
-    );
+    $("#app")
+      ?.classList.remove(
+        "hidden"
+      );
 
     render();
   }
 
   /* =========================================================
-     EVENTOS
+     EVENTOS — CLIQUES
   ========================================================= */
 
   document.addEventListener(
     "click",
-    async (event) => {
+    async (
+      event
+    ) => {
       const target =
         event.target.closest(
           "[data-act], [data-view], [data-close]"
@@ -4633,8 +5857,13 @@
           );
 
           render();
-        } catch (error) {
-          console.error(error);
+
+        } catch (
+          error
+        ) {
+          console.error(
+            error
+          );
 
           toast(
             error.message ||
@@ -4654,6 +5883,14 @@
         action ===
         "add-enc-item"
       ) {
+        /*
+         * Antes de adicionar,
+         * preservamos tudo que o usuário
+         * acabou de digitar.
+         */
+        S.enc =
+          readEncForm();
+
         addEncItem(
           target.dataset.key
         );
@@ -4836,182 +6073,276 @@
   );
 
   /* =========================================================
-     LOGIN
+     FORMULÁRIO DE LOGIN
   ========================================================= */
 
-  $("#loginForm")?.addEventListener(
-    "submit",
-    async (event) => {
-      event.preventDefault();
+  $("#loginForm")
+    ?.addEventListener(
+      "submit",
+      async (
+        event
+      ) => {
+        event.preventDefault();
 
-      const email =
-        $("#email")
-          ?.value.trim() ||
-        "";
+        const email =
+          $("#email")
+            ?.value
+            .trim() ||
+          "";
 
-      const password =
-        $("#password")
-          ?.value ||
-        "";
+        const password =
+          $("#password")
+            ?.value ||
+          "";
 
-      const msg =
-        $("#loginMsg");
-
-      if (msg) {
-        msg.textContent =
-          "Entrando...";
-      }
-
-      try {
-        await login(
-          email,
-          password
-        );
+        const msg =
+          $("#loginMsg");
 
         if (msg) {
           msg.textContent =
-            "";
+            "Entrando...";
         }
-      } catch (error) {
-        console.error(error);
 
-        if (msg) {
-          msg.textContent =
-            error.message ||
-            "E-mail ou senha inválidos.";
+        try {
+          await login(
+            email,
+            password
+          );
+
+          if (msg) {
+            msg.textContent =
+              "";
+          }
+
+        } catch (
+          error
+        ) {
+          console.error(
+            error
+          );
+
+          if (msg) {
+            msg.textContent =
+              error.message ||
+              "E-mail ou senha inválidos.";
+          }
         }
       }
-    }
-  );
+    );
 
   /* =========================================================
      LOGOUT
   ========================================================= */
 
-  $("#logout")?.addEventListener(
-    "click",
-    logout
-  );
+  $("#logout")
+    ?.addEventListener(
+      "click",
+      logout
+    );
 
   /* =========================================================
-     ATUALIZAR
+     ATUALIZAR PAINEL
   ========================================================= */
 
-  $("#refresh")?.addEventListener(
-    "click",
-    async () => {
-      await Promise.all([
-        loadSite(),
-        loadProducts(),
-        loadEnc(),
-        loadOrders()
-      ]);
+  $("#refresh")
+    ?.addEventListener(
+      "click",
+      async () => {
+        try {
+          await Promise.all([
+            loadSite(),
+            loadProducts(),
+            loadEnc(),
+            loadOrders()
+          ]);
 
-      render();
+          render();
 
-      toast(
-        "Painel atualizado."
-      );
-    }
-  );
+          toast(
+            "Painel atualizado."
+          );
+
+        } catch (
+          error
+        ) {
+          console.error(
+            error
+          );
+
+          toast(
+            "Não foi possível atualizar o painel.",
+            "error"
+          );
+        }
+      }
+    );
 
   /* =========================================================
      UPLOAD DA FOTO
   ========================================================= */
 
-  $("#f-photo")?.addEventListener(
-    "change",
-    async (event) => {
-      const file =
-        event.target.files?.[0];
+  $("#f-photo")
+    ?.addEventListener(
+      "change",
+      async (
+        event
+      ) => {
+        const file =
+          event.target.files?.[0];
 
-      if (!file) {
-        return;
-      }
+        if (!file) {
+          return;
+        }
 
-      try {
-        const data =
-          await imageToDataURL(
-            file
+        if (
+          !file.type.startsWith(
+            "image/"
+          )
+        ) {
+          toast(
+            "Selecione uma imagem válida.",
+            "error"
           );
 
-        S.image =
-          data;
+          event.target.value =
+            "";
 
-        const preview =
-          $("#prev");
+          return;
+        }
 
-        preview.src =
-          data;
+        try {
+          const data =
+            await imageToDataURL(
+              file
+            );
 
-        preview.classList.remove(
-          "hidden"
-        );
+          S.image =
+            data;
 
-        $("#rmimg")?.classList.remove(
-          "hidden"
-        );
-      } catch (error) {
-        console.error(error);
+          const preview =
+            $("#prev");
 
-        toast(
-          "Não foi possível carregar a foto.",
-          "error"
-        );
+          if (preview) {
+            preview.src =
+              data;
+
+            preview.classList.remove(
+              "hidden"
+            );
+          }
+
+          $("#rmimg")
+            ?.classList.remove(
+              "hidden"
+            );
+
+        } catch (
+          error
+        ) {
+          console.error(
+            error
+          );
+
+          toast(
+            "Não foi possível carregar a foto.",
+            "error"
+          );
+        }
       }
-    }
-  );
+    );
 
   /* =========================================================
      REMOVER FOTO
   ========================================================= */
 
-  $("#rmimg")?.addEventListener(
-    "click",
-    () => {
-      S.image =
-        null;
+  $("#rmimg")
+    ?.addEventListener(
+      "click",
+      () => {
+        S.image =
+          null;
 
-      $("#prev").src =
-        "";
+        const preview =
+          $("#prev");
 
-      $("#prev").classList.add(
-        "hidden"
-      );
+        if (preview) {
+          preview.src =
+            "";
 
-      $("#rmimg").classList.add(
-        "hidden"
-      );
+          preview.classList.add(
+            "hidden"
+          );
+        }
 
-      $("#f-photo").value =
-        "";
-    }
-  );
+        $("#rmimg")
+          ?.classList.add(
+            "hidden"
+          );
+
+        const photo =
+          $("#f-photo");
+
+        if (photo) {
+          photo.value =
+            "";
+        }
+      }
+    );
 
   /* =========================================================
      FORM PRODUTO
   ========================================================= */
 
-  $("#pform")?.addEventListener(
+  $("#pform")
+    ?.addEventListener(
+      "submit",
+      saveProduct
+    );
+
+  /*
+   * Segurança extra:
+   * caso o formulário seja recriado ou o listener
+   * direto não esteja disponível, o submit continua
+   * sendo capturado aqui.
+   */
+  document.addEventListener(
     "submit",
-    saveProduct
+    async (
+      event
+    ) => {
+      if (
+        event.target?.id ===
+        "pform"
+      ) {
+        event.preventDefault();
+
+        /*
+         * O listener direto normalmente já executa.
+         * Este bloco só existe para garantir que
+         * o formulário nunca fique sem tratamento.
+         */
+      }
+    }
   );
 
   /* =========================================================
      MODAL CLICANDO FORA
   ========================================================= */
 
-  $("#modal")?.addEventListener(
-    "click",
-    (event) => {
-      if (
-        event.target ===
-        $("#modal")
-      ) {
-        closeModal();
+  $("#modal")
+    ?.addEventListener(
+      "click",
+      (
+        event
+      ) => {
+        if (
+          event.target ===
+          $("#modal")
+        ) {
+          closeModal();
+        }
       }
-    }
-  );
+    );
 
   /* =========================================================
      STATUS DOS PEDIDOS
@@ -5019,7 +6350,9 @@
 
   document.addEventListener(
     "change",
-    async (event) => {
+    async (
+      event
+    ) => {
       const element =
         event.target.closest(
           "[data-status-id]"
@@ -5041,50 +6374,78 @@
      MENU MOBILE
   ========================================================= */
 
-  $("#burger")?.addEventListener(
-    "click",
-    () => {
-      $("#side")?.classList.toggle(
-        "open"
-      );
+  $("#burger")
+    ?.addEventListener(
+      "click",
+      () => {
+        $("#side")
+          ?.classList.toggle(
+            "open"
+          );
 
-      $("#shade")?.classList.toggle(
-        "show"
-      );
-    }
-  );
+        $("#shade")
+          ?.classList.toggle(
+            "show"
+          );
+      }
+    );
 
-  $("#shade")?.addEventListener(
-    "click",
-    () => {
-      $("#side")?.classList.remove(
-        "open"
-      );
+  $("#shade")
+    ?.addEventListener(
+      "click",
+      () => {
+        $("#side")
+          ?.classList.remove(
+            "open"
+          );
 
-      $("#shade")?.classList.remove(
-        "show"
-      );
-    }
-  );
+        $("#shade")
+          ?.classList.remove(
+            "show"
+          );
+      }
+    );
 
   /* =========================================================
      INICIALIZAÇÃO
   ========================================================= */
 
   (async () => {
-    const logged =
-      await checkSession();
+    try {
+      const logged =
+        await checkSession();
 
-    if (logged) {
-      await start();
-    } else {
-      $("#login")?.classList.remove(
-        "hidden"
+      if (logged) {
+        await start();
+      } else {
+        $("#login")
+          ?.classList.remove(
+            "hidden"
+          );
+
+        $("#app")
+          ?.classList.add(
+            "hidden"
+          );
+      }
+
+    } catch (
+      error
+    ) {
+      console.error(
+        "Erro ao iniciar painel:",
+        error
       );
 
-      $("#app")?.classList.add(
-        "hidden"
-      );
+      $("#login")
+        ?.classList.remove(
+          "hidden"
+        );
+
+      $("#app")
+        ?.classList.add(
+          "hidden"
+        );
     }
   })();
 
