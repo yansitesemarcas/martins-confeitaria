@@ -388,6 +388,10 @@
               </label>`).join("")}
           </div>
         </div>`).join("");
+      <button type="button" id="clearKitButton" style="margin-top:4px;width:100%;border:2px solid #dccbc0;border-radius:14px;padding:13px 16px;background:#fffaf4;color:#6f4a32;font:inherit;font-weight:800;cursor:pointer">
+        Não quero nenhum Kit Festa
+      </button>
+
       document.getElementById("brigadeiros").innerHTML = [
         ["Clássicos",cfg.brigadeiros.classica,cfg.brigadeiros.classicaPrices],
         ["Premium",cfg.brigadeiros.premium,cfg.brigadeiros.premiumPrices]
@@ -476,6 +480,14 @@
         if(x.name&&x.name.startsWith("brigadeiro_sabor_")&&x.checked){const t=x.name.replace("brigadeiro_sabor_",""),q=Number(document.querySelector('input[name="brigadeiro_'+t+'"]:checked')?.value||0),lim=q===50?2:q===100?4:0;if(document.querySelectorAll('input[name="brigadeiro_sabor_'+t+'"]:checked').length>lim){x.checked=false;alert("Escolha no máximo "+lim+" sabores para essa quantidade.");return;}}
         calc();
       }));
+
+      document.getElementById("clearKitButton").addEventListener("click",()=>{
+        selectedKit=null;
+        document.querySelectorAll('input[name="kit"]').forEach(x=>x.checked=false);
+        document.getElementById("kitSelectedInfo").hidden=true;
+        document.getElementById("kitTopoSection").hidden=true;
+        calc();
+      });
 
       document.querySelectorAll('input[name="kit"]').forEach(input=>input.addEventListener("change",()=>{
         selectedKit=input.value;
