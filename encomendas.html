@@ -224,7 +224,7 @@
             <div class="section-head">
               <span class="eyebrow">Outros itens</span>
               <h2>Complementos para sua festa</h2>
-              <p>Informe a quantidade desejada. Para Petit Brownie e docinhos, escolha 50 ou 100 unidades, ou informe outra quantidade.</p>
+              <p>Informe a quantidade desejada. Para Petit Brownie e docinhos, escolha 50 ou 100 unidades. Se quiser outra quantidade, informe nas observações.</p>
             </div>
 
             <div id="otherItems" class="other-order-list"></div>
@@ -233,7 +233,7 @@
               <div class="section-head">
                 <span class="eyebrow">Docinhos</span>
                 <h2>Escolha seus docinhos</h2>
-                <p>Escolha a linha, a quantidade em centos e os sabores desejados.</p>
+                <p>Escolha a linha, 50 ou 100 unidades e os sabores desejados. Se quiser outra quantidade, informe nas observações.</p>
               </div>
 
               <div class="brigadeiro-box" style="margin-bottom:20px">
@@ -285,7 +285,7 @@
           <label>Nome<input type="text" id="customerName" name="customerName" placeholder="Seu nome" autocomplete="name" required></label>
           <label>WhatsApp<input type="tel" id="customerPhone" name="customerPhone" placeholder="(85) 99999-9999" autocomplete="tel" required></label>
           <label>Data desejada<input type="date" id="customerDate" name="customerDate" required></label>
-          <label>Observações<textarea id="customerNotes" name="customerNotes" rows="4" placeholder="Se escolheu “Outra quantidade”, informe aqui quantas unidades deseja e de qual item. Ex.: Brigadeiro Clássico — 150 unidades."></textarea></label>
+          <label>Observações<textarea id="customerNotes" name="customerNotes" rows="4" placeholder="Opcional: você quer quantos centos de docinho? Informe aqui a quantidade desejada e de qual item. Ex.: Brigadeiro Clássico — 150 unidades."></textarea></label>
         </div>
       </section>
 
@@ -680,14 +680,16 @@
             const custom=document.querySelector(`.custom-brigadeiro-quantity[data-line="${line}"]`);
             const q=select?.value==="custom"?Number(custom?.value||0):Number(select?.value||0);
             const flavors=[...document.querySelectorAll(`input[name="brigadeiro_${line}"]:checked`)].map(x=>x.value);
-            if(select?.value==="custom" && q>0 && q<100){ alert("Na opção \"Outra quantidade\", informe 100 unidades ou mais."); custom.value=100; }\n            return q>=100 ? {linha:line==="classica"?"Linha Clássica":"Linha Premium",quantidade:q,unidade:"unidades",valor:((q/100)*Number(select?.dataset.price100||0)),sabores:flavors} : null;
+            if(select?.value==="custom" && q>0 && q<100){ alert("Na opção \"Outra quantidade\", informe 100 unidades ou mais."); custom.value=100; }
+            return q>=100 ? {linha:line==="classica"?"Linha Clássica":"Linha Premium",quantidade:q,unidade:"unidades",valor:((q/100)*Number(select?.dataset.price100||0)),sabores:flavors} : null;
           }).filter(Boolean)
         ] : [],
         outros:mode==="party" ? [...document.querySelectorAll(".other-quantity")].flatMap(x=>{
           if(x.value==="custom"){
             const custom=x.parentElement?.querySelector(".custom-other-quantity");
             const q=Number(custom?.value||0);
-            if(q>0 && q<100){ alert("Na opção \"Outra quantidade\", informe 100 unidades ou mais."); custom.value=100; return []; }\n            return q>=100 ? [{item:x.dataset.item,quantidade:q,unidade:"unidades",precoPorUnidade:Number(x.dataset.price100||0)/100}] : [];
+            if(q>0 && q<100){ alert("Na opção \"Outra quantidade\", informe 100 unidades ou mais."); custom.value=100; return []; }
+            return q>=100 ? [{item:x.dataset.item,quantidade:q,unidade:"unidades",precoPorUnidade:Number(x.dataset.price100||0)/100}] : [];
           }
           const q=Number(x.value||0);
           return q>0 ? [{item:x.dataset.item,quantidade:q,unidade:"unidades",precoPorUnidade:x.dataset.kind==="hundred"?Number(x.dataset.price100||0)/100:Number(x.dataset.price||0)}] : [];
