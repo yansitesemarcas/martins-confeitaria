@@ -73,6 +73,17 @@
       background:#fcf5ef;border:1px solid #dccbc0;border-radius:15px;
       padding:15px 18px;color:#6d5b50;margin-bottom:18px
     }
+    .brigadeiro-box{
+      background:#fffaf4;border:1px solid #eadfd7;border-radius:18px;padding:20px;
+      color:#4b2b20
+    }
+    .brigadeiro-box h3{margin:0 0 8px;color:#4b2b20;font-family:Georgia,serif}
+    .brigadeiro-box p{color:#806b60}
+    .brigadeiro-quantity{font-size:1rem;font-weight:700}
+    .quantity-centos{
+      margin-top:12px;padding:12px 14px;border:1px solid #dccbc0;border-radius:12px;
+      background:#fff;color:#4b2b20;font:inherit;width:100%;box-sizing:border-box
+    }
     .customer-fields{display:grid;gap:16px}
     .customer-fields label{display:grid;gap:7px;color:#4b2b20;font-weight:700}
     .customer-fields input,.customer-fields textarea,.customer-fields select{
@@ -180,7 +191,7 @@
             <div class="section-head">
               <span class="eyebrow">Kit Festa</span>
               <h2>Escolha seu Kit Festa</h2>
-              <p>Escolha o Kit Festa. Depois de selecionar o kit, o cliente escolhe somente o topo do bolo, 1 massa e 2 recheios. Todos os demais itens do kit são fixos.</p>
+              <p>Escolha o Kit Festa. Depois de selecionar o kit, o cliente escolhe somente o topo do bolo, 1 massa e 2 recheios. Os adicionais são opcionais e os demais itens do kit são fixos.</p>
             </div>
             <div id="kitOptions" class="kit-options"></div>
             <div id="kitSelectedInfo" class="party-note" hidden></div>
@@ -213,9 +224,40 @@
             <div class="section-head">
               <span class="eyebrow">Outros itens</span>
               <h2>Complementos para sua festa</h2>
-              <p>Cupcake com plaquinha e os demais itens disponíveis para a sua encomenda.</p>
+              <p>Informe a quantidade desejada. Para Petit Brownie e docinhos, a quantidade é informada em centos.</p>
             </div>
+
             <div id="otherItems" class="other-order-list"></div>
+
+            <section class="brigadeiro-section" style="margin-top:24px;padding:0!important;border:0!important;box-shadow:none!important">
+              <div class="section-head">
+                <span class="eyebrow">Docinhos</span>
+                <h2>Escolha seus docinhos</h2>
+                <p>Escolha a linha, a quantidade em centos e os sabores desejados.</p>
+              </div>
+
+              <div class="brigadeiro-box" style="margin-bottom:20px">
+                <h3>Linha Clássica</h3>
+                <p>R$ 62,50 por cento.</p>
+                <label class="customer-fields" style="margin-bottom:16px">
+                  <span>Quantos centos?</span>
+                  <input type="number" min="0" step="1" value="" class="brigadeiro-quantity" data-line="classica" data-price="62.5" placeholder="Ex.: 1, 2, 3...">
+                </label>
+                <p style="margin:0 0 10px;color:#806b60;font-weight:700">Escolha os sabores:</p>
+                <div id="classicFlavors" class="options-grid"></div>
+              </div>
+
+              <div class="brigadeiro-box">
+                <h3>Linha Premium</h3>
+                <p>R$ 72,50 por cento.</p>
+                <label class="customer-fields" style="margin-bottom:16px">
+                  <span>Quantos centos?</span>
+                  <input type="number" min="0" step="1" value="" class="brigadeiro-quantity" data-line="premium" data-price="72.5" placeholder="Ex.: 1, 2, 3...">
+                </label>
+                <p style="margin:0 0 10px;color:#806b60;font-weight:700">Escolha os sabores:</p>
+                <div id="premiumFlavors" class="options-grid"></div>
+              </div>
+            </section>
           </section>
 
 
@@ -414,17 +456,18 @@
       const otherItemsEl=document.getElementById("otherItems");
       const availableOtherItems=Array.isArray(cfg.otherItems)&&cfg.otherItems.length ? cfg.otherItems : FALLBACK.otherItems;
       otherItemsEl.innerHTML = availableOtherItems.filter(x=>x.active!==false).map(x=>{
-        if(x.packages){
+        if(x.id==="petit-brownie"){
+          const price100=Number(x.packages?.find(p=>Number(p.qty)===100)?.total||180);
           return `
             <div class="brigadeiro-box">
               <h3>${esc(x.name)}</h3>
               <p>${esc(x.description||"")}</p>
+              <p style="font-weight:800">Valor: ${money(price100)} por cento.</p>
               <label class="customer-fields">
-                <span>Quantidade</span>
-                <select class="other-quantity" data-item="${esc(x.name)}" data-kind="package">
-                  <option value="0">Não adicionar</option>
-                  ${x.packages.map(p=>`<option value="${p.qty}" data-total="${p.total}">${p.qty} unidades — ${money(p.total)}</option>`).join("")}
-                </select>
+                <span>Quantos centos?</span>
+                <input type="number" min="0" step="1" value="" class="other-quantity quantity-centos"
+                  data-item="${esc(x.name)}" data-kind="hundred" data-price="${price100}"
+                  placeholder="Ex.: 1, 2, 3...">
               </label>
             </div>`;
         }
@@ -442,7 +485,14 @@
               </select>
             </label>
           </div>`;
-      }).join("");      bind();
+      }).join("");
+
+      document.getElementById("classicFlavors").innerHTML = (cfg.brigadeiros?.classica||[]).map((x,i)=>
+        `<label class="extra-option"><input type="checkbox" name="brigadeiro_classica" value="${esc(x)}"><span>${esc(x)}</span></label>`).join("");
+      document.getElementById("premiumFlavors").innerHTML = (cfg.brigadeiros?.premium||[]).map((x,i)=>
+        `<label class="extra-option"><input type="checkbox" name="brigadeiro_premium" value="${esc(x)}"><span>${esc(x)}</span></label>`).join("");
+
+      bind();
     }
 
     function setNormalCakeSections(show){
@@ -486,7 +536,19 @@
         if(kit) total += Number(kit.price||0);
         document.querySelectorAll('#partyMode input[name="kitTopo"]:checked').forEach(x=>total+=Number(x.dataset.price||0));
         document.querySelectorAll('#partyMode input[name^="brigadeiro_"]:checked').forEach(x=>total+=Number(x.dataset.price||0));
-        document.querySelectorAll(".other-quantity").forEach(x=>{ const q=Number(x.value||0); if(!q)return; if(x.dataset.kind==="package") total+=Number(x.selectedOptions[0]?.dataset.total||0); else { const from=Number(x.dataset.discountFrom||0); const unit=from&&q>=from?Number(x.dataset.discountPrice||0):Number(x.dataset.price||0); total+=q*unit; } });
+        document.querySelectorAll(".other-quantity").forEach(x=>{
+          const q=Number(x.value||0); if(!q)return;
+          if(x.dataset.kind==="hundred") total += q*Number(x.dataset.price||0);
+          else {
+            const from=Number(x.dataset.discountFrom||0);
+            const unit=from&&q>=from?Number(x.dataset.discountPrice||0):Number(x.dataset.price||0);
+            total+=q*unit;
+          }
+        });
+        document.querySelectorAll(".brigadeiro-quantity").forEach(x=>{
+          const q=Number(x.value||0);
+          if(q) total += q*Number(x.dataset.price||0);
+        });
       }
       document.getElementById("cakeTotal").textContent = money(total);
     }
@@ -494,6 +556,12 @@
     function bind(){
       document.querySelectorAll(".order-path").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
       document.querySelectorAll("#cakeForm input,#cakeForm select").forEach(x=>x.addEventListener("change",()=>{
+        if(x.name==="brigadeiro_classica" && x.checked && document.querySelectorAll('input[name="brigadeiro_classica"]:checked').length>2){
+          x.checked=false; alert("Na Linha Clássica, escolha no máximo 2 sabores."); return;
+        }
+        if(x.name==="brigadeiro_premium" && x.checked && document.querySelectorAll('input[name="brigadeiro_premium"]:checked').length>2){
+          x.checked=false; alert("Na Linha Premium, escolha no máximo 2 sabores."); return;
+        }
         if(x.name==="recheio"&&x.checked&&document.querySelectorAll('input[name="recheio"]:checked').length>2){x.checked=false;alert("Escolha exatamente 2 recheios.");return;}
         if(x.name==="kitRecheio"&&x.checked&&document.querySelectorAll('input[name="kitRecheio"]:checked').length>2){x.checked=false;alert("No Kit Festa, escolha exatamente 2 recheios.");return;}
         calc();
@@ -518,7 +586,7 @@
         setNormalCakeSections(false);
         const kit=cfg.kits.find(x=>x.id===selectedKit);
         const info=document.getElementById("kitSelectedInfo");
-        info.innerHTML=`<strong>${esc(kit?.name||"Kit selecionado")}</strong><br>${esc(kit?.cake||"")}<br><strong>Incluso no kit:</strong><br>${(kit?.items||[]).map(item=>"• "+esc(item)).join("<br>")}<br><br>Os itens do kit permanecem definidos. Você só precisa escolher o topo, a massa e o recheio. Os docinhos são Brigadeiro Tradicional.`;
+        info.innerHTML=`<strong>${esc(kit?.name||"Kit selecionado")}</strong><br>${esc(kit?.cake||"")}<br><strong>Incluso no kit:</strong><br>${(kit?.items||[]).map(item=>"• "+esc(item)).join("<br>")}<br><br>Os itens do kit permanecem definidos. Você escolhe o topo, 1 massa e 2 recheios. Os adicionais são opcionais. Os docinhos do kit são Brigadeiro Tradicional.`;
         info.hidden=false;
         document.getElementById("kitTopoSection").hidden=false;
         document.getElementById("kitCakeOptionsSection").hidden=false;
@@ -540,11 +608,19 @@
       if(!name||!phone||!date){alert("Preencha seu nome, WhatsApp e a data desejada.");return}
       if(mode==="cake"){
         if(kitSelected()){
+          if(!f.get("kitTopo")){alert("Escolha o topo do bolo para o Kit Festa.");return}
           if(document.querySelectorAll('input[name="kitMassa"]:checked').length!==1){alert("Escolha 1 massa para o Kit Festa.");return}
           if(document.querySelectorAll('input[name="kitRecheio"]:checked').length!==2){alert("Escolha exatamente 2 recheios para o Kit Festa.");return}
         }else if(document.querySelectorAll('input[name="recheio"]:checked').length!==2){
           alert("Escolha exatamente 2 recheios para o bolo.");return
         }
+      }else if(mode==="party"){
+        const classicQty=Number(document.querySelector('.brigadeiro-quantity[data-line="classica"]')?.value||0);
+        const premiumQty=Number(document.querySelector('.brigadeiro-quantity[data-line="premium"]')?.value||0);
+        const classicFlavors=document.querySelectorAll('input[name="brigadeiro_classica"]:checked').length;
+        const premiumFlavors=document.querySelectorAll('input[name="brigadeiro_premium"]:checked').length;
+        if(classicQty>0 && classicFlavors===0){alert("Escolha pelo menos 1 sabor da Linha Clássica.");return}
+        if(premiumQty>0 && premiumFlavors===0){alert("Escolha pelo menos 1 sabor da Linha Premium.");return}
       }
 
       const kit=cfg.kits.find(x=>x.id===selectedKit);
@@ -559,8 +635,14 @@
         adicionais:kit ? f.getAll("kitAdicional") : (mode==="cake" ? f.getAll("adicional") : []),
         personalizacao:mode==="cake" ? f.getAll("personalizacao") : [],
         personalizacao_text:document.getElementById("personalizationText")?.value||"",
-        brigadeiros:mode==="party" ? [...document.querySelectorAll('input[name^="brigadeiro_"]:checked')].filter(x=>x.value!=="0").map(x=>({tipo:x.name.replace("brigadeiro_",""),quantidade:Number(x.value),valor:Number(x.dataset.price||0)})) : [],
-        outros:mode==="party" ? [...document.querySelectorAll(".other-quantity")].filter(x=>Number(x.value)>0).map(x=>({item:x.dataset.item,quantidade:Number(x.value),preco:Number(x.dataset.price||0)})) : [],
+        brigadeiros:mode==="party" ? [
+          ...["classica","premium"].map(line=>{
+            const q=Number(document.querySelector(`.brigadeiro-quantity[data-line="${line}"]`)?.value||0);
+            const flavors=[...document.querySelectorAll(`input[name="brigadeiro_${line}"]:checked`)].map(x=>x.value);
+            return q>0 ? {linha:line==="classica"?"Linha Clássica":"Linha Premium",centos:q,sabores:flavors,valorPorCento:Number(document.querySelector(`.brigadeiro-quantity[data-line="${line}"]`)?.dataset.price||0)} : null;
+          }).filter(Boolean)
+        ] : [],
+        outros:mode==="party" ? [...document.querySelectorAll(".other-quantity")].filter(x=>Number(x.value)>0).map(x=>({item:x.dataset.item,quantidade:Number(x.value),unidade:x.dataset.kind==="hundred"?"centos":"unidades",precoPorUnidade:Number(x.dataset.price||0)})) : [],
         observacoes:String(f.get("customerNotes")||"").trim(),total_estimado:total
       };
 
@@ -574,8 +656,8 @@
         kit?`Docinhos: ${kit.docinhos||""} — Brigadeiro Tradicional`:"",
         details.adicionais.length?`Adicionais: ${details.adicionais.join(", ")}`:"",
         details.personalizacao.length?`Personalização: ${details.personalizacao.join(", ")}`:"",
-        details.outros.length?`Outros itens: ${details.outros.map(x=>x.item+" x"+x.quantidade).join(", ")}`:"",
-        details.brigadeiros.length?`Brigadeiros: ${details.brigadeiros.map(x=>x.tipo+" "+x.quantidade).join(", ")}`:"",
+        details.outros.length?`Outros itens: ${details.outros.map(x=>x.item+" — "+x.quantidade+" "+x.unidade).join(", ")}`:"",
+        details.brigadeiros.length?`Docinhos: ${details.brigadeiros.map(x=>x.linha+" — "+x.centos+" centos — sabores: "+x.sabores.join(", ")).join(" | ")}`:"",
         `Total estimado: ${total}`,
         details.observacoes?`Observações: ${details.observacoes}`:""
       ].filter(Boolean).join("\n");
