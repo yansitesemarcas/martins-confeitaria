@@ -4195,93 +4195,115 @@
     const otherItems = Array.isArray(cfg.otherItems) ? cfg.otherItems : [];
     const kits = Array.isArray(cfg.kits) ? cfg.kits : [];
 
+    const priceInput = (type, i, value, extra = "") => `
+      <input class="price-input" type="number" min="0" step="0.01"
+        data-order-price="${type}" data-i="${i}" ${extra}
+        value="${Number(value || 0)}">
+    `;
+
     return `
-      <div class="page-head">
+      <div class="page-head pricing-page-head">
         <div>
           <h2>Valores de Encomendas</h2>
-          <p class="muted">Aqui não é possível criar ou excluir produtos. Somente os valores das opções já existentes podem ser alterados.</p>
+          <p class="muted">Altere somente os preços. Os produtos, sabores e opções permanecem definidos no sistema.</p>
         </div>
       </div>
 
-      <div class="panel">
-        <div class="panel-head"><div><h3>Bolos</h3><p class="muted">Altere somente os preços das faixas existentes.</p></div></div>
-        ${cakes.map((cake, ci) => `
-          <div class="panel" style="margin:12px 0">
-            <h4>${escapeHtml(cake.name)}</h4>
-            ${(cake.options || []).map((option, oi) => `
-              <label class="field">
-                <span>${escapeHtml(option)}</span>
-                <input type="number" min="0" step="0.01" data-order-price="cake" data-i="${ci}" data-oi="${oi}" value="${Number(cake.prices?.[oi] || 0)}">
-              </label>
-            `).join("")}
-          </div>
-        `).join("")}
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><div><h3>Adicionais</h3></div></div>
-        ${extras.map((item, i) => `
-          <label class="field">
-            <span>${escapeHtml(item[0])}</span>
-            <input type="number" min="0" step="0.01" data-order-price="extra" data-i="${i}" value="${Number(item[1] || 0)}">
-          </label>
-        `).join("")}
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><div><h3>Personalizações</h3></div></div>
-        ${personalizations.map((item, i) => `
-          <label class="field">
-            <span>${escapeHtml(item[0])}</span>
-            <input type="number" min="0" step="0.01" data-order-price="personalization" data-i="${i}" value="${Number(item[1] || 0)}">
-          </label>
-        `).join("")}
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><div><h3>Brigadeiros</h3><p class="muted">Os sabores e limites permanecem fixos; somente os preços podem ser alterados.</p></div></div>
-        <label class="field"><span>Clássicos — 50 unidades</span><input type="number" min="0" step="0.01" data-order-price="brig-classic" data-i="0" value="${Number(brigadeiros.classicaPrices?.[0] || 0)}"></label>
-        <label class="field"><span>Clássicos — 100 unidades</span><input type="number" min="0" step="0.01" data-order-price="brig-classic" data-i="1" value="${Number(brigadeiros.classicaPrices?.[1] || 0)}"></label>
-        <label class="field"><span>Premium — 50 unidades</span><input type="number" min="0" step="0.01" data-order-price="brig-premium" data-i="0" value="${Number(brigadeiros.premiumPrices?.[0] || 0)}"></label>
-        <label class="field"><span>Premium — 100 unidades</span><input type="number" min="0" step="0.01" data-order-price="brig-premium" data-i="1" value="${Number(brigadeiros.premiumPrices?.[1] || 0)}"></label>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><div><h3>Outros Itens</h3><p class="muted">O produto e as opções não podem ser criados ou alterados por aqui. Apenas valores.</p></div></div>
-        ${otherItems.map((item, i) => {
-          const packages = Array.isArray(item.packages) ? item.packages : [];
-          if (packages.length) {
-            return `
-              <div class="panel" style="margin:12px 0">
-                <h4>${escapeHtml(item.name)}</h4>
-                ${packages.map((pkg, pi) => `
-                  <label class="field"><span>${Number(pkg.qty || 0)} unidades</span><input type="number" min="0" step="0.01" data-order-price="package" data-i="${i}" data-pi="${pi}" value="${Number(pkg.total || 0)}"></label>
+      <section class="pricing-section">
+        <div class="pricing-section-head">
+          <div><span class="pricing-icon">🍰</span><div><h3>Bolos</h3><p>Valores por tamanho e quantidade de pessoas.</p></div></div>
+        </div>
+        <div class="pricing-cake-grid">
+          ${cakes.map((cake, ci) => `
+            <article class="pricing-card cake-pricing-card">
+              <div class="pricing-card-title"><strong>${escapeHtml(cake.name)}</strong><span>Preço por tamanho</span></div>
+              <div class="price-list">
+                ${(cake.options || []).map((option, oi) => `
+                  <label class="price-row">
+                    <span>${escapeHtml(option)}</span>
+                    ${priceInput("cake", ci, cake.prices?.[oi], `data-oi="${oi}"`)}
+                  </label>
                 `).join("")}
-              </div>`;
-          }
-          return `
-            <label class="field">
-              <span>${escapeHtml(item.name)} — preço unitário</span>
-              <input type="number" min="0" step="0.01" data-order-price="other-unit" data-i="${i}" value="${Number(item.unit || 0)}">
-            </label>
-            ${item.discountUnit != null ? `
-              <label class="field"><span>${escapeHtml(item.name)} — preço unitário a partir de ${Number(item.discountFrom || 0)} unidades</span><input type="number" min="0" step="0.01" data-order-price="other-discount" data-i="${i}" value="${Number(item.discountUnit || 0)}"></label>
-            ` : ""}
-          `;
-        }).join("")}
-      </div>
+              </div>
+            </article>
+          `).join("")}
+        </div>
+      </section>
 
-      <div class="panel">
-        <div class="panel-head"><div><h3>Kit Festa</h3><p class="muted">Somente os preços dos kits existentes podem ser alterados.</p></div></div>
-        ${kits.map((kit, i) => `
-          <label class="field">
-            <span>${escapeHtml(kit.group || "Kit Festa")} — ${escapeHtml(kit.name || kit.id)}</span>
-            <input type="number" min="0" step="0.01" data-order-price="kit" data-i="${i}" value="${Number(kit.price || 0)}">
-          </label>
-        `).join("")}
-      </div>
+      <section class="pricing-section">
+        <div class="pricing-section-head"><div><span class="pricing-icon">➕</span><div><h3>Adicionais</h3><p>Itens extras que podem ser acrescentados ao bolo.</p></div></div></div>
+        <div class="pricing-grid">
+          ${extras.map((item, i) => `
+            <label class="pricing-item-card"><span>${escapeHtml(item[0])}</span>${priceInput("extra", i, item[1])}</label>
+          `).join("")}
+        </div>
+      </section>
 
-      <div class="panel-actions">
+      <section class="pricing-section">
+        <div class="pricing-section-head"><div><span class="pricing-icon">🎀</span><div><h3>Personalizações</h3><p>Valores das opções de decoração e acabamento.</p></div></div></div>
+        <div class="pricing-grid">
+          ${personalizations.map((item, i) => `
+            <label class="pricing-item-card"><span>${escapeHtml(item[0])}</span>${priceInput("personalization", i, item[1])}</label>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="pricing-section">
+        <div class="pricing-section-head"><div><span class="pricing-icon">🍬</span><div><h3>Brigadeiros</h3><p>Os sabores e limites são fixos. Aqui você altera apenas os valores.</p></div></div></div>
+        <div class="pricing-grid brigadeiro-grid">
+          <label class="pricing-item-card"><span>Clássicos · 50 unidades</span>${priceInput("brig-classic", 0, brigadeiros.classicaPrices?.[0])}</label>
+          <label class="pricing-item-card"><span>Clássicos · 100 unidades</span>${priceInput("brig-classic", 1, brigadeiros.classicaPrices?.[1])}</label>
+          <label class="pricing-item-card"><span>Premium · 50 unidades</span>${priceInput("brig-premium", 0, brigadeiros.premiumPrices?.[0])}</label>
+          <label class="pricing-item-card"><span>Premium · 100 unidades</span>${priceInput("brig-premium", 1, brigadeiros.premiumPrices?.[1])}</label>
+        </div>
+      </section>
+
+      <section class="pricing-section">
+        <div class="pricing-section-head"><div><span class="pricing-icon">🍫</span><div><h3>Outros Itens</h3><p>Somente os valores dos itens existentes podem ser alterados.</p></div></div></div>
+        <div class="pricing-grid other-items-grid">
+          ${otherItems.map((item, i) => {
+            const packages = Array.isArray(item.packages) ? item.packages : [];
+            if (packages.length) {
+              return `
+                <article class="pricing-item-card pricing-item-wide">
+                  <div class="item-card-name">${escapeHtml(item.name)}</div>
+                  <div class="item-price-options">
+                    ${packages.map((pkg, pi) => `
+                      <label><span>${Number(pkg.qty || 0)} unidades</span>${priceInput("package", i, pkg.total, `data-pi="${pi}"`)}</label>
+                    `).join("")}
+                  </div>
+                </article>`;
+            }
+            return `
+              <article class="pricing-item-card pricing-item-wide">
+                <div class="item-card-name">${escapeHtml(item.name)}</div>
+                <label><span>Preço unitário</span>${priceInput("other-unit", i, item.unit)}</label>
+                ${item.discountUnit != null ? `
+                  <label><span>A partir de ${Number(item.discountFrom || 0)} unidades</span>${priceInput("other-discount", i, item.discountUnit)}</label>
+                ` : ""}
+              </article>`;
+          }).join("")}
+        </div>
+      </section>
+
+      <section class="pricing-section">
+        <div class="pricing-section-head"><div><span class="pricing-icon">🎉</span><div><h3>Kit Festa</h3><p>Os kits são fixos. Altere somente o preço de cada kit.</p></div></div></div>
+        <div class="pricing-kit-groups">
+          ${[...new Set(kits.map(k => k.group || "Kit Festa"))].map(group => `
+            <div class="kit-group-card">
+              <div class="kit-group-title">${escapeHtml(group)}</div>
+              <div class="pricing-grid">
+                ${kits.map((kit, i) => kit.group === group ? `
+                  <label class="pricing-item-card"><span>${escapeHtml(kit.name || kit.id)}</span>${priceInput("kit", i, kit.price)}</label>
+                ` : "").join("")}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+
+      <div class="pricing-save-bar">
+        <div><strong>Pronto para atualizar?</strong><span>Confira os valores antes de salvar.</span></div>
         <button type="button" class="btn primary" data-action="save-order-pricing">Salvar valores</button>
       </div>
     `;
