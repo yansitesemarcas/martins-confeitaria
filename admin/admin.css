@@ -2328,3 +2328,174 @@ input[data-order-price]:focus {
     grid-template-columns: 1fr;
   }
 }
+
+/* =========================================================
+   MARTINS CONFEITARIA — IDENTIDADE VISUAL COMPLETA
+   ========================================================= */
+:root{
+  --martins-blue:#67b0cb;
+  --martins-blue-dark:#2b7896;
+  --martins-pink:#f3b7bb;
+  --martins-pink-light:#fff1f3;
+  --martins-blue-light:#eaf6fa;
+}
+body{
+  background:
+    radial-gradient(circle at 95% 0%,rgba(243,183,187,.16),transparent 280px),
+    radial-gradient(circle at 5% 100%,rgba(103,176,203,.12),transparent 330px),
+    #f7fbfc;
+}
+#login{background:linear-gradient(135deg,#fff,#f4fafc)}
+#login .login-card{
+  border:1px solid rgba(103,176,203,.25);
+  border-radius:28px;
+  box-shadow:0 28px 80px rgba(43,120,150,.18);
+}
+#login .login-logo{
+  width:145px;height:145px;border-radius:32px;background:#fff;
+  border:2px solid rgba(243,183,187,.5);
+  box-shadow:0 14px 35px rgba(43,120,150,.14);
+}
+#login .login-logo img{width:94%;height:94%;object-fit:contain}
+#login .login-card h1{color:var(--martins-blue-dark)}
+.side{
+  width:285px;
+  background:linear-gradient(180deg,#2b7896 0%,#438fa9 55%,#67b0cb 100%);
+  border:0;
+  box-shadow:8px 0 35px rgba(43,120,150,.18);
+}
+.side:before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(243,183,187,.34),transparent 190px),
+    radial-gradient(circle at 0% 100%,rgba(255,255,255,.08),transparent 220px);
+}
+.brand{
+  position:relative;z-index:2;
+  padding:8px 8px 18px;
+  border-bottom:1px solid rgba(255,255,255,.22);
+}
+.brand-logo{
+  width:56px;height:56px;flex-basis:56px;
+  border-radius:17px;background:#fff;
+  border:2px solid rgba(255,255,255,.8);
+  box-shadow:0 8px 22px rgba(0,0,0,.12);
+}
+.brand-logo img{width:94%;height:94%;object-fit:contain}
+.brand strong{color:#fff}.brand small{color:rgba(255,255,255,.76)}
+.side nav,.side-foot{position:relative;z-index:2}
+.group{color:rgba(255,255,255,.62);letter-spacing:.13em}
+.nav{
+  border:1px solid transparent;
+  border-radius:13px;
+  color:rgba(255,255,255,.92);
+  margin:3px 0;
+}
+.nav:hover{
+  color:#fff;background:rgba(255,255,255,.13);
+  border-color:rgba(255,255,255,.12);
+  transform:translateX(2px);
+}
+.nav.active{
+  color:var(--martins-blue-dark);
+  background:#fff;
+  border-color:#fff;
+  box-shadow:0 8px 22px rgba(0,0,0,.11),inset 4px 0 var(--martins-pink);
+}
+.nav.sub{color:rgba(255,255,255,.86)}
+.side-foot .btn.soft{
+  color:var(--martins-blue-dark);background:#fff;
+  border-color:rgba(255,255,255,.8);
+}
+.top{
+  background:rgba(255,255,255,.95);
+  border-bottom:1px solid #dcecef;
+  box-shadow:0 5px 25px rgba(43,120,150,.07);
+}
+.top h1{color:var(--martins-blue-dark)}
+.top .btn.soft{
+  background:var(--martins-pink-light);
+  color:#a25b65;
+  border-color:#f0d1d5;
+}
+.panel,.card,.stat-card,.order-card,.enc-section,.setting-card{
+  border-color:#dcecef;
+  box-shadow:0 9px 30px rgba(43,120,150,.07);
+}
+.panel{background:rgba(255,255,255,.97);border-radius:20px}
+.panel-head h2,.panel-head h3,
+.enc-section-head h3,.setting-card h3{color:var(--martins-blue-dark)}
+.panel-head h2:before,
+.enc-section-head h3:before,
+.setting-card h3:before{
+  content:"";display:inline-block;width:5px;height:22px;
+  margin-right:9px;vertical-align:-5px;border-radius:9px;
+  background:linear-gradient(var(--martins-pink),var(--martins-blue));
+}
+.stat-card{
+  border-radius:18px;
+  background:linear-gradient(145deg,#fff,#f7fcfd);
+}
+.stat-card strong,.price{color:var(--martins-blue-dark)}
+.btn{border-radius:12px}
+.btn.primary{
+  background:linear-gradient(135deg,#2b7896,#67b0cb);
+  border-color:#2b7896;color:#fff;
+}
+.btn.soft{background:var(--martins-blue-light);color:var(--martins-blue-dark)}
+.btn.danger{background:#fff0f1;color:#b34f5a}
+.prod,.order-card{
+  border-radius:18px;
+  overflow:hidden;
+}
+.prod:hover,.order-card:hover,.stat-card:hover{
+  border-color:rgba(103,176,203,.45);
+  box-shadow:0 15px 36px rgba(43,120,150,.12);
+}
+.tag{background:var(--martins-blue-light);color:var(--martins-blue-dark)}
+.enc-section{
+  background:linear-gradient(180deg,#fff,#fbfdfe);
+  border-radius:20px;
+}
+.enc-card{
+  border-radius:16px;
+  background:linear-gradient(135deg,#f8fcfd,#fff);
+  border-color:#dcecef;
+}
+.enc-card-head strong,.enc-card h4{color:var(--martins-blue-dark)}
+.enc-row input,.enc-row select,.enc-row textarea,
+.dialog input,.dialog select,.dialog textarea,
+.setting-card input,.setting-card select,.setting-card textarea{
+  border-radius:11px;
+  border-color:#d7e9ee;
+}
+input[data-order-price]{
+  border:2px solid #d7e9ee;
+  color:var(--martins-blue-dark);
+  font-weight:800;
+  background:#fff;
+}
+input[data-order-price]:focus{
+  border-color:var(--martins-blue);
+  box-shadow:0 0 0 4px rgba(103,176,203,.13);
+}
+.dialog{
+  border-radius:22px;
+  border-color:#dcecef;
+  box-shadow:0 25px 80px rgba(27,74,90,.25);
+}
+.dhead{background:linear-gradient(90deg,#f7fcfd,#fff4f5)}
+.dhead h2{color:var(--martins-blue-dark)}
+#toast{
+  border-radius:14px;
+  background:linear-gradient(135deg,#2b7896,#67b0cb);
+}
+@media(max-width:900px){
+  .side{width:285px}
+  .main{margin-left:0}
+}
+@media(max-width:700px){
+  .top{padding:12px 15px}
+  .view{padding:15px}
+  .panel{border-radius:16px}
+}
