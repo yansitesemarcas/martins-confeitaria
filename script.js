@@ -21,6 +21,7 @@
 
   let currentCategory = "";
   let cart = [];
+  let settingsSyncTimer = null;
 
   const CART_STORAGE_KEY =
     "martins_confeitaria_cart";
@@ -361,6 +362,40 @@
 
     render();
 
+  }
+
+  /* =========================================================
+     SINCRONIZAÇÃO DAS CONFIGURAÇÕES
+  ========================================================= */
+
+  function startSettingsSync(client) {
+    if (!client) return;
+    if (settingsSyncTimer) clearInterval(settingsSyncTimer);
+
+    const sync = async () => {
+      try {
+        const { data, error } = await client
+          .from("settings")
+          .select("value")
+          .eq("key", "site")
+          .maybeSingle();
+        if (error || !data?.value) return;
+
+        const remote = data.value;
+        const previous = JSON.stringify(state);
+        state = {
+          ...state,
+          ...remote,
+          about: { ...(state.about || {}), ...(remote.about || {}) },
+          cake: { ...(state.cake || {}), ...(remote.cake || {}) }
+        };
+        if (JSON.stringify(state) !== previous) render();
+      } catch (error) {
+        console.warn("Sincronização das configurações:", error);
+      }
+    };
+
+    settingsSyncTimer = setInterval(sync, 5000);
   }
 
   /* =========================================================
