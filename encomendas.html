@@ -238,30 +238,32 @@
 
               <div class="brigadeiro-box" style="margin-bottom:20px">
                 <h3>Linha Clássica</h3>
-                <p>Escolha a quantidade:</p>
+                <p>Escolha a quantidade de centos:</p>
                 <label class="customer-fields" style="margin-bottom:16px">
-                  <span>Quantidade</span>
-                  <select class="brigadeiro-quantity" data-line="classica">
-                    <option value="0">Não adicionar</option>
-                    <option value="50" data-price="62.5">50 unidades — R$ 62,50</option>
-                    <option value="100" data-price="125">100 unidades — R$ 125,00</option>
-                  </select>
+                  <span>Quantos centos?</span>
+                  <input type="number" min="0" step="1" value="" class="brigadeiro-quantity" data-line="classica" data-price100="125" placeholder="Ex.: 1, 2, 3...">
                 </label>
+                <div class="party-note" style="margin-top:12px">
+                  <strong>Valores do estabelecimento:</strong><br>
+                  50 unidades — R$ 62,50<br>
+                  100 unidades — R$ 125,00
+                </div>
                 <p style="margin:0 0 10px;color:#806b60;font-weight:700">Escolha os sabores:</p>
                 <div id="classicFlavors" class="options-grid"></div>
               </div>
 
               <div class="brigadeiro-box">
                 <h3>Linha Premium</h3>
-                <p>Escolha a quantidade:</p>
+                <p>Escolha a quantidade de centos:</p>
                 <label class="customer-fields" style="margin-bottom:16px">
-                  <span>Quantidade</span>
-                  <select class="brigadeiro-quantity" data-line="premium">
-                    <option value="0">Não adicionar</option>
-                    <option value="50" data-price="72.5">50 unidades — R$ 72,50</option>
-                    <option value="100" data-price="145">100 unidades — R$ 145,00</option>
-                  </select>
+                  <span>Quantos centos?</span>
+                  <input type="number" min="0" step="1" value="" class="brigadeiro-quantity" data-line="premium" data-price100="145" placeholder="Ex.: 1, 2, 3...">
                 </label>
+                <div class="party-note" style="margin-top:12px">
+                  <strong>Valores do estabelecimento:</strong><br>
+                  50 unidades — R$ 72,50<br>
+                  100 unidades — R$ 145,00
+                </div>
                 <p style="margin:0 0 10px;color:#806b60;font-weight:700">Escolha os sabores:</p>
                 <div id="premiumFlavors" class="options-grid"></div>
               </div>
@@ -470,11 +472,15 @@
             <div class="brigadeiro-box">
               <h3>${esc(x.name)}</h3>
               <p>${esc(x.description||"")}</p>
-              <p style="font-weight:800">Valor: ${money(price100)} por cento.</p>
+              <p style="font-weight:800">Valores do estabelecimento:</p>
+              <div class="party-note">
+                50 unidades — R$ 90,00<br>
+                100 unidades — R$ 180,00
+              </div>
               <label class="customer-fields">
                 <span>Quantos centos?</span>
                 <input type="number" min="0" step="1" value="" class="other-quantity quantity-centos"
-                  data-item="${esc(x.name)}" data-kind="hundred" data-price="${price100}"
+                  data-item="${esc(x.name)}" data-kind="hundred" data-price100="180"
                   placeholder="Ex.: 1, 2, 3...">
               </label>
             </div>`;
@@ -546,7 +552,7 @@
         document.querySelectorAll('#partyMode input[name^="brigadeiro_"]:checked').forEach(x=>total+=Number(x.dataset.price||0));
         document.querySelectorAll(".other-quantity").forEach(x=>{
           const q=Number(x.value||0); if(!q)return;
-          if(x.dataset.kind==="hundred") total += q*Number(x.dataset.price||0);
+          if(x.dataset.kind==="hundred") total += q*Number(x.dataset.price100||0);
           else {
             const from=Number(x.dataset.discountFrom||0);
             const unit=from&&q>=from?Number(x.dataset.discountPrice||0):Number(x.dataset.price||0);
@@ -555,7 +561,7 @@
         });
         document.querySelectorAll(".brigadeiro-quantity").forEach(x=>{
           const q=Number(x.value||0);
-          if(q) total += Number(x.selectedOptions[0]?.dataset.price||0);
+          if(q) total += q*Number(x.dataset.price100||0);
         });
       }
       document.getElementById("cakeTotal").textContent = money(total);
@@ -647,7 +653,7 @@
           ...["classica","premium"].map(line=>{
             const q=Number(document.querySelector(`.brigadeiro-quantity[data-line="${line}"]`)?.value||0);
             const flavors=[...document.querySelectorAll(`input[name="brigadeiro_${line}"]:checked`)].map(x=>x.value);
-            return q>0 ? {linha:line==="classica"?"Linha Clássica":"Linha Premium",centos:q,sabores:flavors,valor:Number(document.querySelector(`.brigadeiro-quantity[data-line="${line}"]`)?.selectedOptions[0]?.dataset.price||0)} : null;
+            return q>0 ? {linha:line==="classica"?"Linha Clássica":"Linha Premium",centos:q,sabores:flavors,valorPorCento:Number(document.querySelector(`.brigadeiro-quantity[data-line="${line}"]`)?.dataset.price100||0)} : null;
           }).filter(Boolean)
         ] : [],
         outros:mode==="party" ? [...document.querySelectorAll(".other-quantity")].filter(x=>Number(x.value)>0).map(x=>({item:x.dataset.item,quantidade:Number(x.value),unidade:x.dataset.kind==="hundred"?"centos":"unidades",precoPorUnidade:Number(x.dataset.price||0)})) : [],
@@ -665,7 +671,7 @@
         details.adicionais.length?`Adicionais: ${details.adicionais.join(", ")}`:"",
         details.personalizacao.length?`Personalização: ${details.personalizacao.join(", ")}`:"",
         details.outros.length?`Outros itens: ${details.outros.map(x=>x.item+" — "+x.quantidade+" "+x.unidade).join(", ")}`:"",
-        details.brigadeiros.length?`Docinhos: ${details.brigadeiros.map(x=>x.linha+" — "+x.centos+" unidades — "+money(x.valor)+" — sabores: "+x.sabores.join(", ")).join(" | ")}`:"",
+        details.brigadeiros.length?`Docinhos: ${details.brigadeiros.map(x=>x.linha+" — "+x.centos+" cento(s) — "+money(x.valorPorCento)+" por cento — sabores: "+x.sabores.join(", ")).join(" | ")}`:"",
         `Total estimado: ${total}`,
         details.observacoes?`Observações: ${details.observacoes}`:""
       ].filter(Boolean).join("\n");
