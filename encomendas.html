@@ -266,11 +266,11 @@
         {id:"cupcake-sem-plaquinha",name:"Cupcakes sem plaquinha",unit:5.5,active:true}
       ],
       kits:[
-        {id:"pb1",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 01",price:160,cake:"Chantininho 10/15 Pessoas",docinhos:20,items:["04 Cupcakes","20 Petit Brownie","20 Docinhos"]},
-        {id:"pb2",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 02",price:210,cake:"Chantininho 15/20 Pessoas",docinhos:30,items:["05 Cupcakes","30 Petit Brownie","30 Docinhos"]},
-        {id:"pb3",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 03",price:260,cake:"Chantininho 20/25 Pessoas",docinhos:50,items:["08 Cupcakes","50 Petit Brownie","50 Docinhos"]},
-        {id:"pb4",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 04",price:440,cake:"Chantininho 30/40 Pessoas",docinhos:60,items:["10 Cupcakes","60 Petit Brownie","60 Docinhos"]},
-        {id:"pb5",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 05",price:510,cake:"Chantininho 40/50 Pessoas",docinhos:70,items:["12 Cupcakes","70 Petit Brownie","70 Docinhos"]},
+        {id:"pb1",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 01",price:150,cake:"Chantininho 10/15 Pessoas",docinhos:20,items:["04 Cupcakes","20 Petit Brownie","20 Docinhos"]},
+        {id:"pb2",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 02",price:200,cake:"Chantininho 15/20 Pessoas",docinhos:30,items:["05 Cupcakes","30 Petit Brownie","30 Docinhos"]},
+        {id:"pb3",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 03",price:250,cake:"Chantininho 20/25 Pessoas",docinhos:50,items:["08 Cupcakes","50 Petit Brownie","50 Docinhos"]},
+        {id:"pb4",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 04",price:430,cake:"Chantininho 30/40 Pessoas",docinhos:60,items:["10 Cupcakes","60 Petit Brownie","60 Docinhos"]},
+        {id:"pb5",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 05",price:500,cake:"Chantininho 40/50 Pessoas",docinhos:70,items:["12 Cupcakes","70 Petit Brownie","70 Docinhos"]},
         {id:"pr1",group:"Kits com Pirulitos",name:"Kit Pirulito 01",price:130,cake:"Chantininho 10/12 Pessoas",docinhos:20,items:["04 Cupcakes","04 Pirulitos","20 Docinhos"]},
         {id:"pr2",group:"Kits com Pirulitos",name:"Kit Pirulito 02",price:160,cake:"Chantininho 15/20 Pessoas",docinhos:30,items:["05 Cupcakes","05 Pirulitos","30 Docinhos"]},
         {id:"pr3",group:"Kits com Pirulitos",name:"Kit Pirulito 03",price:210,cake:"Chantininho 20/25 Pessoas",docinhos:50,items:["08 Cupcakes","08 Pirulitos","50 Docinhos"]},
@@ -374,13 +374,20 @@
       document.getElementById("cakePersonalizations").innerHTML = cfg.personalizations.map(x=>`
         <label class="extra-option"><input type="checkbox" name="personalizacao" value="${esc(x[0])}" data-price="${Number(x[1]||0)}"><span>${esc(x[0])}</span><strong>+ ${money(x[1])}</strong></label>`).join("");
 
-      document.getElementById("kitOptions").innerHTML = cfg.kits.filter(x=>x.active!==false).map(k=>`
-        <label class="extra-option">
-          <input type="radio" name="kit" value="${esc(k.id)}" data-price="${Number(k.price||0)}">
-          <span><b>${esc(k.name)}</b><small>${esc(k.cake)}</small><small style="margin-top:6px;font-weight:800;color:#6b3f2d">Incluso no kit:</small>${(k.items||[]).map(item=>`<small>• ${esc(item)}</small>`).join("")}</span>
-          <strong>${money(k.price)}</strong>
-        </label>`).join("");
-
+      const activeKits = cfg.kits.filter(x=>x.active!==false);
+      const kitGroups = [...new Set(activeKits.map(k=>k.group || "Kits Festa"))];
+      document.getElementById("kitOptions").innerHTML = kitGroups.map(group=>`
+        <div class="kit-group" style="margin-bottom:24px">
+          <h3 style="margin:0 0 12px;color:#6f4a32">${esc(group)}</h3>
+          <div class="options-grid">
+            ${activeKits.filter(k=>(k.group || "Kits Festa")===group).map(k=>`
+              <label class="extra-option">
+                <input type="radio" name="kit" value="${esc(k.id)}" data-price="${Number(k.price||0)}">
+                <span><b>${esc(k.name)}</b><small>${esc(k.cake)}</small><small style="margin-top:6px;font-weight:800;color:#6b3f2d">Incluso no kit:</small>${(k.items||[]).map(item=>`<small>• ${esc(item)}</small>`).join("")}</span>
+                <strong>${money(k.price)}</strong>
+              </label>`).join("")}
+          </div>
+        </div>`).join("");
       document.getElementById("brigadeiros").innerHTML = [
         ["Clássicos",cfg.brigadeiros.classica,cfg.brigadeiros.classicaPrices],
         ["Premium",cfg.brigadeiros.premium,cfg.brigadeiros.premiumPrices]
