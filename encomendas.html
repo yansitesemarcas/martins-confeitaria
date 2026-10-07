@@ -387,10 +387,8 @@
                 <strong>${money(k.price)}</strong>
               </label>`).join("")}
           </div>
-        </div>`).join("");
-      <button type="button" id="clearKitButton" style="margin-top:4px;width:100%;border:2px solid #dccbc0;border-radius:14px;padding:13px 16px;background:#fffaf4;color:#6f4a32;font:inherit;font-weight:800;cursor:pointer">
-        Não quero nenhum Kit Festa
-      </button>
+        </div>`).join("") + `
+        <button type="button" id="clearKitButton" style="margin-top:4px;width:100%;border:2px solid #dccbc0;border-radius:14px;padding:13px 16px;background:#fffaf4;color:#6f4a32;font:inherit;font-weight:800;cursor:pointer">Não quero nenhum Kit Festa</button>`;
 
       document.getElementById("brigadeiros").innerHTML = [
         ["Clássicos",cfg.brigadeiros.classica,cfg.brigadeiros.classicaPrices],
