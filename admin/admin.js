@@ -3805,300 +3805,107 @@
      ========================================================= */
 
   function renderSettings() {
-    const settings =
-      state.settings || {};
-
-    const instagram =
-      settings.instagram ||
-      settings.instagram_url ||
-      "";
-
-    const whatsapp =
-      settings.whatsapp ||
-      settings.phone ||
-      settings.telefone ||
-      "";
-
-    const address =
-      settings.address ||
-      settings.endereco ||
-      "";
-
-    const maps =
-      settings.maps ||
-      settings.maps_url ||
-      "";
-
-    const hours =
-      settings.hours ||
-      settings.horarios ||
-      "";
+    const settings = state.settings || {};
+    const instagram = settings.instagram || settings.instagram_url || "";
+    const whatsapp = settings.whatsapp || settings.phone || settings.telefone || "";
+    const address = Array.isArray(settings.address) ? settings.address.join(", ") : (settings.address || settings.endereco || "");
+    const maps = settings.maps || settings.maps_url || "";
+    const defaultHours = Array.isArray(DEFAULTS.hours) ? DEFAULTS.hours : [
+      {s:"closed",o:"",c:""},{s:"tbd",o:"",c:""},
+      {s:"open",o:"11:00",c:"23:00"},{s:"open",o:"11:00",c:"18:30"},
+      {s:"open",o:"11:00",c:"23:00"},{s:"open",o:"11:00",c:"23:00"},
+      {s:"open",o:"12:00",c:"17:00"}
+    ];
+    const hours = Array.isArray(settings.hours) && settings.hours.length === 7
+      ? settings.hours : defaultHours;
+    const days = ["Domingo","Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado"];
 
     return `
-      <div class="page-head">
-
-        <div>
-          <h2>
-            Configurações
-          </h2>
-
-          <p class="muted">
-            Altere as informações exibidas no site.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          class="btn primary"
-          data-action="save-settings"
-        >
-          Salvar alterações
-        </button>
-
+      <div class="page-head settings-page-head">
+        <div><h2>Configurações do site</h2><p class="muted">Altere as informações e os horários que aparecem no site.</p></div>
+        <button type="button" class="btn primary" data-action="save-settings">Salvar alterações</button>
       </div>
 
-      <section class="panel">
-
-        <div class="panel-head">
-          <div>
-            <h3>
-              Informações do site
-            </h3>
-
-            <p class="muted">
-              Essas informações são armazenadas no Supabase.
-            </p>
-          </div>
-        </div>
-
+      <section class="settings-card">
+        <div class="settings-card-head"><span class="settings-icon">🍰</span><div><h3>Informações da Martins Confeitaria</h3><p>Esses dados são usados diretamente no site.</p></div></div>
         <div class="settings-grid">
-
-          <label>
-            Instagram
-
-            <input
-              id="s-instagram"
-              type="text"
-              value="${escapeHtml(
-                instagram
-              )}"
-              placeholder="@martins_confeitariaartesanal"
-            >
-          </label>
-
-          <label>
-            WhatsApp
-
-            <input
-              id="s-whatsapp"
-              type="text"
-              value="${escapeHtml(
-                whatsapp
-              )}"
-              placeholder="5585981563070"
-            >
-          </label>
-
-          <label class="full">
-            Endereço
-
-            <input
-              id="s-address"
-              type="text"
-              value="${escapeHtml(
-                address
-              )}"
-              placeholder="Rua 1018, 65, Conjunto Ceará II, Fortaleza-CE"
-            >
-          </label>
-
-          <label class="full">
-            Link do Google Maps
-
-            <input
-              id="s-maps"
-              type="url"
-              value="${escapeHtml(
-                maps
-              )}"
-              placeholder="https://maps.google.com/..."
-            >
-          </label>
-
-          <label class="full">
-            Horários de funcionamento
-
-            <textarea
-              id="s-hours"
-              rows="7"
-              placeholder="Quinta: 11h às 23h&#10;Sexta: 11h às 18h30&#10;..."
-            >${escapeHtml(
-              hours
-            )}</textarea>
-          </label>
-
+          <label>Instagram<input id="s-instagram" type="text" value="${escapeHtml(instagram)}" placeholder="@martins_confeitariaartesanal"></label>
+          <label>WhatsApp<input id="s-whatsapp" type="text" value="${escapeHtml(whatsapp)}" placeholder="5585981563070"></label>
+          <label class="full">Endereço<input id="s-address" type="text" value="${escapeHtml(address)}" placeholder="Rua 1018, 65, Conjunto Ceará II, Fortaleza-CE"></label>
+          <label class="full">Link do Google Maps<input id="s-maps" type="url" value="${escapeHtml(maps)}" placeholder="https://maps.google.com/..."></label>
         </div>
-
       </section>
 
-      <section class="panel">
-
-        <div class="panel-head">
-
-          <div>
-            <h3>
-              Classificações
-            </h3>
-
-            <p class="muted">
-              Categorias utilizadas nos produtos.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            class="btn soft"
-            data-action="new-category"
-          >
-            + Nova classificação
-          </button>
-
+      <section class="settings-card hours-settings-card">
+        <div class="settings-card-head"><span class="settings-icon">🕐</span><div><h3>Horário de funcionamento</h3><p>Escolha o horário de cada dia. Ao salvar, o site passa a usar esses horários.</p></div></div>
+        <div class="hours-admin-list">
+          ${days.map((day,i) => {
+            const h = hours[i] || {s:"tbd",o:"",c:""};
+            return `
+              <div class="hours-admin-row">
+                <div class="hours-day"><strong>${day}</strong><small>Dia ${i + 1}</small></div>
+                <select class="hours-status" data-hour-index="${i}">
+                  <option value="open" ${h.s==="open"?"selected":""}>Aberto</option>
+                  <option value="closed" ${h.s==="closed"?"selected":""}>Fechado</option>
+                  <option value="tbd" ${h.s==="tbd"?"selected":""}>A confirmar</option>
+                </select>
+                <label>Abre<input class="hours-open" data-hour-index="${i}" type="time" value="${escapeHtml(h.o || "")}"></label>
+                <label>Fecha<input class="hours-close" data-hour-index="${i}" type="time" value="${escapeHtml(h.c || "")}"></label>
+              </div>`;
+          }).join("")}
         </div>
+        <div class="hours-note">💡 Se estiver como <b>Fechado</b> ou <b>A confirmar</b>, os horários ficam desativados para aquele dia.</div>
+      </section>
 
-        <div class="category-list">
-
-          ${
-            getCategories()
-              .map(
-                category => `
-                  <span class="badge">
-                    ${escapeHtml(
-                      category
-                    )}
-                  </span>
-                `
-              )
-              .join("")
-          }
-
+      <section class="settings-card">
+        <div class="settings-card-head"><span class="settings-icon">🏷️</span><div><h3>Classificações</h3><p>Categorias utilizadas nos produtos.</p></div>
+          <button type="button" class="btn soft" data-action="new-category">+ Nova classificação</button>
         </div>
-
+        <div class="category-list">${getCategories().map(category => `<span class="badge">${escapeHtml(category)}</span>`).join("")}</div>
       </section>
     `;
   }
 
   async function saveSettings() {
     if (!db) {
-      showToast(
-        "Supabase não está conectado.",
-        "error"
-      );
-
+      showToast("Supabase não está conectado.", "error");
       return;
     }
 
-    const button =
-      document.querySelector(
-        '[data-action="save-settings"]'
-      );
-
-    setButtonLoading(
-      button,
-      true,
-      "Salvando..."
-    );
+    const button = document.querySelector('[data-action="save-settings"]');
+    setButtonLoading(button, true, "Salvando...");
 
     try {
-      const next = {
-        ...(state.settings || {})
-      };
+      const next = { ...(state.settings || {}) };
+      next.instagram = $("#s-instagram")?.value?.trim() || "";
+      next.whatsapp = $("#s-whatsapp")?.value?.trim() || "";
+      next.address = $("#s-address")?.value?.trim() || "";
+      next.maps = $("#s-maps")?.value?.trim() || "";
 
-      const instagram =
-        $("#s-instagram")?.value
-          ?.trim() || "";
+      const currentHours = Array.isArray(next.hours) && next.hours.length === 7
+        ? next.hours : (Array.isArray(DEFAULTS.hours) ? DEFAULTS.hours : []);
+      next.hours = Array.from({length:7}, (_,i) => {
+        const status = document.querySelector(`.hours-status[data-hour-index="${i}"]`)?.value || currentHours[i]?.s || "tbd";
+        const open = document.querySelector(`.hours-open[data-hour-index="${i}"]`)?.value || "";
+        const close = document.querySelector(`.hours-close[data-hour-index="${i}"]`)?.value || "";
+        return { s: status, o: status === "open" ? open : "", c: status === "open" ? close : "" };
+      });
 
-      const whatsapp =
-        $("#s-whatsapp")?.value
-          ?.trim() || "";
+      const {data,error} = await db.from("settings").upsert(
+        {key:"site", value:next},
+        {onConflict:"key"}
+      ).select().single();
 
-      const address =
-        $("#s-address")?.value
-          ?.trim() || "";
+      if (error) throw error;
 
-      const maps =
-        $("#s-maps")?.value
-          ?.trim() || "";
-
-      const hours =
-        $("#s-hours")?.value
-          ?.trim() || "";
-
-      /*
-       * Mantém os demais dados existentes
-       * dentro do objeto settings.
-       */
-
-      next.instagram =
-        instagram;
-
-      next.whatsapp =
-        whatsapp;
-
-      next.address =
-        address;
-
-      next.maps =
-        maps;
-
-      next.hours =
-        hours;
-
-      const {
-        data,
-        error
-      } = await db
-        .from("settings")
-        .upsert(
-          {
-            key: "site",
-            value: next
-          },
-          {
-            onConflict: "key"
-          }
-        )
-        .select()
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      state.settings =
-        data?.value ||
-        next;
-
-      showToast(
-        "Configurações salvas com sucesso."
-      );
-
+      state.settings = data?.value || next;
+      showToast("Configurações e horários salvos. O site já está usando os novos horários.");
       renderCurrentView();
     } catch (error) {
-      console.error(
-        "Erro ao salvar configurações:",
-        error
-      );
-
-      showToast(
-        error?.message ||
-          "Não foi possível salvar as configurações.",
-        "error"
-      );
+      console.error("Erro ao salvar configurações:", error);
+      showToast(error?.message || "Não foi possível salvar as configurações.", "error");
     } finally {
-      setButtonLoading(
-        button,
-        false
-      );
+      setButtonLoading(button, false);
     }
   }
 
