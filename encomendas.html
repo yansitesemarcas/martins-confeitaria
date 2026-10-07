@@ -249,8 +249,8 @@
     const CFG = window.MARTINS_CONFIG || {};
     const FALLBACK = {
       cakes: [
-        {name:"Naked Cake", options:["06/08 pessoas","10/12 pessoas","15/20 pessoas","20/25 pessoas","25/30 pessoas","30/40 pessoas","40/50 pessoas","50/60 pessoas"], prices:[45,70,98,115,145,188,240,280], active:true},
-        {name:"Chantininho", options:["06/08 pessoas","10/12 pessoas","15/20 pessoas","20/25 pessoas","25/30 pessoas","30/40 pessoas","40/50 pessoas","50/60 pessoas"], prices:[60,80,120,140,170,220,260,300], active:true}
+        {name:"Naked Cake", options:["06/08 pessoas","10/12 pessoas","15/20 pessoas","20/25 pessoas","25/30 pessoas","30/40 pessoas","40/50 pessoas","50/60 pessoas"], prices:[55,80,108,125,155,198,250,290], active:true},
+        {name:"Chantininho", options:["06/08 pessoas","10/12 pessoas","15/20 pessoas","20/25 pessoas","25/30 pessoas","30/40 pessoas","40/50 pessoas","50/60 pessoas"], prices:[70,90,130,150,180,230,270,310], active:true}
       ],
       masses:["Amanteigado","Ninho","Chocolate","Baunilha","Coco","Limão"],
       fillings:["Ninho","Brigadeiro","Leite condensado","Oreo","Beijinho","Doce de leite","Limão"],
@@ -270,11 +270,11 @@
         {id:"cupcake-sem-plaquinha",name:"Cupcakes sem plaquinha",unit:5.5,active:true}
       ],
       kits:[
-        {id:"k1",name:"Kit Festa 01",price:150,cake:"Chantininho 10/15 Pessoas",docinhos:20,items:["04 Cupcakes","20 Petit Brownie","20 Docinhos"]},
-        {id:"k2",name:"Kit Festa 02",price:200,cake:"Chantininho 15/20 Pessoas",docinhos:30,items:["05 Cupcakes","30 Petit Brownie","30 Docinhos"]},
-        {id:"k3",name:"Kit Festa 03",price:250,cake:"Chantininho 20/25 Pessoas",docinhos:50,items:["08 Cupcakes","50 Petit Brownie","50 Docinhos"]},
-        {id:"k4",name:"Kit Festa 04",price:430,cake:"Chantininho 30/40 Pessoas",docinhos:60,items:["10 Cupcakes","60 Petit Brownie","60 Docinhos"]},
-        {id:"k5",name:"Kit Festa 05",price:500,cake:"Chantininho 40/50 Pessoas",docinhos:70,items:["12 Cupcakes","70 Petit Brownie","70 Docinhos"]}
+        {id:"k1",name:"Kit Festa 01",price:160,cake:"Chantininho 10/15 Pessoas",docinhos:20,items:["04 Cupcakes","20 Petit Brownie","20 Docinhos"]},
+        {id:"k2",name:"Kit Festa 02",price:210,cake:"Chantininho 15/20 Pessoas",docinhos:30,items:["05 Cupcakes","30 Petit Brownie","30 Docinhos"]},
+        {id:"k3",name:"Kit Festa 03",price:260,cake:"Chantininho 20/25 Pessoas",docinhos:50,items:["08 Cupcakes","50 Petit Brownie","50 Docinhos"]},
+        {id:"k4",name:"Kit Festa 04",price:440,cake:"Chantininho 30/40 Pessoas",docinhos:60,items:["10 Cupcakes","60 Petit Brownie","60 Docinhos"]},
+        {id:"k5",name:"Kit Festa 05",price:510,cake:"Chantininho 40/50 Pessoas",docinhos:70,items:["12 Cupcakes","70 Petit Brownie","70 Docinhos"]}
       ]
     };
 
@@ -387,6 +387,7 @@
           <div class="brigadeiro-box">
             <h3>${esc(x.name)}</h3>
             <p>Valor: ${money(x.unit)} por unidade${x.discountFrom ? " • A partir de "+x.discountFrom+" unidades: "+money(x.discountUnit)+" cada" : ""}</p>
+            ${x.discountFrom ? `<p style="margin-top:6px">A partir de ${x.discountFrom} unidades, o valor promocional é ${money(x.discountUnit)} por unidade.</p>` : ""}
             <label class="customer-fields">
               <span>Quantidade</span>
               <select class="other-quantity" data-item="${esc(x.name)}" data-kind="unit" data-price="${Number(x.unit||0)}" data-discount-price="${Number(x.discountUnit||0)}" data-discount-from="${Number(x.discountFrom||0)}">
