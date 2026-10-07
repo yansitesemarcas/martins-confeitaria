@@ -377,7 +377,7 @@
       document.getElementById("kitOptions").innerHTML = cfg.kits.filter(x=>x.active!==false).map(k=>`
         <label class="extra-option">
           <input type="radio" name="kit" value="${esc(k.id)}" data-price="${Number(k.price||0)}">
-          <span><b>${esc(k.name)}</b><small>${esc(k.cake)}</small><small>${Number(k.docinhos||0)} docinhos inclusos</small></span>
+          <span><b>${esc(k.name)}</b><small>${esc(k.cake)}</small><small style="margin-top:6px;font-weight:800;color:#6b3f2d">Incluso no kit:</small>${(k.items||[]).map(item=>`<small>• ${esc(item)}</small>`).join("")}</span>
           <strong>${money(k.price)}</strong>
         </label>`).join("");
 
@@ -474,7 +474,7 @@
         selectedKit=input.value;
         const kit=cfg.kits.find(x=>x.id===selectedKit);
         const info=document.getElementById("kitSelectedInfo");
-        info.innerHTML=`<strong>${esc(kit?.name||"Kit selecionado")}</strong><br>${esc(kit?.cake||"")}<br>Os itens do kit permanecem definidos. Você só precisa escolher o topo do bolo.`;
+        info.innerHTML=`<strong>${esc(kit?.name||"Kit selecionado")}</strong><br>${esc(kit?.cake||"")}<br><strong>Incluso no kit:</strong><br>${(kit?.items||[]).map(item=>"• "+esc(item)).join("<br>")}<br><br>Os itens do kit permanecem definidos. Você só precisa escolher o topo do bolo.`;
         info.hidden=false;
         document.getElementById("kitTopoSection").hidden=false;
         calc();
