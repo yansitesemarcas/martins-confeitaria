@@ -145,28 +145,28 @@
 
       <section id="cakeMode" class="order-mode active" aria-label="Personalize seu bolo">
         <div class="cake-builder">
-          <fieldset class="extras">
+          <fieldset id="normalCakeTypeSection" class="extras">
             <legend>Escolha o bolo</legend>
             <div id="cakeType"></div>
           </fieldset>
 
-          <fieldset class="extras">
+          <fieldset id="normalMassSection" class="extras">
             <legend>Massa</legend>
             <div id="cakeMassOptions" class="options-grid"></div>
           </fieldset>
 
-          <fieldset class="extras">
+          <fieldset id="normalFillingSection" class="extras">
             <legend>Recheio</legend>
             <p class="party-note">Escolha até duas opções de recheio.</p>
             <div id="cakeFillings" class="options-grid"></div>
           </fieldset>
 
-          <fieldset class="extras">
+          <fieldset id="normalExtrasSection" class="extras">
             <legend>Adicionais</legend>
             <div id="cakeExtras" class="options-grid"></div>
           </fieldset>
 
-          <fieldset class="extras">
+          <fieldset id="normalPersonalizationSection" class="extras">
             <legend>Personalização</legend>
             <div id="cakePersonalizations" class="options-grid"></div>
             <label class="customer-fields" style="margin-top:16px">
@@ -439,6 +439,13 @@
       }).join("");      bind();
     }
 
+    function setNormalCakeSections(show){
+      ["normalCakeTypeSection","normalMassSection","normalFillingSection","normalExtrasSection","normalPersonalizationSection"].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el) el.hidden=!show;
+      });
+    }
+
     function setMode(next){
       mode = next;
       document.querySelectorAll(".order-path").forEach(b=>b.classList.toggle("active",b.dataset.mode===next));
@@ -490,6 +497,7 @@
         document.querySelectorAll('input[name="kit"], input[name="kitRecheio"], input[name="kitTopo"]').forEach(x=>x.checked=false);
         document.querySelectorAll('input[name="kitMassa"]').forEach(x=>x.checked=false);
         document.getElementById("kitSelectedInfo").hidden=true;
+        setNormalCakeSections(true);
         document.getElementById("kitTopoSection").hidden=true;
         document.getElementById("kitCakeOptionsSection").hidden=true;
         calc();
@@ -499,7 +507,8 @@
         selectedKit=input.value;
         document.querySelectorAll('input[name="kitRecheio"]').forEach(x=>x.checked=false);
         document.querySelectorAll('input[name="kitMassa"]').forEach(x=>x.checked=false);
-        document.querySelectorAll('#cakeMode input[name="recheio"], #cakeMode input[name="adicional"], #cakeMode input[name="personalizacao"]').forEach(x=>x.checked=false);
+        document.querySelectorAll('#cakeMode input[name="recheio"], #cakeMode input[name="adicional"], #cakeMode input[name="personalizacao"], #cakeMode input[name="cakeType"], #cakeMode input[name="massa"]').forEach(x=>x.checked=false);
+        setNormalCakeSections(false);
         const kit=cfg.kits.find(x=>x.id===selectedKit);
         const info=document.getElementById("kitSelectedInfo");
         info.innerHTML=`<strong>${esc(kit?.name||"Kit selecionado")}</strong><br>${esc(kit?.cake||"")}<br><strong>Incluso no kit:</strong><br>${(kit?.items||[]).map(item=>"• "+esc(item)).join("<br>")}<br><br>Os itens do kit permanecem definidos. Você só precisa escolher o topo, a massa e o recheio. Os docinhos são Brigadeiro Tradicional.`;
@@ -575,7 +584,7 @@
       window.open(`https://wa.me/5585981563070?text=${encodeURIComponent(text)}`,"_blank","noopener");
     }
 
-    getConfig().then(data=>{cfg=data;render()});
+    getConfig().then(data=>{cfg=data;render();setNormalCakeSections(true)});
   })();
   </script>
 </body>
