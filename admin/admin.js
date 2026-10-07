@@ -4047,6 +4047,171 @@
     );
   }
 
+  function renderOrderPricingView() {
+    const cfg = state.settings?.encomendas || {};
+    const cakes = Array.isArray(cfg.cakes) ? cfg.cakes : [];
+    const extras = Array.isArray(cfg.extras) ? cfg.extras : [];
+    const personalizations = Array.isArray(cfg.personalizations) ? cfg.personalizations : [];
+    const brigadeiros = cfg.brigadeiros || {};
+    const otherItems = Array.isArray(cfg.otherItems) ? cfg.otherItems : [];
+    const kits = Array.isArray(cfg.kits) ? cfg.kits : [];
+
+    return `
+      <div class="page-head">
+        <div>
+          <h2>Valores de Encomendas</h2>
+          <p class="muted">Aqui não é possível criar ou excluir produtos. Somente os valores das opções já existentes podem ser alterados.</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h3>Bolos</h3><p class="muted">Altere somente os preços das faixas existentes.</p></div></div>
+        ${cakes.map((cake, ci) => `
+          <div class="panel" style="margin:12px 0">
+            <h4>${escapeHtml(cake.name)}</h4>
+            ${(cake.options || []).map((option, oi) => `
+              <label class="field">
+                <span>${escapeHtml(option)}</span>
+                <input type="number" min="0" step="0.01" data-order-price="cake" data-ci="${ci}" data-oi="${oi}" value="${Number(cake.prices?.[oi] || 0)}">
+              </label>
+            `).join("")}
+          </div>
+        `).join("")}
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h3>Adicionais</h3></div></div>
+        ${extras.map((item, i) => `
+          <label class="field">
+            <span>${escapeHtml(item[0])}</span>
+            <input type="number" min="0" step="0.01" data-order-price="extra" data-i="${i}" value="${Number(item[1] || 0)}">
+          </label>
+        `).join("")}
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h3>Personalizações</h3></div></div>
+        ${personalizations.map((item, i) => `
+          <label class="field">
+            <span>${escapeHtml(item[0])}</span>
+            <input type="number" min="0" step="0.01" data-order-price="personalization" data-i="${i}" value="${Number(item[1] || 0)}">
+          </label>
+        `).join("")}
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h3>Brigadeiros</h3><p class="muted">Os sabores e limites permanecem fixos; somente os preços podem ser alterados.</p></div></div>
+        <label class="field"><span>Clássicos — 50 unidades</span><input type="number" min="0" step="0.01" data-order-price="brig-classic" data-i="0" value="${Number(brigadeiros.classicaPrices?.[0] || 0)}"></label>
+        <label class="field"><span>Clássicos — 100 unidades</span><input type="number" min="0" step="0.01" data-order-price="brig-classic" data-i="1" value="${Number(brigadeiros.classicaPrices?.[1] || 0)}"></label>
+        <label class="field"><span>Premium — 50 unidades</span><input type="number" min="0" step="0.01" data-order-price="brig-premium" data-i="0" value="${Number(brigadeiros.premiumPrices?.[0] || 0)}"></label>
+        <label class="field"><span>Premium — 100 unidades</span><input type="number" min="0" step="0.01" data-order-price="brig-premium" data-i="1" value="${Number(brigadeiros.premiumPrices?.[1] || 0)}"></label>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h3>Outros Itens</h3><p class="muted">O produto e as opções não podem ser criados ou alterados por aqui. Apenas valores.</p></div></div>
+        ${otherItems.map((item, i) => {
+          const packages = Array.isArray(item.packages) ? item.packages : [];
+          if (packages.length) {
+            return `
+              <div class="panel" style="margin:12px 0">
+                <h4>${escapeHtml(item.name)}</h4>
+                ${packages.map((pkg, pi) => `
+                  <label class="field"><span>${Number(pkg.qty || 0)} unidades</span><input type="number" min="0" step="0.01" data-order-price="package" data-i="${i}" data-pi="${pi}" value="${Number(pkg.total || 0)}"></label>
+                `).join("")}
+              </div>`;
+          }
+          return `
+            <label class="field">
+              <span>${escapeHtml(item.name)} — preço unitário</span>
+              <input type="number" min="0" step="0.01" data-order-price="other-unit" data-i="${i}" value="${Number(item.unit || 0)}">
+            </label>
+            ${item.discountUnit != null ? `
+              <label class="field"><span>${escapeHtml(item.name)} — preço unitário a partir de ${Number(item.discountFrom || 0)} unidades</span><input type="number" min="0" step="0.01" data-order-price="other-discount" data-i="${i}" value="${Number(item.discountUnit || 0)}"></label>
+            ` : ""}
+          `;
+        }).join("")}
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h3>Kit Festa</h3><p class="muted">Somente os preços dos kits existentes podem ser alterados.</p></div></div>
+        ${kits.map((kit, i) => `
+          <label class="field">
+            <span>${escapeHtml(kit.group || "Kit Festa")} — ${escapeHtml(kit.name || kit.id)}</span>
+            <input type="number" min="0" step="0.01" data-order-price="kit" data-i="${i}" value="${Number(kit.price || 0)}">
+          </label>
+        `).join("")}
+      </div>
+
+      <div class="panel-actions">
+        <button type="button" class="btn primary" data-action="save-order-pricing">Salvar valores</button>
+      </div>
+    `;
+  }
+
+  async function saveOrderPricing() {
+    if (!db) {
+      showToast("Supabase não está conectado.", "error");
+      return;
+    }
+
+    const current = state.settings?.encomendas;
+    if (!current || typeof current !== "object") {
+      showToast("Configuração de encomendas não encontrada.", "error");
+      return;
+    }
+
+    const cfg = JSON.parse(JSON.stringify(current));
+
+    $("[data-order-price]").forEach(input => {
+      const value = Number(input.value || 0);
+      const type = input.dataset.orderPrice;
+      const i = Number(input.dataset.i);
+
+      if (type === "cake") {
+        const oi = Number(input.dataset.oi);
+        if (cfg.cakes?.[i]?.prices) cfg.cakes[i].prices[oi] = value;
+      } else if (type === "extra" && cfg.extras?.[i]) {
+        cfg.extras[i][1] = value;
+      } else if (type === "personalization" && cfg.personalizations?.[i]) {
+        cfg.personalizations[i][1] = value;
+      } else if (type === "brig-classic" && cfg.brigadeiros?.classicaPrices) {
+        cfg.brigadeiros.classicaPrices[i] = value;
+      } else if (type === "brig-premium" && cfg.brigadeiros?.premiumPrices) {
+        cfg.brigadeiros.premiumPrices[i] = value;
+      } else if (type === "package" && cfg.otherItems?.[i]?.packages?.[Number(input.dataset.pi)]) {
+        cfg.otherItems[i].packages[Number(input.dataset.pi)].total = value;
+      } else if (type === "other-unit" && cfg.otherItems?.[i]) {
+        cfg.otherItems[i].unit = value;
+      } else if (type === "other-discount" && cfg.otherItems?.[i]) {
+        cfg.otherItems[i].discountUnit = value;
+      } else if (type === "kit" && cfg.kits?.[i]) {
+        cfg.kits[i].price = value;
+      }
+    });
+
+    const button = document.querySelector('[data-action="save-order-pricing"]');
+    setButtonLoading(button, true, "Salvando...");
+
+    try {
+      const next = { ...(state.settings || {}), encomendas: cfg };
+      const { data, error } = await db.from("settings").upsert(
+        { key: "site", value: next },
+        { onConflict: "key" }
+      ).select().single();
+
+      if (error) throw error;
+
+      state.settings = data?.value || next;
+      showToast("Valores de encomendas salvos com sucesso.");
+      renderCurrentView();
+    } catch (error) {
+      console.error("Erro ao salvar valores de encomendas:", error);
+      showToast(error?.message || "Não foi possível salvar os valores.", "error");
+    } finally {
+      setButtonLoading(button, false);
+    }
+  }
+
   function renderCurrentView() {
     if (!view) {
       return;
@@ -4076,9 +4241,7 @@
 
       case "prod-orders":
         view.innerHTML =
-          renderProductsView(
-            "encomendas"
-          );
+          renderOrderPricingView();
         break;
 
       case "ord-ready":
@@ -4525,14 +4688,7 @@
         const action =
           target.dataset.action;
 
-        if (
-          action ===
-          "new-product"
-        ) {
-          openProductModal();
 
-          return;
-        }
 
         if (
           action ===
@@ -4639,6 +4795,15 @@
           "save-settings"
         ) {
           saveSettings();
+
+          return;
+        }
+
+        if (
+          action ===
+          "save-order-pricing"
+        ) {
+          saveOrderPricing();
 
           return;
         }
