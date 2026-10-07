@@ -25,6 +25,18 @@
   const DEFAULTS =
     window.MARTINS_DEFAULTS || {};
 
+  const ORDER_DEFAULTS = {
+    cakes: [
+      {name:"Naked Cake",options:["06/08 pessoas","10/12 pessoas","15/20 pessoas","20/25 pessoas","25/30 pessoas","30/40 pessoas","40/50 pessoas","50/60 pessoas"],prices:[55,80,108,125,155,198,250,290],active:true},
+      {name:"Chantininho",options:["06/08 pessoas","10/12 pessoas","15/20 pessoas","20/25 pessoas","25/30 pessoas","30/40 pessoas","40/50 pessoas","50/60 pessoas"],prices:[70,90,130,150,180,230,270,310],active:true}
+    ],
+    extras:[["Abacaxi",10],["Morango",16],["Crocante de Castanha",10],["Kit Kat",12],["Geleia de Morango",16],["Ouro Branco",10],["Nutella",16],["Kinder Bueno",16]],
+    personalizations:[["Topo simples",20],["Topo 3D",30],["Flores naturais",70],["Scrap Cake",30]],
+    brigadeiros:{classicaPrices:[62.5,125],premiumPrices:[72.5,145]},
+    otherItems:[{name:"Petit Brownie",packages:[{qty:50,total:90},{qty:100,total:180}]},{name:"Mini Brownie Recheado",unit:3.5,discountUnit:2.8,discountFrom:20},{name:"Bem Casado no papel crepom",unit:6,discountUnit:4.8,discountFrom:20},{name:"Bem Casado na folha de celofane",unit:5,discountUnit:4,discountFrom:20},{name:"Cupcakes com plaquinha",unit:6.5},{name:"Cupcakes sem plaquinha",unit:5.5}],
+    kits:[{id:"pb1",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 01",price:150},{id:"pb2",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 02",price:200},{id:"pb3",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 03",price:250},{id:"pb4",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 04",price:430},{id:"pb5",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 05",price:500},{id:"pr1",group:"Kits com Pirulitos",name:"Kit Pirulito 01",price:130},{id:"pr2",group:"Kits com Pirulitos",name:"Kit Pirulito 02",price:160},{id:"pr3",group:"Kits com Pirulitos",name:"Kit Pirulito 03",price:210},{id:"pr4",group:"Kits com Pirulitos",name:"Kit Pirulito 04",price:350},{id:"pr5",group:"Kits com Pirulitos",name:"Kit Pirulito 05",price:450}]
+  };
+
   /* =========================================================
      ESTADO
      ========================================================= */
@@ -403,7 +415,7 @@
     state.settings = {
       ...DEFAULTS,
       ...(siteResult.data?.value || {}),
-      encomendas: orderResult.data?.value || {}
+      encomendas: orderResult.data?.value || ORDER_DEFAULTS
     };
   }
 
@@ -4074,7 +4086,7 @@
             ${(cake.options || []).map((option, oi) => `
               <label class="field">
                 <span>${escapeHtml(option)}</span>
-                <input type="number" min="0" step="0.01" data-order-price="cake" data-ci="${ci}" data-oi="${oi}" value="${Number(cake.prices?.[oi] || 0)}">
+                <input type="number" min="0" step="0.01" data-order-price="cake" data-i="${ci}" data-oi="${oi}" value="${Number(cake.prices?.[oi] || 0)}">
               </label>
             `).join("")}
           </div>
