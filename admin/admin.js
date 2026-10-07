@@ -4694,6 +4694,19 @@
 
         if (
           action ===
+          "new-product"
+        ) {
+          if (state.activeView === "prod-orders") {
+            showToast("Na área de Encomendas não é possível criar novos produtos.", "warning");
+            return;
+          }
+
+          openProductModal();
+          return;
+        }
+
+        if (
+          action ===
           "edit-product"
         ) {
           const id =
