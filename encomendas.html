@@ -266,11 +266,16 @@
         {id:"cupcake-sem-plaquinha",name:"Cupcakes sem plaquinha",unit:5.5,active:true}
       ],
       kits:[
-        {id:"k1",name:"Kit Festa 01",price:160,cake:"Chantininho 10/15 Pessoas",docinhos:20,items:["04 Cupcakes","20 Petit Brownie","20 Docinhos"]},
-        {id:"k2",name:"Kit Festa 02",price:210,cake:"Chantininho 15/20 Pessoas",docinhos:30,items:["05 Cupcakes","30 Petit Brownie","30 Docinhos"]},
-        {id:"k3",name:"Kit Festa 03",price:260,cake:"Chantininho 20/25 Pessoas",docinhos:50,items:["08 Cupcakes","50 Petit Brownie","50 Docinhos"]},
-        {id:"k4",name:"Kit Festa 04",price:440,cake:"Chantininho 30/40 Pessoas",docinhos:60,items:["10 Cupcakes","60 Petit Brownie","60 Docinhos"]},
-        {id:"k5",name:"Kit Festa 05",price:510,cake:"Chantininho 40/50 Pessoas",docinhos:70,items:["12 Cupcakes","70 Petit Brownie","70 Docinhos"]}
+        {id:"pb1",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 01",price:160,cake:"Chantininho 10/15 Pessoas",docinhos:20,items:["04 Cupcakes","20 Petit Brownie","20 Docinhos"]},
+        {id:"pb2",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 02",price:210,cake:"Chantininho 15/20 Pessoas",docinhos:30,items:["05 Cupcakes","30 Petit Brownie","30 Docinhos"]},
+        {id:"pb3",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 03",price:260,cake:"Chantininho 20/25 Pessoas",docinhos:50,items:["08 Cupcakes","50 Petit Brownie","50 Docinhos"]},
+        {id:"pb4",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 04",price:440,cake:"Chantininho 30/40 Pessoas",docinhos:60,items:["10 Cupcakes","60 Petit Brownie","60 Docinhos"]},
+        {id:"pb5",group:"Kits com Petit Brownie",name:"Kit Petit Brownie 05",price:510,cake:"Chantininho 40/50 Pessoas",docinhos:70,items:["12 Cupcakes","70 Petit Brownie","70 Docinhos"]},
+        {id:"pr1",group:"Kits com Pirulitos",name:"Kit Pirulito 01",price:130,cake:"Chantininho 10/12 Pessoas",docinhos:20,items:["04 Cupcakes","04 Pirulitos","20 Docinhos"]},
+        {id:"pr2",group:"Kits com Pirulitos",name:"Kit Pirulito 02",price:160,cake:"Chantininho 15/20 Pessoas",docinhos:30,items:["05 Cupcakes","05 Pirulitos","30 Docinhos"]},
+        {id:"pr3",group:"Kits com Pirulitos",name:"Kit Pirulito 03",price:210,cake:"Chantininho 20/25 Pessoas",docinhos:50,items:["08 Cupcakes","08 Pirulitos","50 Docinhos"]},
+        {id:"pr4",group:"Kits com Pirulitos",name:"Kit Pirulito 04",price:350,cake:"Chantininho 30/40 Pessoas",docinhos:60,items:["10 Cupcakes","10 Pirulitos","60 Docinhos"]},
+        {id:"pr5",group:"Kits com Pirulitos",name:"Kit Pirulito 05",price:450,cake:"Chantininho 40/50 Pessoas",docinhos:70,items:["12 Cupcakes","12 Pirulitos","70 Docinhos"]}
       ]
     };
 
@@ -281,7 +286,7 @@
     const merge = v => {
       const x = clone(FALLBACK);
       if(!v || typeof v !== "object") return x;
-      return {...x,...v,brigadeiros:{...x.brigadeiros,...(v.brigadeiros || {})}};
+      return {...x,...v,kits:(Array.isArray(v.kits) && v.kits.length>=10) ? v.kits : x.kits,brigadeiros:{...x.brigadeiros,...(v.brigadeiros || {})}};
     };
 
     async function getConfig(){
