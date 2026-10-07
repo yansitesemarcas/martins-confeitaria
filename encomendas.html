@@ -289,7 +289,16 @@
     const merge = v => {
       const x = clone(FALLBACK);
       if(!v || typeof v !== "object") return x;
-      return {...x,...v,kits:(Array.isArray(v.kits) && v.kits.length>=10) ? v.kits : x.kits,brigadeiros:{...x.brigadeiros,...(v.brigadeiros || {})}};
+      return {...x,...v,
+  cakes:Array.isArray(v.cakes)&&v.cakes.length ? v.cakes : x.cakes,
+  masses:Array.isArray(v.masses)&&v.masses.length ? v.masses : x.masses,
+  fillings:Array.isArray(v.fillings)&&v.fillings.length ? v.fillings : x.fillings,
+  extras:Array.isArray(v.extras) ? v.extras : x.extras,
+  personalizations:Array.isArray(v.personalizations) ? v.personalizations : x.personalizations,
+  otherItems:Array.isArray(v.otherItems)&&v.otherItems.length ? v.otherItems : x.otherItems,
+  kits:(Array.isArray(v.kits)&&v.kits.length>=10) ? v.kits : x.kits,
+  brigadeiros:{...x.brigadeiros,...(v.brigadeiros || {})}
+};
     };
 
     async function getConfig(){
@@ -396,7 +405,9 @@
         </div>`).join("") + `
         <button type="button" id="clearKitButton" style="margin-top:4px;width:100%;border:2px solid #dccbc0;border-radius:14px;padding:13px 16px;background:#fffaf4;color:#6f4a32;font:inherit;font-weight:800;cursor:pointer">Não quero nenhum Kit Festa</button>`;
 
-      document.getElementById("otherItems").innerHTML = cfg.otherItems.filter(x=>x.active!==false).map(x=>{
+      const otherItemsEl=document.getElementById("otherItems");
+      const availableOtherItems=Array.isArray(cfg.otherItems)&&cfg.otherItems.length ? cfg.otherItems : FALLBACK.otherItems;
+      otherItemsEl.innerHTML = availableOtherItems.filter(x=>x.active!==false).map(x=>{
         if(x.packages){
           return `
             <div class="brigadeiro-box">
@@ -433,9 +444,11 @@
       document.querySelectorAll(".order-path").forEach(b=>b.classList.toggle("active",b.dataset.mode===next));
       document.getElementById("cakeMode").classList.toggle("active",next==="cake");
       document.getElementById("partyMode").classList.toggle("active",next==="party");
+      document.getElementById("partyMode").style.display = next==="party" ? "block" : "none";
+      document.getElementById("cakeMode").style.display = next==="cake" ? "block" : "none";
       if(next==="cake"){
         selectedKit = null;
-        document.querySelectorAll('input[name="kit"]').forEach(x=>x.checked=false);
+        document.querySelectorAll('input[name="kit"], input[name="kitRecheio"], input[name="kitTopo"], input[name="kitMassa"]').forEach(x=>x.checked=false);
         document.getElementById("kitTopoSection").hidden = true;
         document.getElementById("kitCakeOptionsSection").hidden = true;
         document.getElementById("kitSelectedInfo").hidden = true;
@@ -474,7 +487,8 @@
 
       document.getElementById("clearKitButton").addEventListener("click",()=>{
         selectedKit=null;
-        document.querySelectorAll('input[name="kit"], input[name="kitRecheio"]').forEach(x=>x.checked=false);
+        document.querySelectorAll('input[name="kit"], input[name="kitRecheio"], input[name="kitTopo"]').forEach(x=>x.checked=false);
+        document.querySelectorAll('input[name="kitMassa"]').forEach(x=>x.checked=false);
         document.getElementById("kitSelectedInfo").hidden=true;
         document.getElementById("kitTopoSection").hidden=true;
         document.getElementById("kitCakeOptionsSection").hidden=true;
@@ -484,6 +498,7 @@
       document.querySelectorAll('input[name="kit"]').forEach(input=>input.addEventListener("change",()=>{
         selectedKit=input.value;
         document.querySelectorAll('input[name="kitRecheio"]').forEach(x=>x.checked=false);
+        document.querySelectorAll('#cakeMode input[name="recheio"], #cakeMode input[name="adicional"], #cakeMode input[name="personalizacao"]').forEach(x=>x.checked=false);
         const kit=cfg.kits.find(x=>x.id===selectedKit);
         const info=document.getElementById("kitSelectedInfo");
         info.innerHTML=`<strong>${esc(kit?.name||"Kit selecionado")}</strong><br>${esc(kit?.cake||"")}<br><strong>Incluso no kit:</strong><br>${(kit?.items||[]).map(item=>"• "+esc(item)).join("<br>")}<br><br>Os itens do kit permanecem definidos. Você só precisa escolher o topo, a massa e o recheio. Os docinhos são Brigadeiro Tradicional.`;
@@ -497,6 +512,8 @@
       calc();
     }
 
+    function kitSelected(){ return mode==="cake" && !!selectedKit; }
+
     async function submitOrder(e){
       e.preventDefault();
       const f=new FormData(e.currentTarget);
@@ -504,7 +521,14 @@
       const phone=String(f.get("customerPhone")||"").trim();
       const date=String(f.get("customerDate")||"");
       if(!name||!phone||!date){alert("Preencha seu nome, WhatsApp e a data desejada.");return}
-      if(mode==="cake"&&document.querySelectorAll('input[name="recheio"]:checked').length!==2){alert("Escolha exatamente 2 recheios para o bolo.");return}
+      if(mode==="cake"){
+        if(kitSelected()){
+          if(document.querySelectorAll('input[name="kitMassa"]:checked').length!==1){alert("Escolha 1 massa para o Kit Festa.");return}
+          if(document.querySelectorAll('input[name="kitRecheio"]:checked').length!==2){alert("Escolha exatamente 2 recheios para o Kit Festa.");return}
+        }else if(document.querySelectorAll('input[name="recheio"]:checked').length!==2){
+          alert("Escolha exatamente 2 recheios para o bolo.");return
+        }
+      }
 
       const kit=cfg.kits.find(x=>x.id===selectedKit);
       const total=document.getElementById("cakeTotal").textContent;
