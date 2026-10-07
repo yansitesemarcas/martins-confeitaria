@@ -247,7 +247,7 @@
                     <option value="100">100 unidades — R$ 125,00</option>
                     <option value="custom">Outra quantidade</option>
                   </select>
-                  <input type="number" min="1" step="1" class="custom-brigadeiro-quantity quantity-centos" data-line="classica" data-price100="125" placeholder="Digite a quantidade de unidades" hidden>
+                  <input type="number" min="1" step="1" class="custom-brigadeiro-quantity quantity-centos" data-line="classica" data-price100="125" placeholder="Informe quantas unidades você quer" hidden>
                 </label>
                 <p style="margin:0 0 10px;color:#806b60;font-weight:700">Escolha os sabores:</p>
                 <div id="classicFlavors" class="options-grid"></div>
@@ -285,7 +285,7 @@
           <label>Nome<input type="text" id="customerName" name="customerName" placeholder="Seu nome" autocomplete="name" required></label>
           <label>WhatsApp<input type="tel" id="customerPhone" name="customerPhone" placeholder="(85) 99999-9999" autocomplete="tel" required></label>
           <label>Data desejada<input type="date" id="customerDate" name="customerDate" required></label>
-          <label>Observações<textarea id="customerNotes" name="customerNotes" rows="4" placeholder="Alguma informação importante sobre sua encomenda?"></textarea></label>
+          <label>Observações<textarea id="customerNotes" name="customerNotes" rows="4" placeholder="Se escolheu “Outra quantidade”, informe aqui quantas unidades deseja e de qual item. Ex.: Brigadeiro Clássico — 150 unidades."></textarea></label>
         </div>
       </section>
 
@@ -695,6 +695,11 @@
         observacoes:String(f.get("customerNotes")||"").trim(),total_estimado:total
       };
 
+      const customQuantities=[...document.querySelectorAll(".custom-brigadeiro-quantity,.custom-other-quantity")].filter(x=>!x.hidden&&Number(x.value||0)>0).map(x=>{
+        const item=x.dataset.line==="classica"?"Brigadeiro Linha Clássica":x.dataset.line==="premium"?"Brigadeiro Linha Premium":x.dataset.item||"Item";
+        return item+" — "+x.value+" unidades";
+      });
+      const customQuantityText=customQuantities.length ? "Quantidades informadas manualmente: "+customQuantities.join(", ") : "";
       const text=[
         "Olá! Gostaria de fazer uma encomenda na Martins Confeitaria.","",
         `Nome: ${name}`,`WhatsApp: ${phone}`,`Data desejada: ${date}`,
@@ -708,6 +713,7 @@
         details.outros.length?`Outros itens: ${details.outros.map(x=>x.item+" — "+x.quantidade+" "+x.unidade).join(", ")}`:"",
         details.brigadeiros.length?`Docinhos: ${details.brigadeiros.map(x=>x.linha+" — "+x.quantidade+" unidades — "+money(x.valor)+" — sabores: "+x.sabores.join(", ")).join(" | ")}`:"",
         `Total estimado: ${total}`,
+        customQuantityText,
         details.observacoes?`Observações: ${details.observacoes}`:""
       ].filter(Boolean).join("\n");
 
