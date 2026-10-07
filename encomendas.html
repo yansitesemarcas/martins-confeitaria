@@ -687,7 +687,7 @@
           if(x.value==="custom"){
             const custom=x.parentElement?.querySelector(".custom-other-quantity");
             const q=Number(custom?.value||0);
-            return q>0 ? [{item:x.dataset.item,quantidade:q,unidade:"unidades",precoPorUnidade:Number(x.dataset.price100||0)/100}] : [];
+            if(q>0 && q<100){ alert("Na opção \"Outra quantidade\", informe 100 unidades ou mais."); custom.value=100; return []; }\n            return q>=100 ? [{item:x.dataset.item,quantidade:q,unidade:"unidades",precoPorUnidade:Number(x.dataset.price100||0)/100}] : [];
           }
           const q=Number(x.value||0);
           return q>0 ? [{item:x.dataset.item,quantidade:q,unidade:"unidades",precoPorUnidade:x.dataset.kind==="hundred"?Number(x.dataset.price100||0)/100:Number(x.dataset.price||0)}] : [];
