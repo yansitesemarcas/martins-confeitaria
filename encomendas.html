@@ -327,7 +327,7 @@
       const el = document.getElementById(targetId);
       el.innerHTML = TOPOS.map((x,i)=>`
         <label class="extra-option">
-          <input type="radio" name="${name}" value="${esc(x[0])}" data-price="${x[1]}" ${i===0?"checked":""}>
+          <input type="radio" name="${name}" value="${esc(x[0])}" data-price="${x[1]}" >
           <span>${esc(x[0])}</span>
           <strong>${money(x[1])}</strong>
         </label>`).join("");
@@ -362,7 +362,7 @@
           <div class="options-grid">
             ${selected.options.map((o,i)=>`
               <label class="extra-option">
-                <input type="radio" name="cakeType" value="${esc(selected.name+" — "+o)}" data-price="${Number(selected.prices?.[i]||0)}" ${i===0?"checked":""}>
+                <input type="radio" name="cakeType" value="${esc(selected.name+" — "+o)}" data-price="${Number(selected.prices?.[i]||0)}" >
                 <span>${esc(o)}</span>
                 <strong>${money(selected.prices?.[i])}</strong>
               </label>`).join("")}
