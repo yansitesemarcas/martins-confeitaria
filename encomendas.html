@@ -262,10 +262,12 @@
         classicaPrices:[62.5,125], premiumPrices:[72.5,145], flavorLimit50:2, flavorLimit100:4
       },
       otherItems:[
-        {name:"Petit Brownie",price:0,active:true},
-        {name:"Mini Brownie Recheado",price:0,active:true},
-        {name:"Bem Casado",price:0,active:true},
-        {name:"Cupcake com Plaquinha",price:35,active:true}
+        {id:"petit-brownie",name:"Petit Brownie",description:"Quadradinho de brownie com uma pitanga de brigadeiro na caixeta de docinho.",packages:[{qty:50,total:90},{qty:100,total:180}],active:true},
+        {id:"mini-brownie",name:"Mini Brownie Recheado",unit:3.5,discountUnit:2.8,discountFrom:20,active:true},
+        {id:"bem-casado-crepom",name:"Bem Casado no papel crepom",unit:6,discountUnit:4.8,discountFrom:20,active:true},
+        {id:"bem-casado-celofane",name:"Bem Casado na folha de celofane",unit:5,discountUnit:4,discountFrom:20,active:true},
+        {id:"cupcake-plaquinha",name:"Cupcakes com plaquinha",unit:6.5,active:true},
+        {id:"cupcake-sem-plaquinha",name:"Cupcakes sem plaquinha",unit:5.5,active:true}
       ],
       kits:[
         {id:"k1",name:"Kit Festa 01",price:150,cake:"Chantininho 10/15 Pessoas",docinhos:20,items:["04 Cupcakes","20 Petit Brownie","20 Docinhos"]},
@@ -332,7 +334,7 @@
         <label class="extra-option"><input type="radio" name="massa" value="${esc(x)}" ${i===0?"checked":""}><span>${esc(x)}</span></label>`).join("");
 
       document.getElementById("cakeFillings").innerHTML = cfg.fillings.map((x,i)=>`
-        <label class="extra-option"><input type="radio" name="recheio" value="${esc(x)}" ${i===0?"checked":""}><span>${esc(x)}</span></label>`).join("");
+        <label class="extra-option"><input type="checkbox" name="recheio" value="${esc(x)}"><span>${esc(x)}</span></label>`).join("");
 
       document.getElementById("cakeExtras").innerHTML = cfg.extras.map(x=>`
         <label class="extra-option"><input type="checkbox" name="adicional" value="${esc(x[0])}" data-price="${Number(x[1]||0)}"><span>${esc(x[0])}</span><strong>+ ${money(x[1])}</strong></label>`).join("");
@@ -353,29 +355,48 @@
       ].map(([type,flavors,prices])=>`
         <div class="brigadeiro-box">
           <h3>Brigadeiros ${type}</h3>
-          <p>Sabores disponíveis: ${flavors.map(esc).join(", ")}</p>
           <div class="options-grid">
             <label class="extra-option"><input type="radio" name="brigadeiro_${type}" value="0" data-price="0" checked><span>Não adicionar</span></label>
             <label class="extra-option"><input type="radio" name="brigadeiro_${type}" value="50" data-price="${Number(prices?.[0]||0)}"><span>50 unidades</span><strong>${money(prices?.[0])}</strong></label>
             <label class="extra-option"><input type="radio" name="brigadeiro_${type}" value="100" data-price="${Number(prices?.[1]||0)}"><span>100 unidades</span><strong>${money(prices?.[1])}</strong></label>
           </div>
+          <div class="brigadeiro-flavors" style="margin-top:15px">
+            <p><strong>Escolha os sabores:</strong> até 2 sabores para 50 unidades ou até 4 sabores para 100 unidades.</p>
+            <div class="options-grid">
+              ${flavors.map(flavor=>`<label class="extra-option"><input type="checkbox" name="brigadeiro_sabor_${type}" value="${esc(flavor)}" disabled><span>${esc(flavor)}</span></label>`).join("")}
+            </div>
+          </div>
         </div>`).join("");
 
-      document.getElementById("otherItems").innerHTML = cfg.otherItems.filter(x=>x.active!==false).map(x=>`
-        <div class="brigadeiro-box">
-          <h3>${esc(x.name)}</h3>
-          <p>${Number(x.price||0) ? "Valor base: "+money(x.price) : "Valor sob consulta pelo WhatsApp."}</p>
-          <label class="customer-fields">
-            <span>Quantidade</span>
-            <select class="other-quantity" data-item="${esc(x.name)}" data-price="${Number(x.price||0)}">
-              <option value="0">Não adicionar</option><option value="1">1 unidade</option><option value="2">2 unidades</option>
-              <option value="3">3 unidades</option><option value="5">5 unidades</option><option value="10">10 unidades</option>
-              <option value="20">20 unidades</option><option value="50">50 unidades</option><option value="100">100 unidades</option>
-            </select>
-          </label>
-        </div>`).join("");
-
-      bind();
+      document.getElementById("otherItems").innerHTML = cfg.otherItems.filter(x=>x.active!==false).map(x=>{
+        if(x.packages){
+          return `
+            <div class="brigadeiro-box">
+              <h3>${esc(x.name)}</h3>
+              <p>${esc(x.description||"")}</p>
+              <label class="customer-fields">
+                <span>Quantidade</span>
+                <select class="other-quantity" data-item="${esc(x.name)}" data-kind="package">
+                  <option value="0">Não adicionar</option>
+                  ${x.packages.map(p=>`<option value="${p.qty}" data-total="${p.total}">${p.qty} unidades — ${money(p.total)}</option>`).join("")}
+                </select>
+              </label>
+            </div>`;
+        }
+        return `
+          <div class="brigadeiro-box">
+            <h3>${esc(x.name)}</h3>
+            <p>Valor: ${money(x.unit)} por unidade${x.discountFrom ? " • A partir de "+x.discountFrom+" unidades: "+money(x.discountUnit)+" cada" : ""}</p>
+            <label class="customer-fields">
+              <span>Quantidade</span>
+              <select class="other-quantity" data-item="${esc(x.name)}" data-kind="unit" data-price="${Number(x.unit||0)}" data-discount-price="${Number(x.discountUnit||0)}" data-discount-from="${Number(x.discountFrom||0)}">
+                <option value="0">Não adicionar</option>
+                <option value="1">1 unidade</option><option value="5">5 unidades</option><option value="10">10 unidades</option>
+                <option value="20">20 unidades</option><option value="30">30 unidades</option><option value="50">50 unidades</option><option value="100">100 unidades</option>
+              </select>
+            </label>
+          </div>`;
+      }).join("");      bind();
     }
 
     function setMode(next){
@@ -402,14 +423,19 @@
         if(kit) total += Number(kit.price||0);
         document.querySelectorAll('#partyMode input[name="kitTopo"]:checked').forEach(x=>total+=Number(x.dataset.price||0));
         document.querySelectorAll('#partyMode input[name^="brigadeiro_"]:checked').forEach(x=>total+=Number(x.dataset.price||0));
-        document.querySelectorAll(".other-quantity").forEach(x=>total+=Number(x.value||0)*Number(x.dataset.price||0));
+        document.querySelectorAll(".other-quantity").forEach(x=>{ const q=Number(x.value||0); if(!q)return; if(x.dataset.kind==="package") total+=Number(x.selectedOptions[0]?.dataset.total||0); else { const from=Number(x.dataset.discountFrom||0); const unit=from&&q>=from?Number(x.dataset.discountPrice||0):Number(x.dataset.price||0); total+=q*unit; } });
       }
       document.getElementById("cakeTotal").textContent = money(total);
     }
 
     function bind(){
       document.querySelectorAll(".order-path").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
-      document.querySelectorAll("#cakeForm input,#cakeForm select").forEach(x=>x.addEventListener("change",calc));
+      document.querySelectorAll("#cakeForm input,#cakeForm select").forEach(x=>x.addEventListener("change",()=>{
+        if(x.name==="recheio"&&x.checked&&document.querySelectorAll('input[name="recheio"]:checked').length>2){x.checked=false;alert("Escolha exatamente 2 recheios.");return;}
+        if(x.name&&x.name.startsWith("brigadeiro_")&&!x.name.startsWith("brigadeiro_sabor_")){const t=x.name.replace("brigadeiro_",""),q=Number(x.value||0);document.querySelectorAll('input[name="brigadeiro_sabor_'+t+'"]').forEach(s=>{s.disabled=q===0;s.checked=false;});}
+        if(x.name&&x.name.startsWith("brigadeiro_sabor_")&&x.checked){const t=x.name.replace("brigadeiro_sabor_",""),q=Number(document.querySelector('input[name="brigadeiro_'+t+'"]:checked')?.value||0),lim=q===50?2:q===100?4:0;if(document.querySelectorAll('input[name="brigadeiro_sabor_'+t+'"]:checked').length>lim){x.checked=false;alert("Escolha no máximo "+lim+" sabores para essa quantidade.");return;}}
+        calc();
+      }));
 
       document.querySelectorAll('input[name="kit"]').forEach(input=>input.addEventListener("change",()=>{
         selectedKit=input.value;
@@ -432,6 +458,7 @@
       const phone=String(f.get("customerPhone")||"").trim();
       const date=String(f.get("customerDate")||"");
       if(!name||!phone||!date){alert("Preencha seu nome, WhatsApp e a data desejada.");return}
+      if(mode==="cake"&&document.querySelectorAll('input[name="recheio"]:checked').length!==2){alert("Escolha exatamente 2 recheios para o bolo.");return}
 
       const kit=cfg.kits.find(x=>x.id===selectedKit);
       const total=document.getElementById("cakeTotal").textContent;
@@ -440,7 +467,7 @@
         kit:kit?.name||null,bolo:kit?.cake||f.get("cakeType")||null,
         topo:kit ? (f.get("kitTopo")||"") : (f.get("topo")||""),
         massa:mode==="cake" ? (f.get("massa")||"") : "",
-        recheio:mode==="cake" ? (f.get("recheio")||"") : "",
+        recheio:mode==="cake" ? f.getAll("recheio") : "",
         adicionais:mode==="cake" ? f.getAll("adicional") : [],
         personalizacao:mode==="cake" ? f.getAll("personalizacao") : [],
         personalizacao_text:document.getElementById("personalizationText")?.value||"",
