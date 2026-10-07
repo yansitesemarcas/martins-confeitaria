@@ -412,10 +412,63 @@
       console.error("Erro ao carregar configuração de encomendas:", orderResult.error);
     }
 
+    const savedOrderConfig =
+      orderResult.data?.value &&
+      typeof orderResult.data.value === "object"
+        ? orderResult.data.value
+        : {};
+
+    const defaultOrderConfig =
+      JSON.parse(JSON.stringify(ORDER_DEFAULTS));
+
+    const orderConfig = {
+      ...defaultOrderConfig,
+      ...savedOrderConfig,
+
+      cakes:
+        Array.isArray(savedOrderConfig.cakes) &&
+        savedOrderConfig.cakes.length
+          ? savedOrderConfig.cakes
+          : defaultOrderConfig.cakes,
+
+      extras:
+        Array.isArray(savedOrderConfig.extras) &&
+        savedOrderConfig.extras.length
+          ? savedOrderConfig.extras
+          : defaultOrderConfig.extras,
+
+      personalizations:
+        Array.isArray(savedOrderConfig.personalizations) &&
+        savedOrderConfig.personalizations.length
+          ? savedOrderConfig.personalizations
+          : defaultOrderConfig.personalizations,
+
+      brigadeiros:
+        savedOrderConfig.brigadeiros &&
+        typeof savedOrderConfig.brigadeiros === "object"
+          ? {
+              ...defaultOrderConfig.brigadeiros,
+              ...savedOrderConfig.brigadeiros
+            }
+          : defaultOrderConfig.brigadeiros,
+
+      otherItems:
+        Array.isArray(savedOrderConfig.otherItems) &&
+        savedOrderConfig.otherItems.length
+          ? savedOrderConfig.otherItems
+          : defaultOrderConfig.otherItems,
+
+      kits:
+        Array.isArray(savedOrderConfig.kits) &&
+        savedOrderConfig.kits.length
+          ? savedOrderConfig.kits
+          : defaultOrderConfig.kits
+    };
+
     state.settings = {
       ...DEFAULTS,
       ...(siteResult.data?.value || {}),
-      encomendas: orderResult.data?.value || ORDER_DEFAULTS
+      encomendas: orderConfig
     };
   }
 
