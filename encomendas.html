@@ -247,7 +247,7 @@
                     <option value="100">100 unidades — R$ 125,00</option>
                     <option value="custom">Outra quantidade</option>
                   </select>
-                  <input type="number" min="1" step="1" class="custom-brigadeiro-quantity quantity-centos" data-line="classica" data-price100="125" placeholder="Informe quantas unidades você quer" hidden>
+                  <input type="number" min="100" step="1" class="custom-brigadeiro-quantity quantity-centos" data-line="classica" data-price100="125" placeholder="Informe quantas unidades você quer" hidden>
                 </label>
                 <p style="margin:0 0 10px;color:#806b60;font-weight:700">Escolha os sabores:</p>
                 <div id="classicFlavors" class="options-grid"></div>
@@ -264,7 +264,7 @@
                     <option value="100">100 unidades — R$ 145,00</option>
                     <option value="custom">Outra quantidade</option>
                   </select>
-                  <input type="number" min="1" step="1" class="custom-brigadeiro-quantity quantity-centos" data-line="premium" data-price100="145" placeholder="Digite a quantidade de unidades" hidden>
+                  <input type="number" min="100" step="1" class="custom-brigadeiro-quantity quantity-centos" data-line="premium" data-price100="145" placeholder="Digite a quantidade de unidades" hidden>
                 </label>
                 <p style="margin:0 0 10px;color:#806b60;font-weight:700">Escolha os sabores:</p>
                 <div id="premiumFlavors" class="options-grid"></div>
@@ -482,7 +482,7 @@
                   <option value="100">100 unidades — R$ 180,00</option>
                   <option value="custom">Outra quantidade</option>
                 </select>
-                <input type="number" min="1" step="1" class="custom-other-quantity quantity-centos"
+                <input type="number" min="100" step="1" class="custom-other-quantity quantity-centos"
                   data-item="${esc(x.name)}" data-kind="hundred" data-price100="180"
                   placeholder="Digite a quantidade de unidades" hidden>
               </label>
@@ -680,7 +680,7 @@
             const custom=document.querySelector(`.custom-brigadeiro-quantity[data-line="${line}"]`);
             const q=select?.value==="custom"?Number(custom?.value||0):Number(select?.value||0);
             const flavors=[...document.querySelectorAll(`input[name="brigadeiro_${line}"]:checked`)].map(x=>x.value);
-            return q>0 ? {linha:line==="classica"?"Linha Clássica":"Linha Premium",quantidade:q,unidade:"unidades",valor:((q/100)*Number(select?.dataset.price100||0)),sabores:flavors} : null;
+            if(select?.value==="custom" && q>0 && q<100){ alert("Na opção \"Outra quantidade\", informe 100 unidades ou mais."); custom.value=100; }\n            return q>=100 ? {linha:line==="classica"?"Linha Clássica":"Linha Premium",quantidade:q,unidade:"unidades",valor:((q/100)*Number(select?.dataset.price100||0)),sabores:flavors} : null;
           }).filter(Boolean)
         ] : [],
         outros:mode==="party" ? [...document.querySelectorAll(".other-quantity")].flatMap(x=>{
