@@ -370,6 +370,32 @@
     let cfg;
     let mode = "cake";
     let selectedKit = null;
+    let configSyncTimer = null;
+    let configClient = null;
+
+    async function syncConfigLive(){
+      try{
+        const latest = await getConfig();
+        latest.kits = latest.kits.map(k=>({...k,price:Number(k.price||0)+10}));
+
+        if(JSON.stringify(latest) !== JSON.stringify(cfg)){
+          const currentMode = mode;
+          const currentKit = selectedKit;
+          cfg = latest;
+          selectedKit = currentKit && cfg.kits.some(k=>k.id===currentKit) ? currentKit : null;
+          render();
+          setNormalCakeSections(currentMode === "cake" && !selectedKit);
+          mode = currentMode;
+        }
+      }catch(e){
+        console.warn("Sincronização das encomendas:",e);
+      }
+    }
+
+    function startConfigSync(){
+      if(configSyncTimer) clearInterval(configSyncTimer);
+      configSyncTimer = setInterval(syncConfigLive, 5000);
+    }
 
     function renderTopos(targetId, name){
       const el = document.getElementById(targetId);
@@ -719,7 +745,13 @@
       window.open(`https://wa.me/5585981563070?text=${encodeURIComponent(text)}`,"_blank","noopener");
     }
 
-    getConfig().then(data=>{cfg=data;cfg.kits=cfg.kits.map(k=>({...k,price:Number(k.price||0)+10}));render();setNormalCakeSections(true)});
+    getConfig().then(data=>{
+      cfg=data;
+      cfg.kits=cfg.kits.map(k=>({...k,price:Number(k.price||0)+10}));
+      render();
+      setNormalCakeSections(true);
+      startConfigSync();
+    });
   })();
   </script>
 </body>
