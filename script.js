@@ -374,24 +374,39 @@
 
     const sync = async () => {
       try {
-        const { data, error } = await client
-          .from("settings")
-          .select("value")
-          .eq("key", "site")
-          .maybeSingle();
-        if (error || !data?.value) return;
+        const [settingsResult, productsResult] = await Promise.all([
+          client.from("settings").select("value").eq("key", "site").maybeSingle(),
+          client.from("products").select("*").order("sort", { ascending: true })
+        ]);
 
-        const remote = data.value;
-        const previous = JSON.stringify(state);
-        state = {
-          ...state,
-          ...remote,
-          about: { ...(state.about || {}), ...(remote.about || {}) },
-          cake: { ...(state.cake || {}), ...(remote.cake || {}) }
-        };
-        if (JSON.stringify(state) !== previous) render();
+        let changed = false;
+
+        if (!settingsResult.error && settingsResult.data?.value) {
+          const remote = settingsResult.data.value;
+          const nextState = {
+            ...state,
+            ...remote,
+            about: { ...(state.about || {}), ...(remote.about || {}) },
+            cake: { ...(state.cake || {}), ...(remote.cake || {}) }
+          };
+
+          if (JSON.stringify(nextState) !== JSON.stringify(state)) {
+            state = nextState;
+            changed = true;
+          }
+        }
+
+        if (!productsResult.error && Array.isArray(productsResult.data)) {
+          const nextProducts = productsResult.data.map(product => ({ ...product }));
+          if (JSON.stringify(nextProducts) !== JSON.stringify(state.products || [])) {
+            state.products = nextProducts;
+            changed = true;
+          }
+        }
+
+        if (changed) render();
       } catch (error) {
-        console.warn("Sincronização das configurações:", error);
+        console.warn("Sincronização automática do site:", error);
       }
     };
 
