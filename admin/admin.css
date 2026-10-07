@@ -2573,3 +2573,22 @@ input[data-order-price]:focus{
  .price-row{grid-template-columns:1fr 92px}.pricing-item-card{align-items:flex-start;flex-direction:column}.pricing-item-card .price-input{max-width:none;flex-basis:auto}
  .item-price-options{grid-template-columns:1fr}
 }
+
+
+/* =========================================================
+   MARTINS — CONFIGURAÇÕES / HORÁRIOS
+   ========================================================= */
+.settings-page-head{margin-bottom:18px}
+.settings-card{background:#fff;border:1px solid #dcecef;border-radius:20px;padding:18px;margin-bottom:18px;box-shadow:0 8px 26px rgba(43,120,150,.06)}
+.settings-card-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.settings-card-head>div{flex:1}.settings-card-head h3{margin:0;color:#2b7896}.settings-card-head p{margin:3px 0 0;color:#78909a;font-size:12px}
+.settings-icon{width:43px;height:43px;display:grid;place-items:center;flex:0 0 43px;border-radius:14px;background:linear-gradient(135deg,#fff0f2,#eaf6fa);border:1px solid #e2edf0;font-size:20px}
+.hours-admin-list{display:grid;gap:9px}
+.hours-admin-row{display:grid;grid-template-columns:minmax(150px,1fr) 125px 150px 150px;gap:10px;align-items:center;padding:12px;border:1px solid #e1edf0;border-radius:14px;background:#fbfdfe}
+.hours-day strong{display:block;color:#2b7896}.hours-day small{display:block;margin-top:2px;color:#9aabb1;font-size:10px}
+.hours-admin-row label{display:grid;gap:5px;color:#71808a;font-size:11px;font-weight:700}
+.hours-admin-row select,.hours-admin-row input{width:100%;height:40px;padding:8px 10px;border:1px solid #d7e8ed;border-radius:10px;background:#fff;color:#334e57;outline:none}
+.hours-admin-row select:focus,.hours-admin-row input:focus{border-color:#67b0cb;box-shadow:0 0 0 3px rgba(103,176,203,.11)}
+.hours-note{margin-top:12px;padding:11px 13px;border-radius:12px;background:#f7fcfd;color:#71808a;font-size:12px;border:1px dashed #d6e8ed}
+@media(max-width:900px){.hours-admin-row{grid-template-columns:1fr 1fr}.hours-day{grid-column:1/-1}}
+@media(max-width:520px){.settings-card{padding:13px}.settings-card-head{align-items:flex-start}.hours-admin-row{grid-template-columns:1fr}.hours-day{grid-column:auto}.hours-admin-row .hours-status{width:100%}}
