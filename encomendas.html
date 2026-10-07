@@ -180,23 +180,23 @@
             <div class="section-head">
               <span class="eyebrow">Kit Festa</span>
               <h2>Escolha seu Kit Festa</h2>
-              <p>O kit já vem com os itens definidos. Ao escolher um kit, você poderá escolher somente o topo, a massa e o recheio. Os demais itens são fixos.</p>
+              <p>Escolha o Kit Festa. Depois de selecionar o kit, o cliente escolhe somente o topo do bolo, 1 massa e 2 recheios. Todos os demais itens do kit são fixos.</p>
             </div>
             <div id="kitOptions" class="kit-options"></div>
             <div id="kitSelectedInfo" class="party-note" hidden></div>
           </section>
 
           <section id="kitTopoSection" class="extras" hidden>
-            <legend style="display:block">Topo do bolo do kit</legend>
+            <legend style="display:block">1. Topo do bolo</legend>
             <p class="party-note">Para o kit festa, você escolhe somente o topo, a massa e o recheio. Os demais itens são fixos.</p>
             <div id="kitTopoOptions" class="options-grid"></div>
           </section>
 
           <section id="kitCakeOptionsSection" class="extras" hidden>
-            <legend style="display:block">Massa e recheio do bolo do kit</legend>
-            <p class="party-note">Escolha a massa e o recheio. Os docinhos do kit são sempre <strong>Brigadeiro Tradicional</strong> e os demais itens já vêm definidos.</p>
-            <div><h3 style="color:#4b2b20;font-family:Georgia,serif">Massa</h3><div id="kitMassOptions" class="options-grid"></div></div>
-            <div style="margin-top:20px"><h3 style="color:#4b2b20;font-family:Georgia,serif">Recheio</h3><div id="kitFillingOptions" class="options-grid"></div></div>
+            <legend style="display:block">2. Massa e 3. Recheios</legend>
+            <p class="party-note">Escolha 1 massa e 2 recheios. Os docinhos do kit são sempre <strong>Brigadeiro Tradicional</strong>. Os demais itens já vêm definidos pelo kit.</p>
+            <div><h3 style="color:#4b2b20;font-family:Georgia,serif">Escolha 1 massa</h3><div id="kitMassOptions" class="options-grid"></div></div>
+            <div style="margin-top:20px"><h3 style="color:#4b2b20;font-family:Georgia,serif">Escolha exatamente 2 recheios</h3><div id="kitFillingOptions" class="options-grid"></div></div>
           </section>
 
         </div>
@@ -331,7 +331,7 @@
     function render(){
       renderTopos("kitTopoOptions","kitTopo");
 
-      document.getElementById("kitMassOptions").innerHTML = cfg.masses.map((x,i)=>`<label class="extra-option"><input type="radio" name="kitMassa" value="${esc(x)}" ${i===0?"checked":""}><span>${esc(x)}</span></label>`).join("");
+      document.getElementById("kitMassOptions").innerHTML = cfg.masses.map((x,i)=>`<label class="extra-option"><input type="radio" name="kitMassa" value="${esc(x)}"><span>${esc(x)}</span></label>`).join("");
       document.getElementById("kitFillingOptions").innerHTML = cfg.fillings.map(x=>`<label class="extra-option"><input type="checkbox" name="kitRecheio" value="${esc(x)}"><span>${esc(x)}</span></label>`).join("");
 
       const cake = document.getElementById("cakeType");
@@ -498,6 +498,7 @@
       document.querySelectorAll('input[name="kit"]').forEach(input=>input.addEventListener("change",()=>{
         selectedKit=input.value;
         document.querySelectorAll('input[name="kitRecheio"]').forEach(x=>x.checked=false);
+        document.querySelectorAll('input[name="kitMassa"]').forEach(x=>x.checked=false);
         document.querySelectorAll('#cakeMode input[name="recheio"], #cakeMode input[name="adicional"], #cakeMode input[name="personalizacao"]').forEach(x=>x.checked=false);
         const kit=cfg.kits.find(x=>x.id===selectedKit);
         const info=document.getElementById("kitSelectedInfo");
