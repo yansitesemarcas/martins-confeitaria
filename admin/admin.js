@@ -1758,13 +1758,15 @@
           </p>
         </div>
 
-        <button
-          type="button"
-          class="btn primary"
-          data-action="new-product"
-        >
-          + Novo produto
-        </button>
+        ${area === "encomendas" ? "" : `
+          <button
+            type="button"
+            class="btn primary"
+            data-action="new-product"
+          >
+            + Novo produto
+          </button>
+        `}
 
       </div>
 
