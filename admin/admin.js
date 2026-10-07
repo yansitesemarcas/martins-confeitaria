@@ -421,48 +421,120 @@
     const defaultOrderConfig =
       JSON.parse(JSON.stringify(ORDER_DEFAULTS));
 
+    const mergeNamedOptions = (defaults, saved, key = "name") => {
+      const savedList = Array.isArray(saved) ? saved : [];
+      const result = defaults.map(item => {
+        const savedItem = savedList.find(
+          candidate =>
+            String(candidate?.[key] || "").trim().toLowerCase() ===
+            String(item?.[key] || "").trim().toLowerCase()
+        );
+        return savedItem ? { ...item, ...savedItem } : { ...item };
+      });
+
+      savedList.forEach(item => {
+        const exists = result.some(
+          candidate =>
+            String(candidate?.[key] || "").trim().toLowerCase() ===
+            String(item?.[key] || "").trim().toLowerCase()
+        );
+        if (!exists) result.push(item);
+      });
+
+      return result;
+    };
+
+    const mergePairOptions = (defaults, saved) => {
+      const savedList = Array.isArray(saved) ? saved : [];
+      return defaults.map(item => {
+        const savedItem = savedList.find(
+          candidate =>
+            String(candidate?.[0] || "").trim().toLowerCase() ===
+            String(item?.[0] || "").trim().toLowerCase()
+        );
+        return savedItem
+          ? [item[0], Number(savedItem[1] ?? item[1])]
+          : [...item];
+      });
+    };
+
+    const mergeKits = (defaults, saved) => {
+      const savedList = Array.isArray(saved) ? saved : [];
+      return defaults.map(item => {
+        const savedItem = savedList.find(
+          candidate =>
+            String(candidate?.id || "").trim().toLowerCase() ===
+            String(item?.id || "").trim().toLowerCase()
+        );
+        return savedItem
+          ? { ...item, ...savedItem }
+          : { ...item };
+      });
+    };
+
+    const mergeOtherItems = (defaults, saved) => {
+      const savedList = Array.isArray(saved) ? saved : [];
+      return defaults.map(item => {
+        const savedItem = savedList.find(
+          candidate =>
+            String(candidate?.name || "").trim().toLowerCase() ===
+            String(item?.name || "").trim().toLowerCase()
+        );
+        if (!savedItem) return { ...item };
+
+        return {
+          ...item,
+          ...savedItem,
+          packages: Array.isArray(savedItem.packages)
+            ? savedItem.packages
+            : item.packages
+        };
+      });
+    };
+
     const orderConfig = {
       ...defaultOrderConfig,
       ...savedOrderConfig,
-
-      cakes:
-        Array.isArray(savedOrderConfig.cakes) &&
-        savedOrderConfig.cakes.length
-          ? savedOrderConfig.cakes
-          : defaultOrderConfig.cakes,
-
-      extras:
-        Array.isArray(savedOrderConfig.extras) &&
-        savedOrderConfig.extras.length
-          ? savedOrderConfig.extras
-          : defaultOrderConfig.extras,
-
-      personalizations:
-        Array.isArray(savedOrderConfig.personalizations) &&
-        savedOrderConfig.personalizations.length
-          ? savedOrderConfig.personalizations
-          : defaultOrderConfig.personalizations,
-
-      brigadeiros:
-        savedOrderConfig.brigadeiros &&
-        typeof savedOrderConfig.brigadeiros === "object"
-          ? {
-              ...defaultOrderConfig.brigadeiros,
-              ...savedOrderConfig.brigadeiros
-            }
-          : defaultOrderConfig.brigadeiros,
-
-      otherItems:
-        Array.isArray(savedOrderConfig.otherItems) &&
-        savedOrderConfig.otherItems.length
-          ? savedOrderConfig.otherItems
-          : defaultOrderConfig.otherItems,
-
-      kits:
-        Array.isArray(savedOrderConfig.kits) &&
-        savedOrderConfig.kits.length
-          ? savedOrderConfig.kits
-          : defaultOrderConfig.kits
+      cakes: mergeNamedOptions(
+        defaultOrderConfig.cakes,
+        savedOrderConfig.cakes
+      ),
+      extras: mergePairOptions(
+        defaultOrderConfig.extras,
+        savedOrderConfig.extras
+      ),
+      personalizations: mergePairOptions(
+        defaultOrderConfig.personalizations,
+        savedOrderConfig.personalizations
+      ),
+      brigadeiros: {
+        ...defaultOrderConfig.brigadeiros,
+        ...(savedOrderConfig.brigadeiros || {}),
+        classicaPrices:
+          Array.isArray(savedOrderConfig.brigadeiros?.classicaPrices) &&
+          savedOrderConfig.brigadeiros.classicaPrices.length
+            ? [
+                savedOrderConfig.brigadeiros.classicaPrices[0] ?? defaultOrderConfig.brigadeiros.classicaPrices[0],
+                savedOrderConfig.brigadeiros.classicaPrices[1] ?? defaultOrderConfig.brigadeiros.classicaPrices[1]
+              ]
+            : [...defaultOrderConfig.brigadeiros.classicaPrices],
+        premiumPrices:
+          Array.isArray(savedOrderConfig.brigadeiros?.premiumPrices) &&
+          savedOrderConfig.brigadeiros.premiumPrices.length
+            ? [
+                savedOrderConfig.brigadeiros.premiumPrices[0] ?? defaultOrderConfig.brigadeiros.premiumPrices[0],
+                savedOrderConfig.brigadeiros.premiumPrices[1] ?? defaultOrderConfig.brigadeiros.premiumPrices[1]
+              ]
+            : [...defaultOrderConfig.brigadeiros.premiumPrices]
+      },
+      otherItems: mergeOtherItems(
+        defaultOrderConfig.otherItems,
+        savedOrderConfig.otherItems
+      ),
+      kits: mergeKits(
+        defaultOrderConfig.kits,
+        savedOrderConfig.kits
+      )
     };
 
     state.settings = {
