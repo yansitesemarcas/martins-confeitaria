@@ -323,7 +323,7 @@
       renderTopos("kitTopoOptions","kitTopo");
 
       document.getElementById("kitMassOptions").innerHTML = cfg.masses.map((x,i)=>`<label class="extra-option"><input type="radio" name="kitMassa" value="${esc(x)}" ${i===0?"checked":""}><span>${esc(x)}</span></label>`).join("");
-      document.getElementById("kitFillingOptions").innerHTML = cfg.fillings.map((x,i)=>`<label class="extra-option"><input type="radio" name="kitRecheio" value="${esc(x)}" ${i===0?"checked":""}><span>${esc(x)}</span></label>`).join("");
+      document.getElementById("kitFillingOptions").innerHTML = cfg.fillings.map(x=>`<label class="extra-option"><input type="checkbox" name="kitRecheio" value="${esc(x)}"><span>${esc(x)}</span></label>`).join("");
 
       const cake = document.getElementById("cakeType");
       const activeCakes = cfg.cakes.filter(x=>x.active!==false);
@@ -395,25 +395,6 @@
           </div>
         </div>`).join("") + `
         <button type="button" id="clearKitButton" style="margin-top:4px;width:100%;border:2px solid #dccbc0;border-radius:14px;padding:13px 16px;background:#fffaf4;color:#6f4a32;font:inherit;font-weight:800;cursor:pointer">Não quero nenhum Kit Festa</button>`;
-
-      document.getElementById("brigadeiros").innerHTML = [
-        ["Clássicos",cfg.brigadeiros.classica,cfg.brigadeiros.classicaPrices],
-        ["Premium",cfg.brigadeiros.premium,cfg.brigadeiros.premiumPrices]
-      ].map(([type,flavors,prices])=>`
-        <div class="brigadeiro-box">
-          <h3>Brigadeiros ${type}</h3>
-          <div class="options-grid">
-            <label class="extra-option"><input type="radio" name="brigadeiro_${type}" value="0" data-price="0" checked><span>Não adicionar</span></label>
-            <label class="extra-option"><input type="radio" name="brigadeiro_${type}" value="50" data-price="${Number(prices?.[0]||0)}"><span>50 unidades</span><strong>${money(prices?.[0])}</strong></label>
-            <label class="extra-option"><input type="radio" name="brigadeiro_${type}" value="100" data-price="${Number(prices?.[1]||0)}"><span>100 unidades</span><strong>${money(prices?.[1])}</strong></label>
-          </div>
-          <div class="brigadeiro-flavors" style="margin-top:15px">
-            <p><strong>Escolha os sabores:</strong> até 2 sabores para 50 unidades ou até 4 sabores para 100 unidades.</p>
-            <div class="options-grid">
-              ${flavors.map(flavor=>`<label class="extra-option"><input type="checkbox" name="brigadeiro_sabor_${type}" value="${esc(flavor)}" disabled><span>${esc(flavor)}</span></label>`).join("")}
-            </div>
-          </div>
-        </div>`).join("");
 
       document.getElementById("otherItems").innerHTML = cfg.otherItems.filter(x=>x.active!==false).map(x=>{
         if(x.packages){
@@ -487,14 +468,13 @@
       document.querySelectorAll(".order-path").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
       document.querySelectorAll("#cakeForm input,#cakeForm select").forEach(x=>x.addEventListener("change",()=>{
         if(x.name==="recheio"&&x.checked&&document.querySelectorAll('input[name="recheio"]:checked').length>2){x.checked=false;alert("Escolha exatamente 2 recheios.");return;}
-        if(x.name&&x.name.startsWith("brigadeiro_")&&!x.name.startsWith("brigadeiro_sabor_")){const t=x.name.replace("brigadeiro_",""),q=Number(x.value||0);document.querySelectorAll('input[name="brigadeiro_sabor_'+t+'"]').forEach(s=>{s.disabled=q===0;s.checked=false;});}
-        if(x.name&&x.name.startsWith("brigadeiro_sabor_")&&x.checked){const t=x.name.replace("brigadeiro_sabor_",""),q=Number(document.querySelector('input[name="brigadeiro_'+t+'"]:checked')?.value||0),lim=q===50?2:q===100?4:0;if(document.querySelectorAll('input[name="brigadeiro_sabor_'+t+'"]:checked').length>lim){x.checked=false;alert("Escolha no máximo "+lim+" sabores para essa quantidade.");return;}}
+        if(x.name==="kitRecheio"&&x.checked&&document.querySelectorAll('input[name="kitRecheio"]:checked').length>2){x.checked=false;alert("No Kit Festa, escolha exatamente 2 recheios.");return;}
         calc();
       }));
 
       document.getElementById("clearKitButton").addEventListener("click",()=>{
         selectedKit=null;
-        document.querySelectorAll('input[name="kit"]').forEach(x=>x.checked=false);
+        document.querySelectorAll('input[name="kit"], input[name="kitRecheio"]').forEach(x=>x.checked=false);
         document.getElementById("kitSelectedInfo").hidden=true;
         document.getElementById("kitTopoSection").hidden=true;
         document.getElementById("kitCakeOptionsSection").hidden=true;
@@ -503,6 +483,7 @@
 
       document.querySelectorAll('input[name="kit"]').forEach(input=>input.addEventListener("change",()=>{
         selectedKit=input.value;
+        document.querySelectorAll('input[name="kitRecheio"]').forEach(x=>x.checked=false);
         const kit=cfg.kits.find(x=>x.id===selectedKit);
         const info=document.getElementById("kitSelectedInfo");
         info.innerHTML=`<strong>${esc(kit?.name||"Kit selecionado")}</strong><br>${esc(kit?.cake||"")}<br><strong>Incluso no kit:</strong><br>${(kit?.items||[]).map(item=>"• "+esc(item)).join("<br>")}<br><br>Os itens do kit permanecem definidos. Você só precisa escolher o topo, a massa e o recheio. Os docinhos são Brigadeiro Tradicional.`;
@@ -532,7 +513,7 @@
         kit:kit?.name||null,bolo:kit?.cake||f.get("cakeType")||null,
         topo:kit ? (f.get("kitTopo")||"") : (f.get("topo")||""),
         massa:kit ? (f.get("kitMassa")||"") : (mode==="cake" ? (f.get("massa")||"") : ""),
-        recheio:kit ? (f.get("kitRecheio")||"") : (mode==="cake" ? f.getAll("recheio") : ""),
+        recheio:kit ? f.getAll("kitRecheio") : (mode==="cake" ? f.getAll("recheio") : ""),
         docinhos_kit:kit ? "Brigadeiro Tradicional" : "",
         adicionais:mode==="cake" ? f.getAll("adicional") : [],
         personalizacao:mode==="cake" ? f.getAll("personalizacao") : [],
