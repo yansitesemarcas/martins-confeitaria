@@ -320,15 +320,47 @@
       renderTopos("kitTopoOptions","kitTopo");
 
       const cake = document.getElementById("cakeType");
-      cake.innerHTML = cfg.cakes.filter(x=>x.active!==false).map(c=>`
-        <div class="options-grid">
-          ${c.options.map((o,i)=>`
-            <label class="extra-option">
-              <input type="radio" name="cakeType" value="${esc(c.name+" — "+o)}" data-price="${Number(c.prices?.[i]||0)}" ${c===cfg.cakes.find(y=>y.active!==false) && i===0?"checked":""}>
-              <span>${esc(c.name+" — "+o)}</span>
-              <strong>${money(c.prices?.[i])}</strong>
-            </label>`).join("")}
-        </div>`).join("");
+      const activeCakes = cfg.cakes.filter(x=>x.active!==false);
+      let selectedCakeName = activeCakes[0]?.name || "";
+
+      cake.innerHTML = `
+        <div class="cake-kind-switch" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:20px">
+          ${activeCakes.map((c,i)=>`
+            <button type="button" class="cake-kind-button" data-cake-kind="${esc(c.name)}" style="border:2px solid #dccbc0;border-radius:16px;padding:16px;background:${i===0?"#6f4a32":"#fffaf4"};color:${i===0?"#fff":"#5b3e26"};font:inherit;font-weight:800;cursor:pointer">
+              ${esc(c.name)}
+            </button>`).join("")}
+        </div>
+        <div id="cakeSizeOptions"></div>`;
+
+      const renderCakeSizes = () => {
+        const selected = activeCakes.find(c=>c.name===selectedCakeName) || activeCakes[0];
+        const sizes = document.getElementById("cakeSizeOptions");
+        if(!selected){sizes.innerHTML="";return;}
+        sizes.innerHTML = `
+          <p style="margin:0 0 12px;color:#806b60;font-weight:700">Escolha o tamanho do ${esc(selected.name)}:</p>
+          <div class="options-grid">
+            ${selected.options.map((o,i)=>`
+              <label class="extra-option">
+                <input type="radio" name="cakeType" value="${esc(selected.name+" — "+o)}" data-price="${Number(selected.prices?.[i]||0)}" ${i===0?"checked":""}>
+                <span>${esc(o)}</span>
+                <strong>${money(selected.prices?.[i])}</strong>
+              </label>`).join("")}
+          </div>`;
+        document.querySelectorAll('#cakeSizeOptions input[name="cakeType"]').forEach(x=>x.addEventListener("change",calc));
+        calc();
+      };
+
+      cake.querySelectorAll("[data-cake-kind]").forEach(btn=>btn.addEventListener("click",()=>{
+        selectedCakeName=btn.dataset.cakeKind;
+        cake.querySelectorAll("[data-cake-kind]").forEach(b=>{
+          const active=b.dataset.cakeKind===selectedCakeName;
+          b.style.background=active?"#6f4a32":"#fffaf4";
+          b.style.color=active?"#fff":"#5b3e26";
+          b.style.borderColor=active?"#6f4a32":"#dccbc0";
+        });
+        renderCakeSizes();
+      }));
+      renderCakeSizes();
 
       document.getElementById("cakeMassOptions").innerHTML = cfg.masses.map((x,i)=>`
         <label class="extra-option"><input type="radio" name="massa" value="${esc(x)}" ${i===0?"checked":""}><span>${esc(x)}</span></label>`).join("");
