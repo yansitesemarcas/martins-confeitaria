@@ -379,31 +379,31 @@
       );
     }
 
-    const {
-      data,
-      error
-    } = await db
-      .from("settings")
-      .select("*")
-      .eq("key", "site")
-      .maybeSingle();
+    const [siteResult, orderResult] = await Promise.all([
+      db
+        .from("settings")
+        .select("*")
+        .eq("key", "site")
+        .maybeSingle(),
+      db
+        .from("settings")
+        .select("*")
+        .eq("key", "encomendas")
+        .maybeSingle()
+    ]);
 
-    if (error) {
-      console.error(
-        "Erro ao carregar settings:",
-        error
-      );
+    if (siteResult.error) {
+      console.error("Erro ao carregar settings:", siteResult.error);
+    }
 
-      state.settings = {
-        ...DEFAULTS
-      };
-
-      return;
+    if (orderResult.error) {
+      console.error("Erro ao carregar configuração de encomendas:", orderResult.error);
     }
 
     state.settings = {
       ...DEFAULTS,
-      ...(data?.value || {})
+      ...(siteResult.data?.value || {}),
+      encomendas: orderResult.data?.value || {}
     };
   }
 
@@ -4193,15 +4193,17 @@
     setButtonLoading(button, true, "Salvando...");
 
     try {
-      const next = { ...(state.settings || {}), encomendas: cfg };
       const { data, error } = await db.from("settings").upsert(
-        { key: "site", value: next },
+        { key: "encomendas", value: cfg },
         { onConflict: "key" }
       ).select().single();
 
       if (error) throw error;
 
-      state.settings = data?.value || next;
+      state.settings = {
+        ...(state.settings || {}),
+        encomendas: data?.value || cfg
+      };
       showToast("Valores de encomendas salvos com sucesso.");
       renderCurrentView();
     } catch (error) {
