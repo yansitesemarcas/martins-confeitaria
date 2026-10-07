@@ -1016,26 +1016,7 @@
         }
       );
 
-    if (ready.length) {
-      return ready;
-    }
-
-    return products
-      .filter((product) => {
-
-        const area =
-          normalizeArea(
-            product.area
-          );
-
-        return (
-          (!area ||
-            area === "cardapio") &&
-          product.available !== false
-        );
-
-      })
-      .slice(0, 3);
+    return ready;
 
   }
 
