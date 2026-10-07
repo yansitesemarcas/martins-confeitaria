@@ -174,11 +174,8 @@
               <input id="personalizationText" name="personalizationText" placeholder="Ex.: Feliz aniversário Maria">
             </label>
           </fieldset>
-        </div>
-      </section>
 
-      <section id="partyMode" class="order-mode" aria-label="Para sua festa e outros itens">
-        <div class="cake-builder">
+
           <section class="kit-section">
             <div class="section-head">
               <span class="eyebrow">Para sua festa</span>
@@ -202,6 +199,11 @@
             <div style="margin-top:20px"><h3 style="color:#4b2b20;font-family:Georgia,serif">Recheio</h3><div id="kitFillingOptions" class="options-grid"></div></div>
           </section>
 
+        </div>
+      </section>
+
+      <section id="partyMode" class="order-mode" aria-label="Para sua festa e outros itens">
+        <div class="cake-builder">
           <section class="other-orders-section">
             <div class="section-head">
               <span class="eyebrow">Outros itens</span>
@@ -211,13 +213,7 @@
             <div id="otherItems" class="other-order-list"></div>
           </section>
 
-          <section class="brigadeiro-section">
-            <div class="section-head">
-              <h2>Brigadeiros</h2>
-              <p>Escolha, se desejar, brigadeiros clássicos ou premium.</p>
-            </div>
-            <div id="brigadeiros" class="brigadeiro-list"></div>
-          </section>
+
         </div>
       </section>
 
@@ -470,7 +466,13 @@
     function calc(){
       let total = 0;
       if(mode==="cake"){
-        document.querySelectorAll('#cakeMode input[type="radio"]:checked,#cakeMode input[type="checkbox"]:checked').forEach(x=>total+=Number(x.dataset.price||0));
+        const kit = cfg.kits.find(x=>x.id===selectedKit);
+        if(kit){
+          total += Number(kit.price||0);
+          document.querySelectorAll('#cakeMode input[name="kitTopo"]:checked').forEach(x=>total+=Number(x.dataset.price||0));
+        }else{
+          document.querySelectorAll('#cakeMode input[type="radio"]:checked,#cakeMode input[type="checkbox"]:checked').forEach(x=>total+=Number(x.dataset.price||0));
+        }
       }else{
         const kit = cfg.kits.find(x=>x.id===selectedKit);
         if(kit) total += Number(kit.price||0);
@@ -503,7 +505,7 @@
         selectedKit=input.value;
         const kit=cfg.kits.find(x=>x.id===selectedKit);
         const info=document.getElementById("kitSelectedInfo");
-        info.innerHTML=`<strong>${esc(kit?.name||"Kit selecionado")}</strong><br>${esc(kit?.cake||"")}<br><strong>Incluso no kit:</strong><br>${(kit?.items||[]).map(item=>"• "+esc(item)).join("<br>")}<br><br>Os itens do kit permanecem definidos. Você só precisa escolher o topo do bolo.`;
+        info.innerHTML=`<strong>${esc(kit?.name||"Kit selecionado")}</strong><br>${esc(kit?.cake||"")}<br><strong>Incluso no kit:</strong><br>${(kit?.items||[]).map(item=>"• "+esc(item)).join("<br>")}<br><br>Os itens do kit permanecem definidos. Você só precisa escolher o topo, a massa e o recheio. Os docinhos são Brigadeiro Tradicional.`;
         info.hidden=false;
         document.getElementById("kitTopoSection").hidden=false;
         document.getElementById("kitCakeOptionsSection").hidden=false;
