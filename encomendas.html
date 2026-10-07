@@ -183,7 +183,7 @@
             <div class="section-head">
               <span class="eyebrow">Para sua festa</span>
               <h2>Escolha seu kit festa</h2>
-              <p>O kit já vem com os itens definidos. Ao escolher um kit, você poderá escolher somente o topo do bolo.</p>
+              <p>O kit já vem com os itens definidos. Ao escolher um kit, você poderá escolher somente o topo, a massa e o recheio. Os demais itens são fixos.</p>
             </div>
             <div id="kitOptions" class="kit-options"></div>
             <div id="kitSelectedInfo" class="party-note" hidden></div>
@@ -191,8 +191,15 @@
 
           <section id="kitTopoSection" class="extras" hidden>
             <legend style="display:block">Topo do bolo do kit</legend>
-            <p class="party-note">Para o kit festa, a única personalização disponível é o topo do bolo.</p>
+            <p class="party-note">Para o kit festa, você escolhe somente o topo, a massa e o recheio. Os demais itens são fixos.</p>
             <div id="kitTopoOptions" class="options-grid"></div>
+          </section>
+
+          <section id="kitCakeOptionsSection" class="extras" hidden>
+            <legend style="display:block">Massa e recheio do bolo do kit</legend>
+            <p class="party-note">Escolha a massa e o recheio. Os docinhos do kit são sempre <strong>Brigadeiro Tradicional</strong> e os demais itens já vêm definidos.</p>
+            <div><h3 style="color:#4b2b20;font-family:Georgia,serif">Massa</h3><div id="kitMassOptions" class="options-grid"></div></div>
+            <div style="margin-top:20px"><h3 style="color:#4b2b20;font-family:Georgia,serif">Recheio</h3><div id="kitFillingOptions" class="options-grid"></div></div>
           </section>
 
           <section class="other-orders-section">
@@ -318,6 +325,9 @@
 
     function render(){
       renderTopos("kitTopoOptions","kitTopo");
+
+      document.getElementById("kitMassOptions").innerHTML = cfg.masses.map((x,i)=>`<label class="extra-option"><input type="radio" name="kitMassa" value="${esc(x)}" ${i===0?"checked":""}><span>${esc(x)}</span></label>`).join("");
+      document.getElementById("kitFillingOptions").innerHTML = cfg.fillings.map((x,i)=>`<label class="extra-option"><input type="radio" name="kitRecheio" value="${esc(x)}" ${i===0?"checked":""}><span>${esc(x)}</span></label>`).join("");
 
       const cake = document.getElementById("cakeType");
       const activeCakes = cfg.cakes.filter(x=>x.active!==false);
@@ -450,6 +460,7 @@
         selectedKit = null;
         document.querySelectorAll('input[name="kit"]').forEach(x=>x.checked=false);
         document.getElementById("kitTopoSection").hidden = true;
+        document.getElementById("kitCakeOptionsSection").hidden = true;
         document.getElementById("kitSelectedInfo").hidden = true;
       }
       calc();
@@ -484,6 +495,7 @@
         document.querySelectorAll('input[name="kit"]').forEach(x=>x.checked=false);
         document.getElementById("kitSelectedInfo").hidden=true;
         document.getElementById("kitTopoSection").hidden=true;
+        document.getElementById("kitCakeOptionsSection").hidden=true;
         calc();
       });
 
@@ -494,6 +506,7 @@
         info.innerHTML=`<strong>${esc(kit?.name||"Kit selecionado")}</strong><br>${esc(kit?.cake||"")}<br><strong>Incluso no kit:</strong><br>${(kit?.items||[]).map(item=>"• "+esc(item)).join("<br>")}<br><br>Os itens do kit permanecem definidos. Você só precisa escolher o topo do bolo.`;
         info.hidden=false;
         document.getElementById("kitTopoSection").hidden=false;
+        document.getElementById("kitCakeOptionsSection").hidden=false;
         calc();
       }));
 
@@ -516,8 +529,9 @@
         tipo:"encomenda",modo:mode,cliente:name,whatsapp:phone,data_desejada:date,
         kit:kit?.name||null,bolo:kit?.cake||f.get("cakeType")||null,
         topo:kit ? (f.get("kitTopo")||"") : (f.get("topo")||""),
-        massa:mode==="cake" ? (f.get("massa")||"") : "",
-        recheio:mode==="cake" ? f.getAll("recheio") : "",
+        massa:kit ? (f.get("kitMassa")||"") : (mode==="cake" ? (f.get("massa")||"") : ""),
+        recheio:kit ? (f.get("kitRecheio")||"") : (mode==="cake" ? f.getAll("recheio") : ""),
+        docinhos_kit:kit ? "Brigadeiro Tradicional" : "",
         adicionais:mode==="cake" ? f.getAll("adicional") : [],
         personalizacao:mode==="cake" ? f.getAll("personalizacao") : [],
         personalizacao_text:document.getElementById("personalizationText")?.value||"",
@@ -533,6 +547,7 @@
         details.topo?`Topo: ${details.topo}`:"",
         details.massa?`Massa: ${details.massa}`:"",
         details.recheio?`Recheio: ${details.recheio}`:"",
+        kit?`Docinhos: ${kit.docinhos||""} — Brigadeiro Tradicional`:"",
         details.adicionais.length?`Adicionais: ${details.adicionais.join(", ")}`:"",
         details.personalizacao.length?`Personalização: ${details.personalizacao.join(", ")}`:"",
         details.outros.length?`Outros itens: ${details.outros.map(x=>x.item+" x"+x.quantidade).join(", ")}`:"",
