@@ -224,7 +224,7 @@
             <div class="section-head">
               <span class="eyebrow">Outros itens</span>
               <h2>Complementos para sua festa</h2>
-              <p>Informe a quantidade desejada. Para Petit Brownie e docinhos, a quantidade é informada em centos.</p>
+              <p>Informe a quantidade desejada. Para Petit Brownie e docinhos, escolha 50 ou 100 unidades, ou informe outra quantidade.</p>
             </div>
 
             <div id="otherItems" class="other-order-list"></div>
@@ -238,16 +238,17 @@
 
               <div class="brigadeiro-box" style="margin-bottom:20px">
                 <h3>Linha Clássica</h3>
-                <p>Escolha a quantidade de centos:</p>
+                <p>Escolha a quantidade:</p>
                 <label class="customer-fields" style="margin-bottom:16px">
-                  <span>Quantos centos?</span>
-                  <input type="text" inputmode="decimal" value="" class="brigadeiro-quantity quantity-centos" data-line="classica" data-price100="125" placeholder="Ex.: 1, 2, 3...">
+                  <span>Quantidade</span>
+                  <select class="brigadeiro-quantity" data-line="classica" data-price100="125">
+                    <option value="0">Não adicionar</option>
+                    <option value="50">50 unidades — R$ 62,50</option>
+                    <option value="100">100 unidades — R$ 125,00</option>
+                    <option value="custom">Outra quantidade</option>
+                  </select>
+                  <input type="number" min="1" step="1" class="custom-brigadeiro-quantity quantity-centos" data-line="classica" data-price100="125" placeholder="Digite a quantidade de unidades" hidden>
                 </label>
-                <div class="party-note" style="margin-top:12px">
-                  <strong>Valores do estabelecimento:</strong><br>
-                  50 unidades — R$ 62,50<br>
-                  100 unidades — R$ 125,00
-                </div>
                 <p style="margin:0 0 10px;color:#806b60;font-weight:700">Escolha os sabores:</p>
                 <div id="classicFlavors" class="options-grid"></div>
               </div>
@@ -256,14 +257,15 @@
                 <h3>Linha Premium</h3>
                 <p>Escolha a quantidade de centos:</p>
                 <label class="customer-fields" style="margin-bottom:16px">
-                  <span>Quantos centos?</span>
-                  <input type="text" inputmode="decimal" value="" class="brigadeiro-quantity quantity-centos" data-line="premium" data-price100="145" placeholder="Ex.: 1, 2, 3...">
+                  <span>Quantidade</span>
+                  <select class="brigadeiro-quantity" data-line="premium" data-price100="145">
+                    <option value="0">Não adicionar</option>
+                    <option value="50">50 unidades — R$ 72,50</option>
+                    <option value="100">100 unidades — R$ 145,00</option>
+                    <option value="custom">Outra quantidade</option>
+                  </select>
+                  <input type="number" min="1" step="1" class="custom-brigadeiro-quantity quantity-centos" data-line="premium" data-price100="145" placeholder="Digite a quantidade de unidades" hidden>
                 </label>
-                <div class="party-note" style="margin-top:12px">
-                  <strong>Valores do estabelecimento:</strong><br>
-                  50 unidades — R$ 72,50<br>
-                  100 unidades — R$ 145,00
-                </div>
                 <p style="margin:0 0 10px;color:#806b60;font-weight:700">Escolha os sabores:</p>
                 <div id="premiumFlavors" class="options-grid"></div>
               </div>
@@ -472,16 +474,17 @@
             <div class="brigadeiro-box">
               <h3>${esc(x.name)}</h3>
               <p>${esc(x.description||"")}</p>
-              <p style="font-weight:800">Valores do estabelecimento:</p>
-              <div class="party-note">
-                50 unidades — R$ 90,00<br>
-                100 unidades — R$ 180,00
-              </div>
               <label class="customer-fields">
-                <span>Quantos centos?</span>
-                <input type="text" inputmode="decimal" value="" class="other-quantity quantity-centos"
+                <span>Quantidade</span>
+                <select class="other-quantity" data-item="${esc(x.name)}" data-kind="hundred" data-price100="180">
+                  <option value="0">Não adicionar</option>
+                  <option value="50">50 unidades — R$ 90,00</option>
+                  <option value="100">100 unidades — R$ 180,00</option>
+                  <option value="custom">Outra quantidade</option>
+                </select>
+                <input type="number" min="1" step="1" class="custom-other-quantity quantity-centos"
                   data-item="${esc(x.name)}" data-kind="hundred" data-price100="180"
-                  placeholder="Ex.: 1, 2, 3...">
+                  placeholder="Digite a quantidade de unidades" hidden>
               </label>
             </div>`;
         }
@@ -551,17 +554,24 @@
         document.querySelectorAll('#partyMode input[name="kitTopo"]:checked').forEach(x=>total+=Number(x.dataset.price||0));
         document.querySelectorAll('#partyMode input[name^="brigadeiro_"]:checked').forEach(x=>total+=Number(x.dataset.price||0));
         document.querySelectorAll(".other-quantity").forEach(x=>{
-          const q=Number(String(x.value||"").replace(",", ".")); if(!q)return;
-          if(x.dataset.kind==="hundred") total += q*Number(x.dataset.price100||0);
+          if(x.value==="custom") return;
+          const q=Number(x.value||0); if(!q)return;
+          if(x.dataset.kind==="hundred") total += (q/100)*Number(x.dataset.price100||0);
           else {
             const from=Number(x.dataset.discountFrom||0);
             const unit=from&&q>=from?Number(x.dataset.discountPrice||0):Number(x.dataset.price||0);
             total+=q*unit;
           }
         });
+        document.querySelectorAll(".custom-other-quantity").forEach(x=>{
+          const q=Number(x.value||0); if(q) total += (q/100)*Number(x.dataset.price100||0);
+        });
         document.querySelectorAll(".brigadeiro-quantity").forEach(x=>{
-          const q=Number(String(x.value||"").replace(",", "."));
-          if(q) total += q*Number(x.dataset.price100||0);
+          if(x.value==="custom") return;
+          const q=Number(x.value||0); if(q) total += (q/100)*Number(x.dataset.price100||0);
+        });
+        document.querySelectorAll(".custom-brigadeiro-quantity").forEach(x=>{
+          const q=Number(x.value||0); if(q) total += (q/100)*Number(x.dataset.price100||0);
         });
       }
       document.getElementById("cakeTotal").textContent = money(total);
@@ -629,8 +639,12 @@
           alert("Escolha exatamente 2 recheios para o bolo.");return
         }
       }else if(mode==="party"){
-        const classicQty=Number(String(document.querySelector('.brigadeiro-quantity[data-line="classica"]')?.value||"").replace(",", "."));
-        const premiumQty=Number(String(document.querySelector('.brigadeiro-quantity[data-line="premium"]')?.value||"").replace(",", "."));
+        const classicSelect=document.querySelector('.brigadeiro-quantity[data-line="classica"]');
+        const premiumSelect=document.querySelector('.brigadeiro-quantity[data-line="premium"]');
+        const classicCustom=document.querySelector('.custom-brigadeiro-quantity[data-line="classica"]');
+        const premiumCustom=document.querySelector('.custom-brigadeiro-quantity[data-line="premium"]');
+        const classicQty=classicSelect?.value==="custom"?Number(classicCustom?.value||0):Number(classicSelect?.value||0);
+        const premiumQty=premiumSelect?.value==="custom"?Number(premiumCustom?.value||0):Number(premiumSelect?.value||0);
         const classicFlavors=document.querySelectorAll('input[name="brigadeiro_classica"]:checked').length;
         const premiumFlavors=document.querySelectorAll('input[name="brigadeiro_premium"]:checked').length;
         if(classicQty>0 && classicFlavors===0){alert("Escolha pelo menos 1 sabor da Linha Clássica.");return}
@@ -651,12 +665,14 @@
         personalizacao_text:document.getElementById("personalizationText")?.value||"",
         brigadeiros:mode==="party" ? [
           ...["classica","premium"].map(line=>{
-            const q=Number(String(document.querySelector(`.brigadeiro-quantity[data-line="${line}"]`)?.value||"").replace(",", "."));
+            const select=document.querySelector(`.brigadeiro-quantity[data-line="${line}"]`);
+            const custom=document.querySelector(`.custom-brigadeiro-quantity[data-line="${line}"]`);
+            const q=select?.value==="custom"?Number(custom?.value||0):Number(select?.value||0);
             const flavors=[...document.querySelectorAll(`input[name="brigadeiro_${line}"]:checked`)].map(x=>x.value);
-            return q>0 ? {linha:line==="classica"?"Linha Clássica":"Linha Premium",centos:q,sabores:flavors,valorPorCento:Number(document.querySelector(`.brigadeiro-quantity[data-line="${line}"]`)?.dataset.price100||0)} : null;
+            return q>0 ? {linha:line==="classica"?"Linha Clássica":"Linha Premium",quantidade:q,unidade:"unidades",valor:((q/100)*Number(select?.dataset.price100||0)),sabores:flavors} : null;
           }).filter(Boolean)
         ] : [],
-        outros:mode==="party" ? [...document.querySelectorAll(".other-quantity")].filter(x=>Number(String(x.value||"").replace(",", "."))>0).map(x=>({item:x.dataset.item,quantidade:Number(String(x.value||"").replace(",", ".")),unidade:x.dataset.kind==="hundred"?"centos":"unidades",precoPorUnidade:Number(x.dataset.price100||x.dataset.price||0)})) : [],
+        outros:mode==="party" ? [...document.querySelectorAll(".other-quantity")].filter(x=>Number(String(x.value||"").replace(",", "."))>0).map(x=>({item:x.dataset.item,quantidade:Number(String(x.value||"").replace(",", ".")),unidade:"unidades",precoPorUnidade:x.dataset.kind==="hundred"?Number(x.dataset.price100||0)/100:Number(x.dataset.price||0)})) : [],
         observacoes:String(f.get("customerNotes")||"").trim(),total_estimado:total
       };
 
@@ -671,7 +687,7 @@
         details.adicionais.length?`Adicionais: ${details.adicionais.join(", ")}`:"",
         details.personalizacao.length?`Personalização: ${details.personalizacao.join(", ")}`:"",
         details.outros.length?`Outros itens: ${details.outros.map(x=>x.item+" — "+x.quantidade+" "+x.unidade).join(", ")}`:"",
-        details.brigadeiros.length?`Docinhos: ${details.brigadeiros.map(x=>x.linha+" — "+x.centos+" cento(s) — "+money(x.valorPorCento)+" por cento — sabores: "+x.sabores.join(", ")).join(" | ")}`:"",
+        details.brigadeiros.length?`Docinhos: ${details.brigadeiros.map(x=>x.linha+" — "+x.quantidade+" unidades — "+money(x.valor)+" — sabores: "+x.sabores.join(", ")).join(" | ")}`:"",
         `Total estimado: ${total}`,
         details.observacoes?`Observações: ${details.observacoes}`:""
       ].filter(Boolean).join("\n");
