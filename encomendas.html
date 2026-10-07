@@ -579,6 +579,17 @@
 
     function bind(){
       document.querySelectorAll(".order-path").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
+      document.querySelectorAll(".brigadeiro-quantity").forEach(select=>select.addEventListener("change",()=>{
+        const custom=document.querySelector(`.custom-brigadeiro-quantity[data-line="${select.dataset.line}"]`);
+        if(custom) custom.hidden=select.value!=="custom";
+        calc();
+      }));
+      document.querySelectorAll(".other-quantity").forEach(select=>select.addEventListener("change",()=>{
+        const custom=select.parentElement?.querySelector(".custom-other-quantity");
+        if(custom) custom.hidden=select.value!=="custom";
+        calc();
+      }));
+
       document.querySelectorAll("#cakeForm input,#cakeForm select").forEach(x=>x.addEventListener("change",()=>{
         if(x.name==="brigadeiro_classica" && x.checked && document.querySelectorAll('input[name="brigadeiro_classica"]:checked').length>2){
           x.checked=false; alert("Na Linha Clássica, escolha no máximo 2 sabores."); return;
@@ -672,7 +683,15 @@
             return q>0 ? {linha:line==="classica"?"Linha Clássica":"Linha Premium",quantidade:q,unidade:"unidades",valor:((q/100)*Number(select?.dataset.price100||0)),sabores:flavors} : null;
           }).filter(Boolean)
         ] : [],
-        outros:mode==="party" ? [...document.querySelectorAll(".other-quantity")].filter(x=>Number(String(x.value||"").replace(",", "."))>0).map(x=>({item:x.dataset.item,quantidade:Number(String(x.value||"").replace(",", ".")),unidade:"unidades",precoPorUnidade:x.dataset.kind==="hundred"?Number(x.dataset.price100||0)/100:Number(x.dataset.price||0)})) : [],
+        outros:mode==="party" ? [...document.querySelectorAll(".other-quantity")].flatMap(x=>{
+          if(x.value==="custom"){
+            const custom=x.parentElement?.querySelector(".custom-other-quantity");
+            const q=Number(custom?.value||0);
+            return q>0 ? [{item:x.dataset.item,quantidade:q,unidade:"unidades",precoPorUnidade:Number(x.dataset.price100||0)/100}] : [];
+          }
+          const q=Number(x.value||0);
+          return q>0 ? [{item:x.dataset.item,quantidade:q,unidade:"unidades",precoPorUnidade:x.dataset.kind==="hundred"?Number(x.dataset.price100||0)/100:Number(x.dataset.price||0)}] : [];
+        }) : [],
         observacoes:String(f.get("customerNotes")||"").trim(),total_estimado:total
       };
 
