@@ -6,7 +6,7 @@
   <title>Encomenda | Martins Confeitaria</title>
   <meta name="description" content="Monte sua encomenda na Martins Confeitaria.">
   <link rel="icon" href="logo.png">
-  <link rel="stylesheet" href="style.css?v=20261006-02">
+  <link rel="stylesheet" href="style.css?v=20261008-01">
 
   <style>
     /* =========================================================
@@ -234,6 +234,9 @@
                 <span class="eyebrow">Docinhos</span>
                 <h2>Escolha seus docinhos</h2>
                 <p>Escolha a linha, 50 ou 100 unidades e os sabores desejados. O valor já aparece no campo de quantidade. Se quiser outra quantidade, informe somente nas observações.</p>
+                <div class="party-note" style="margin-top:16px;margin-bottom:0">
+                  <strong>Regra de sabores:</strong> 50 unidades, escolha até 2 sabores. 100 unidades, escolha até 4 sabores.
+                </div>
               </div>
 
               <div class="brigadeiro-box" style="margin-bottom:20px">
@@ -252,7 +255,7 @@
 
               <div class="brigadeiro-box">
                 <h3>Linha Premium</h3>
-                <p>Escolha a quantidade de centos:</p>
+                <p>Escolha a quantidade:</p>
                 <label class="customer-fields" style="margin-bottom:16px">
                   <span>Quantidade</span>
                   <select class="brigadeiro-quantity" data-line="premium" data-price100="145">
@@ -597,6 +600,16 @@
       document.querySelectorAll(".brigadeiro-quantity").forEach(select=>select.addEventListener("change",()=>{
         const custom=document.querySelector(`.custom-brigadeiro-quantity[data-line="${select.dataset.line}"]`);
         if(custom) custom.hidden=select.value!=="custom";
+
+        const line=select.dataset.line;
+        const quantity=Number(select.value||0);
+        const limit=quantity===50 ? 2 : quantity===100 ? 4 : 4;
+        const selector=`input[name="brigadeiro_${line}"]`;
+        const selected=[...document.querySelectorAll(`${selector}:checked`)];
+        if(selected.length>limit){
+          selected.slice(limit).forEach(input=>input.checked=false);
+          alert(`Para ${quantity} unidades, escolha no máximo ${limit} sabores.`);
+        }
         calc();
       }));
       document.querySelectorAll(".other-quantity").forEach(select=>select.addEventListener("change",()=>{
@@ -606,11 +619,16 @@
       }));
 
       document.querySelectorAll("#cakeForm input,#cakeForm select").forEach(x=>x.addEventListener("change",()=>{
-        if(x.name==="brigadeiro_classica" && x.checked && document.querySelectorAll('input[name="brigadeiro_classica"]:checked').length>2){
-          x.checked=false; alert("Na Linha Clássica, escolha no máximo 2 sabores."); return;
-        }
-        if(x.name==="brigadeiro_premium" && x.checked && document.querySelectorAll('input[name="brigadeiro_premium"]:checked').length>2){
-          x.checked=false; alert("Na Linha Premium, escolha no máximo 2 sabores."); return;
+        if((x.name==="brigadeiro_classica" || x.name==="brigadeiro_premium") && x.checked){
+          const line=x.name==="brigadeiro_classica" ? "classica" : "premium";
+          const quantity=Number(document.querySelector(`.brigadeiro-quantity[data-line="${line}"]`)?.value||0);
+          const limit=quantity===50 ? 2 : quantity===100 ? 4 : 4;
+          const selected=document.querySelectorAll(`input[name="brigadeiro_${line}"]:checked`).length;
+          if(selected>limit){
+            x.checked=false;
+            alert(`Para ${quantity} unidades, escolha no máximo ${limit} sabores.`);
+            return;
+          }
         }
         if(x.name==="recheio"&&x.checked&&document.querySelectorAll('input[name="recheio"]:checked').length>2){x.checked=false;alert("Escolha exatamente 2 recheios.");return;}
         if(x.name==="kitRecheio"&&x.checked&&document.querySelectorAll('input[name="kitRecheio"]:checked').length>2){x.checked=false;alert("No Kit Festa, escolha exatamente 2 recheios.");return;}
