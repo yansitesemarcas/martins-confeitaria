@@ -687,91 +687,140 @@
 
     async function submitOrder(e){
       e.preventDefault();
-      const f=new FormData(e.currentTarget);
+      const form=e.currentTarget;
+      const f=new FormData(form);
       const name=String(f.get("customerName")||"").trim();
       const phone=String(f.get("customerPhone")||"").trim();
       const date=String(f.get("customerDate")||"");
-      if(!name||!phone||!date){alert("Preencha seu nome, WhatsApp e a data desejada.");return}
-      if(mode==="cake"){
-        if(kitSelected()){
-          if(!f.get("kitTopo")){alert("Escolha o topo do bolo para o Kit Festa.");return}
-          if(document.querySelectorAll('input[name="kitMassa"]:checked').length!==1){alert("Escolha 1 massa para o Kit Festa.");return}
-          if(document.querySelectorAll('input[name="kitRecheio"]:checked').length!==2){alert("Escolha exatamente 2 recheios para o Kit Festa.");return}
-        }else if(document.querySelectorAll('input[name="recheio"]:checked').length!==2){
-          alert("Escolha exatamente 2 recheios para o bolo.");return
-        }
-      }else if(mode==="party"){
-        const classicSelect=document.querySelector('.brigadeiro-quantity[data-line="classica"]');
-        const premiumSelect=document.querySelector('.brigadeiro-quantity[data-line="premium"]');
-        const classicCustom=document.querySelector('.custom-brigadeiro-quantity[data-line="classica"]');
-        const premiumCustom=document.querySelector('.custom-brigadeiro-quantity[data-line="premium"]');
-        const classicQty=classicSelect?.value==="custom"?Number(classicCustom?.value||0):Number(classicSelect?.value||0);
-        const premiumQty=premiumSelect?.value==="custom"?Number(premiumCustom?.value||0):Number(premiumSelect?.value||0);
-        const classicFlavors=document.querySelectorAll('input[name="brigadeiro_classica"]:checked').length;
-        const premiumFlavors=document.querySelectorAll('input[name="brigadeiro_premium"]:checked').length;
-        if(classicQty>0 && classicFlavors===0){alert("Escolha pelo menos 1 sabor da Linha Clássica.");return}
-        if(premiumQty>0 && premiumFlavors===0){alert("Escolha pelo menos 1 sabor da Linha Premium.");return}
+      if(!name||!phone||!date){
+        alert("Preencha seu nome, WhatsApp e a data desejada.");
+        return;
       }
 
-      const kit=cfg.kits.find(x=>x.id===selectedKit);
+      // Lê as escolhas marcadas em TODAS as seções, mesmo que a última
+      // seção visitada seja apenas "Para sua festa / Outros itens".
+      const checkedValues = selector => [...document.querySelectorAll(selector)]
+        .filter(el=>el.checked)
+        .map(el=>el.value)
+        .filter(Boolean);
+      const selectedKit=cfg.kits.find(x=>x.id===selectedKitId()) || null;
+      const normalCake=document.querySelector('#cakeMode input[name="cakeType"]:checked');
+      const normalMass=document.querySelector('#cakeMode input[name="massa"]:checked');
+      const kitMass=document.querySelector('#cakeMode input[name="kitMassa"]:checked');
+      const kitTop=document.querySelector('#cakeMode input[name="kitTopo"]:checked');
+      const normalFillings=checkedValues('#cakeMode input[name="recheio"]:checked');
+      const kitFillings=checkedValues('#cakeMode input[name="kitRecheio"]:checked');
+      const isKit=!!selectedKit;
+      const hasNormalCake=!!normalCake || !!normalMass || normalFillings.length>0 ||
+        checkedValues('#cakeMode input[name="adicional"]:checked').length>0 ||
+        checkedValues('#cakeMode input[name="personalizacao"]:checked').length>0;
+
+      if(isKit){
+        if(!kitTop){alert("Escolha o topo do bolo para o Kit Festa.");return}
+        if(!kitMass){alert("Escolha 1 massa para o Kit Festa.");return}
+        if(kitFillings.length!==2){alert("Escolha exatamente 2 recheios para o Kit Festa.");return}
+      }else if(hasNormalCake && normalFillings.length!==2){
+        alert("Escolha exatamente 2 recheios para o bolo.");return
+      }
+
+      const cakeName=isKit ? selectedKit.cake : (normalCake?.value||"");
+      const mass=isKit ? (kitMass?.value||"") : (normalMass?.value||"");
+      const fillings=isKit ? kitFillings : normalFillings;
+      const extras=checkedValues(isKit
+        ? '#cakeMode input[name="kitAdicional"]:checked'
+        : '#cakeMode input[name="adicional"]:checked');
+      const personalizations=checkedValues('#cakeMode input[name="personalizacao"]:checked');
+      const personalizationText=String(document.getElementById("personalizationText")?.value||"").trim();
+
+      const otherItems=[...document.querySelectorAll(".other-quantity")].flatMap(el=>{
+        const quantity=Number(el.value||0);
+        if(!quantity) return [];
+        let unitPrice=0;
+        if(el.dataset.kind==="hundred"){
+          unitPrice=Number(el.dataset.price100||180)/100;
+        }else{
+          const discountFrom=Number(el.dataset.discountFrom||0);
+          unitPrice=discountFrom&&quantity>=discountFrom
+            ? Number(el.dataset.discountPrice||0)
+            : Number(el.dataset.price||0);
+        }
+        return [{item:el.dataset.item||el.closest(".brigadeiro-box")?.querySelector("h3")?.textContent?.trim()||"Outro item",
+          quantidade:quantity,unidade:"unidades",precoPorUnidade:unitPrice,subtotal:quantity*unitPrice}];
+      });
+
+      const sweets=[...["classica","premium"].map(line=>{
+        const select=document.querySelector(`.brigadeiro-quantity[data-line="${line}"]`);
+        const quantity=Number(select?.value||0);
+        if(!quantity) return null;
+        const flavors=checkedValues(`input[name="brigadeiro_${line}"]:checked`);
+        if(flavors.length===0){
+          alert(`Escolha pelo menos 1 sabor da Linha ${line==="classica"?"Clássica":"Premium"}.`);
+          throw new Error("Falta escolher sabor dos docinhos.");
+        }
+        const maxFlavors=quantity===50?2:4;
+        if(flavors.length>maxFlavors){
+          alert(`Para ${quantity} unidades, escolha no máximo ${maxFlavors} sabores.`);
+          throw new Error("Quantidade de sabores inválida.");
+        }
+        const unitHundred=Number(select?.dataset.price100||0);
+        return {linha:line==="classica"?"Linha Clássica":"Linha Premium",quantidade:quantity,
+          valor:(quantity/100)*unitHundred,sabores:flavors};
+      })].filter(Boolean);
+
       const total=document.getElementById("cakeTotal").textContent;
       const details={
         tipo:"encomenda",modo:mode,cliente:name,whatsapp:phone,data_desejada:date,
-        kit:kit?.name||null,bolo:kit?.cake||f.get("cakeType")||null,
-        topo:kit ? (f.get("kitTopo")||"") : (f.get("topo")||""),
-        massa:kit ? (f.get("kitMassa")||"") : (f.get("massa")||""),
-        recheio:kit ? f.getAll("kitRecheio") : f.getAll("recheio"),
-        docinhos_kit:kit ? "Brigadeiro Tradicional" : "",
-        adicionais:kit ? f.getAll("kitAdicional") : f.getAll("adicional"),
-        personalizacao:f.getAll("personalizacao"),
-        personalizacao_text:document.getElementById("personalizationText")?.value||"",
-        brigadeiros: [
-          ...["classica","premium"].map(line=>{
-            const select=document.querySelector(`.brigadeiro-quantity[data-line="${line}"]`);
-            const custom=document.querySelector(`.custom-brigadeiro-quantity[data-line="${line}"]`);
-            const q=select?.value==="custom"?Number(custom?.value||0):Number(select?.value||0);
-            const flavors=[...document.querySelectorAll(`input[name="brigadeiro_${line}"]:checked`)].map(x=>x.value);
-            if(select?.value==="custom" && q>0 && q<100){ alert("Na opção \"Outra quantidade\", informe 100 unidades ou mais."); custom.value=100; }
-            return q>=100 ? {linha:line==="classica"?"Linha Clássica":"Linha Premium",quantidade:q,unidade:"unidades",valor:((q/100)*Number(select?.dataset.price100||0)),sabores:flavors} : null;
-          }).filter(Boolean)
-        ].filter(Boolean),
-        outros: [...document.querySelectorAll(".other-quantity")].flatMap(x=>{
-          if(x.value==="custom"){
-            const custom=x.parentElement?.querySelector(".custom-other-quantity");
-            const q=Number(custom?.value||0);
-            if(q>0 && q<100){ alert("Na opção \"Outra quantidade\", informe 100 unidades ou mais."); custom.value=100; return []; }
-            return q>=100 ? [{item:x.dataset.item,quantidade:q,unidade:"unidades",precoPorUnidade:Number(x.dataset.price100||0)/100}] : [];
-          }
-          const q=Number(x.value||0);
-          return q>0 ? [{item:x.dataset.item,quantidade:q,unidade:"unidades",precoPorUnidade:x.dataset.kind==="hundred"?Number(x.dataset.price100||0)/100:Number(x.dataset.price||0)}] : [];
-        }),
-        observacoes:String(f.get("customerNotes")||"").trim(),total_estimado:total
+        kit:selectedKit?.name||null,
+        itens_kit:selectedKit?.items||[],
+        bolo:cakeName||null,
+        topo:isKit?(kitTop?.value||""):"",
+        massa:mass,
+        recheios:fillings,
+        adicionais:extras,
+        personalizacao:personalizations,
+        personalizacao_text:personalizationText,
+        brigadeiros:sweets,
+        outros:otherItems,
+        observacoes:String(f.get("customerNotes")||"").trim(),
+        total_estimado:total
       };
 
-      const customQuantities=[...document.querySelectorAll(".custom-brigadeiro-quantity,.custom-other-quantity")].filter(x=>!x.hidden&&Number(x.value||0)>0).map(x=>{
-        const item=x.dataset.line==="classica"?"Brigadeiro Linha Clássica":x.dataset.line==="premium"?"Brigadeiro Linha Premium":x.dataset.item||"Item";
-        return item+" — "+x.value+" unidades";
-      });
-      const customQuantityText=customQuantities.length ? "Quantidades informadas manualmente: "+customQuantities.join(", ") : "";
-      const text=[
-        "Olá! Gostaria de fazer uma encomenda na Martins Confeitaria.","",
-        `Nome: ${name}`,`WhatsApp: ${phone}`,`Data desejada: ${date}`,
-        kit?`Kit: ${kit.name}`:`Bolo: ${details.bolo||"Não informado"}`,
-        details.topo?`Topo: ${details.topo}`:"",
-        details.massa?`Massa: ${details.massa}`:"",
-        details.recheio?`Recheios: ${Array.isArray(details.recheio)?details.recheio.join(", "):details.recheio}`:"",
-        kit?`Docinhos inclusos no Kit: ${kit.docinhos||""} — Brigadeiro Tradicional`:"",
-        kit?(kit.items||[]).length?`Itens inclusos no Kit: ${(kit.items||[]).join(", ")}`:"":"",
-        details.adicionais.length?`Adicionais: ${details.adicionais.join(", ")}`:"",
-        details.personalizacao.length?`Personalização: ${details.personalizacao.join(", ")}`:"",
-        details.personalizacao_text?`Texto da personalização: ${details.personalizacao_text}`:"",
-        details.outros.length?`Outros itens: ${details.outros.map(x=>x.item+" — "+x.quantidade+" "+x.unidade).join(", ")}`:"",
-        details.brigadeiros.length?`Docinhos: ${details.brigadeiros.map(x=>x.linha+" — "+x.quantidade+" unidades — "+money(x.valor)+" — sabores: "+x.sabores.join(", ")).join(" | ")}`:"",
-        details.bolo?`Bolo: ${details.bolo}`:"",
-        `Total estimado: ${total}`,
-        customQuantityText,
-        details.observacoes?`Observações: ${details.observacoes}`:""
-      ].filter(Boolean).join("\n");
+      const lines=[
+        "Olá! Gostaria de fazer uma encomenda na Martins Confeitaria.",
+        "",
+        `Nome: ${name}`,
+        `WhatsApp: ${phone}`,
+        `Data desejada: ${date}`,
+        "",
+        "RESUMO DO PEDIDO"
+      ];
+      if(selectedKit){
+        lines.push(`Kit Festa: ${selectedKit.name}`,`Bolo incluso: ${selectedKit.cake}`);
+        if(selectedKit.items?.length) lines.push(`Itens inclusos no kit: ${selectedKit.items.join(", ")}`);
+        if(selectedKit.docinhos) lines.push(`Docinhos inclusos no kit: ${selectedKit.docinhos} unidades de Brigadeiro Tradicional`);
+        if(kitTop) lines.push(`Topo: ${kitTop.value} (+ ${money(kitTop.dataset.price)})`);
+        if(kitMass) lines.push(`Massa do kit: ${kitMass.value}`);
+        if(kitFillings.length) lines.push(`Recheios do kit: ${kitFillings.join(", ")}`);
+        if(extras.length) lines.push(`Adicionais do kit: ${extras.join(", ")}`);
+      }else if(hasNormalCake || cakeName){
+        lines.push(`Bolo: ${cakeName||"Não selecionado"}`);
+        if(mass) lines.push(`Massa: ${mass}`);
+        if(fillings.length) lines.push(`Recheios: ${fillings.join(", ")}`);
+        if(extras.length) lines.push(`Adicionais: ${extras.join(", ")}`);
+      }
+      if(personalizations.length) lines.push(`Personalização: ${personalizations.join(", ")}`);
+      if(personalizationText) lines.push(`Texto da personalização: ${personalizationText}`);
+      if(otherItems.length){
+        lines.push("", "OUTROS ITENS:");
+        otherItems.forEach(item=>lines.push(`• ${item.item}: ${item.quantidade} unidades (${money(item.subtotal)})`));
+      }
+      if(sweets.length){
+        lines.push("", "DOCINHOS:");
+        sweets.forEach(item=>lines.push(`• ${item.linha}: ${item.quantidade} unidades; sabores: ${item.sabores.join(", ")}; valor: ${money(item.valor)}`));
+      }
+      lines.push("", `TOTAL ESTIMADO: ${total}`);
+      if(details.observacoes) lines.push("", `Observações: ${details.observacoes}`);
+      const message=lines.join("\n");
 
       try{
         if(window.supabase&&CFG.SUPABASE_URL&&CFG.SUPABASE_ANON_KEY){
@@ -779,9 +828,13 @@
           const {error}=await c.from("custom_cakes").insert({data:details,status:"novo"});
           if(error) console.warn("custom_cakes:",error.message);
         }
-      }catch(err){console.warn(err)}
+      }catch(err){console.warn("Não foi possível salvar a encomenda no painel:",err)}
 
-      window.open(`https://wa.me/5585981563070?text=${encodeURIComponent(text)}`,"_blank","noopener");
+      window.open(`https://wa.me/5585981563070?text=${encodeURIComponent(message)}`,"_blank","noopener");
+    }
+
+    function selectedKitId(){
+      return selectedKit || "";
     }
 
     getConfig().then(data=>{
