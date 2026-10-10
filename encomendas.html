@@ -334,7 +334,17 @@
       const x = clone(FALLBACK);
       if(!v || typeof v !== "object") return x;
       return {...x,...v,
-  cakes:Array.isArray(v.cakes)&&v.cakes.length ? v.cakes : x.cakes,
+  cakes:(()=>{
+    const remote=Array.isArray(v.cakes)?v.cakes:[];
+    const requiredNames=["Chantininho","Naked Cake"];
+    const result=remote.filter(c=>!requiredNames.some(n=>String(c.name||"").trim().toLowerCase()===n.toLowerCase()));
+    requiredNames.forEach(name=>{
+      const configured=remote.find(c=>String(c.name||"").trim().toLowerCase()===name.toLowerCase());
+      const fallback=x.cakes.find(c=>c.name===name);
+      result.push(configured||fallback);
+    });
+    return result;
+  })(),
   masses:Array.isArray(v.masses)&&v.masses.length ? v.masses : x.masses,
   fillings:Array.isArray(v.fillings)&&v.fillings.length ? v.fillings : x.fillings,
   extras:Array.isArray(v.extras) ? v.extras : x.extras,
