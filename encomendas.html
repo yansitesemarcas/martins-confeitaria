@@ -556,42 +556,64 @@
     }
 
     function calc(){
+      // O total da encomenda é acumulativo: mantém o valor do bolo
+      // mesmo quando o cliente passa para "Para sua festa / Outros itens".
       let total = 0;
-      if(mode==="cake"){
-        const kit = cfg.kits.find(x=>x.id===selectedKit);
-        if(kit){
-          total += Number(kit.price||0);
-          document.querySelectorAll('#cakeMode input[name="kitTopo"]:checked').forEach(x=>total+=Number(x.dataset.price||0));
-          document.querySelectorAll('#cakeMode input[name="kitAdicional"]:checked').forEach(x=>total+=Number(x.dataset.price||0));
-        }else{
-          document.querySelectorAll('#cakeMode input[type="radio"]:checked,#cakeMode input[type="checkbox"]:checked').forEach(x=>total+=Number(x.dataset.price||0));
-        }
+
+      const kit = cfg.kits.find(x=>x.id===selectedKit);
+
+      // 1) Sempre calcula o que foi escolhido na parte do bolo.
+      if(kit){
+        total += Number(kit.price||0);
+        document.querySelectorAll('#cakeMode input[name="kitTopo"]:checked').forEach(x=>{
+          total += Number(x.dataset.price||0);
+        });
+        document.querySelectorAll('#cakeMode input[name="kitAdicional"]:checked').forEach(x=>{
+          total += Number(x.dataset.price||0);
+        });
       }else{
-        const kit = cfg.kits.find(x=>x.id===selectedKit);
-        if(kit) total += Number(kit.price||0);
-        document.querySelectorAll('#partyMode input[name="kitTopo"]:checked').forEach(x=>total+=Number(x.dataset.price||0));
-        document.querySelectorAll('#partyMode input[name^="brigadeiro_"]:checked').forEach(x=>total+=Number(x.dataset.price||0));
-        document.querySelectorAll(".other-quantity").forEach(x=>{
-          if(x.value==="custom") return;
-          const q=Number(x.value||0); if(!q)return;
-          if(x.dataset.kind==="hundred") total += (q/100)*Number(x.dataset.price100||0);
-          else {
-            const from=Number(x.dataset.discountFrom||0);
-            const unit=from&&q>=from?Number(x.dataset.discountPrice||0):Number(x.dataset.price||0);
-            total+=q*unit;
-          }
-        });
-        document.querySelectorAll(".custom-other-quantity").forEach(x=>{
-          const q=Number(x.value||0); if(q) total += (q/100)*Number(x.dataset.price100||0);
-        });
-        document.querySelectorAll(".brigadeiro-quantity").forEach(x=>{
-          if(x.value==="custom") return;
-          const q=Number(x.value||0); if(q) total += (q/100)*Number(x.dataset.price100||0);
-        });
-        document.querySelectorAll(".custom-brigadeiro-quantity").forEach(x=>{
-          const q=Number(x.value||0); if(q) total += (q/100)*Number(x.dataset.price100||0);
+        document.querySelectorAll('#cakeMode input[type="radio"]:checked,#cakeMode input[type="checkbox"]:checked').forEach(x=>{
+          total += Number(x.dataset.price||0);
         });
       }
+
+      // 2) Também soma os itens escolhidos para a festa/outros itens.
+      document.querySelectorAll('#partyMode input[name^="brigadeiro_"]:checked').forEach(x=>{
+        total += Number(x.dataset.price||0);
+      });
+
+      document.querySelectorAll(".other-quantity").forEach(x=>{
+        if(x.value==="custom") return;
+        const q=Number(x.value||0);
+        if(!q) return;
+
+        if(x.dataset.kind==="hundred"){
+          total += (q/100)*Number(x.dataset.price100||0);
+        }else{
+          const from=Number(x.dataset.discountFrom||0);
+          const unit=from&&q>=from
+            ? Number(x.dataset.discountPrice||0)
+            : Number(x.dataset.price||0);
+          total += q*unit;
+        }
+      });
+
+      document.querySelectorAll(".custom-other-quantity").forEach(x=>{
+        const q=Number(x.value||0);
+        if(q) total += (q/100)*Number(x.dataset.price100||0);
+      });
+
+      document.querySelectorAll(".brigadeiro-quantity").forEach(x=>{
+        if(x.value==="custom") return;
+        const q=Number(x.value||0);
+        if(q) total += (q/100)*Number(x.dataset.price100||0);
+      });
+
+      document.querySelectorAll(".custom-brigadeiro-quantity").forEach(x=>{
+        const q=Number(x.value||0);
+        if(q) total += (q/100)*Number(x.dataset.price100||0);
+      });
+
       document.getElementById("cakeTotal").textContent = money(total);
     }
 
