@@ -573,11 +573,15 @@ async function submitOrder(e){
  for(const [i,card] of [...document.querySelectorAll(".normal-cake-card")].entries()){
    const cake=card.querySelector('input[type="radio"][name^="cakeType_"]:checked');
    const mass=card.querySelector('input[type="radio"][name^="massa_"]:checked');
-   const fillings=checkedValues('input[name="'+(card.querySelector('input[name^="recheio_"]')?.name||"")+""]:checked');
+   const fillingInput=card.querySelector('input[name^="recheio_"]');
+   const fillings=fillingInput?checkedValues('input[name="'+fillingInput.name+'"]:checked'):[];
    const extras=[...card.querySelectorAll('input[name^="adicional_"]:checked')].map(x=>({nome:x.value,preco:Number(x.dataset.price||0)}));
    const personalizations=[...card.querySelectorAll('input[name^="personalizacao_"]:checked')].map(x=>({nome:x.value,preco:Number(x.dataset.price||0)}));
    const personalizationText=String(card.querySelector('input[name^="personalizationText_"]')?.value||"").trim();
-   if(!cake){alert("Escolha o tipo e o tamanho do Bolo "+(i+1)+".");return;}
+   if(!cake){
+     if(fillings.length||extras.length||personalizations.length||personalizationText){alert("Escolha o tipo e o tamanho do Bolo "+(i+1)+".");return;}
+     continue;
+   }
    if(fillings.length!==2){alert("Escolha exatamente 2 recheios para o Bolo "+(i+1)+".");return;}
    normalCakes.push({bolo:cake.value,tipo:cake.dataset.kindName||cake.value.split(" — ")[0],preco:Number(cake.dataset.price||0),massa:mass?.value||"",recheios:fillings,adicionais:extras,personalizacao:personalizations,personalizacao_text:personalizationText});
  }
