@@ -408,7 +408,7 @@
             ${c.options.map((o,i)=>`
               <label class="extra-option" style="align-items:center">
                 <span><b>${esc(o)}</b><small>${money(c.prices?.[i])} por bolo</small></span>
-                <input type="number" class="normal-cake-quantity" min="0" max="30" step="1" value="0" inputmode="numeric" aria-label="Quantidade de ${esc(c.name)} ${esc(o)}" data-cake-name="${esc(c.name)}" data-size="${esc(o)}" data-price="${Number(c.prices?.[i]||0)}" style="width:76px;padding:10px;border:1px solid #dccbc0;border-radius:8px;font:inherit">
+                <input type="number" class="normal-cake-quantity" min="0" step="1" value="0" inputmode="numeric" aria-label="Quantidade de ${esc(c.name)} ${esc(o)}" data-cake-name="${esc(c.name)}" data-size="${esc(o)}" data-price="${Number(c.prices?.[i]||0)}" style="width:76px;padding:10px;border:1px solid #dccbc0;border-radius:8px;font:inherit">
               </label>`).join("")}
           </div>
         </section>`).join("");
