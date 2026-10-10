@@ -544,13 +544,9 @@
       document.getElementById("partyMode").classList.toggle("active",next==="party");
       document.getElementById("partyMode").style.display = next==="party" ? "block" : "none";
       document.getElementById("cakeMode").style.display = next==="cake" ? "block" : "none";
-      if(next==="cake"){
-        selectedKit = null;
-        document.querySelectorAll('input[name="kit"], input[name="kitRecheio"], input[name="kitTopo"], input[name="kitMassa"]').forEach(x=>x.checked=false);
-        document.getElementById("kitTopoSection").hidden = true;
-        document.getElementById("kitCakeOptionsSection").hidden = true;
-        document.getElementById("kitSelectedInfo").hidden = true;
-      }
+      // Trocar de seção não pode apagar escolhas anteriores.
+      // O estado do bolo/kit e os itens da festa permanecem selecionados
+      // enquanto o cliente navega entre as duas partes da encomenda.
       calc();
       window.scrollTo({top:document.querySelector(".order-paths").offsetTop-90,behavior:"smooth"});
     }
