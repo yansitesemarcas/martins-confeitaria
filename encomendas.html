@@ -725,7 +725,7 @@
         adicionais:kit ? f.getAll("kitAdicional") : (mode==="cake" ? f.getAll("adicional") : []),
         personalizacao:mode==="cake" ? f.getAll("personalizacao") : [],
         personalizacao_text:document.getElementById("personalizationText")?.value||"",
-        brigadeiros:mode==="party" ? [
+        brigadeiros: [
           ...["classica","premium"].map(line=>{
             const select=document.querySelector(`.brigadeiro-quantity[data-line="${line}"]`);
             const custom=document.querySelector(`.custom-brigadeiro-quantity[data-line="${line}"]`);
@@ -734,8 +734,8 @@
             if(select?.value==="custom" && q>0 && q<100){ alert("Na opção \"Outra quantidade\", informe 100 unidades ou mais."); custom.value=100; }
             return q>=100 ? {linha:line==="classica"?"Linha Clássica":"Linha Premium",quantidade:q,unidade:"unidades",valor:((q/100)*Number(select?.dataset.price100||0)),sabores:flavors} : null;
           }).filter(Boolean)
-        ] : [],
-        outros:mode==="party" ? [...document.querySelectorAll(".other-quantity")].flatMap(x=>{
+        ].filter(Boolean),
+        outros: [...document.querySelectorAll(".other-quantity")].flatMap(x=>{
           if(x.value==="custom"){
             const custom=x.parentElement?.querySelector(".custom-other-quantity");
             const q=Number(custom?.value||0);
@@ -744,7 +744,7 @@
           }
           const q=Number(x.value||0);
           return q>0 ? [{item:x.dataset.item,quantidade:q,unidade:"unidades",precoPorUnidade:x.dataset.kind==="hundred"?Number(x.dataset.price100||0)/100:Number(x.dataset.price||0)}] : [];
-        }) : [],
+        }),
         observacoes:String(f.get("customerNotes")||"").trim(),total_estimado:total
       };
 
@@ -759,12 +759,15 @@
         kit?`Kit: ${kit.name}`:`Bolo: ${details.bolo||"Não informado"}`,
         details.topo?`Topo: ${details.topo}`:"",
         details.massa?`Massa: ${details.massa}`:"",
-        details.recheio?`Recheio: ${details.recheio}`:"",
-        kit?`Docinhos: ${kit.docinhos||""} — Brigadeiro Tradicional`:"",
+        details.recheio?`Recheios: ${Array.isArray(details.recheio)?details.recheio.join(", "):details.recheio}`:"",
+        kit?`Docinhos inclusos no Kit: ${kit.docinhos||""} — Brigadeiro Tradicional`:"",
+        kit?(kit.items||[]).length?`Itens inclusos no Kit: ${(kit.items||[]).join(", ")}`:"":"",
         details.adicionais.length?`Adicionais: ${details.adicionais.join(", ")}`:"",
         details.personalizacao.length?`Personalização: ${details.personalizacao.join(", ")}`:"",
+        details.personalizacao_text?`Texto da personalização: ${details.personalizacao_text}`:"",
         details.outros.length?`Outros itens: ${details.outros.map(x=>x.item+" — "+x.quantidade+" "+x.unidade).join(", ")}`:"",
         details.brigadeiros.length?`Docinhos: ${details.brigadeiros.map(x=>x.linha+" — "+x.quantidade+" unidades — "+money(x.valor)+" — sabores: "+x.sabores.join(", ")).join(" | ")}`:"",
+        details.bolo?`Bolo: ${details.bolo}`:"",
         `Total estimado: ${total}`,
         customQuantityText,
         details.observacoes?`Observações: ${details.observacoes}`:""
