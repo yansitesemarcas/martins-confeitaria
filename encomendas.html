@@ -42,6 +42,9 @@
     .order-path.active span{color:#f4e8d8}
 
     .order-mode{display:none}
+    .normal-cake-card h4{color:#6f4a32;margin:18px 0 10px}
+    .normal-cake-card .cake-size-options{margin-bottom:14px}
+
     .order-mode.active{display:block}
     .cake-builder{display:grid;gap:25px}
     .extras,.kit-section,.brigadeiro-section,.other-orders-section,.customer-section{
@@ -156,35 +159,12 @@
 
       <section id="cakeMode" class="order-mode active" aria-label="Personalize seu bolo">
         <div class="cake-builder">
-          <fieldset id="normalCakeTypeSection" class="extras">
-            <legend>Escolha o bolo</legend>
-            <div id="cakeType"></div>
-          </fieldset>
-
-          <fieldset id="normalMassSection" class="extras">
-            <legend>Massa</legend>
-            <div id="cakeMassOptions" class="options-grid"></div>
-          </fieldset>
-
-          <fieldset id="normalFillingSection" class="extras">
-            <legend>Recheio</legend>
-            <p class="party-note">Escolha até duas opções de recheio.</p>
-            <div id="cakeFillings" class="options-grid"></div>
-          </fieldset>
-
-          <fieldset id="normalExtrasSection" class="extras">
-            <legend>Adicionais</legend>
-            <div id="cakeExtras" class="options-grid"></div>
-          </fieldset>
-
-          <fieldset id="normalPersonalizationSection" class="extras">
-            <legend>Personalização</legend>
-            <div id="cakePersonalizations" class="options-grid"></div>
-            <label class="customer-fields" style="margin-top:16px">
-              <span>Como deseja personalizar?</span>
-              <input id="personalizationText" name="personalizationText" placeholder="Ex.: Feliz aniversário Maria">
-            </label>
-          </fieldset>
+          <section id="normalCakeTypeSection" class="extras">
+            <legend style="display:block">Seus bolos avulsos</legend>
+            <p class="party-note">Adicione quantos Naked Cakes e bolos com Chantininho quiser. Cada bolo terá tamanho, massa, recheios e adicionais próprios.</p>
+            <div id="normalCakesContainer"></div>
+            <button type="button" id="addNormalCake" class="submit-order" style="margin-top:14px">+ Adicionar outro bolo</button>
+          </section>
 
 
           <section class="kit-section">
@@ -399,61 +379,7 @@
     }
 
     function render(){
-      const cake = document.getElementById("cakeType");
-      const activeCakes = cfg.cakes.filter(x=>x.active!==false);
-      let selectedCakeName = activeCakes[0]?.name || "";
-
-      cake.innerHTML = `
-        <div class="cake-kind-switch" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:20px">
-          ${activeCakes.map((c,i)=>`
-            <button type="button" class="cake-kind-button" data-cake-kind="${esc(c.name)}" style="border:2px solid #dccbc0;border-radius:16px;padding:16px;background:${i===0?"#6f4a32":"#fffaf4"};color:${i===0?"#fff":"#5b3e26"};font:inherit;font-weight:800;cursor:pointer">
-              ${esc(c.name)}
-            </button>`).join("")}
-        </div>
-        <div id="cakeSizeOptions"></div>`;
-
-      const renderCakeSizes = () => {
-        const selected = activeCakes.find(c=>c.name===selectedCakeName) || activeCakes[0];
-        const sizes = document.getElementById("cakeSizeOptions");
-        if(!selected){sizes.innerHTML="";return;}
-        sizes.innerHTML = `
-          <p style="margin:0 0 12px;color:#806b60;font-weight:700">Escolha o tamanho do ${esc(selected.name)}:</p>
-          <div class="options-grid">
-            ${selected.options.map((o,i)=>`
-              <label class="extra-option">
-                <input type="radio" name="cakeType" value="${esc(selected.name+" — "+o)}" data-price="${Number(selected.prices?.[i]||0)}" >
-                <span>${esc(o)}</span>
-                <strong>${money(selected.prices?.[i])}</strong>
-              </label>`).join("")}
-          </div>`;
-        document.querySelectorAll('#cakeSizeOptions input[name="cakeType"]').forEach(x=>x.addEventListener("change",calc));
-        calc();
-      };
-
-      cake.querySelectorAll("[data-cake-kind]").forEach(btn=>btn.addEventListener("click",()=>{
-        selectedCakeName=btn.dataset.cakeKind;
-        cake.querySelectorAll("[data-cake-kind]").forEach(b=>{
-          const active=b.dataset.cakeKind===selectedCakeName;
-          b.style.background=active?"#6f4a32":"#fffaf4";
-          b.style.color=active?"#fff":"#5b3e26";
-          b.style.borderColor=active?"#6f4a32":"#dccbc0";
-        });
-        renderCakeSizes();
-      }));
-      renderCakeSizes();
-
-      document.getElementById("cakeMassOptions").innerHTML = cfg.masses.map((x,i)=>`
-        <label class="extra-option"><input type="radio" name="massa" value="${esc(x)}" ${i===0?"checked":""}><span>${esc(x)}</span></label>`).join("");
-
-      document.getElementById("cakeFillings").innerHTML = cfg.fillings.map((x,i)=>`
-        <label class="extra-option"><input type="checkbox" name="recheio" value="${esc(x)}"><span>${esc(x)}</span></label>`).join("");
-
-      document.getElementById("cakeExtras").innerHTML = cfg.extras.map(x=>`
-        <label class="extra-option"><input type="checkbox" name="adicional" value="${esc(x[0])}" data-price="${Number(x[1]||0)}"><span>${esc(x[0])}</span><strong>+ ${money(x[1])}</strong></label>`).join("");
-
-      document.getElementById("cakePersonalizations").innerHTML = cfg.personalizations.map(x=>`
-        <label class="extra-option"><input type="checkbox" name="personalizacao" value="${esc(x[0])}" data-price="${Number(x[1]||0)}"><span>${esc(x[0])}</span><strong>+ ${money(x[1])}</strong></label>`).join("");
-
+      renderNormalCakes();
       const activeKits = cfg.kits.filter(x=>x.active!==false);
       const kitGroups = [...new Set(activeKits.map(k=>k.group || "Kits Festa"))];
       document.getElementById("kitOptions").innerHTML = kitGroups.map(group=>`
@@ -475,7 +401,6 @@
       const availableOtherItems=Array.isArray(cfg.otherItems)&&cfg.otherItems.length ? cfg.otherItems : FALLBACK.otherItems;
       otherItemsEl.innerHTML = availableOtherItems.filter(x=>x.active!==false).map(x=>{
         if(x.id==="petit-brownie"){
-          const price100=Number(x.packages?.find(p=>Number(p.qty)===100)?.total||180);
           return `
             <div class="brigadeiro-box">
               <h3>${esc(x.name)}</h3>
@@ -505,14 +430,79 @@
           </div>`;
       }).join("");
 
-      document.getElementById("classicFlavors").innerHTML = (cfg.brigadeiros?.classica||[]).map((x,i)=>
+      document.getElementById("classicFlavors").innerHTML = (cfg.brigadeiros?.classica||[]).map(x=>
         `<label class="extra-option"><input type="checkbox" name="brigadeiro_classica" value="${esc(x)}"><span>${esc(x)}</span></label>`).join("");
-      document.getElementById("premiumFlavors").innerHTML = (cfg.brigadeiros?.premium||[]).map((x,i)=>
+      document.getElementById("premiumFlavors").innerHTML = (cfg.brigadeiros?.premium||[]).map(x=>
         `<label class="extra-option"><input type="checkbox" name="brigadeiro_premium" value="${esc(x)}"><span>${esc(x)}</span></label>`).join("");
 
       bind();
     }
 
+    let normalCakeCounter = 0;
+    function renderNormalCakes(){
+      const root=document.getElementById("normalCakesContainer");
+      if(!root)return;
+      const activeCakes=cfg.cakes.filter(c=>c.active!==false);
+      if(!root.children.length) addNormalCake();
+    }
+    function addNormalCake(){
+      const root=document.getElementById("normalCakesContainer");
+      if(!root)return;
+      const activeCakes=cfg.cakes.filter(c=>c.active!==false);
+      if(!activeCakes.length)return;
+      const id=++normalCakeCounter;
+      const card=document.createElement("article");
+      card.className="normal-cake-card";
+      card.dataset.cakeId=String(id);
+      card.style.cssText="border:1px solid #e5d5c9;border-radius:16px;padding:18px;margin:14px 0;background:#fffdf9";
+      card.innerHTML=`
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <h3 style="color:#6f4a32;margin:0">Bolo ${id}</h3>
+          <button type="button" class="remove-normal-cake" style="border:1px solid #dccbc0;border-radius:10px;padding:8px 12px;background:#fff;color:#6f4a32;font:inherit;cursor:pointer">Remover bolo</button>
+        </div>
+        <h4>Tipo e tamanho</h4>
+        <div class="options-grid cake-size-options">
+          ${activeCakes.map(c=>c.options.map((o,i)=>`
+            <label class="extra-option">
+              <input type="radio" name="cakeType_${id}" value="${esc(c.name+" — "+o)}" data-kind-name="${esc(c.name)}" data-price="${Number(c.prices?.[i]||0)}" required>
+              <span><b>${esc(c.name)}</b><small>${esc(o)}</small></span>
+              <strong>${money(c.prices?.[i])}</strong>
+            </label>`).join("")).join("")}
+        </div>
+        <h4>Massa</h4>
+        <div class="options-grid">
+          ${cfg.masses.map((x,i)=>`<label class="extra-option"><input type="radio" name="massa_${id}" value="${esc(x)}" ${i===0?"checked":""}><span>${esc(x)}</span></label>`).join("")}
+        </div>
+        <h4>Recheios (escolha até 2)</h4>
+        <div class="options-grid">
+          ${cfg.fillings.map(x=>`<label class="extra-option"><input type="checkbox" name="recheio_${id}" value="${esc(x)}"><span>${esc(x)}</span></label>`).join("")}
+        </div>
+        <h4>Adicionais</h4>
+        <div class="options-grid">
+          ${cfg.extras.map(x=>`<label class="extra-option"><input type="checkbox" name="adicional_${id}" value="${esc(x[0])}" data-price="${Number(x[1]||0)}"><span>${esc(x[0])}</span><strong>+ ${money(x[1])}</strong></label>`).join("")}
+        </div>
+        <h4>Personalização</h4>
+        <div class="options-grid">
+          ${cfg.personalizations.map(x=>`<label class="extra-option"><input type="checkbox" name="personalizacao_${id}" value="${esc(x[0])}" data-price="${Number(x[1]||0)}"><span>${esc(x[0])}</span><strong>+ ${money(x[1])}</strong></label>`).join("")}
+        </div>
+        <label class="customer-fields" style="margin-top:12px"><span>Texto da personalização</span><input name="personalizationText_${id}" placeholder="Ex.: Feliz aniversário Maria"></label>`;
+      root.appendChild(card);
+      card.querySelector(".remove-normal-cake").addEventListener("click",()=>{card.remove();renumberNormalCakes();calc();});
+      card.querySelectorAll("input").forEach(x=>x.addEventListener("change",()=>{
+        if(x.type==="checkbox"&&x.name.startsWith("recheio_")&&x.checked){
+          const group=card.querySelectorAll('input[name="'+x.name+'"]:checked');
+          if(group.length>2){x.checked=false;alert("Escolha no máximo 2 recheios para este bolo.");return;}
+        }
+        calc();
+      }));
+      renumberNormalCakes();
+      calc();
+    }
+    function renumberNormalCakes(){
+      document.querySelectorAll(".normal-cake-card").forEach((card,i)=>{
+        const h=card.querySelector("h3");if(h)h.textContent="Bolo "+(i+1);
+      });
+    }
     function kitKey(id){return String(id).replace(/[^a-zA-Z0-9_-]/g,"_");}
 function renderKitCustomizations(){
  const root=document.getElementById("kitCustomizations");if(!root)return;
@@ -548,23 +538,24 @@ function renderKitCustomizations(){
  let total=0;
  document.querySelectorAll('#cakeMode input[name="kit"]:checked').forEach(x=>{total+=Number(x.dataset.price||0);});
  document.querySelectorAll(".kit-custom-card:not([hidden]) input:checked").forEach(x=>{total+=Number(x.dataset.price||0);});
- document.querySelectorAll('#cakeMode input[name="cakeType"]:checked,#cakeMode input[name="adicional"]:checked,#cakeMode input[name="personalizacao"]:checked').forEach(x=>{total+=Number(x.dataset.price||0);});
+ document.querySelectorAll(".normal-cake-card").forEach(card=>{
+   card.querySelectorAll('input[type="radio"][name^="cakeType_"]:checked,input[name^="adicional_"]:checked,input[name^="personalizacao_"]:checked').forEach(x=>{total+=Number(x.dataset.price||0);});
+ });
  document.querySelectorAll('#partyMode input[name^="brigadeiro_"]:checked').forEach(x=>{total+=Number(x.dataset.price||0);});
  document.querySelectorAll(".other-quantity").forEach(x=>{if(x.value==="custom")return;const q=Number(x.value||0);if(!q)return;if(x.dataset.kind==="hundred")total+=(q/100)*Number(x.dataset.price100||0);else{const from=Number(x.dataset.discountFrom||0);const unit=from&&q>=from?Number(x.dataset.discountPrice||0):Number(x.dataset.price||0);total+=q*unit;}});
  document.querySelectorAll(".custom-other-quantity").forEach(x=>{const q=Number(x.value||0);if(q)total+=(q/100)*Number(x.dataset.price100||0);});
  document.querySelectorAll(".brigadeiro-quantity").forEach(x=>{if(x.value==="custom")return;const q=Number(x.value||0);if(q)total+=(q/100)*Number(x.dataset.price100||0);});
  document.querySelectorAll(".custom-brigadeiro-quantity").forEach(x=>{const q=Number(x.value||0);if(q)total+=(q/100)*Number(x.dataset.price100||0);});
- const out=document.getElementById("cakeTotal");if(out)out.textContent=money(total);return total;
-}
-    function bind(){
+ const out=document.getElementById("cakeTot    function bind(){
  document.querySelectorAll(".order-path").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
+ const addButton=document.getElementById("addNormalCake");
+ if(addButton)addButton.addEventListener("click",addNormalCake);
  document.querySelectorAll(".brigadeiro-quantity").forEach(select=>select.addEventListener("change",()=>{const custom=document.querySelector('.custom-brigadeiro-quantity[data-line="'+select.dataset.line+'"]');if(custom)custom.hidden=select.value!=="custom";const line=select.dataset.line;const q=Number(select.value||0);const limit=q===50?2:4;const chosen=[...document.querySelectorAll('input[name="brigadeiro_'+line+'"]:checked')];if(chosen.length>limit){chosen.slice(limit).forEach(x=>x.checked=false);alert("Quantidade máxima de sabores excedida.");}calc();}));
  document.querySelectorAll(".other-quantity").forEach(select=>select.addEventListener("change",()=>{const custom=select.parentElement?.querySelector(".custom-other-quantity");if(custom)custom.hidden=select.value!=="custom";calc();}));
  document.querySelectorAll("#cakeForm input,#cakeForm select").forEach(x=>x.addEventListener("change",()=>{
   if((x.name==="brigadeiro_classica"||x.name==="brigadeiro_premium")&&x.checked){const line=x.name==="brigadeiro_classica"?"classica":"premium";const q=Number(document.querySelector('.brigadeiro-quantity[data-line="'+line+'"]')?.value||0);const limit=q===50?2:4;if(document.querySelectorAll('input[name="brigadeiro_'+line+'"]:checked').length>limit){x.checked=false;alert("Quantidade máxima de sabores excedida.");return;}}
-  if(x.name==="recheio"&&x.checked&&document.querySelectorAll('input[name="recheio"]:checked').length>2){x.checked=false;alert("Escolha exatamente 2 recheios para o bolo.");return;}
-  if(x.name.startsWith("kitRecheio_")&&x.checked&&document.querySelectorAll('input[name="'+x.name+'"]:checked').length>2){x.checked=false;alert("Escolha exatamente 2 recheios para este kit.");return;}
-  if(x.name==="kit"){const card=Array.from(document.querySelectorAll(".kit-custom-card")).find(c=>c.dataset.kitCard===x.value);if(card)card.hidden=!x.checked;const any=!!document.querySelector('input[name="kit"]:checked');document.getElementById("kitCustomizationsSection").hidden=!any;setNormalCakeSections(!any);selectedKit=x.checked?x.value:(document.querySelector('input[name="kit"]:checked')?.value||null);}
+  if(x.name.startsWith("kitRecheio_")&&x.checked&&document.querySelectorAll('input[name="'+x.name+'"]:checked').length>2){x.checked=false;alert("Escolha no máximo 2 recheios para este kit.");return;}
+  if(x.name==="kit"){const card=Array.from(document.querySelectorAll(".kit-custom-card")).find(c=>c.dataset.kitCard===x.value);if(card)card.hidden=!x.checked;const any=!!document.querySelector('input[name="kit"]:checked');document.getElementById("kitCustomizationsSection").hidden=!any;setNormalCakeSections(true);selectedKit=x.checked?x.value:(document.querySelector('input[name="kit"]:checked')?.value||null);}
   calc();
  }));
  const clear=document.getElementById("clearKitButton");if(clear)clear.addEventListener("click",()=>{document.querySelectorAll('input[name="kit"]').forEach(x=>x.checked=false);document.querySelectorAll(".kit-custom-card").forEach(c=>{c.hidden=true;c.querySelectorAll("input").forEach(x=>x.checked=false);});document.getElementById("kitCustomizationsSection").hidden=true;setNormalCakeSections(true);selectedKit=null;calc();});
@@ -578,17 +569,26 @@ async function submitOrder(e){
  const selectedIds=checkedValues('input[name="kit"]:checked');const selectedKits=cfg.kits.filter(k=>selectedIds.includes(String(k.id)));
  const kitDetails=[];
  for(let i=0;i<selectedKits.length;i++){const k=selectedKits[i],key=kitKey(k.id);const top=document.querySelector('input[name="kitTopo_'+key+'"]:checked');const mass=document.querySelector('input[name="kitMassa_'+key+'"]:checked');const fills=checkedValues('input[name="kitRecheio_'+key+'"]:checked');const extras=[...document.querySelectorAll('input[name="kitAdicional_'+key+'"]:checked')].map(x=>({nome:x.value,preco:Number(x.dataset.price||0)}));if(!top||!mass||fills.length!==2){alert("No Kit Festa "+(i+1)+" ("+k.name+"), escolha um topo, uma massa e exatamente dois recheios.");return;}kitDetails.push({nome:k.name,bolo:k.cake,itens:k.items||[],docinhos:k.docinhos||0,topo:top.value,preco_topo:Number(top.dataset.price||0),massa:mass.value,recheios:fills,adicionais:extras,preco:Number(k.price||0)});}
- const normalCake=document.querySelector('#cakeMode input[name="cakeType"]:checked');const normalMass=document.querySelector('#cakeMode input[name="massa"]:checked');const normalFillings=checkedValues('#cakeMode input[name="recheio"]:checked');const normalExtras=[...document.querySelectorAll('#cakeMode input[name="adicional"]:checked')].map(x=>({nome:x.value,preco:Number(x.dataset.price||0)}));const personalizations=checkedValues('#cakeMode input[name="personalizacao"]:checked');const personalizationText=String(document.getElementById("personalizationText")?.value||"").trim();
- const hasNormalCake=!!normalCake||normalFillings.length>0||normalExtras.length>0||personalizations.length>0||!!personalizationText;
- if(hasNormalCake&&normalFillings.length!==2){alert("Escolha exatamente 2 recheios para o bolo.");return;}
+ const normalCakes=[];
+ for(const [i,card] of [...document.querySelectorAll(".normal-cake-card")].entries()){
+   const cake=card.querySelector('input[type="radio"][name^="cakeType_"]:checked');
+   const mass=card.querySelector('input[type="radio"][name^="massa_"]:checked');
+   const fillings=checkedValues('input[name="'+(card.querySelector('input[name^="recheio_"]')?.name||"")+""]:checked');
+   const extras=[...card.querySelectorAll('input[name^="adicional_"]:checked')].map(x=>({nome:x.value,preco:Number(x.dataset.price||0)}));
+   const personalizations=[...card.querySelectorAll('input[name^="personalizacao_"]:checked')].map(x=>({nome:x.value,preco:Number(x.dataset.price||0)}));
+   const personalizationText=String(card.querySelector('input[name^="personalizationText_"]')?.value||"").trim();
+   if(!cake){alert("Escolha o tipo e o tamanho do Bolo "+(i+1)+".");return;}
+   if(fillings.length!==2){alert("Escolha exatamente 2 recheios para o Bolo "+(i+1)+".");return;}
+   normalCakes.push({bolo:cake.value,tipo:cake.dataset.kindName||cake.value.split(" — ")[0],preco:Number(cake.dataset.price||0),massa:mass?.value||"",recheios:fillings,adicionais:extras,personalizacao:personalizations,personalizacao_text:personalizationText});
+ }
+ const hasNormalCake=normalCakes.length>0;
  const otherItems=[...document.querySelectorAll(".other-quantity")].flatMap(el=>{const q=Number(el.value||0);if(!q)return[];let unit=0;if(el.dataset.kind==="hundred")unit=Number(el.dataset.price100||180)/100;else{const from=Number(el.dataset.discountFrom||0);unit=from&&q>=from?Number(el.dataset.discountPrice||0):Number(el.dataset.price||0);}return[{item:el.dataset.item||el.closest(".brigadeiro-box")?.querySelector("h3")?.textContent?.trim()||"Outro item",quantidade:q,unidade:"unidades",precoPorUnidade:unit,subtotal:q*unit}];});
  const sweets=[];for(const line of ["classica","premium"]){const select=document.querySelector('.brigadeiro-quantity[data-line="'+line+'"]');const q=Number(select?.value||0);if(!q)continue;const flavors=checkedValues('input[name="brigadeiro_'+line+'"]:checked');if(!flavors.length){alert("Escolha pelo menos um sabor da linha "+(line==="classica"?"Clássica":"Premium")+".");return;}const max=q===50?2:4;if(flavors.length>max){alert("Para "+q+" unidades, escolha no máximo "+max+" sabores.");return;}sweets.push({linha:line==="classica"?"Linha Clássica":"Linha Premium",quantidade:q,valor:(q/100)*Number(select.dataset.price100||0),sabores:flavors});}
  const total=document.getElementById("cakeTotal").textContent;const notes=String(f.get("customerNotes")||"").trim();
- const details={tipo:"encomenda",modo:mode,cliente:name,whatsapp:phone,data_desejada:date,kits:kitDetails,kit:kitDetails[0]?.nome||null,itens_kit:kitDetails[0]?.itens||[],bolo:normalCake?.value||null,topo:"",massa:normalMass?.value||"",recheios:normalFillings,adicionais:normalExtras,personalizacao:personalizations,personalizacao_text:personalizationText,brigadeiros:sweets,outros:otherItems,observacoes:notes,total_estimado:total};
+ const details={tipo:"encomenda",modo:mode,cliente:name,whatsapp:phone,data_desejada:date,kits:kitDetails,kit:kitDetails[0]?.nome||null,itens_kit:kitDetails[0]?.itens||[],bolos:normalCakes,bolo:normalCakes[0]?.bolo||null,massa:normalCakes[0]?.massa||"",recheios:normalCakes[0]?.recheios||[],adicionais:normalCakes.flatMap(x=>x.adicionais),personalizacao:normalCakes.flatMap(x=>x.personalizacao.map(p=>p.nome)),brigadeiros:sweets,outros:otherItems,observacoes:notes,total_estimado:total};
  const lines=["Olá! Gostaria de fazer uma encomenda na Martins Confeitaria.","","Nome: "+name,"WhatsApp: "+phone,"Data desejada: "+date,"","RESUMO DO PEDIDO"];
  kitDetails.forEach((k,i)=>{lines.push("","KIT FESTA "+(i+1)+": "+k.nome,"Bolo incluso: "+k.bolo);if(k.itens.length)lines.push("Itens inclusos: "+k.itens.join(", "));if(k.docinhos)lines.push("Docinhos inclusos: "+k.docinhos+" unidades de Brigadeiro Tradicional");lines.push("Topo: "+k.topo+" (+ "+money(k.preco_topo)+")","Massa: "+k.massa,"Recheios: "+k.recheios.join(", "));if(k.adicionais.length)lines.push("Adicionais: "+k.adicionais.map(x=>x.nome+" ("+money(x.preco)+")").join(", "));});
- if(hasNormalCake){lines.push("","BOLO AVULSO");if(normalCake)lines.push("Bolo: "+normalCake.value);if(normalMass)lines.push("Massa: "+normalMass.value);if(normalFillings.length)lines.push("Recheios: "+normalFillings.join(", "));if(normalExtras.length)lines.push("Adicionais: "+normalExtras.map(x=>x.nome+" ("+money(x.preco)+")").join(", "));}
- if(personalizations.length)lines.push("Personalização: "+personalizations.join(", "));if(personalizationText)lines.push("Texto da personalização: "+personalizationText);
+ normalCakes.forEach((c,i)=>{lines.push("","BOLO AVULSO "+(i+1),"Tipo e tamanho: "+c.bolo,"Preço: "+money(c.preco),"Massa: "+c.massa,"Recheios: "+c.recheios.join(", "));if(c.adicionais.length)lines.push("Adicionais: "+c.adicionais.map(x=>x.nome+" ("+money(x.preco)+")").join(", "));if(c.personalizacao.length)lines.push("Personalização: "+c.personalizacao.map(x=>x.nome+" ("+money(x.preco)+")").join(", "));if(c.personalizacao_text)lines.push("Texto da personalização: "+c.personalizacao_text);});
  if(otherItems.length){lines.push("","OUTROS ITENS:");otherItems.forEach(x=>lines.push("• "+x.item+": "+x.quantidade+" unidades ("+money(x.subtotal)+")"));}
  if(sweets.length){lines.push("","DOCINHOS:");sweets.forEach(x=>lines.push("• "+x.linha+": "+x.quantidade+" unidades; sabores: "+x.sabores.join(", ")+"; valor: "+money(x.valor)));}
  lines.push("","TOTAL ESTIMADO: "+total);if(notes)lines.push("","Observações: "+notes);const message=lines.join("\n");
