@@ -719,11 +719,11 @@
         tipo:"encomenda",modo:mode,cliente:name,whatsapp:phone,data_desejada:date,
         kit:kit?.name||null,bolo:kit?.cake||f.get("cakeType")||null,
         topo:kit ? (f.get("kitTopo")||"") : (f.get("topo")||""),
-        massa:kit ? (f.get("kitMassa")||"") : (mode==="cake" ? (f.get("massa")||"") : ""),
-        recheio:kit ? f.getAll("kitRecheio") : (mode==="cake" ? f.getAll("recheio") : ""),
+        massa:kit ? (f.get("kitMassa")||"") : (f.get("massa")||""),
+        recheio:kit ? f.getAll("kitRecheio") : f.getAll("recheio"),
         docinhos_kit:kit ? "Brigadeiro Tradicional" : "",
-        adicionais:kit ? f.getAll("kitAdicional") : (mode==="cake" ? f.getAll("adicional") : []),
-        personalizacao:mode==="cake" ? f.getAll("personalizacao") : [],
+        adicionais:kit ? f.getAll("kitAdicional") : f.getAll("adicional"),
+        personalizacao:f.getAll("personalizacao"),
         personalizacao_text:document.getElementById("personalizationText")?.value||"",
         brigadeiros: [
           ...["classica","premium"].map(line=>{
