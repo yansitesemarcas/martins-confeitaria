@@ -418,11 +418,11 @@
             ${c.options.map((o,i)=>`
               <label class="extra-option" style="align-items:center">
                 <span><b>${esc(o)}</b><small>${money(c.prices?.[i])} por bolo</small></span>
-                <input type="number" class="normal-cake-quantity" min="0" step="1" value="0" inputmode="numeric" aria-label="Quantidade de ${esc(c.name)} ${esc(o)}" data-cake-name="${esc(c.name)}" data-size="${esc(o)}" data-price="${Number(c.prices?.[i]||0)}" style="width:76px;padding:10px;border:1px solid #dccbc0;border-radius:8px;font:inherit">
+                <input type="checkbox" class="normal-cake-option" aria-label="Selecionar ${esc(c.name)} ${esc(o)}" data-cake-name="${esc(c.name)}" data-size="${esc(o)}" data-price="${Number(c.prices?.[i]||0)}">
               </label>`).join("")}
           </div>
         </section>`).join("");
-      cake.querySelectorAll(".normal-cake-quantity").forEach(x=>x.addEventListener("input",calc));
+      cake.querySelectorAll(".normal-cake-option").forEach(x=>x.addEventListener("change",calc));
 
       document.getElementById("cakeMassOptions").innerHTML = cfg.masses.map((x,i)=>`
         <label class="extra-option"><input type="radio" name="massa" value="${esc(x)}" ${i===0?"checked":""}><span>${esc(x)}</span></label>`).join("");
@@ -530,7 +530,7 @@ function renderKitCustomizations(){
  let total=0;
  document.querySelectorAll('#cakeMode input[name="kit"]:checked').forEach(x=>{total+=Number(x.dataset.price||0);});
  document.querySelectorAll(".kit-custom-card:not([hidden]) input:checked").forEach(x=>{total+=Number(x.dataset.price||0);});
- document.querySelectorAll('#cakeMode input.normal-cake-quantity').forEach(x=>{const q=Math.max(0,Math.floor(Number(x.value||0)));total+=q*Number(x.dataset.price||0);});
+ document.querySelectorAll('#cakeMode input.normal-cake-option:checked').forEach(x=>{total+=Number(x.dataset.price||0);});
  document.querySelectorAll('#cakeMode input[name="adicional"]:checked,#cakeMode input[name="personalizacao"]:checked').forEach(x=>{total+=Number(x.dataset.price||0);});
  document.querySelectorAll('#partyMode input[name^="brigadeiro_"]:checked').forEach(x=>{total+=Number(x.dataset.price||0);});
  document.querySelectorAll(".other-quantity").forEach(x=>{if(x.value==="custom")return;const q=Number(x.value||0);if(!q)return;if(x.dataset.kind==="hundred")total+=(q/100)*Number(x.dataset.price100||0);else{const from=Number(x.dataset.discountFrom||0);const unit=from&&q>=from?Number(x.dataset.discountPrice||0):Number(x.dataset.price||0);total+=q*unit;}});
@@ -561,7 +561,7 @@ async function submitOrder(e){
  const selectedIds=checkedValues('input[name="kit"]:checked');const selectedKits=cfg.kits.filter(k=>selectedIds.includes(String(k.id)));
  const kitDetails=[];
  for(let i=0;i<selectedKits.length;i++){const k=selectedKits[i],key=kitKey(k.id);const top=document.querySelector('input[name="kitTopo_'+key+'"]:checked');const mass=document.querySelector('input[name="kitMassa_'+key+'"]:checked');const fills=checkedValues('input[name="kitRecheio_'+key+'"]:checked');const extras=[...document.querySelectorAll('input[name="kitAdicional_'+key+'"]:checked')].map(x=>({nome:x.value,preco:Number(x.dataset.price||0)}));if(!top||!mass||fills.length!==2){alert("No Kit Festa "+(i+1)+" ("+k.name+"), escolha um topo, uma massa e exatamente dois recheios.");return;}kitDetails.push({nome:k.name,bolo:k.cake,itens:k.items||[],docinhos:k.docinhos||0,topo:top.value,preco_topo:Number(top.dataset.price||0),massa:mass.value,recheios:fills,adicionais:extras,preco:Number(k.price||0)});}
- const normalCakes=[...document.querySelectorAll('#cakeMode input.normal-cake-quantity')].map(x=>({tipo:x.dataset.cakeName,tamanho:x.dataset.size,quantidade:Math.max(0,Math.floor(Number(x.value||0))),preco_unitario:Number(x.dataset.price||0)})).filter(x=>x.quantidade>0);
+ const normalCakes=[...document.querySelectorAll('#cakeMode input.normal-cake-option:checked')].map(x=>({tipo:x.dataset.cakeName,tamanho:x.dataset.size,quantidade:1,preco_unitario:Number(x.dataset.price||0)}));
  const normalMass=document.querySelector('#cakeMode input[name="massa"]:checked');const normalFillings=checkedValues('#cakeMode input[name="recheio"]:checked');const normalExtras=[...document.querySelectorAll('#cakeMode input[name="adicional"]:checked')].map(x=>({nome:x.value,preco:Number(x.dataset.price||0)}));const personalizations=checkedValues('#cakeMode input[name="personalizacao"]:checked');const personalizationText=String(document.getElementById("personalizationText")?.value||"").trim();
  const hasNormalCake=normalCakes.length>0||normalFillings.length>0||normalExtras.length>0||personalizations.length>0||!!personalizationText;
  if(hasNormalCake&&normalCakes.length>0&&normalFillings.length!==2){alert("Escolha exatamente 2 recheios para os bolos avulsos.");return;}
