@@ -497,19 +497,6 @@ function renderKitCustomizations(){
  '<div><h4>Escolha exatamente 2 recheios</h4><div class="options-grid">'+cfg.fillings.map(x=>'<label class="extra-option"><input type="checkbox" name="kitRecheio_'+key+'" value="'+esc(x)+'"><span>'+esc(x)+'</span></label>').join("")+'</div></div>' +
  '<div><h4>Adicionais opcionais</h4><div class="options-grid">'+cfg.extras.map(x=>'<label class="extra-option"><input type="checkbox" name="kitAdicional_'+key+'" value="'+esc(x[0])+'" data-price="'+Number(x[1]||0)+'"><span>'+esc(x[0])+'</span><strong>+ '+money(x[1])+'</strong></label>').join("")+'</div></div></article>';}).join("");
 }
-    function positionOtherItems(){
-      const source = document.querySelector("#partyMode .other-orders-section");
-      const target = document.getElementById("normalFillingSection");
-      const heading = source?.querySelector(":scope > .section-head");
-      const items = document.getElementById("otherItems");
-      if(!source || !target || !heading || !items || document.getElementById("cakeOtherItemsSection")) return;
-      const section = document.createElement("section");
-      section.id = "cakeOtherItemsSection";
-      section.className = "other-orders-section";
-      section.append(heading, items);
-      target.insertAdjacentElement("afterend", section);
-    }
-
     function setNormalCakeSections(show){
       ["normalCakeTypeSection","normalMassSection","normalFillingSection","normalExtrasSection","normalPersonalizationSection"].forEach(id=>{
         const el=document.getElementById(id);
@@ -592,7 +579,6 @@ function selectedKitId(){
       cfg=data;
       cfg.kits=cfg.kits.map(k=>({...k,price:Number(k.price||0)+10}));
       render();
-      positionOtherItems();
       setNormalCakeSections(true);
       startConfigSync();
     });
