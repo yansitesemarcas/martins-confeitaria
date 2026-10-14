@@ -1287,7 +1287,7 @@
     const {
       error: uploadError
     } = await db.storage
-      .from("images")
+      .from("media")
       .upload(
         path,
         file,
@@ -1311,7 +1311,7 @@
     const {
       data
     } = db.storage
-      .from("images")
+      .from("media")
       .getPublicUrl(path);
 
     return (
