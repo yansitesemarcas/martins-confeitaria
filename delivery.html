@@ -60,9 +60,13 @@
   </div>
 
 
-  <div id="categories" class="tabs"></div>
+  <div class="section-action" id="showReadyMenuAction" style="margin:24px 0;text-align:center;">
+    <button type="button" class="btn primary" id="showReadyMenu">Ver produtos e categorias</button>
+  </div>
 
-  <div id="products" class="grid">
+  <div id="categories" class="tabs hidden" aria-hidden="true"></div>
+
+  <div id="products" class="grid hidden" aria-hidden="true">
 
     <div class="empty">
       Carregando produtos...
@@ -1602,7 +1606,17 @@ ${lines}
     INICIAR
   */
 
-  loadProducts();
+  const showReadyMenuButton = $('#showReadyMenu');
+  if (showReadyMenuButton) {
+    showReadyMenuButton.addEventListener('click', async () => {
+      $('#showReadyMenuAction').classList.add('hidden');
+      $('#categories').classList.remove('hidden');
+      $('#products').classList.remove('hidden');
+      $('#categories').setAttribute('aria-hidden', 'false');
+      $('#products').setAttribute('aria-hidden', 'false');
+      await loadProducts();
+    }, { once: true });
+  }
 
 })();
 
