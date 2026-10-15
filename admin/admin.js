@@ -3861,7 +3861,8 @@
         <div class="settings-card-head"><span class="settings-icon">🏷️</span><div><h3>Classificações</h3><p>Categorias utilizadas nos produtos.</p></div>
           <button type="button" class="btn soft" data-action="new-category">+ Nova classificação</button>
         </div>
-        <div class="category-list">${getCategories().map(category => `<span class="badge">${escapeHtml(category)}</span>`).join("")}</div>
+        <div class="category-list category-order-list">${getCategories().map((category,index,categories) => '<div class="category-order-row" style="display:flex;align-items:center;gap:8px;margin:8px 0"><span class="badge" style="flex:1">' + escapeHtml(category) + '</span><button type="button" class="btn soft" data-action="reorder-category" data-index="' + index + '" data-direction="up" aria-label="Mover para cima" title="Mover para cima" ' + (index===0?'disabled':'') + '>↑</button><button type="button" class="btn soft" data-action="reorder-category" data-index="' + index + '" data-direction="down" aria-label="Mover para baixo" title="Mover para baixo" ' + (index===categories.length-1?'disabled':'') + '>↓</button></div>').join("")}</div>
+        <p class="muted">Use as setas para definir a ordem das classificações no delivery. Depois clique em “Salvar alterações”.</p>
       </section>
     `;
   }
@@ -4770,6 +4771,21 @@
         ) {
           createCategory();
 
+          return;
+        }
+
+        if (
+          action ===
+          "reorder-category"
+        ) {
+          const categories = getCategories();
+          const from = Number(target.dataset.index);
+          const to = target.dataset.direction === "up" ? from - 1 : from + 1;
+          if (from >= 0 && from < categories.length && to >= 0 && to < categories.length) {
+            [categories[from], categories[to]] = [categories[to], categories[from]];
+            state.settings = { ...(state.settings || {}), categories };
+            renderCurrentView();
+          }
           return;
         }
 
