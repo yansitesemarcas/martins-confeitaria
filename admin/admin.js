@@ -3661,6 +3661,7 @@ return `
       await Promise.all([
         loadSettings(),
         loadProducts(),
+        loadOrders(),
         loadCustomCakes()
       ]);
 
