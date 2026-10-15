@@ -1864,9 +1864,32 @@
   function renderProductsView(area) {
     const products = getOrderProducts();
     return `
-      <div class="page-head"><div><h2>Produtos de Encomendas</h2><p class="muted">Produtos utilizados para pedidos personalizados.</p></div></div>
-      <div class="stats mini"><div class="stat"><strong>${products.length}</strong><span>Produtos de encomenda</span></div><div class="stat"><strong>${products.filter(product => product.available !== false).length}</strong><span>Ativos</span></div></div>
-      ${products.length ? `<div class="products-grid">${products.map(renderProductCard).join("")}</div>` : `<div class="empty">Nenhum produto de encomenda cadastrado.</div>`}
+      <div class="page-head">
+        <div><h2>Produtos de Encomendas</h2><p class="muted">Produtos utilizados para pedidos personalizados.</p></div>
+      </div>
+      <div class="stats mini">
+        <div class="stat"><strong>${products.length}</strong><span>Produtos de encomenda</span></div>
+        <div class="stat"><strong>${products.filter(product => product.available !== false).length}</strong><span>Ativos</span></div>
+      </div>
+      ${products.length ? `
+        <div class="products-grid">
+          ${products.map(product => `
+            <article class="product-card">
+              <div class="product-info">
+                <div class="product-top"><span class="badge">Encomendas</span></div>
+                <h3>${escapeHtml(product.name || "Produto")}</h3>
+                ${product.category ? `<p class="muted">${escapeHtml(product.category)}</p>` : ""}
+                ${product.description ? `<p class="description">${escapeHtml(product.description)}</p>` : ""}
+                <div class="price-area"><strong>${money(product.price)}</strong></div>
+                <div class="product-actions">
+                  <button type="button" class="btn soft" data-action="edit-product" data-id="${escapeHtml(product.id)}">Editar</button>
+                  <button type="button" class="btn danger" data-action="delete-product" data-id="${escapeHtml(product.id)}">Excluir</button>
+                </div>
+              </div>
+            </article>
+          `).join("")}
+        </div>
+      ` : `<div class="empty">Nenhum produto de encomenda cadastrado.</div>`}
     `;
   }
 
