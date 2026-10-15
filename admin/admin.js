@@ -3586,13 +3586,6 @@ return `
         <div class="hours-note">💡 Se estiver como <b>Fechado</b> ou <b>A confirmar</b>, os horários ficam desativados para aquele dia.</div>
       </section>
 
-      <section class="settings-card">
-        <div class="settings-card-head"><span class="settings-icon">🏷️</span><div><h3>Classificações</h3><p>Categorias utilizadas nos produtos.</p></div>
-          <button type="button" class="btn soft" data-action="new-category">+ Nova classificação</button>
-        </div>
-        <div class="category-list category-order-list">${getCategories().map((category,index,categories) => '<div class="category-order-row" style="display:flex;align-items:center;gap:8px;margin:8px 0"><span class="badge" style="flex:1">' + escapeHtml(category) + '</span><button type="button" class="btn soft" data-action="reorder-category" data-index="' + index + '" data-direction="up" aria-label="Mover para cima" title="Mover para cima" ' + (index===0?'disabled':'') + '>↑</button><button type="button" class="btn soft" data-action="reorder-category" data-index="' + index + '" data-direction="down" aria-label="Mover para baixo" title="Mover para baixo" ' + (index===categories.length-1?'disabled':'') + '>↓</button></div>').join("")}</div>
-        <p class="muted">Use as setas para definir a ordem das classificações no delivery. Depois clique em “Salvar alterações”.</p>
-      </section>
     `;
   }
 
