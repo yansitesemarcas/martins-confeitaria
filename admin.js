@@ -1161,9 +1161,9 @@
      ========================================================= */
 
   function renderProducts(area) {
-    const list = S.products.filter(
-      p => normalizeArea(p.area) === area
-    );
+    const list = S.products
+      .filter(p => normalizeArea(p.area) === area)
+      .sort((a, b) => number(a.sort_order, 0) - number(b.sort_order, 0));
 
     const title =
       area === "pronta"
@@ -1281,6 +1281,20 @@
           }
 
           <div class="product-actions">
+            <button class="btn soft"
+              data-act="reorder-product"
+              data-direction="up"
+              data-id="${escapeHTML(p.id)}"
+              aria-label="Mover ${escapeHTML(p.name || "produto")} para cima"
+              title="Mover para cima">↑</button>
+
+            <button class="btn soft"
+              data-act="reorder-product"
+              data-direction="down"
+              data-id="${escapeHTML(p.id)}"
+              aria-label="Mover ${escapeHTML(p.name || "produto")} para baixo"
+              title="Mover para baixo">↓</button>
+
             <button class="btn soft"
               data-act="edit-product"
               data-id="${escapeHTML(p.id)}">
@@ -1668,6 +1682,58 @@
           "Erro ao salvar produto.",
         "error"
       );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function reorderProduct(id, direction) {
+    if (!sb) {
+      showToast("Supabase não está conectado.", "error");
+      return;
+    }
+
+    const current = S.products.find(p => String(p.id) === String(id));
+    if (!current) return;
+
+    const area = normalizeArea(current.area);
+    const list = S.products
+      .filter(p => normalizeArea(p.area) === area)
+      .sort((a, b) => number(a.sort_order, 0) - number(b.sort_order, 0));
+
+    const index = list.findIndex(p => String(p.id) === String(id));
+    const otherIndex = direction === "up" ? index - 1 : index + 1;
+
+    if (index < 0 || otherIndex < 0 || otherIndex >= list.length) return;
+
+    const first = list[index];
+    const second = list[otherIndex];
+    const firstOrder = number(first.sort_order, index);
+    const secondOrder = number(second.sort_order, otherIndex);
+
+    setLoading(true);
+    try {
+      const { error: firstError } = await sb
+        .from("products")
+        .update({ sort_order: secondOrder })
+        .eq("id", first.id);
+      if (firstError) throw firstError;
+
+      const { error: secondError } = await sb
+        .from("products")
+        .update({ sort_order: firstOrder })
+        .eq("id", second.id);
+      if (secondError) {
+        await sb.from("products").update({ sort_order: firstOrder }).eq("id", first.id);
+        throw secondError;
+      }
+
+      await loadProducts();
+      renderView();
+      showToast("Classificação atualizada no delivery.");
+    } catch (error) {
+      console.error(error);
+      showToast(error.message || "Não foi possível atualizar a classificação.", "error");
     } finally {
       setLoading(false);
     }
@@ -4439,6 +4505,10 @@
             null,
             target.dataset.area
           );
+          break;
+
+        case "reorder-product":
+          await reorderProduct(target.dataset.id, target.dataset.direction);
           break;
 
         case "edit-product":
