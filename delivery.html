@@ -511,9 +511,10 @@
         .from('products')
         .select('*')
         .order(
-          'sort',
+          'sort_order',
           {
-            ascending: true
+            ascending: true,
+            nullsFirst: false
           }
         );
 
