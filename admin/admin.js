@@ -320,10 +320,7 @@
   }
 
   function areaLabel(area) {
-    return normalizeArea(area) ===
-      "encomendas"
-      ? "Encomendas"
-      : "Pronta Entrega";
+    return "Encomendas";
   }
 
   /* =========================================================
@@ -1864,108 +1861,17 @@
     `;
   }
 
-  function renderProductsView(
-    area
-  ) {
-    const products =
-      area === "encomendas"
-        ? getOrderProducts()
-        : getReadyProducts();
-
-    const label =
-      area === "encomendas"
-        ? "Produtos de Encomendas"
-        : "Produtos de Pronta Entrega";
-
-    const description =
-      area === "encomendas"
-        ? "Produtos utilizados para pedidos de encomenda."
-        : "Produtos disponíveis para pronta entrega.";
-
+  function renderProductsView(area) {
+    const products = getOrderProducts();
     return `
-      <div class="page-head">
-
-        <div>
-          <h2>
-            ${label}
-          </h2>
-
-          <p class="muted">
-            ${description}
-          </p>
-        </div>
-
-        ${area === "encomendas" ? "" : `
-          <button
-            type="button"
-            class="btn primary"
-            data-action="new-product"
-          >
-            + Novo produto
-          </button>
-        `}
-
-      </div>
-
-      <div class="stats mini">
-
-        <div class="stat">
-          <strong>
-            ${products.length}
-          </strong>
-          <span>
-            ${area === "encomendas"
-              ? "Produtos de encomenda"
-              : "Produtos de pronta entrega"}
-          </span>
-        </div>
-
-        <div class="stat">
-          <strong>
-            ${
-              products.filter(
-                (product) =>
-                  product.available !==
-                  false
-              ).length
-            }
-          </strong>
-          <span>
-            Ativos
-          </span>
-        </div>
-
-      </div>
-
-      ${
-        products.length
-          ? `
-            <div class="products-grid">
-              ${products
-                .map(
-                  productCard
-                )
-                .join("")}
-            </div>
-          `
-          : `
-            <div class="empty">
-              <strong>
-                Nenhum produto encontrado.
-              </strong>
-
-              <p>
-                Clique em "Novo produto"
-                para cadastrar um item.
-              </p>
-            </div>
-          `
-      }
+      <div class="page-head"><div><h2>Produtos de Encomendas</h2><p class="muted">Produtos utilizados para pedidos personalizados.</p></div></div>
+      <div class="stats mini"><div class="stat"><strong>${products.length}</strong><span>Produtos de encomenda</span></div><div class="stat"><strong>${products.filter(product => product.available !== false).length}</strong><span>Ativos</span></div></div>
+      ${products.length ? `<div class="products-grid">${products.map(renderProductCard).join("")}</div>` : `<div class="empty">Nenhum produto de encomenda cadastrado.</div>`}
     `;
   }
 
   /* =========================================================
-     MIGRAÇÃO DOS PRODUTOS EXISTENTES
+     MIGRAÇÃO/ DOS PRODUTOS EXISTENTES
      ========================================================= */
 
   async function migrateExistingProductsToOrders() {
@@ -2129,16 +2035,6 @@
 
         <div class="stat">
           <strong>
-            ${readyProducts.length}
-          </strong>
-
-          <span>
-            Pronta Entrega
-          </span>
-        </div>
-
-        <div class="stat">
-          <strong>
             ${orderProducts.length}
           </strong>
 
@@ -2179,78 +2075,7 @@
 
       </div>
 
-      <div class="dashboard-grid">
-
-        <section class="panel">
-
-          <div class="panel-head">
-            <div>
-              <h3>
-                Pronta Entrega
-              </h3>
-
-              <p class="muted">
-                Produtos disponíveis para venda imediata.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              class="btn soft"
-              data-action="go-view"
-              data-view="prod-ready"
-            >
-              Ver produtos
-            </button>
-          </div>
-
-          ${
-            readyProducts.length
-              ? `
-                <div class="dashboard-list">
-                  ${readyProducts
-                    .slice(0, 5)
-                    .map(
-                      (product) => `
-                        <div class="list-row">
-
-                          <div>
-                            <strong>
-                              ${escapeHtml(
-                                product.name
-                              )}
-                            </strong>
-
-                            <small>
-                              ${escapeHtml(
-                                product.category ||
-                                  "Sem classificação"
-                              )}
-                            </small>
-                          </div>
-
-                          <strong>
-                            ${money(
-                              product.price
-                            )}
-                          </strong>
-
-                        </div>
-                      `
-                    )
-                    .join("")}
-                </div>
-              `
-              : `
-                <div class="empty small">
-                  Nenhum produto de pronta entrega.
-                </div>
-              `
-          }
-
-        </section>
-
-        <section class="panel">
+      <div class="dashboard-grid"><section class="panel">
 
           <div class="panel-head">
             <div>
@@ -3964,14 +3789,8 @@
     dashboard:
       "Dashboard",
 
-    "prod-ready":
-      "Produtos — Pronta Entrega",
-
     "prod-orders":
       "Produtos — Encomendas",
-
-    "ord-ready":
-      "Pedidos — Pronta Entrega",
 
     "ord-orders":
       "Pedidos — Encomendas",
@@ -4202,27 +4021,10 @@
       current
     );
 
-    switch (current) {
-      case "prod-ready":
-        view.innerHTML =
-          renderProductsView(
-            "pronta"
-          );
-        break;
-
-      case "prod-orders":
+    switch (current) {case "prod-orders":
         view.innerHTML =
           renderOrderPricingView();
-        break;
-
-      case "ord-ready":
-        view.innerHTML =
-          renderOrdersView(
-            "pronta"
-          );
-        break;
-
-      case "ord-orders":
+        break;case "ord-orders":
         view.innerHTML =
           renderOrdersView(
             "encomendas"
@@ -4250,9 +4052,7 @@
   ) {
     const allowed = [
       "dashboard",
-      "prod-ready",
       "prod-orders",
-      "ord-ready",
       "ord-orders",
       "settings"
     ];
