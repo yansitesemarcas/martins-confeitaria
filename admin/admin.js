@@ -1448,7 +1448,7 @@
       };
 
       if (imageUrl) {
-        payload.image_url =
+        payload.image =
           imageUrl;
       }
 
