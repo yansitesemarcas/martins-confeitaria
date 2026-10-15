@@ -1190,6 +1190,32 @@
       </div>
 
       ${
+        area === "pronta" && list.length
+          ? `
+            <section class="card" style="margin-bottom:16px">
+              <div class="card-head">
+                <div>
+                  <h3>Classificação do delivery</h3>
+                  <p class="muted">Use as setas para definir a ordem em que os produtos aparecem para os clientes.</p>
+                </div>
+              </div>
+              <ol style="list-style:none;padding:0;margin:0">
+                ${list.map((p, index) => `
+                  <li style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border,#eee)">
+                    <span><strong>${index + 1}.</strong> ${escapeHTML(p.name || "Sem nome")}</span>
+                    <span style="display:flex;gap:6px;flex-shrink:0">
+                      <button class="btn soft" type="button" data-act="reorder-product" data-direction="up" data-id="${escapeHTML(p.id)}" aria-label="Mover ${escapeHTML(p.name || "produto")} para cima" title="Mover para cima" ${index === 0 ? "disabled" : ""}>↑</button>
+                      <button class="btn soft" type="button" data-act="reorder-product" data-direction="down" data-id="${escapeHTML(p.id)}" aria-label="Mover ${escapeHTML(p.name || "produto")} para baixo" title="Mover para baixo" ${index === list.length - 1 ? "disabled" : ""}>↓</button>
+                    </span>
+                  </li>
+                `).join("")}
+              </ol>
+            </section>
+          `
+          : ""
+      }
+
+      ${
         list.length
           ? `
             <div class="products">
