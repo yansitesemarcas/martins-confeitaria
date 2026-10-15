@@ -1987,9 +1987,6 @@
      ========================================================= */
 
   function renderDashboard() {
-    const readyProducts =
-      getReadyProducts();
-
     const orderProducts =
       getOrderProducts();
 
@@ -3664,7 +3661,6 @@ return `
       await Promise.all([
         loadSettings(),
         loadProducts(),
-        loadOrders(),
         loadCustomCakes()
       ]);
 
