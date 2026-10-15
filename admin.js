@@ -4200,8 +4200,8 @@
             ${
               (S.site.categories || [])
                 .map(
-                  (category, index) => `
-                    <div class="row">
+                  (category, index, categories) => `
+                    <div class="row" style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center">
 
                       <input
                         class="input"
@@ -4209,6 +4209,27 @@
                         value="${escapeHTML(
                           category
                         )}">
+
+                      <span style="display:flex;gap:4px">
+                        <button
+                          class="btn soft"
+                          type="button"
+                          data-act="reorder-site-category"
+                          data-direction="up"
+                          data-index="${index}"
+                          aria-label="Mover classificação para cima"
+                          title="Mover para cima"
+                          ${index === 0 ? "disabled" : ""}>↑</button>
+                        <button
+                          class="btn soft"
+                          type="button"
+                          data-act="reorder-site-category"
+                          data-direction="down"
+                          data-index="${index}"
+                          aria-label="Mover classificação para baixo"
+                          title="Mover para baixo"
+                          ${index === categories.length - 1 ? "disabled" : ""}>↓</button>
+                      </span>
 
                       <button
                         class="btn danger"
@@ -4302,6 +4323,18 @@
         "error"
       );
     }
+  }
+
+  function reorderSiteCategory(index, direction) {
+    const categories = S.site?.categories;
+    if (!Array.isArray(categories)) return;
+
+    const from = Number(index);
+    const to = direction === "up" ? from - 1 : from + 1;
+    if (from < 0 || to < 0 || from >= categories.length || to >= categories.length) return;
+
+    [categories[from], categories[to]] = [categories[to], categories[from]];
+    renderView();
   }
 
   function removeSiteCategory(index) {
@@ -4727,6 +4760,13 @@
         case "remove-site-category":
           removeSiteCategory(
             target.dataset.index
+          );
+          break;
+
+        case "reorder-site-category":
+          reorderSiteCategory(
+            target.dataset.index,
+            target.dataset.direction
           );
           break;
       }
