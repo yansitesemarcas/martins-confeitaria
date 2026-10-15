@@ -578,7 +578,7 @@
       como pronta-entrega.
     */
 
-    deliveryCats =
+    const productCategories =
       [
         ...new Set(
           availableProducts
@@ -591,6 +591,33 @@
             .filter(Boolean)
         )
       ];
+
+    /*
+      Usa a ordem definida nas configurações do site.
+      Categorias sem ordem configurada ficam no final.
+    */
+    let configuredCategories = [];
+    try {
+      const { data: siteSetting, error: siteSettingError } =
+        await client
+          .from('settings')
+          .select('value')
+          .eq('key', 'site')
+          .maybeSingle();
+
+      if (!siteSettingError && Array.isArray(siteSetting?.value?.categories)) {
+        configuredCategories = siteSetting.value.categories
+          .map(c => String(c || '').trim())
+          .filter(Boolean);
+      }
+    } catch (error) {
+      console.warn('Não foi possível carregar a ordem das classificações:', error);
+    }
+
+    deliveryCats = [
+      ...configuredCategories.filter(c => productCategories.includes(c)),
+      ...productCategories.filter(c => !configuredCategories.includes(c))
+    ];
 
 
     /*
