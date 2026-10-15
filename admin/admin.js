@@ -2129,76 +2129,7 @@ return `
 
       </div>
 
-      <section class="panel">
-
-        <div class="panel-head">
-
-          <div>
-            <h3>
-              Pedidos recentes
-            </h3>
-
-            <p class="muted">
-              Últimos pedidos recebidos pelo site.
-            </p>
-          </div>
-
-          
-
-        </div>
-
-        ${
-          state.orders.length
-            ? `
-              <div class="dashboard-list">
-
-                ${state.orders
-                  .slice(0, 8)
-                  .map(
-                    order => `
-                      <div class="list-row">
-
-                        <div>
-                          <strong>
-                            ${escapeHtml(
-                              getOrderCustomerName(
-                                order
-                              )
-                            )}
-                          </strong>
-
-                          <small>
-                            ${escapeHtml(
-                              getOrderDisplayTitle(
-                                order
-                              )
-                            )}
-                          </small>
-                        </div>
-
-                        <span class="badge">
-                          ${escapeHtml(
-                            getOrderStatusLabel(
-                              order.status
-                            )
-                          )}
-                        </span>
-
-                      </div>
-                    `
-                  )
-                  .join("")}
-
-              </div>
-            `
-            : `
-              <div class="empty small">
-                Nenhum pedido recebido.
-              </div>
-            `
-        }
-
-      </section>
+      
     `;
   }
 
