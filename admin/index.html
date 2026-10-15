@@ -21,12 +21,8 @@
     <div class="brand"><span class="brand-logo"><img src="../logo.png" alt="Martins Confeitaria"></span><div><strong>Martins Confeitaria</strong><small>Administração</small></div></div>
     <nav>
       <button data-view="dashboard" class="nav">📊 Dashboard</button>
-      <div class="group">Produtos</div>
-      <button data-view="prod-ready" class="nav sub">🍰 Pronta Entrega</button>
-      <div class="group">Pedidos</div>
-      <button data-view="ord-ready" class="nav sub">🛒 Pronta Entrega</button>
-      <button data-view="ord-orders" class="nav sub">📋 Encomendas</button>
       <div class="group">Encomendas</div>
+      <button data-view="ord-orders" class="nav sub">📋 Pedidos de Encomendas</button>
       <button data-view="prod-orders" class="nav sub">💰 Valores de Encomendas</button>
       <div class="group">Site</div>
       <button data-view="settings" class="nav">⚙️ Configurações</button>
@@ -46,7 +42,7 @@
   <form id="pform" class="dialog">
     <div class="dhead"><h2 id="mtitle">Novo produto</h2><button type="button" class="x" data-close>×</button></div>
     <div class="dbody grid">
-      <label class="full">Tipo<select id="f-area"><option value="pronta">Pronta Entrega</option><option value="encomendas">Encomenda</option></select></label>
+      <input id="f-area" type="hidden" value="encomendas">
       <label class="full">Nome<input id="f-name" required></label>
       <label>Classificação<select id="f-cat"></select></label>
       <label>Preço (R$)<input id="f-price" type="number" step="0.01" min="0"></label>
