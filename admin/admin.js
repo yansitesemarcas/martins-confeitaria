@@ -2001,27 +2001,7 @@
         (product) =>
           product.available !== false
       ).length;
-
-    const totalOrders =
-      state.orders.length;
-
-    const pendingOrders =
-      state.orders.filter(
-        (order) => {
-          const status =
-            normalizeText(
-              order.status
-            );
-
-          return (
-            status === "pendente" ||
-            status === "novo" ||
-            !status
-          );
-        }
-      ).length;
-
-    return `
+return `
       <div class="page-head">
 
         <div>
@@ -2073,26 +2053,6 @@
 
           <span>
             Produtos ativos
-          </span>
-        </div>
-
-        <div class="stat">
-          <strong>
-            ${totalOrders}
-          </strong>
-
-          <span>
-            Pedidos
-          </span>
-        </div>
-
-        <div class="stat">
-          <strong>
-            ${pendingOrders}
-          </strong>
-
-          <span>
-            Pendentes
           </span>
         </div>
 
@@ -2183,14 +2143,7 @@
             </p>
           </div>
 
-          <button
-            type="button"
-            class="btn soft"
-            data-action="go-view"
-            data-view="ord-ready"
-          >
-            Ver pedidos
-          </button>
+          
 
         </div>
 
