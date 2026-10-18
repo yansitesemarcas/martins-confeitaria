@@ -351,7 +351,7 @@
   personalizations:Array.isArray(v.personalizations) ? v.personalizations : x.personalizations,
   otherItems:Array.isArray(v.otherItems)&&v.otherItems.length ? v.otherItems : x.otherItems,
   kits:(Array.isArray(v.kits)&&v.kits.length>=10) ? v.kits : x.kits,
-  brigadeiros:{...x.brigadeiros,...(v.brigadeiros || {})}
+  brigadeiros:{...x.brigadeiros,...(v.brigadeiros || {}),premiumPrices:[72.5,145]}
 };
     };
 
